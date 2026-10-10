@@ -1,5 +1,8 @@
 import { migrateEvidence } from './evidence'
 import type { Audit, AuditSummary, PageRecord } from './types'
+import { AuditFormatError, CURRENT_VERSION, MAX_IMPORT_BYTES, isRecord, readVersion, validateAudit } from './audit-validate'
+
+export { AuditFormatError } from './audit-validate'
 
 const LEGACY_KEY = 'rgaa-audit'
 const INDEX_KEY = 'rgaa-index'
@@ -88,31 +91,88 @@ async function remove(keys: string[]): Promise<void> {
   for (const k of keys) localStorage.removeItem(k)
 }
 
-/** Fills what older versions of an audit did not have. */
-export function migrate(audit: Audit): Audit {
-  const a = audit as Audit & { version: number }
+/* ------------------------------------------------------------------ */
+/* Versions: explicit migrations, then a full validation                */
+/* ------------------------------------------------------------------ */
+
+type Rec = Record<string, unknown>
+const missing = (v: unknown): boolean => v === undefined || v === null
+const fill = (o: Rec, key: string, value: unknown): void => {
+  if (missing(o[key])) o[key] = value
+}
+
+/** v2 -> v3: audits saved before they had an id, a name, dates and page identifiers. */
+function v2ToV3(a: Rec): void {
   const now = Date.now()
-  a.version = 3
-  a.id ||= newId()
-  a.name ??= ''
-  a.createdAt ||= now
-  a.updatedAt ||= Math.max(0, ...audit.pages.map((p) => p.updatedAt || 0)) || now
-  a.meta ??= { site: '', auditor: '', context: 'Visite initiale' }
-  a.pages ??= []
-  for (const p of a.pages) {
-    // an early bug saved the text "undefined" as the URL / title of a page
-    if (!/^[a-z][a-z0-9+.-]*:/i.test(p.url ?? '')) p.url = ''
-    if (p.title === 'undefined') p.title = ''
-    p.themes ??= [1]
-    p.checklist ??= {}
-    p.findings ??= []
-    p.findingReviews ??= {}
-    p.scannedThemes ??= p.scanCount ? [1] : []
-    p.nextFindingId ??= 1
-    p.nextFindingIds ??= {}
-    migrateEvidence(p) // tool-prefilled verdicts become suggestions (src/lib/evidence.ts)
+  fill(a, 'id', newId())
+  fill(a, 'name', '')
+  fill(a, 'meta', { site: '', auditor: '', context: 'Visite initiale' })
+  const pages = (a.pages as unknown[]).filter(isRecord)
+  const times = pages.map((p) => (typeof p.updatedAt === 'number' ? p.updatedAt : 0)).filter(Boolean)
+  if (!a.createdAt) a.createdAt = times.length ? Math.min(...times) : now
+  if (!a.updatedAt) a.updatedAt = times.length ? Math.max(...times) : now
+  const used = new Set(pages.map((p) => p.id).filter((id) => typeof id === 'string'))
+  let n = 1
+  for (const p of pages) {
+    if (typeof p.id === 'string' && p.id) continue
+    while (used.has(`P${String(n).padStart(2, '0')}`)) n++
+    p.id = `P${String(n).padStart(2, '0')}`
+    used.add(p.id as string)
   }
-  return a
+  fill(a, 'current', null)
+}
+
+/** One entry per version that can still be read: it brings an audit of that version to the next one. */
+const MIGRATIONS: Record<number, (a: Rec) => void> = { 2: v2ToV3 }
+
+/**
+ * Brings a raw audit up to the current version, in place. The version is checked first (a newer or unknown version
+ * throws unsupported-version instead of being relabelled), then the explicit migrations run, then the fields
+ * added later within v3 are filled. It tolerates malformed input (validateAudit reports it afterwards).
+ */
+export function migrate(audit: Audit): Audit {
+  const a = audit as unknown as Rec
+  for (let v = readVersion(a); v < CURRENT_VERSION; v++) MIGRATIONS[v](a)
+  a.version = CURRENT_VERSION
+  const now = Date.now()
+  const pages = a.pages as unknown[]
+  fill(a, 'id', newId())
+  fill(a, 'name', '')
+  if (!a.createdAt) a.createdAt = now
+  if (!a.updatedAt) a.updatedAt = Math.max(0, ...pages.filter(isRecord).map((p) => (typeof p.updatedAt === 'number' ? p.updatedAt : 0))) || now
+  fill(a, 'meta', { site: '', auditor: '', context: 'Visite initiale' })
+  for (const p of pages) {
+    if (!isRecord(p)) continue
+    // an early bug saved the text "undefined" as the URL / title of a page
+    if (typeof p.url !== 'string' || !/^[a-z][a-z0-9+.-]*:/i.test(p.url)) p.url = ''
+    if (p.title === 'undefined') p.title = ''
+    fill(p, 'title', '')
+    fill(p, 'scanCount', 0)
+    fill(p, 'items', [])
+    fill(p, 'reviews', {})
+    fill(p, 'updatedAt', a.updatedAt)
+    if (missing(p.nextId)) p.nextId = Array.isArray(p.items) ? Math.max(0, ...p.items.map((i) => (isRecord(i) && typeof i.id === 'number' ? i.id : 0))) + 1 : 1
+    fill(p, 'themes', [1])
+    fill(p, 'checklist', {})
+    fill(p, 'findings', [])
+    fill(p, 'findingReviews', {})
+    fill(p, 'scannedThemes', p.scanCount ? [1] : [])
+    fill(p, 'nextFindingId', 1)
+    fill(p, 'nextFindingIds', {})
+    // tool-prefilled checklist verdicts become suggestions (src/lib/evidence.ts); a malformed checklist is left to the validator
+    if (isRecord(p.checklist)) migrateEvidence(p as unknown as Pick<PageRecord, 'checklist'>)
+  }
+  if (typeof a.current === 'string' && !pages.some((p) => isRecord(p) && p.id === a.current)) a.current = null
+  fill(a, 'current', null)
+  return a as unknown as Audit
+}
+
+/** Migrates then validates the whole structure. Throws an AuditFormatError; never returns a half-valid audit. */
+export function parseAudit(raw: unknown): Audit {
+  readVersion(raw)
+  const audit = migrate(raw as Audit)
+  validateAudit(audit)
+  return audit
 }
 
 const summaryOf = (a: Audit): AuditSummary => ({
@@ -125,12 +185,15 @@ const summaryOf = (a: Audit): AuditSummary => ({
   exportedAt: a.exportedAt,
 })
 
+const isSummary = (v: unknown): v is AuditSummary =>
+  isRecord(v) && typeof v.id === 'string' && typeof v.name === 'string' && typeof v.updatedAt === 'number' && typeof v.pages === 'number'
+
+/** The list of audits. Throws when the storage cannot be read or the index is corrupt (it is never guessed as empty). */
 export async function listAudits(): Promise<AuditSummary[]> {
-  try {
-    return (await read<AuditSummary[]>(INDEX_KEY)) ?? []
-  } catch {
-    return []
-  }
+  const index = await read<unknown>(INDEX_KEY)
+  if (index === undefined) return []
+  if (!Array.isArray(index)) throw new AuditFormatError('storage-corrupt', INDEX_KEY, 'the list of audits is not a list')
+  return index.filter(isSummary)
 }
 
 /** Large inline previews (svg / canvas data URLs) are dropped to keep the stored audit small. */
@@ -144,60 +207,98 @@ function compact(audit: Audit): Audit {
   }
 }
 
-/** Saves the audit and its line in the list. Throws when the storage refuses. */
+/**
+ * Saves the audit and its line in the list. Throws when the storage refuses.
+ * UNSERIALIZED read-modify-write of the index: only the persistence authority (src/lib/persistence.ts, run by the
+ * background page) may call it, one task at a time.
+ */
 export async function saveAudit(audit: Audit): Promise<void> {
   const index = (await listAudits()).filter((s) => s.id !== audit.id)
   index.push(summaryOf(audit))
   await write({ [auditKey(audit.id)]: compact(audit), [INDEX_KEY]: index })
 }
 
-export async function loadAuditById(id: string): Promise<Audit | null> {
+/** Found, genuinely absent, or failed (storage error / corrupt data): a failure is never the same as absent. */
+export type LoadResult = { status: 'found'; audit: Audit } | { status: 'absent' } | { status: 'failed'; error: Error }
+
+const asError = (err: unknown): Error => (err instanceof Error ? err : new Error(String(err)))
+const asCorrupt = (err: unknown, key: string): Error =>
+  err instanceof AuditFormatError ? new AuditFormatError('storage-corrupt', err.path || key, err.code + (err.detail ? ` ${err.detail}` : '')) : asError(err)
+
+export async function loadAuditById(id: string): Promise<LoadResult> {
+  let stored: unknown
   try {
-    const stored = await read<Audit>(auditKey(id))
-    return stored ? migrate(stored) : null
-  } catch {
-    return null
+    stored = await read<unknown>(auditKey(id))
+  } catch (error) {
+    return { status: 'failed', error: asError(error) }
+  }
+  if (stored === undefined || stored === null) return { status: 'absent' }
+  try {
+    return { status: 'found', audit: parseAudit(stored) }
+  } catch (error) {
+    return { status: 'failed', error: asCorrupt(error, auditKey(id)) }
   }
 }
 
-export const getActiveId = async (): Promise<string | null> => (await read<string>(ACTIVE_KEY).catch(() => undefined)) ?? null
+/** Throws when the storage cannot be read. */
+export const getActiveId = async (): Promise<string | null> => (await read<string>(ACTIVE_KEY)) ?? null
 export const setActiveId = (id: string): Promise<void> => write({ [ACTIVE_KEY]: id })
 
+export type ActiveLoad = { status: 'found'; audit: Audit; created: boolean; saved: boolean } | { status: 'failed'; error: Error }
+
 /**
- * The audit to open at start: the last one used, else the audit saved by the first versions (which had a single
- * unnamed audit), else a new empty one called `defaultName`.
+ * The audit to open at start: the last one used, else the most recent one of the list, else the audit saved by the
+ * first versions (a single unnamed audit), else a new empty one called `defaultName`. Any read or validation failure
+ * on the way returns 'failed': a fresh audit is created only when the storage is readable and really has nothing,
+ * so an unreadable audit is never replaced by an empty one. `persist` is the (serialized) writer.
  */
-export async function loadActiveAudit(defaultName: string): Promise<Audit> {
+export async function loadActiveAudit(defaultName: string, persist: (audit: Audit) => Promise<void> = saveAudit): Promise<ActiveLoad> {
   try {
     const activeId = await getActiveId()
-    const active = activeId ? await loadAuditById(activeId) : null
-    if (active) return active
-    const index = await listAudits()
-    const latest = [...index].sort((a, b) => b.updatedAt - a.updatedAt)[0]
-    const fromIndex = latest ? await loadAuditById(latest.id) : null
-    if (fromIndex) return fromIndex
-    const legacy = await read<Audit>(LEGACY_KEY)
-    if (legacy && Array.isArray(legacy.pages)) {
-      const migrated = migrate(legacy)
+    if (activeId) {
+      const active = await loadAuditById(activeId)
+      if (active.status === 'found') return { status: 'found', audit: active.audit, created: false, saved: true }
+      if (active.status === 'failed') return active
+    }
+    const latest = [...(await listAudits())].sort((a, b) => b.updatedAt - a.updatedAt)[0]
+    if (latest) {
+      const fromIndex = await loadAuditById(latest.id)
+      if (fromIndex.status === 'found') return { status: 'found', audit: fromIndex.audit, created: false, saved: true }
+      if (fromIndex.status === 'failed') return fromIndex
+    }
+    const legacy = await read<unknown>(LEGACY_KEY)
+    if (legacy !== undefined && legacy !== null) {
+      let migrated: Audit
+      try {
+        migrated = parseAudit(legacy)
+      } catch (error) {
+        return { status: 'failed', error: asCorrupt(error, LEGACY_KEY) }
+      }
       migrated.name ||= defaultName
-      await saveAudit(migrated)
+      await persist(migrated)
       await setActiveId(migrated.id)
       await remove([LEGACY_KEY])
-      return migrated
+      return { status: 'found', audit: migrated, created: false, saved: true }
     }
-  } catch {
-    /* fall through to a fresh audit */
+  } catch (error) {
+    return { status: 'failed', error: asError(error) }
   }
   const fresh = emptyAudit(defaultName)
-  await saveAudit(fresh).catch(() => undefined)
-  await setActiveId(fresh.id).catch(() => undefined)
-  return fresh
+  let saved = true
+  try {
+    await persist(fresh)
+    await setActiveId(fresh.id)
+  } catch {
+    saved = false
+  }
+  return { status: 'found', audit: fresh, created: true, saved }
 }
 
+/** UNSERIALIZED, like saveAudit: called by the persistence authority only. */
 export async function deleteAuditById(id: string): Promise<void> {
   const index = (await listAudits()).filter((s) => s.id !== id)
-  await remove([auditKey(id)])
   await write({ [INDEX_KEY]: index })
+  await remove([auditKey(id)])
 }
 
 /** A copy with its own identifier, so both live side by side. */
@@ -220,15 +321,25 @@ export function auditToFile(audit: Audit): string {
   return JSON.stringify({ format: FILE_FORMAT, version: 3, exportedAt: Date.now(), audit }, null, 1)
 }
 
-/** Reads an audit file; throws an Error with a short reason when it is not one of ours. */
+/** Rejects a file that is too big before it is read at all (File.size). */
+export function checkImportSize(bytes: number): void {
+  if (bytes > MAX_IMPORT_BYTES) throw new AuditFormatError('too-large', '', `${bytes} bytes`)
+}
+
+/**
+ * Reads an audit file as unknown data and validates it completely. Throws an AuditFormatError (not-json, not-audit,
+ * unsupported-version, too-large, invalid) and never returns something half valid.
+ */
 export function auditFromFile(text: string): Audit {
+  checkImportSize(text.length)
   let data: unknown
   try {
     data = JSON.parse(text)
   } catch {
-    throw new Error('not-json')
+    throw new AuditFormatError('not-json')
   }
-  const file = data as { format?: string; audit?: Audit }
-  if (file?.format !== FILE_FORMAT || !file.audit || !Array.isArray(file.audit.pages)) throw new Error('not-audit')
-  return migrate(file.audit)
+  if (!isRecord(data) || data.format !== FILE_FORMAT || !isRecord(data.audit)) throw new AuditFormatError('not-audit')
+  // the version of the file itself, then the one of the audit (parseAudit)
+  if (data.version !== undefined && (typeof data.version !== 'number' || data.version > CURRENT_VERSION || data.version < 2)) throw new AuditFormatError('unsupported-version', 'version', String(data.version))
+  return parseAudit(data.audit)
 }

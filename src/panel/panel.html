@@ -12,6 +12,7 @@
       <span class="auditbar-sep" aria-hidden="true">›</span>
       <button id="audit-name-btn" type="button" class="audit-name" title="Rename this audit" data-i18n-attrs="title"></button>
       <span id="save-state" class="pill" role="status" aria-live="polite"></span>
+      <button id="save-retry-btn" type="button" class="pill error-retry" hidden></button>
       <span id="backup-state" class="pill muted"></span>
       <span class="spacer"></span>
       <button id="audits-btn" type="button" aria-pressed="false" data-i18n>Audits</button>
@@ -119,6 +120,14 @@
           <button id="confirm-cancel" type="button" autofocus data-i18n>Cancel</button>
           <button id="confirm-ok" type="button" class="danger-solid">Confirm</button>
         </div>
+      </form>
+    </dialog>
+
+    <dialog id="choice-dialog" class="confirm" aria-labelledby="choice-title">
+      <form method="dialog">
+        <h2 id="choice-title"></h2>
+        <p id="choice-text"></p>
+        <div class="confirm-actions" id="choice-actions"></div>
       </form>
     </dialog>
 
