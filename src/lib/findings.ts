@@ -25,6 +25,20 @@ export const FINDING_CRITERIA: Record<number, FindingCriterion[]> = {
       checks: ['The title says what the frame contains or what it is for (test 2.2.1).', 'Not “iframe”, a file name or a URL.'],
     },
   ],
+  6: [
+    {
+      id: '6.1',
+      level: 'A',
+      question: 'Is this link explicit: does its text (or its context) say where it goes or what it does?',
+      checks: ['The link text, read alone or with its sentence, list item, cell or heading, tells the destination or the action (test 6.1.1).', 'Not “click here”, “read more”, “more” or a bare URL, unless the context makes it clear.'],
+    },
+    {
+      id: '6.2',
+      level: 'A',
+      question: 'Does this link have a name (an accessible label)?',
+      checks: ['The link has text, or an image with an alt, or an aria-label / aria-labelledby, or a title that gives it a name (test 6.2.1).', 'An empty link, or an icon without a name, is non-compliant.'],
+    },
+  ],
   3: [
     {
       id: '3.2',
@@ -62,6 +76,14 @@ export function hintForFinding(f: FindingItem, criterionId: string): Hint | null
       if (f.type === 'contrast-unknown') return { tone: 'info', text: t('The background is an image, a gradient, a translucent layer or something placed over the text: a script cannot compute the ratio. Check it by eye or with a colour picker.') }
       return { tone: 'warn', text: t('Ratio {ratio} is below the required {required}. Check the exceptions (disabled, decorative, logo) before confirming.', { ratio: f.facts.Ratio ?? '', required: f.facts.Required ?? '' }) }
     }
+    case '6.1': {
+      if (f.type === 'link-empty') return { tone: 'warn', text: t('No name: 6.2 fails first.') }
+      if (f.type === 'link-generic') return { tone: 'warn', text: t('“{text}” says nothing about the destination alone: check that its context (sentence, heading, aria-describedby) makes it explicit.', { text: f.facts.Text ?? '' }) }
+      return { tone: 'info', text: t('Read the link text with its context: does it say where it goes or what it does?') }
+    }
+    case '6.2':
+      if (f.type === 'link-empty') return { tone: 'warn', text: t('This link has no accessible name: no text, alt, aria-label, aria-labelledby or title.') }
+      return { tone: 'ok', text: t('Name found: “{name}”.', { name: f.facts['Accessible name'] ?? '' }) }
     default:
       return null
   }
@@ -73,9 +95,12 @@ export function suggestFinding(f: FindingItem): Record<string, Verdict> {
     const ok = f.facts.title !== null && f.facts.title.trim() !== ''
     return { '2.1': ok ? 'c' : 'nc' }
   }
+  if (f.type === 'link-empty') return { '6.2': 'nc' }
+  if (f.type === 'link-generic') return { '6.2': 'c' }
+  if (f.type === 'link') return { '6.1': 'c', '6.2': 'c' }
   if (f.type === 'contrast-ok') return { '3.2': 'c' }
   if (f.type === 'contrast-fail') return { '3.2': 'nc' }
   return {}
 }
 
-export const findingIcon = (f: FindingItem): string => (f.type === 'iframe' || f.type === 'frame' ? f.type : f.type.replace('contrast-', ''))
+export const findingIcon = (f: FindingItem): string => (f.type === 'iframe' || f.type === 'frame' ? f.type : f.type.replace('contrast-', '').replace('link-', ''))

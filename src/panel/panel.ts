@@ -151,8 +151,8 @@ async function applyBoxes(): Promise<void> {
 async function syncFilterBoxes(): Promise<void> {
   let ids: number[] | null = null
   if (theme === 1 && filter !== 'all') ids = visibleElements().map((e) => e.id)
-  if ((theme === 2 || theme === 3) && findingFilter !== 'all' && page) ids = page.findings.filter((f) => f.theme === theme && findingMatches(f, findingFilter)).map((f) => f.id)
-  if (theme !== 1 && theme !== 2 && theme !== 3) return
+  if (FINDING_THEMES.has(theme) && findingFilter !== 'all' && page) ids = page.findings.filter((f) => f.theme === theme && findingMatches(f, findingFilter)).map((f) => f.id)
+  if (theme !== 1 && !FINDING_THEMES.has(theme)) return
   await sendToPage(inspectedTabId(), { type: 'RGAA_SHOW_ONLY', theme, ids }).catch(() => undefined)
 }
 
@@ -201,6 +201,7 @@ function tDyn(text: string): string {
     [/^(.+) — cannot be computed$/, (m) => t('{what} — cannot be computed', { what: tDyn(m[1]) })],
     [/^(\d+)px( bold)?$/, (m) => `${m[1]} px${m[2] ? ` ${t('bold')}` : ''}`],
     [/^<(\w+)> without title$/, (m) => t('<{tag}> without title', { tag: m[1] })],
+    [/^<(\w+)> without name$/, (m) => t('<{tag}> without name', { tag: m[1] })],
   ]
   for (const [re, fn] of rules) {
     const m = re.exec(text)
@@ -696,7 +697,7 @@ function boxStates(themeNo: number): Record<number, string> {
     if (f.theme !== themeNo || f.type === 'contrast-ok') continue
     const pending = findingNeedsReview(f)
     const status = findingStatus(f)
-    const failing = f.type === 'contrast-fail' || (themeNo === 2 && !f.facts.title?.trim())
+    const failing = f.type === 'contrast-fail' || f.type === 'link-empty' || (themeNo === 2 && !f.facts.title?.trim())
     out[f.id] = !pending ? (status === 'nc' ? 'nc' : 'c') : failing ? 'error' : 'review'
   }
   return out
@@ -1545,7 +1546,9 @@ function updateTools(): void {
 }
 
 function keyOfFinding(theme: number, f: RawFinding): string {
-  return theme === 2 ? `2|${f.type}|${f.facts.src ?? ''}|${hash(f.contextHtml)}` : `3|${f.type}|${f.label}|${f.facts['Font size'] ?? ''}`
+  if (theme === 2) return `2|${f.type}|${f.facts.src ?? ''}|${hash(f.contextHtml)}`
+  if (theme === 3) return `3|${f.type}|${f.label}|${f.facts['Font size'] ?? ''}`
+  return `${theme}|${f.type}|${f.label}|${f.summary}|${hash(f.html)}`
 }
 
 /** Merges the scan of one theme into the current page; returns the renumbering for the boxes. */
@@ -1705,7 +1708,7 @@ async function captureShots(list: FindingItem[]): Promise<number> {
 /** What the list shows: every finding, except the unnumbered “text that passes” line of Colours. */
 const listedFindings = (themeNo: number): FindingItem[] => (page?.findings ?? []).filter((f) => f.theme === themeNo && f.type !== 'contrast-ok')
 
-type FindingFilter = 'all' | 'review' | 'contrast-fail' | 'contrast-unknown'
+type FindingFilter = 'all' | 'review' | 'contrast-fail' | 'contrast-unknown' | 'link-empty' | 'link-generic'
 let findingFilter: FindingFilter = 'all'
 
 /**
@@ -1718,6 +1721,8 @@ function findingNeedsReview(f: FindingItem): boolean {
     if (f.type !== 'contrast-fail' && f.type !== 'contrast-unknown') return false
     return !(r && r.answers['3.2'] !== undefined && !r.auto)
   }
+  // a link with a usable name is pre-filled compliant and does not ask for attention; empty or generic ones do
+  if (f.theme === 6 && f.type === 'link') return false
   const ids = (FINDING_CRITERIA[f.theme] ?? []).map((c) => c.id)
   return ids.some((c) => r?.answers[c] === undefined) || Boolean(r?.auto)
 }
@@ -1763,7 +1768,7 @@ function renderFindingsView(): void {
         'div',
         {},
         h('h2', {}, `${def.number}. ${def.name}`),
-        h('p', { class: 'hint-line' }, theme === 2 ? t('Every iframe / frame of the page, with its title.') : t('Only the texts that fail or that a script cannot judge are numbered and boxed on the page. Criteria 3.1 and 3.3 need your eyes (below).')),
+        h('p', { class: 'hint-line' }, theme === 2 ? t('Every iframe / frame of the page, with its title.') : theme === 6 ? t('Every link of the page (identical links are grouped), with its name and destination. Links with no name or a generic text are boxed on the page.') : t('Only the texts that fail or that a script cannot judge are numbered and boxed on the page. Criteria 3.1 and 3.3 need your eyes (below).')),
         h('div', { class: 'theme-summary', 'data-theme': String(theme), 'aria-label': t('Totals') }),
       ),
       h('div', { class: 'nav' }, toolsEl),
@@ -1772,12 +1777,14 @@ function renderFindingsView(): void {
   if (!scanned) {
     themeEl.append(h('p', { class: 'hint-line' }, t('Not scanned yet. Open {url} in the browser and click “Scan {label}”.', { url: rec.url, label })))
   } else if (!list.length) {
-    themeEl.append(h('p', { class: 'hint-line' }, theme === 3 && passing ? t('No text with a contrast problem found: {summary}.', { summary: tDyn(passing.summary) }) : theme === 2 ? t('No frames found on the page at the last scan: criteria are not applicable.') : t('No text colours found on the page at the last scan: criteria are not applicable.')))
+    themeEl.append(h('p', { class: 'hint-line' }, theme === 3 && passing ? t('No text with a contrast problem found: {summary}.', { summary: tDyn(passing.summary) }) : theme === 2 ? t('No frames found on the page at the last scan: criteria are not applicable.') : theme === 6 ? t('No links found on the page at the last scan: criteria are not applicable.') : t('No text colours found on the page at the last scan: criteria are not applicable.')))
   } else {
     const options: [FindingFilter, string][] =
       theme === 3
         ? [['all', 'All'], ['review', 'To review'], ['contrast-fail', 'Fail'], ['contrast-unknown', 'Check by eye']]
-        : [['all', 'All'], ['review', 'To review']]
+        : theme === 6
+          ? [['all', 'All'], ['review', 'To review'], ['link-empty', 'No name'], ['link-generic', 'Generic text']]
+          : [['all', 'All'], ['review', 'To review']]
     if (!options.some(([v]) => v === findingFilter)) findingFilter = 'all'
     const shown = list.filter((f) => findingMatches(f, findingFilter))
     if (!shown.some((f) => f.id === findingSel)) findingSel = shown[0]?.id ?? null
@@ -2646,7 +2653,7 @@ async function scan(): Promise<void> {
       const { map, added } = mergeFindings(tn, response?.findings ?? [])
       await sendToPage(inspectedTabId(), { type: 'RGAA_RELABEL', map, theme: tn })
       const n = rec.findings.filter((f) => f.theme === tn).length
-      parts.push(tn === 2 ? t('{n} frame(s)', { n }) : `${t('{n} contrast finding(s)', { n: listedFindings(tn).length })}${added ? ` (${t('{n} new', { n: added })})` : ''}`)
+      parts.push(tn === 2 ? t('{n} frame(s)', { n }) : tn === 6 ? t('{n} link(s)', { n }) : `${t('{n} contrast finding(s)', { n: listedFindings(tn).length })}${added ? ` (${t('{n} new', { n: added })})` : ''}`)
     }
     const missing = rec.findings.filter((f) => f.present && !f.shot && f.type !== 'contrast-ok' && rec.themes.includes(f.theme)).slice(0, 80)
     const shots = await captureShots(missing)

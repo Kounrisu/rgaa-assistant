@@ -437,11 +437,11 @@ export function manualSheet(pages: PageInput[]): Sheet {
 
 export function findingsSheet(pages: PageInput[]): Sheet {
   const rows: CellInput[][] = [
-    title('Détail des éléments – cadres et couleurs'),
+    title('Détail des éléments – cadres, couleurs et liens'),
     [],
     head(['Page', 'Thème', 'N°', 'Aperçu', 'Type', 'Constat', 'Détails', 'Critère', 'Statut', 'Remarque']),
   ]
-  const criteriaOf = (f: FindingItem) => (f.theme === 2 ? ['2.1', '2.2'] : ['3.2'])
+  const criteriaOf = (f: FindingItem) => (f.theme === 2 ? ['2.1', '2.2'] : f.theme === 6 ? ['6.1', '6.2'] : ['3.2'])
   pages.forEach((page, pageIndex) => {
     for (const f of page.findings) {
       const review = page.findingReviews[f.key]
