@@ -79,4 +79,8 @@ export const FR_UX: Record<string, string> = {
   'Download the report (HTML)': 'Télécharger le rapport (HTML)',
   'Add a page to the audit first.': 'Ajoutez d’abord une page à l’audit.',
   'Report downloaded. Open it in a browser and print it to PDF if you need one.': 'Rapport téléchargé. Ouvrez-le dans un navigateur et imprimez-le en PDF si besoin.',
+  'Next to review': 'Prochain à relire',
+  'Go to the next element or criterion that still needs your answer, in any theme (shortcut: n)': 'Aller au prochain élément ou critère qui attend encore votre réponse, dans n’importe quelle thématique (raccourci : n)',
+  '{done}/{total} criteria answered': '{done}/{total} critères renseignés',
+  'Progress of {label}': 'Avancement de {label}',
 }
