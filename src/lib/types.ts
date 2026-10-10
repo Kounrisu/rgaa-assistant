@@ -68,9 +68,15 @@ export interface AuditItem extends ImageElementInfo {
 export type ChecklistVerdict = 'c' | 'nc' | 'na'
 /** The answer for one criterion of a checklist theme (every theme except Images). */
 export interface ChecklistAnswer {
+  /** The auditor's own answer. Only a human sets or clears it: automatic runs never write here. */
   verdict?: ChecklistVerdict
   note: string
-  /** Name of the tool that pre-filled the verdict (axe…); cleared when the auditor answers. */
+  /**
+   * What the automatic checks suggest (pre-filled, "to confirm"). Not a verdict: it is shown on the card and one
+   * click turns it into `verdict`. Refreshed by each run while `verdict` is unset; ignored once the auditor answers.
+   */
+  suggested?: ChecklistVerdict
+  /** Name of the tool behind `suggested` (axe…); cleared when the auditor answers. */
   source?: string
   /** What the automatic checks found for this criterion, by tool, at the last run. */
   autoResults?: Record<string, { result: 'pass' | 'fail'; rules: string[]; /** What was seen (e.g. the doctype found). */ details?: string[] }>
