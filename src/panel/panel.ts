@@ -12,6 +12,7 @@ import axeFrench from 'axe-core/locales/fr.json'
 import { applyToolResults, fromAxe, type ToolResults } from '../lib/axe-import'
 import { RULES, type RuleFinding } from '../lib/rgaa-rules'
 import { packSnapshot, unpackSnapshot } from '../lib/snapshot'
+import { initPageTools, renderPageTools, resetPageTools } from './page-tools-ui'
 import { checkHtml } from '../lib/html-check'
 // --- Asqatasun-derived: begin ---
 import type { AsqExtra } from '../lib/asqatasun-rules' // a type only: the table itself stays in the page script
@@ -1012,6 +1013,7 @@ function select(id: number, scroll: boolean): void {
 /* ------------------------------------------------------------------ */
 
 const pageSelect = $<HTMLSelectElement>('page-select')
+const pageToolsEl = $('page-tools')
 const liveUrlEl = $('live-url')
 const deletePageBtn = $<HTMLButtonElement>('delete-page-btn')
 const resetPageBtn = $<HTMLButtonElement>('reset-page-btn')
@@ -1077,6 +1079,7 @@ function renderPageBar(): void {
     )
   }
   pageSelect.disabled = !audit.pages.length
+  pageToolsEl.hidden = !page
   deletePageBtn.disabled = !page
   resetPageBtn.disabled = !page
   const onLive = Boolean(page && liveUrl && normalizeUrl(page.url) === normalizeUrl(liveUrl))
@@ -1716,7 +1719,7 @@ async function captureShots(list: FindingItem[]): Promise<number> {
 /** What the list shows: every finding, except the unnumbered “text that passes” line of Colours. */
 const listedFindings = (themeNo: number): FindingItem[] => (page?.findings ?? []).filter((f) => f.theme === themeNo && f.type !== 'contrast-ok')
 
-type FindingFilter = 'all' | 'field-nolabel' | 'field-placeholder' | 'table-nohead' | 'table-layout' | 'review' | 'contrast-fail' | 'contrast-unknown' | 'link-empty' | 'link-generic' | 'headings' | 'landmarks'
+type FindingFilter = 'all' | 'hidden' | 'link-skip' | 'field-nolabel' | 'field-placeholder' | 'table-nohead' | 'table-layout' | 'review' | 'contrast-fail' | 'contrast-unknown' | 'link-empty' | 'link-generic' | 'headings' | 'landmarks'
 let findingFilter: FindingFilter = 'all'
 
 /**
@@ -1730,7 +1733,7 @@ function findingNeedsReview(f: FindingItem): boolean {
     return !(r && r.answers['3.2'] !== undefined && !r.auto)
   }
   // a link with a usable name is pre-filled compliant and does not ask for attention; empty or generic ones do
-  if (f.theme === 6 && f.type === 'link') return false
+  if (f.theme === 6 && (f.type === 'link' || f.type === 'link-skip')) return false
   if (f.theme === 9 && (f.type === 'heading' || f.type === 'landmark')) return false
   if (f.theme === 11 && f.type === 'field') return false
   if (f.theme === 5 && (f.type === 'table-layout' || (f.type === 'table-data' && !f.facts.Title))) return false
@@ -1741,6 +1744,8 @@ function findingNeedsReview(f: FindingItem): boolean {
 function findingMatches(f: FindingItem, value: FindingFilter): boolean {
   if (value === 'all') return true
   if (value === 'review') return findingNeedsReview(f)
+  if (value === 'hidden') return Boolean(f.data.hidden)
+  if (value === 'link-skip') return f.type === 'link-skip' || f.type === 'link-skip-broken'
   if (value === 'headings') return f.data.group === 'heading'
   if (value === 'landmarks') return f.data.group === 'landmark'
   return f.type === value
@@ -1796,13 +1801,13 @@ function renderFindingsView(): void {
       theme === 3
         ? [['all', 'All'], ['review', 'To review'], ['contrast-fail', 'Fail'], ['contrast-unknown', 'Check by eye']]
         : theme === 6
-          ? [['all', 'All'], ['review', 'To review'], ['link-empty', 'No name'], ['link-generic', 'Generic text']]
+          ? [['all', 'All'], ['review', 'To review'], ['link-empty', 'No name'], ['link-generic', 'Generic text'], ['link-skip', 'Skip links'], ['hidden', 'Hidden content']]
           : theme === 9
-            ? [['all', 'All'], ['review', 'To review'], ['headings', 'Headings'], ['landmarks', 'Landmarks']]
+            ? [['all', 'All'], ['review', 'To review'], ['headings', 'Headings'], ['landmarks', 'Landmarks'], ['hidden', 'Hidden content']]
             : theme === 11
-              ? [['all', 'All'], ['review', 'To review'], ['field-nolabel', 'No label'], ['field-placeholder', 'Placeholder only']]
+              ? [['all', 'All'], ['review', 'To review'], ['field-nolabel', 'No label'], ['field-placeholder', 'Placeholder only'], ['hidden', 'Hidden content']]
               : theme === 5
-                ? [['all', 'All'], ['review', 'To review'], ['table-nohead', 'No header cell'], ['table-layout', 'Layout tables']]
+                ? [['all', 'All'], ['review', 'To review'], ['table-nohead', 'No header cell'], ['table-layout', 'Layout tables'], ['hidden', 'Hidden content']]
                 : [['all', 'All'], ['review', 'To review']]
     if (!options.some(([v]) => v === findingFilter)) findingFilter = 'all'
     const shown = list.filter((f) => findingMatches(f, findingFilter))
@@ -1845,7 +1850,7 @@ function renderFindingsView(): void {
             },
             f.shot ? h('img', { class: 'shot', src: f.shot, alt: '' }) : null,
             h('span', { class: 'num' }, `#${f.id}`),
-            h('span', { class: 'main' }, h('span', { class: `alt${bad ? ' missing' : ''}` }, tDyn(f.label), f.data.humanNeeded ? h('span', { class: 'type error' }, t('check by eye')) : null), h('span', { class: 'alt' }, tDyn(f.summary))),
+            h('span', { class: 'main' }, h('span', { class: `alt${bad ? ' missing' : ''}` }, tDyn(f.label), f.data.humanNeeded ? h('span', { class: 'type error' }, t('check by eye')) : null, f.data.hidden === 'visually-hidden' ? h('span', { class: 'type popin', title: t('Visually hidden: read by screen readers only') }, t('hidden')) : f.data.hidden === 'aria-hidden' ? h('span', { class: 'type popin', title: t('Hidden from assistive technologies (aria-hidden)') }, 'aria-hidden') : null, f.type === 'link-skip' || f.type === 'link-skip-broken' ? h('span', { class: 'type new' }, t('skip link')) : null), h('span', { class: 'alt' }, tDyn(f.summary))),
             h('span', { class: `dot ${st === 'todo' ? '' : st}`, role: 'img', 'aria-label': t(STATUS_LABEL[st]), title: t(STATUS_LABEL[st]) }),
           ),
         ),
@@ -2715,6 +2720,7 @@ chrome.devtools.network.onNavigated.addListener((url: string) => {
   liveUrl = url
   // The boxes are gone with the old document: what was seen is shown as last seen until the next scan.
   scannedThisSession.clear()
+  resetPageTools()
   for (const p of audit.pages) for (const el of p.items) el.present = true
   newBanner.hidden = true
   renderPageBar()
@@ -3330,6 +3336,7 @@ function applyLanguage(lang: Lang): void {
   translateStatic()
   renderAll()
   renderAuditBar()
+  renderPageTools()
   void applyBoxes()
 }
 
@@ -3351,6 +3358,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden && sav
 async function init(): Promise<void> {
   setLang(getLang())
   translateStatic()
+  initPageTools(pageToolsEl, { send: (payload) => sendToPage(inspectedTabId(), payload), say })
   audit = await loadActiveAudit(t('Untitled audit'))
   saveState = 'saved'
   savedAt = audit.updatedAt
