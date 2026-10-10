@@ -1056,8 +1056,39 @@ async function startPick(respond: (r: Record<string, unknown>) => void): Promise
   window.addEventListener('keydown', onPickKey, true)
 }
 
+/** Runs the axe engine (injected by the background page just before) and sends back a light copy of its findings. */
+async function runAxe(locale: unknown): Promise<Record<string, unknown>> {
+  const axe = (globalThis as unknown as { axe?: { run: (ctx: Document, opts: object) => Promise<Record<string, unknown>>; configure: (c: object) => void } }).axe
+  if (!axe) return { error: 'axe-not-loaded' }
+  try {
+    if (locale) axe.configure({ locale })
+    const r = (await axe.run(document, { resultTypes: ['violations', 'incomplete'] })) as {
+      violations: { id: string; impact: string | null; help: string; nodes: { html: string; target: unknown[]; any?: { data?: unknown }[] }[] }[]
+      incomplete: unknown[]
+      passes: unknown[]
+    }
+    return {
+      url: location.href,
+      violations: r.violations.map((v) => ({
+        id: v.id,
+        impact: v.impact,
+        help: v.help,
+        nodes: v.nodes.slice(0, 200).map((n) => ({ html: n.html.slice(0, 400), target: n.target.flat().map(String), any: n.any?.[0]?.data ? [{ data: n.any[0].data }] : [] })),
+      })),
+      incomplete: r.incomplete.length,
+      passes: r.passes?.length ?? 0,
+    }
+  } catch (err) {
+    return { error: String(err) }
+  }
+}
+
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (!isCurrent()) return undefined
+  if (message?.type === 'RGAA_AXE_RUN') {
+    void runAxe(message.locale).then(sendResponse)
+    return true
+  }
   if (message?.type === 'RGAA_PICK_START') {
     void startPick(sendResponse)
     return true

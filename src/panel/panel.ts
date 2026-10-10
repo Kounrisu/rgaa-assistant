@@ -8,7 +8,8 @@ import { computeThemes, testIdFor, type Outcome } from '../lib/results'
 import { colorOf } from '../lib/theme-colors'
 import { contrastRatio, parseHex, toHex } from '../lib/contrast'
 import { MANUAL_CHECKS, MANUAL_GROUPS } from '../lib/manual-checks'
-import { applyToolResults, parseToolFile } from '../lib/axe-import'
+import axeFrench from 'axe-core/locales/fr.json'
+import { applyToolResults, fromAxe } from '../lib/axe-import'
 import { FINDING_CRITERIA, findingCriterionIds, hintForFinding, suggestFinding, type FindingCriterion } from '../lib/findings'
 import { FINDING_THEMES, SCANNED_THEMES, THEMES, THEME_LABEL, themeByNumber } from '../lib/themes'
 import type { Audit, AuditItem, AuditSummary, ChecklistVerdict, Detected, FindingItem, ImageElementInfo, ImageKind, ImageReview, PageRecord, RawFinding, Verdict } from '../lib/types'
@@ -2684,7 +2685,7 @@ window.addEventListener('unhandledrejection', (event) => say(t('Panel error: {me
 
 const checksEl = $('checks')
 const checksBtn = $<HTMLButtonElement>('checks-btn')
-const toolInput = $<HTMLInputElement>('tool-file')
+let axeRunning = false
 
 function manualProgress(rec: PageRecord): { done: number; issues: number; total: number } {
   const answers = Object.values(rec.manualChecks ?? {})
@@ -2697,7 +2698,6 @@ function renderChecks(): void {
   const rec = page
   rec.manualChecks ??= {}
   const progress = manualProgress(rec)
-  const sample = '{\n  "tool": "Asqatasun",\n  "url": "https://example.org/page",\n  "results": [\n    { "criterion": "6.1", "status": "nc", "note": "Lien « en savoir plus » ambigu" },\n    { "criterion": "8.5", "status": "c" }\n  ]\n}'
   const body = h('div', { class: 'checks-body' })
 
   for (const group of MANUAL_GROUPS) {
@@ -2751,18 +2751,17 @@ function renderChecks(): void {
     h(
       'div',
       { class: 'card' },
-      h('h3', {}, t('Import the results of another tool')),
-      h('p', { class: 'hint-line' }, t('axe results (JSON) or a simple RGAA file. What the tool found becomes a pre-filled “non-compliant” to confirm; a tool that finds nothing never marks a criterion compliant.')),
-      h('div', { class: 'nav' }, h('button', { type: 'button', class: 'primary', onclick: () => toolInput.click() }, t('Import results (.json)'))),
-      h('details', {}, h('summary', {}, t('Accepted files')), h('p', { class: 'hint-line' }, t('axe: the JSON saved by axe DevTools (Export), or the object returned by axe.run(). Other tools (Asqatasun…): convert their result to this format, one line per criterion or test:')), h('pre', { class: 'code-sample' }, sample)),
+      h('h3', {}, t('Automatic checks')),
+      h('p', { class: 'hint-line' }, t('Runs the axe engine on the page you are inspecting and maps what it finds to RGAA criteria. A finding becomes a pre-filled “non-compliant” to confirm; finding nothing never marks a criterion compliant. It covers only part of the RGAA: the manual checks below are still needed.')),
+      h('div', { class: 'nav' }, h('button', { type: 'button', class: 'primary', disabled: axeRunning, onclick: () => void runAutoChecks() }, axeRunning ? t('Running the checks…') : t('Run the automatic checks'))),
     ),
     ...reports.map((r) =>
       h(
         'div',
         { class: 'card' },
-        h('h3', {}, t('Import {tool} — {date}', { tool: r.tool, date: dateTimeOf(r.at) })),
+        h('h3', {}, t('Automatic checks ({tool}) — {date}', { tool: r.tool, date: dateTimeOf(r.at) })),
         h('p', { class: 'hint-line' }, t('{set} verdict(s) pre-filled, {noted} element note(s). {passes} passed rule(s) ignored, {incomplete} to check by hand.', { set: r.set, noted: r.noted, passes: r.passes, incomplete: r.incomplete })),
-        ...(r.conflicts.length ? [h('p', { class: 'hint warn' }, t('The tool disagrees with your answer:')), h('ul', { class: 'checks' }, ...r.conflicts.map((x) => h('li', {}, x)))] : []),
+        ...(r.conflicts.length ? [h('p', { class: 'hint warn' }, t('The scan disagrees with your answer:')), h('ul', { class: 'checks' }, ...r.conflicts.map((x) => h('li', {}, x)))] : []),
         ...(r.unmatched.length ? [h('details', {}, h('summary', {}, t('{n} finding(s) not matched to a scanned element', { n: r.unmatched.length })), h('ul', { class: 'checks' }, ...r.unmatched.slice(0, 60).map((x) => h('li', {}, x))))] : []),
         ...(r.unmapped.length ? [h('details', {}, h('summary', {}, t('{n} rule(s) with no RGAA criterion in this tool', { n: r.unmapped.length })), h('p', { class: 'hint-line' }, r.unmapped.slice(0, 80).join(' · ')))] : []),
       ),
@@ -2771,32 +2770,34 @@ function renderChecks(): void {
   )
 }
 
-async function importToolFile(file: File): Promise<void> {
-  if (!page) return void say(t('Add a page first, then import its results.'))
-  let results
-  try {
-    results = parseToolFile(await file.text())
-  } catch (err) {
-    return void say((err as Error).message === 'not-json' ? t('This file is not valid JSON.') : t('This file is not axe results nor the simple RGAA format.'))
-  }
+async function runAutoChecks(): Promise<void> {
+  if (!page || axeRunning) return
   const rec = page
-  if (results.url && normalizeUrl(results.url) !== normalizeUrl(rec.url)) {
-    const ok = await askConfirm(t('These results are for another page'), t('The file says {url}, but {label} is registered for {registered}. Apply them to {label} anyway?', { url: results.url, label: pageLabel(rec), registered: rec.url }), t('Apply anyway'))
-    if (!ok) return void say(t('Import cancelled.'))
+  axeRunning = true
+  keepScroll(checksEl, renderChecks)
+  say(t('Running the automatic checks on the page…'))
+  try {
+    const response = await chrome.runtime.sendMessage({ type: 'RGAA_AXE', tabId: inspectedTabId(), locale: getLang() === 'fr' ? axeFrench : null })
+    if (!response || response.error) throw new Error(response?.error ?? 'no response')
+    const results = fromAxe(response)
+    if (results.url && rec.url && normalizeUrl(results.url) !== normalizeUrl(rec.url)) {
+      const ok = await askConfirm(t('The browser is on another page'), t('The browser is on {url}, but {label} is registered for {registered}. Apply them to {label} anyway?', { url: results.url, label: pageLabel(rec), registered: rec.url }), t('Apply anyway'))
+      if (!ok) return void say(t('Scan cancelled.'))
+    }
+    const report = applyToolResults(rec, results)
+    persist()
+    renderAll()
+    say(t('Automatic checks on {label}: {n} rule(s) failed, {set} verdict(s) pre-filled, {noted} element note(s). Confirm them in the themes.', { label: pageLabel(rec), n: results.violations.length, set: report.set, noted: report.noted }))
+  } catch (err) {
+    say(t('Could not run the automatic checks. Reload the tab, check the extension may access this site, and try again.'))
+    console.error(err)
+  } finally {
+    axeRunning = false
+    if (view === 'checks') keepScroll(checksEl, renderChecks)
   }
-  const report = applyToolResults(rec, results)
-  persist()
-  renderAll()
-  setView('checks')
-  say(t('{tool} results imported on {label}: {set} verdict(s) pre-filled, {noted} element note(s). Confirm them in the themes.', { tool: report.tool, label: pageLabel(rec), set: report.set, noted: report.noted }))
 }
 
 checksBtn.addEventListener('click', () => setView(view === 'checks' ? 'review' : 'checks'))
-toolInput.addEventListener('change', () => {
-  const file = toolInput.files?.[0]
-  toolInput.value = ''
-  if (file) void importToolFile(file)
-})
 
 /* ------------------------------------------------------------------ */
 /* Audits: name, saved state, list of audits, file save / reopen         */

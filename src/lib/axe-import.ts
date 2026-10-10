@@ -1,9 +1,8 @@
-import { THEMES } from './themes'
 import type { ChecklistVerdict, ImportReport, PageRecord } from './types'
 
 /**
- * Results of another tool (axe, Asqatasun…) turned into pre-filled answers.
- * A tool finding only ever sets "non-compliant, to confirm": a tool that finds nothing does not prove a criterion
+ * Results of the automatic scan (the axe engine run on the page) turned into pre-filled answers.
+ * A finding only ever sets "non-compliant, to confirm": a scan that finds nothing does not prove a criterion
  * is met, so passes are never turned into "compliant".
  */
 
@@ -24,7 +23,6 @@ export interface ToolResults {
   tool: string
   url: string
   violations: ToolViolation[]
-  /** Criterion-level answers of tools that work on the RGAA directly. */
   answers: { criterion: string; status: ChecklistVerdict; note: string }[]
   incomplete: number
   passes: number
@@ -52,51 +50,22 @@ export const AXE_TO_RGAA: Record<string, string> = {
 }
 
 const themeOfCriterion = (criterion: string): number => Number(criterion.split('.')[0])
-const criterionExists = (criterion: string): boolean => THEMES.some((t) => t.criteria.some((c) => c.id === criterion))
 const clean = (s: unknown): string => String(s ?? '').replace(/\s+/g, ' ').trim()
 
-/** Reads a file the user picked: axe results (axe-core / axe DevTools export) or the simple RGAA format. Throws 'unknown-format'. */
-export function parseToolFile(text: string): ToolResults {
-  let data: unknown
-  try {
-    data = JSON.parse(text)
-  } catch {
-    throw new Error('not-json')
-  }
-  const root = (Array.isArray(data) ? data[0] : data) as Record<string, unknown> | undefined
-  const o = (root && typeof root === 'object' && !Array.isArray(root.violations) && root.results && typeof root.results === 'object' && !Array.isArray(root.results) ? root.results : root) as Record<string, unknown> | undefined
-  if (o && Array.isArray(o.violations)) {
-    const violations: ToolViolation[] = (o.violations as Record<string, unknown>[]).map((v) => ({
-      rule: clean(v.id),
-      impact: v.impact ? clean(v.impact) : null,
-      help: clean(v.help || v.description || v.id),
-      nodes: (Array.isArray(v.nodes) ? (v.nodes as Record<string, unknown>[]) : []).map((n) => ({
-        html: String(n.html ?? ''),
-        target: Array.isArray(n.target) ? (n.target as unknown[]).flat().map(String) : [],
-        summary: clean(n.failureSummary),
-      })),
-      data: firstData(v),
-    }))
-    return {
-      tool: 'axe',
-      url: clean(o.url ?? (o.testEnvironment as Record<string, unknown> | undefined)?.windowUrl),
-      violations,
-      answers: [],
-      incomplete: Array.isArray(o.incomplete) ? o.incomplete.length : 0,
-      passes: Array.isArray(o.passes) ? o.passes.length : 0,
-    }
-  }
-  if (root && Array.isArray(root.results)) {
-    const answers = (root.results as Record<string, unknown>[])
-      .map((r) => ({
-        criterion: clean(r.criterion ?? r.test).split('.').slice(0, 2).join('.'),
-        status: clean(r.status).toLowerCase() as ChecklistVerdict,
-        note: clean(r.note),
-      }))
-      .filter((a) => criterionExists(a.criterion) && ['c', 'nc', 'na'].includes(a.status))
-    return { tool: clean(root.tool) || 'import', url: clean(root.url), violations: [], answers, incomplete: 0, passes: 0 }
-  }
-  throw new Error('unknown-format')
+/** Turns what the axe engine returned in the page into the shape used here. */
+export function fromAxe(o: Record<string, unknown>): ToolResults {
+  const violations: ToolViolation[] = (Array.isArray(o.violations) ? (o.violations as Record<string, unknown>[]) : []).map((v) => ({
+    rule: clean(v.id),
+    impact: v.impact ? clean(v.impact) : null,
+    help: clean(v.help || v.description || v.id),
+    nodes: (Array.isArray(v.nodes) ? (v.nodes as Record<string, unknown>[]) : []).map((n) => ({
+      html: String(n.html ?? ''),
+      target: Array.isArray(n.target) ? (n.target as unknown[]).flat().map(String) : [],
+      summary: clean(n.failureSummary),
+    })),
+    data: firstData(v),
+  }))
+  return { tool: 'axe', url: clean(o.url), violations, answers: [], incomplete: Number(o.incomplete) || 0, passes: Number(o.passes) || 0 }
 }
 
 function firstData(v: Record<string, unknown>): Record<string, unknown> | undefined {
