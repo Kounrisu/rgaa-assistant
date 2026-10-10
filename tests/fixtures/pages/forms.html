@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Formulaires</title></head>
+<body><main>
+<form>
+  <label for="n">Nom</label><input id="n" name="lastname" type="text">
+  <label>Prénom <input name="firstname" type="text" autocomplete="given-name"></label>
+  <input type="email" name="mail">
+  <input type="password" aria-label="Mot de passe" autocomplete="off">
+  <input type="text" placeholder="Rechercher">
+  <input type="text" title="Titre champ" name="city">
+  <input type="tel" aria-labelledby="lbl"><span id="lbl">Téléphone</span>
+  <input type="hidden" name="h">
+  <input type="checkbox" id="c1"><label for="c1">Case</label>
+  <select name="s"><option>1</option></select>
+  <textarea name="t"></textarea>
+  <div role="textbox" aria-required="true" aria-label="Zone"></div>
+  <input type="text" name="invisible" style="display:none">
+  <button type="submit">Envoyer</button>
+  <input type="submit" value="OK">
+</form>
+</main></body>
+</html>

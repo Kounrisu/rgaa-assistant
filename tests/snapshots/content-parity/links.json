@@ -1,0 +1,1224 @@
+{
+  "highlight images": {
+    "returned": true,
+    "response": {
+      "elements": [
+        {
+          "id": 1,
+          "tag": "img",
+          "type": "img",
+          "src": "https://page.test/x.png",
+          "thumb": "https://page.test/x.png",
+          "alt": "Logo",
+          "ariaLabel": null,
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": "Logo",
+          "ignoredBy": null,
+          "role": null,
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": null,
+          "isInsideLink": true,
+          "linkHref": "/d",
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 0,
+          "naturalHeight": 0,
+          "html": "<img src=\"x.png\" alt=\"Logo\">",
+          "contextHtml": "<a href=\"/d\"><img src=\"x.png\" alt=\"Logo\" data-rgaa-target=\"\"></a>",
+          "deterministic": {
+            "altMissing": false,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 2": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 3": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "contrast-ok",
+          "id": 0,
+          "label": "Text with sufficient contrast",
+          "summary": "13 text element(s) · 2 colour pair(s)",
+          "facts": {
+            "Text elements checked": "13",
+            "Sufficient contrast": "13",
+            "To review (listed below)": "0",
+            "Not listed (limit)": null
+          },
+          "html": "",
+          "contextHtml": "",
+          "count": 13,
+          "data": {
+            "humanNeeded": false,
+            "checked": 13,
+            "okCount": 13
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 5": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 6": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "link-skip",
+          "id": 1,
+          "label": "“Aller au contenu”",
+          "summary": "#contenu",
+          "facts": {
+            "Text": "Aller au contenu",
+            "Accessible name": "Aller au contenu",
+            "href": "#contenu",
+            "target": null,
+            "title": null,
+            "aria-label": null,
+            "Occurrences": null,
+            "Skip link": "yes, target found",
+            "Visibility": null,
+            "Element": "<a>"
+          },
+          "html": "<a href=\"#contenu\">Aller au contenu</a>",
+          "contextHtml": "<body>\n<a href=\"#contenu\" data-rgaa-target=\"\">Aller au contenu</a>\n<a href=\"#absent\">Passer au menu</a>\n<header><nav aria-label=\"Principal\">\n  <a href=\"/\">Accueil</a>\n  <a href=\"/a\">En savoir plus</a>\n  <a href=\"/b\">En savoir plus</a>\n  <a href=\"/c\"></a>\n  <a href=\"/d\"><img src=\"x.png\" alt=\"Logo\"></a>\n  <a href=\"/e\" aria-label=\"Libellé\">Texte</a>\n  <a href=\"/f\" title=\"Titre seul\"></a>\n  <a href=\"https://example.test\" target=\"_blank\">Externe</a>\n  <a href=\"/same\">Doublon</a><a href=\"/same\">Doublon</a>\n  <a href=\"/sr\" style=\"position:absolute;left:-9999px\">Lien hors écran</a>\n  <a href=\"/gone\" style=\"display:none\">Lien caché</a>\n  <span role=\"link\" tabindex=\"0\">Pseudo-lien</span>\n</nav></header>\n<main id=\"contenu\"><h1>Liens</h1><p>Voir <a href=\"/lire\">cliquez ici</a>.</p></main>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 428px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"1\" data-alt=\"alt “Logo”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">1</span></div></div></body>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "reason": "",
+            "hidden": null
+          }
+        },
+        {
+          "type": "link-skip-broken",
+          "id": 2,
+          "label": "“Passer au menu”",
+          "summary": "#absent",
+          "facts": {
+            "Text": "Passer au menu",
+            "Accessible name": "Passer au menu",
+            "href": "#absent",
+            "target": null,
+            "title": null,
+            "aria-label": null,
+            "Occurrences": null,
+            "Skip link": "yes, TARGET NOT FOUND",
+            "Visibility": null,
+            "Element": "<a>"
+          },
+          "html": "<a href=\"#absent\">Passer au menu</a>",
+          "contextHtml": "<body>\n<a href=\"#contenu\">Aller au contenu</a>\n<a href=\"#absent\" data-rgaa-target=\"\">Passer au menu</a>\n<header><nav aria-label=\"Principal\">\n  <a href=\"/\">Accueil</a>\n  <a href=\"/a\">En savoir plus</a>\n  <a href=\"/b\">En savoir plus</a>\n  <a href=\"/c\"></a>\n  <a href=\"/d\"><img src=\"x.png\" alt=\"Logo\"></a>\n  <a href=\"/e\" aria-label=\"Libellé\">Texte</a>\n  <a href=\"/f\" title=\"Titre seul\"></a>\n  <a href=\"https://example.test\" target=\"_blank\">Externe</a>\n  <a href=\"/same\">Doublon</a><a href=\"/same\">Doublon</a>\n  <a href=\"/sr\" style=\"position:absolute;left:-9999px\">Lien hors écran</a>\n  <a href=\"/gone\" style=\"display:none\">Lien caché</a>\n  <span role=\"link\" tabindex=\"0\">Pseudo-lien</span>\n</nav></header>\n<main id=\"contenu\"><h1>Liens</h1><p>Voir <a href=\"/lire\">cliquez ici</a>.</p></main>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 428px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"1\" data-alt=\"alt “Logo”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">1</span></div></div></body>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "reason": "",
+            "hidden": null
+          }
+        },
+        {
+          "type": "link",
+          "id": 3,
+          "label": "“Accueil”",
+          "summary": "/",
+          "facts": {
+            "Text": "Accueil",
+            "Accessible name": "Accueil",
+            "href": "/",
+            "target": null,
+            "title": null,
+            "aria-label": null,
+            "Occurrences": null,
+            "Skip link": null,
+            "Visibility": null,
+            "Element": "<a>"
+          },
+          "html": "<a href=\"/\">Accueil</a>",
+          "contextHtml": "<nav aria-label=\"Principal\">\n  <a href=\"/\" data-rgaa-target=\"\">Accueil</a>\n  <a href=\"/a\">En savoir plus</a>\n  <a href=\"/b\">En savoir plus</a>\n  <a href=\"/c\"></a>\n  <a href=\"/d\"><img src=\"x.png\" alt=\"Logo\"></a>\n  <a href=\"/e\" aria-label=\"Libellé\">Texte</a>\n  <a href=\"/f\" title=\"Titre seul\"></a>\n  <a href=\"https://example.test\" target=\"_blank\">Externe</a>\n  <a href=\"/same\">Doublon</a><a href=\"/same\">Doublon</a>\n  <a href=\"/sr\" style=\"position:absolute;left:-9999px\">Lien hors écran</a>\n  <a href=\"/gone\" style=\"display:none\">Lien caché</a>\n  <span role=\"link\" tabindex=\"0\">Pseudo-lien</span>\n</nav>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "reason": "",
+            "hidden": null
+          }
+        },
+        {
+          "type": "link-generic",
+          "id": 4,
+          "label": "“En savoir plus”",
+          "summary": "/a",
+          "facts": {
+            "Text": "En savoir plus",
+            "Accessible name": "En savoir plus",
+            "href": "/a",
+            "target": null,
+            "title": null,
+            "aria-label": null,
+            "Occurrences": null,
+            "Skip link": null,
+            "Visibility": null,
+            "Element": "<a>"
+          },
+          "html": "<a href=\"/a\">En savoir plus</a>",
+          "contextHtml": "<nav aria-label=\"Principal\">\n  <a href=\"/\">Accueil</a>\n  <a href=\"/a\" data-rgaa-target=\"\">En savoir plus</a>\n  <a href=\"/b\">En savoir plus</a>\n  <a href=\"/c\"></a>\n  <a href=\"/d\"><img src=\"x.png\" alt=\"Logo\"></a>\n  <a href=\"/e\" aria-label=\"Libellé\">Texte</a>\n  <a href=\"/f\" title=\"Titre seul\"></a>\n  <a href=\"https://example.test\" target=\"_blank\">Externe</a>\n  <a href=\"/same\">Doublon</a><a href=\"/same\">Doublon</a>\n  <a href=\"/sr\" style=\"position:absolute;left:-9999px\">Lien hors écran</a>\n  <a href=\"/gone\" style=\"display:none\">Lien caché</a>\n  <span role=\"link\" tabindex=\"0\">Pseudo-lien</span>\n</nav>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "reason": "generic",
+            "hidden": null
+          }
+        },
+        {
+          "type": "link-generic",
+          "id": 5,
+          "label": "“En savoir plus”",
+          "summary": "/b",
+          "facts": {
+            "Text": "En savoir plus",
+            "Accessible name": "En savoir plus",
+            "href": "/b",
+            "target": null,
+            "title": null,
+            "aria-label": null,
+            "Occurrences": null,
+            "Skip link": null,
+            "Visibility": null,
+            "Element": "<a>"
+          },
+          "html": "<a href=\"/b\">En savoir plus</a>",
+          "contextHtml": "<nav aria-label=\"Principal\">\n  <a href=\"/\">Accueil</a>\n  <a href=\"/a\">En savoir plus</a>\n  <a href=\"/b\" data-rgaa-target=\"\">En savoir plus</a>\n  <a href=\"/c\"></a>\n  <a href=\"/d\"><img src=\"x.png\" alt=\"Logo\"></a>\n  <a href=\"/e\" aria-label=\"Libellé\">Texte</a>\n  <a href=\"/f\" title=\"Titre seul\"></a>\n  <a href=\"https://example.test\" target=\"_blank\">Externe</a>\n  <a href=\"/same\">Doublon</a><a href=\"/same\">Doublon</a>\n  <a href=\"/sr\" style=\"position:absolute;left:-9999px\">Lien hors écran</a>\n  <a href=\"/gone\" style=\"display:none\">Lien caché</a>\n  <span role=\"link\" tabindex=\"0\">Pseudo-lien</span>\n</nav>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "reason": "generic",
+            "hidden": null
+          }
+        },
+        {
+          "type": "link-empty",
+          "id": 6,
+          "label": "<a> without name",
+          "summary": "/c",
+          "facts": {
+            "Text": null,
+            "Accessible name": null,
+            "href": "/c",
+            "target": null,
+            "title": null,
+            "aria-label": null,
+            "Occurrences": null,
+            "Skip link": null,
+            "Visibility": null,
+            "Element": "<a>"
+          },
+          "html": "<a href=\"/c\"></a>",
+          "contextHtml": "<nav aria-label=\"Principal\">\n  <a href=\"/\">Accueil</a>\n  <a href=\"/a\">En savoir plus</a>\n  <a href=\"/b\">En savoir plus</a>\n  <a href=\"/c\" data-rgaa-target=\"\"></a>\n  <a href=\"/d\"><img src=\"x.png\" alt=\"Logo\"></a>\n  <a href=\"/e\" aria-label=\"Libellé\">Texte</a>\n  <a href=\"/f\" title=\"Titre seul\"></a>\n  <a href=\"https://example.test\" target=\"_blank\">Externe</a>\n  <a href=\"/same\">Doublon</a><a href=\"/same\">Doublon</a>\n  <a href=\"/sr\" style=\"position:absolute;left:-9999px\">Lien hors écran</a>\n  <a href=\"/gone\" style=\"display:none\">Lien caché</a>\n  <span role=\"link\" tabindex=\"0\">Pseudo-lien</span>\n</nav>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "reason": "no-name",
+            "hidden": null
+          }
+        },
+        {
+          "type": "link",
+          "id": 7,
+          "label": "“Logo”",
+          "summary": "/d",
+          "facts": {
+            "Text": null,
+            "Accessible name": "Logo",
+            "href": "/d",
+            "target": null,
+            "title": null,
+            "aria-label": null,
+            "Occurrences": null,
+            "Skip link": null,
+            "Visibility": null,
+            "Element": "<a>"
+          },
+          "html": "<a href=\"/d\"></a>",
+          "contextHtml": "<nav aria-label=\"Principal\">\n  <a href=\"/\">Accueil</a>\n  <a href=\"/a\">En savoir plus</a>\n  <a href=\"/b\">En savoir plus</a>\n  <a href=\"/c\"></a>\n  <a href=\"/d\" data-rgaa-target=\"\"><img src=\"x.png\" alt=\"Logo\"></a>\n  <a href=\"/e\" aria-label=\"Libellé\">Texte</a>\n  <a href=\"/f\" title=\"Titre seul\"></a>\n  <a href=\"https://example.test\" target=\"_blank\">Externe</a>\n  <a href=\"/same\">Doublon</a><a href=\"/same\">Doublon</a>\n  <a href=\"/sr\" style=\"position:absolute;left:-9999px\">Lien hors écran</a>\n  <a href=\"/gone\" style=\"display:none\">Lien caché</a>\n  <span role=\"link\" tabindex=\"0\">Pseudo-lien</span>\n</nav>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "reason": "",
+            "hidden": null
+          }
+        },
+        {
+          "type": "link",
+          "id": 8,
+          "label": "“Libellé”",
+          "summary": "/e",
+          "facts": {
+            "Text": "Texte",
+            "Accessible name": "Libellé",
+            "href": "/e",
+            "target": null,
+            "title": null,
+            "aria-label": "Libellé",
+            "Occurrences": null,
+            "Skip link": null,
+            "Visibility": null,
+            "Element": "<a>"
+          },
+          "html": "<a href=\"/e\" aria-label=\"Libellé\">Texte</a>",
+          "contextHtml": "<nav aria-label=\"Principal\">\n  <a href=\"/\">Accueil</a>\n  <a href=\"/a\">En savoir plus</a>\n  <a href=\"/b\">En savoir plus</a>\n  <a href=\"/c\"></a>\n  <a href=\"/d\"><img src=\"x.png\" alt=\"Logo\"></a>\n  <a href=\"/e\" aria-label=\"Libellé\" data-rgaa-target=\"\">Texte</a>\n  <a href=\"/f\" title=\"Titre seul\"></a>\n  <a href=\"https://example.test\" target=\"_blank\">Externe</a>\n  <a href=\"/same\">Doublon</a><a href=\"/same\">Doublon</a>\n  <a href=\"/sr\" style=\"position:absolute;left:-9999px\">Lien hors écran</a>\n  <a href=\"/gone\" style=\"display:none\">Lien caché</a>\n  <span role=\"link\" tabindex=\"0\">Pseudo-lien</span>\n</nav>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "reason": "",
+            "hidden": null
+          }
+        },
+        {
+          "type": "link",
+          "id": 9,
+          "label": "“Titre seul”",
+          "summary": "/f",
+          "facts": {
+            "Text": null,
+            "Accessible name": "Titre seul",
+            "href": "/f",
+            "target": null,
+            "title": "Titre seul",
+            "aria-label": null,
+            "Occurrences": null,
+            "Skip link": null,
+            "Visibility": null,
+            "Element": "<a>"
+          },
+          "html": "<a href=\"/f\" title=\"Titre seul\"></a>",
+          "contextHtml": "<nav aria-label=\"Principal\">\n  <a href=\"/\">Accueil</a>\n  <a href=\"/a\">En savoir plus</a>\n  <a href=\"/b\">En savoir plus</a>\n  <a href=\"/c\"></a>\n  <a href=\"/d\"><img src=\"x.png\" alt=\"Logo\"></a>\n  <a href=\"/e\" aria-label=\"Libellé\">Texte</a>\n  <a href=\"/f\" title=\"Titre seul\" data-rgaa-target=\"\"></a>\n  <a href=\"https://example.test\" target=\"_blank\">Externe</a>\n  <a href=\"/same\">Doublon</a><a href=\"/same\">Doublon</a>\n  <a href=\"/sr\" style=\"position:absolute;left:-9999px\">Lien hors écran</a>\n  <a href=\"/gone\" style=\"display:none\">Lien caché</a>\n  <span role=\"link\" tabindex=\"0\">Pseudo-lien</span>\n</nav>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "reason": "",
+            "hidden": null
+          }
+        },
+        {
+          "type": "link",
+          "id": 10,
+          "label": "“Externe”",
+          "summary": "https://example.test",
+          "facts": {
+            "Text": "Externe",
+            "Accessible name": "Externe",
+            "href": "https://example.test",
+            "target": "_blank",
+            "title": null,
+            "aria-label": null,
+            "Occurrences": null,
+            "Skip link": null,
+            "Visibility": null,
+            "Element": "<a>"
+          },
+          "html": "<a href=\"https://example.test\" target=\"_blank\">Externe</a>",
+          "contextHtml": "<nav aria-label=\"Principal\">\n  <a href=\"/\">Accueil</a>\n  <a href=\"/a\">En savoir plus</a>\n  <a href=\"/b\">En savoir plus</a>\n  <a href=\"/c\"></a>\n  <a href=\"/d\"><img src=\"x.png\" alt=\"Logo\"></a>\n  <a href=\"/e\" aria-label=\"Libellé\">Texte</a>\n  <a href=\"/f\" title=\"Titre seul\"></a>\n  <a href=\"https://example.test\" target=\"_blank\" data-rgaa-target=\"\">Externe</a>\n  <a href=\"/same\">Doublon</a><a href=\"/same\">Doublon</a>\n  <a href=\"/sr\" style=\"position:absolute;left:-9999px\">Lien hors écran</a>\n  <a href=\"/gone\" style=\"display:none\">Lien caché</a>\n  <span role=\"link\" tabindex=\"0\">Pseudo-lien</span>\n</nav>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "reason": "",
+            "hidden": null
+          }
+        },
+        {
+          "type": "link",
+          "id": 11,
+          "label": "“Doublon”",
+          "summary": "/same",
+          "facts": {
+            "Text": "Doublon",
+            "Accessible name": "Doublon",
+            "href": "/same",
+            "target": null,
+            "title": null,
+            "aria-label": null,
+            "Occurrences": "2",
+            "Skip link": null,
+            "Visibility": null,
+            "Element": "<a>"
+          },
+          "html": "<a href=\"/same\">Doublon</a>",
+          "contextHtml": "<nav aria-label=\"Principal\">\n  <a href=\"/\">Accueil</a>\n  <a href=\"/a\">En savoir plus</a>\n  <a href=\"/b\">En savoir plus</a>\n  <a href=\"/c\"></a>\n  <a href=\"/d\"><img src=\"x.png\" alt=\"Logo\"></a>\n  <a href=\"/e\" aria-label=\"Libellé\">Texte</a>\n  <a href=\"/f\" title=\"Titre seul\"></a>\n  <a href=\"https://example.test\" target=\"_blank\">Externe</a>\n  <a href=\"/same\" data-rgaa-target=\"\">Doublon</a><a href=\"/same\">Doublon</a>\n  <a href=\"/sr\" style=\"position:absolute;left:-9999px\">Lien hors écran</a>\n  <a href=\"/gone\" style=\"display:none\">Lien caché</a>\n  <span role=\"link\" tabindex=\"0\">Pseudo-lien</span>\n</nav>",
+          "count": 2,
+          "data": {
+            "humanNeeded": false,
+            "reason": "",
+            "hidden": null
+          }
+        },
+        {
+          "type": "link",
+          "id": 12,
+          "label": "“Lien hors écran”",
+          "summary": "/sr",
+          "facts": {
+            "Text": "Lien hors écran",
+            "Accessible name": "Lien hors écran",
+            "href": "/sr",
+            "target": null,
+            "title": null,
+            "aria-label": null,
+            "Occurrences": null,
+            "Skip link": null,
+            "Visibility": "visually hidden (read by screen readers only)",
+            "Element": "<a>"
+          },
+          "html": "<a href=\"/sr\" style=\"position:absolute;left:-9999px\">Lien hors écran</a>",
+          "contextHtml": "<nav aria-label=\"Principal\">\n  <a href=\"/\">Accueil</a>\n  <a href=\"/a\">En savoir plus</a>\n  <a href=\"/b\">En savoir plus</a>\n  <a href=\"/c\"></a>\n  <a href=\"/d\"><img src=\"x.png\" alt=\"Logo\"></a>\n  <a href=\"/e\" aria-label=\"Libellé\">Texte</a>\n  <a href=\"/f\" title=\"Titre seul\"></a>\n  <a href=\"https://example.test\" target=\"_blank\">Externe</a>\n  <a href=\"/same\">Doublon</a><a href=\"/same\">Doublon</a>\n  <a href=\"/sr\" style=\"position:absolute;left:-9999px\" data-rgaa-target=\"\">Lien hors écran</a>\n  <a href=\"/gone\" style=\"display:none\">Lien caché</a>\n  <span role=\"link\" tabindex=\"0\">Pseudo-lien</span>\n</nav>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "reason": "",
+            "hidden": "visually-hidden"
+          }
+        },
+        {
+          "type": "link",
+          "id": 13,
+          "label": "“Pseudo-lien”",
+          "summary": "(no href)",
+          "facts": {
+            "Text": "Pseudo-lien",
+            "Accessible name": "Pseudo-lien",
+            "href": null,
+            "target": null,
+            "title": null,
+            "aria-label": null,
+            "Occurrences": null,
+            "Skip link": null,
+            "Visibility": null,
+            "Element": "<span>"
+          },
+          "html": "<span role=\"link\" tabindex=\"0\">Pseudo-lien</span>",
+          "contextHtml": "<nav aria-label=\"Principal\">\n  <a href=\"/\">Accueil</a>\n  <a href=\"/a\">En savoir plus</a>\n  <a href=\"/b\">En savoir plus</a>\n  <a href=\"/c\"></a>\n  <a href=\"/d\"><img src=\"x.png\" alt=\"Logo\"></a>\n  <a href=\"/e\" aria-label=\"Libellé\">Texte</a>\n  <a href=\"/f\" title=\"Titre seul\"></a>\n  <a href=\"https://example.test\" target=\"_blank\">Externe</a>\n  <a href=\"/same\">Doublon</a><a href=\"/same\">Doublon</a>\n  <a href=\"/sr\" style=\"position:absolute;left:-9999px\">Lien hors écran</a>\n  <a href=\"/gone\" style=\"display:none\">Lien caché</a>\n  <span role=\"link\" tabindex=\"0\" data-rgaa-target=\"\">Pseudo-lien</span>\n</nav>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "reason": "",
+            "hidden": null
+          }
+        },
+        {
+          "type": "link-generic",
+          "id": 14,
+          "label": "“cliquez ici”",
+          "summary": "/lire",
+          "facts": {
+            "Text": "cliquez ici",
+            "Accessible name": "cliquez ici",
+            "href": "/lire",
+            "target": null,
+            "title": null,
+            "aria-label": null,
+            "Occurrences": null,
+            "Skip link": null,
+            "Visibility": null,
+            "Element": "<a>"
+          },
+          "html": "<a href=\"/lire\">cliquez ici</a>",
+          "contextHtml": "<p>Voir <a href=\"/lire\" data-rgaa-target=\"\">cliquez ici</a>.</p>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "reason": "generic",
+            "hidden": null
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 9": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "landmark",
+          "id": 1,
+          "label": "banner",
+          "summary": "<header>",
+          "facts": {
+            "Role": "banner",
+            "Name": null,
+            "Element": "<header>"
+          },
+          "html": "<header>Accueil En savoir plus En savoir plus Texte Externe DoublonDoublon Lien hors écr</header>",
+          "contextHtml": "<body>\n<a href=\"#contenu\">Aller au contenu</a>\n<a href=\"#absent\">Passer au menu</a>\n<header data-rgaa-target=\"\"><nav aria-label=\"Principal\">\n  <a href=\"/\">Accueil</a>\n  <a href=\"/a\">En savoir plus</a>\n  <a href=\"/b\">En savoir plus</a>\n  <a href=\"/c\"></a>\n  <a href=\"/d\"><img src=\"x.png\" alt=\"Logo\"></a>\n  <a href=\"/e\" aria-label=\"Libellé\">Texte</a>\n  <a href=\"/f\" title=\"Titre seul\"></a>\n  <a href=\"https://example.test\" target=\"_blank\">Externe</a>\n  <a href=\"/same\">Doublon</a><a href=\"/same\">Doublon</a>\n  <a href=\"/sr\" style=\"position:absolute;left:-9999px\">Lien hors écran</a>\n  <a href=\"/gone\" style=\"display:none\">Lien caché</a>\n  <span role=\"link\" tabindex=\"0\">Pseudo-lien</span>\n</nav></header>\n<main id=\"contenu\"><h1>Liens</h1><p>Voir <a href=\"/lire\">cliquez ici</a>.</p></main>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 428px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"1\" data-alt=\"alt “Logo”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">1</span></div></div><div id=\"rgaa-assistant-overlay-t6\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">1</span></div><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data- …",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "landmark",
+            "level": 1,
+            "badge": "banner"
+          }
+        },
+        {
+          "type": "landmark",
+          "id": 2,
+          "label": "navigation “Principal”",
+          "summary": "<nav>",
+          "facts": {
+            "Role": "navigation",
+            "Name": "Principal",
+            "Element": "<nav>"
+          },
+          "html": "<nav aria-label=\"Principal\">Accueil En savoir plus En savoir plus Texte Externe DoublonDoublon Lien hors écr</nav>",
+          "contextHtml": "<header><nav aria-label=\"Principal\" data-rgaa-target=\"\">\n  <a href=\"/\">Accueil</a>\n  <a href=\"/a\">En savoir plus</a>\n  <a href=\"/b\">En savoir plus</a>\n  <a href=\"/c\"></a>\n  <a href=\"/d\"><img src=\"x.png\" alt=\"Logo\"></a>\n  <a href=\"/e\" aria-label=\"Libellé\">Texte</a>\n  <a href=\"/f\" title=\"Titre seul\"></a>\n  <a href=\"https://example.test\" target=\"_blank\">Externe</a>\n  <a href=\"/same\">Doublon</a><a href=\"/same\">Doublon</a>\n  <a href=\"/sr\" style=\"position:absolute;left:-9999px\">Lien hors écran</a>\n  <a href=\"/gone\" style=\"display:none\">Lien caché</a>\n  <span role=\"link\" tabindex=\"0\">Pseudo-lien</span>\n</nav></header>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "landmark",
+            "level": 1,
+            "badge": "navigation"
+          }
+        },
+        {
+          "type": "landmark",
+          "id": 3,
+          "label": "main",
+          "summary": "<main>",
+          "facts": {
+            "Role": "main",
+            "Name": null,
+            "Element": "<main>"
+          },
+          "html": "<main id=\"contenu\">LiensVoir cliquez ici.</main>",
+          "contextHtml": "<body>\n<a href=\"#contenu\">Aller au contenu</a>\n<a href=\"#absent\">Passer au menu</a>\n<header><nav aria-label=\"Principal\">\n  <a href=\"/\">Accueil</a>\n  <a href=\"/a\">En savoir plus</a>\n  <a href=\"/b\">En savoir plus</a>\n  <a href=\"/c\"></a>\n  <a href=\"/d\"><img src=\"x.png\" alt=\"Logo\"></a>\n  <a href=\"/e\" aria-label=\"Libellé\">Texte</a>\n  <a href=\"/f\" title=\"Titre seul\"></a>\n  <a href=\"https://example.test\" target=\"_blank\">Externe</a>\n  <a href=\"/same\">Doublon</a><a href=\"/same\">Doublon</a>\n  <a href=\"/sr\" style=\"position:absolute;left:-9999px\">Lien hors écran</a>\n  <a href=\"/gone\" style=\"display:none\">Lien caché</a>\n  <span role=\"link\" tabindex=\"0\">Pseudo-lien</span>\n</nav></header>\n<main id=\"contenu\" data-rgaa-target=\"\"><h1>Liens</h1><p>Voir <a href=\"/lire\">cliquez ici</a>.</p></main>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 428px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"1\" data-alt=\"alt “Logo”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">1</span></div></div><div id=\"rgaa-assistant-overlay-t6\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">1</span></div><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data- …",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "landmark",
+            "level": 1,
+            "badge": "main"
+          }
+        },
+        {
+          "type": "heading",
+          "id": 4,
+          "label": "“Liens”",
+          "summary": "h1",
+          "facts": {
+            "Level": "h1",
+            "Text": "Liens",
+            "Previous level": null,
+            "Visibility": null,
+            "Element": "<h1>"
+          },
+          "html": "<h1>Liens</h1>",
+          "contextHtml": "<main id=\"contenu\"><h1 data-rgaa-target=\"\">Liens</h1><p>Voir <a href=\"/lire\">cliquez ici</a>.</p></main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "heading",
+            "level": 1,
+            "badge": "h1",
+            "hidden": null
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 11": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "rules run": {
+    "returned": true,
+    "response": {
+      "url": "https://page.test/start",
+      "findings": [
+        {
+          "key": "target-blank",
+          "count": 1,
+          "samples": [
+            "a"
+          ]
+        },
+        {
+          "key": "no-media",
+          "count": 0
+        },
+        {
+          "key": "no-table",
+          "count": 0
+        },
+        {
+          "key": "no-form",
+          "count": 0
+        },
+        {
+          "key": "no-button",
+          "count": 0
+        },
+        {
+          "key": "asq:10.9.2",
+          "count": 1,
+          "samples": [
+            "img"
+          ],
+          "asq": {
+            "criterion": "10.9",
+            "test": "10.9.2",
+            "status": "review",
+            "text": "RGAA 10.9.2: {n} image(s) found: check that no information is given by shape, size or position alone. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:10.10.2",
+          "count": 1,
+          "samples": [
+            "img"
+          ],
+          "asq": {
+            "criterion": "10.10",
+            "test": "10.10.2",
+            "status": "review",
+            "text": "RGAA 10.10.2: {n} image(s) found: check that the way shape, size or position convey information is relevant. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:13.7.1",
+          "count": 1,
+          "samples": [
+            "img"
+          ],
+          "asq": {
+            "criterion": "13.7",
+            "test": "13.7.1",
+            "status": "review",
+            "text": "RGAA 13.7.1: {n} image(s) or media element(s) found: check that none flashes or changes brightness abruptly. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:6.1.1-fail",
+          "count": 2,
+          "samples": [
+            "a",
+            "a"
+          ],
+          "asq": {
+            "criterion": "6.1",
+            "test": "6.1.1",
+            "status": "nc",
+            "text": "RGAA {test}: {n} link(s) whose text is not explicit by itself (only punctuation, or \"click here\", \"more\"…) and that have no context. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:6.1.1",
+          "count": 12,
+          "samples": [
+            "a",
+            "a",
+            "a"
+          ],
+          "asq": {
+            "criterion": "6.1",
+            "test": "6.1.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} link(s): check that the link text, alone or with its context, tells where the link goes. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:8.4.1-relevance",
+          "count": 1,
+          "detail": "fr",
+          "asq": {
+            "criterion": "8.4",
+            "test": "8.4.1",
+            "status": "review",
+            "text": "RGAA 8.4.1: the language code is valid ({detail}): check that it is the language of the page."
+          }
+        },
+        {
+          "key": "asq:8.6.1",
+          "count": 1,
+          "detail": "Liens",
+          "asq": {
+            "criterion": "8.6",
+            "test": "8.6.1",
+            "status": "review",
+            "text": "RGAA 8.6.1: check that the page title ({detail}) is relevant."
+          }
+        },
+        {
+          "key": "asq:9.1.2",
+          "count": 1,
+          "samples": [
+            "h1"
+          ],
+          "asq": {
+            "criterion": "9.1",
+            "test": "9.1.2",
+            "status": "review",
+            "text": "RGAA 9.1.2: {n} heading(s): check that each one is relevant. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:9.2.1-footer",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no <footer> element outside <article> and <section>."
+          }
+        },
+        {
+          "key": "asq:13.3.1-noext",
+          "count": 15,
+          "samples": [
+            "a",
+            "a",
+            "a"
+          ],
+          "asq": {
+            "criterion": "13.3",
+            "test": "13.3.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} link(s) whose address has no recognised file name: check that none gives access to an office document. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:13.4.1-noext",
+          "count": 15,
+          "samples": [
+            "a",
+            "a",
+            "a"
+          ],
+          "asq": {
+            "criterion": "13.4",
+            "test": "13.4.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} link(s) whose address has no recognised file name: check that none gives access to an office document. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:na:2.1",
+          "count": 0,
+          "asq": {
+            "criterion": "2.1",
+            "test": "2.1.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:2.2",
+          "count": 0,
+          "asq": {
+            "criterion": "2.2",
+            "test": "2.2.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.1",
+          "count": 0,
+          "asq": {
+            "criterion": "4.1",
+            "test": "4.1.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.2",
+          "count": 0,
+          "asq": {
+            "criterion": "4.2",
+            "test": "4.2.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.3",
+          "count": 0,
+          "asq": {
+            "criterion": "4.3",
+            "test": "4.3.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.4",
+          "count": 0,
+          "asq": {
+            "criterion": "4.4",
+            "test": "4.4.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.5",
+          "count": 0,
+          "asq": {
+            "criterion": "4.5",
+            "test": "4.5.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.6",
+          "count": 0,
+          "asq": {
+            "criterion": "4.6",
+            "test": "4.6.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.7",
+          "count": 0,
+          "asq": {
+            "criterion": "4.7",
+            "test": "4.7.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.8",
+          "count": 0,
+          "asq": {
+            "criterion": "4.8",
+            "test": "4.8.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.9",
+          "count": 0,
+          "asq": {
+            "criterion": "4.9",
+            "test": "4.9.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.11",
+          "count": 0,
+          "asq": {
+            "criterion": "4.11",
+            "test": "4.11.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.12",
+          "count": 0,
+          "asq": {
+            "criterion": "4.12",
+            "test": "4.12.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.13",
+          "count": 0,
+          "asq": {
+            "criterion": "4.13",
+            "test": "4.13.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:11.11",
+          "count": 0,
+          "asq": {
+            "criterion": "11.11",
+            "test": "11.11.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:11.12",
+          "count": 0,
+          "asq": {
+            "criterion": "11.12",
+            "test": "11.12.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:11.13",
+          "count": 0,
+          "asq": {
+            "criterion": "11.13",
+            "test": "11.13.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:pass:8.1",
+          "count": 0,
+          "detail": "<!DOCTYPE html>",
+          "asq": {
+            "criterion": "8.1",
+            "test": "8.1.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:8.3",
+          "count": 0,
+          "asq": {
+            "criterion": "8.3",
+            "test": "8.3.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:8.5",
+          "count": 0,
+          "asq": {
+            "criterion": "8.5",
+            "test": "8.5.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:10.1",
+          "count": 0,
+          "asq": {
+            "criterion": "10.1",
+            "test": "10.1.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "skip-link-broken",
+          "count": 1,
+          "samples": [
+            "#absent"
+          ]
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "snapshot": {
+    "returned": true,
+    "response": {
+      "url": "https://page.test/start",
+      "title": "Liens",
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      },
+      "html": "<!DOCTYPE html>\n<html lang=\"fr\" data-rgaa-instance=\"X\"><head><meta charset=\"utf-8\"><title>Liens</title></head>\n<body>\n<a href=\"#contenu\">Aller au contenu</a>\n<a href=\"#absent\">Passer au menu</a>\n<header><nav aria-label=\"Principal\">\n  <a href=\"/\">Accueil</a>\n  <a href=\"/a\">En savoir plus</a>\n  <a href=\"/b\">En savoir plus</a>\n  <a href=\"/c\"></a>\n  <a href=\"/d\"><img src=\"x.png\" alt=\"Logo\"></a>\n  <a href=\"/e\" aria-label=\"Libellé\">Texte</a>\n  <a href=\"/f\" title=\"Titre seul\"></a>\n  <a href=\"https://example.test\" target=\"_blank\">Externe</a>\n  <a href=\"/same\">Doublon</a><a href=\"/same\">Doublon</a>\n  <a href=\"/sr\" style=\"position:absolute;left:-9999px\">Lien hors écran</a>\n  <a href=\"/gone\" style=\"display:none\">Lien caché</a>\n  <span role=\"link\" tabindex=\"0\">Pseudo-lien</span>\n</nav></header>\n<main id=\"contenu\"><h1>Liens</h1><p>Voir <a href=\"/lire\">cliquez ici</a>.</p></main>\n\n\n</body></html>"
+    }
+  },
+  "overlay after scans": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 428px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"1\" data-alt=\"alt “Logo”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t6\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">1</span></div><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">2</span></div><div style=\"position: absolute; left: 8px; top: 278px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"3\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">3</span></div><div style=\"position: absolute; left: 8px; top: 308px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"4\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">4</span></div><div style=\"position: absolute; left: 8px; top: 338px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"5\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">5</span></div><div style=\"position: absolute; left: 8px; top: 368px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"6\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">6</span></div><div style=\"position: absolute; left: 8px; top: 398px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"7\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">7</span></div><div style=\"position: absolute; left: 8px; top: 458px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"8\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">8</span></div><div style=\"position: absolute; left: 8px; top: 488px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"9\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">9</span></div><div style=\"position: absolute; left: 8px; top: 518px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"10\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">10</span></div><div style=\"position: absolute; left: 8px; top: 548px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"11\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">11</span></div><div style=\"position: absolute; left: 8px; top: 578px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"11\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; display: none; white-space: nowrap; background: rgb(0, 0, 6);\">11</span></div><div style=\"position: absolute; left: -9999px; top: 0px; width: 2px; height: 2px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"12\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">12</span></div><div style=\"position: absolute; left: 8px; top: 668px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"13\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">13</span></div><div style=\"position: absolute; left: 8px; top: 788px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"14\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">14</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 218px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"1\" data-badge=\"banner\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">1 · banner</span></div><div style=\"position: absolute; left: 8px; top: 248px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"navigation\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · navigation</span></div><div style=\"position: absolute; left: 8px; top: 698px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"3\" data-badge=\"main\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">3 · main</span></div><div style=\"position: absolute; left: 8px; top: 728px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"4\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">4 · h1</span></div></div>"
+  ],
+  "states theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "states theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay options": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "focus image 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "focus link 2": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "focus unknown": {
+    "returned": true,
+    "response": {
+      "ok": false
+    }
+  },
+  "show only theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "show only theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "locate": {
+    "returned": true,
+    "response": {
+      "rect": {
+        "x": 8,
+        "y": 158,
+        "w": 100,
+        "h": 20
+      },
+      "vw": 1024,
+      "vh": 768
+    }
+  },
+  "locate unknown": {
+    "returned": true,
+    "response": {
+      "rect": null
+    }
+  },
+  "scroll restore": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "unfocus": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "relabel theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "relabel theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay options 2": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "tool reveal on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 1
+    }
+  },
+  "tool tables on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 0
+    }
+  },
+  "tool taborder on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 15
+    }
+  },
+  "overlay after interactions": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 428px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"11\" data-alt=\"alt “Logo”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">11</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t6\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 4px solid rgb(255, 23, 68); background: rgba(255, 23, 68, 0.16); box-shadow: 0 0 0 1px #fff, 0 0 10px 2px rgba(255, 23, 68, 0.75); animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"21\" data-state=\"error\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(255, 23, 68); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">! 21</span></div><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 4px solid rgb(250, 204, 21); background: rgba(250, 204, 21, 0.25); box-shadow: 0 0 0 3px #000006, 0 0 0 5px #000; animation: rgaa-assistant-pulse 0.9s ease-in-out 3; z-index: 1;\" data-color=\"#000006\" data-id=\"2\" data-state=\"ignored\" data-focused=\"true\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(0, 0, 0); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(250, 204, 21);\">2</span></div><div style=\"position: absolute; left: 8px; top: 278px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(22, 163, 74); background: rgba(22, 163, 74, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"3\" data-state=\"c\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(22, 163, 74);\">✓ 3</span></div><div style=\"position: absolute; left: 8px; top: 308px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"4\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">4</span></div><div style=\"position: absolute; left: 8px; top: 338px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"5\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">5</span></div><div style=\"position: absolute; left: 8px; top: 368px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"6\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">6</span></div><div style=\"position: absolute; left: 8px; top: 398px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"7\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">7</span></div><div style=\"position: absolute; left: 8px; top: 458px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"8\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">8</span></div><div style=\"position: absolute; left: 8px; top: 488px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"9\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">9</span></div><div style=\"position: absolute; left: 8px; top: 518px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"10\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">10</span></div><div style=\"position: absolute; left: 8px; top: 548px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"11\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">11</span></div><div style=\"position: absolute; left: 8px; top: 578px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"11\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; display: none; white-space: nowrap; background: rgb(0, 0, 6);\">11</span></div><div style=\"position: absolute; left: -9999px; top: 0px; width: 2px; height: 2px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"12\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">12</span></div><div style=\"position: absolute; left: 8px; top: 668px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"13\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">13</span></div><div style=\"position: absolute; left: 8px; top: 788px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"14\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">14</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 218px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"1\" data-badge=\"banner\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">1 · banner</span></div><div style=\"position: absolute; left: 8px; top: 248px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"navigation\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · navigation</span></div><div style=\"position: absolute; left: 8px; top: 698px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"3\" data-badge=\"main\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">3 · main</span></div><div style=\"position: absolute; left: 8px; top: 728px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"4\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">4 · h1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-tools\" style=\"position: absolute; top: 0px; left: 0px; width: 0px; height: 0px; z-index: 2147483645; pointer-events: none;\"><div data-tool=\"tables\"></div><div data-tool=\"taborder\"><svg width=\"0\" height=\"0\" style=\"position: absolute; left: 0px; top: 0px; pointer-events: none;\"><polyline points=\"14,164 14,194 14,284 14,314 14,344 14,374 14,404 14,464 14,494 14,524 14,554 14,584 14,614 14,674 14,794\" fill=\"none\" stroke=\"#0369a1\" stroke-width=\"1.5\" stroke-opacity=\"0.55\"></polyline></svg><div title=\"a\" style=\"position: absolute; left: 4px; top: 154px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">1</div><div title=\"a\" style=\"position: absolute; left: 4px; top: 184px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">2</div><div title=\"a\" style=\"position: absolute; left: 4px; top: 274px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">3</div><div title=\"a\" style=\"position: absolute; left: 4px; top: 304px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">4</div><div title=\"a\" style=\"position: absolute; left: 4px; top: 334px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">5</div><div title=\"a\" style=\"position: absolute; left: 4px; top: 364px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">6</div><div title=\"a\" style=\"position: absolute; left: 4px; top: 394px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">7</div><div title=\"a\" style=\"position: absolute; left: 4px; top: 454px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">8</div><div title=\"a\" style=\"position: absolute; left: 4px; top: 484px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">9</div><div title=\"a\" style=\"position: absolute; left: 4px; top: 514px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">10</div><div title=\"a\" style=\"position: absolute; left: 4px; top: 544px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">11</div><div title=\"a\" style=\"position: absolute; left: 4px; top: 574px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">12</div><div title=\"a\" style=\"position: absolute; left: 4px; top: 604px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">13</div><div title=\"span\" style=\"position: absolute; left: 4px; top: 664px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">14</div><div title=\"a\" style=\"position: absolute; left: 4px; top: 784px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">15</div></div></div>"
+  ],
+  "tools reset": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "pick cancel": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "unknown message": {},
+  "clear theme 3": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "clear theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay after clear themes": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay-t6\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 4px solid rgb(255, 23, 68); background: rgba(255, 23, 68, 0.16); box-shadow: 0 0 0 1px #fff, 0 0 10px 2px rgba(255, 23, 68, 0.75); animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"21\" data-state=\"error\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(255, 23, 68); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">! 21</span></div><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 4px solid rgb(250, 204, 21); background: rgba(250, 204, 21, 0.25); box-shadow: 0 0 0 3px #000006, 0 0 0 5px #000; animation: rgaa-assistant-pulse 0.9s ease-in-out 3; z-index: 1;\" data-color=\"#000006\" data-id=\"2\" data-state=\"ignored\" data-focused=\"true\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(0, 0, 0); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(250, 204, 21);\">2</span></div><div style=\"position: absolute; left: 8px; top: 278px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(22, 163, 74); background: rgba(22, 163, 74, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"3\" data-state=\"c\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(22, 163, 74);\">✓ 3</span></div><div style=\"position: absolute; left: 8px; top: 308px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"4\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">4</span></div><div style=\"position: absolute; left: 8px; top: 338px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"5\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">5</span></div><div style=\"position: absolute; left: 8px; top: 368px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"6\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">6</span></div><div style=\"position: absolute; left: 8px; top: 398px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"7\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">7</span></div><div style=\"position: absolute; left: 8px; top: 458px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"8\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">8</span></div><div style=\"position: absolute; left: 8px; top: 488px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"9\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">9</span></div><div style=\"position: absolute; left: 8px; top: 518px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"10\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">10</span></div><div style=\"position: absolute; left: 8px; top: 548px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"11\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">11</span></div><div style=\"position: absolute; left: 8px; top: 578px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"11\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; display: none; white-space: nowrap; background: rgb(0, 0, 6);\">11</span></div><div style=\"position: absolute; left: -9999px; top: 0px; width: 2px; height: 2px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"12\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">12</span></div><div style=\"position: absolute; left: 8px; top: 668px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"13\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">13</span></div><div style=\"position: absolute; left: 8px; top: 788px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#000006\" data-id=\"14\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">14</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 218px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"1\" data-badge=\"banner\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">1 · banner</span></div><div style=\"position: absolute; left: 8px; top: 248px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"navigation\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · navigation</span></div><div style=\"position: absolute; left: 8px; top: 698px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"3\" data-badge=\"main\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">3 · main</span></div><div style=\"position: absolute; left: 8px; top: 728px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"4\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">4 · h1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-tools\" style=\"position: absolute; top: 0px; left: 0px; width: 0px; height: 0px; z-index: 2147483645; pointer-events: none;\"></div>"
+  ],
+  "clear highlights": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay after clear all": []
+}

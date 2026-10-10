@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Contenu masqué</title>
+<style>.sr{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}.clip{clip:rect(0,0,0,0);position:absolute}</style></head>
+<body><main>
+<h1>Masqué</h1>
+<h2 class="sr">Titre pour lecteurs d'écran</h2>
+<a class="sr" href="#x">Lien lecteur</a>
+<p aria-hidden="true">Texte aria-hidden <a href="/ah">lien</a></p>
+<p style="visibility:hidden">Invisible</p>
+<p hidden>Attribut hidden</p>
+<p class="clip">Clip</p>
+<p style="color:#777;background:#fff">Texte gris sur blanc</p>
+<p style="color:#000;background:#fff">Texte noir sur blanc</p>
+<p style="color:#fff;background:#fff">Blanc sur blanc</p>
+<p style="color:#888;background:url(x.png)">Sur image</p>
+<p style="font-size:30px;color:#999;background:#fff">Grand texte</p>
+<iframe src="https://other.test/frame" title="Cadre externe"></iframe>
+<iframe src="/same-origin"></iframe>
+</main></body>
+</html>
