@@ -190,42 +190,34 @@ export const FR_LIB: Record<string, string> = {
   /* ---- asqatasun-rules.ts ---- */
   'RGAA {criterion}: no element to check on this page, not applicable.':
     'RGAA {criterion} : aucun élément à contrôler sur cette page, non applicable.',
+  'RGAA {test}: {n} element(s) that may be audio (audio, bgsound, object, embed, links to audio files): check them against this test. Examples: {samples}':
+    'RGAA {test} : {n} élément(s) pouvant être de l’audio (audio, bgsound, object, embed, liens vers des fichiers audio) : à contrôler au regard de ce test. Exemples : {samples}',
+  'RGAA {test}: {n} element(s) that may be video (video, svg, canvas, object, embed, links to video files, video players): check them against this test. Examples: {samples}':
+    'RGAA {test} : {n} élément(s) pouvant être de la vidéo (video, svg, canvas, object, embed, liens vers des fichiers vidéo, lecteurs vidéo) : à contrôler au regard de ce test. Exemples : {samples}',
+  'RGAA {test}: {n} time-based media found (audio, video, svg, canvas, object, embed, links to media files, video players): check them against this test. Examples: {samples}':
+    'RGAA {test} : {n} média(s) temporel(s) détecté(s) (audio, video, svg, canvas, object, embed, liens vers des fichiers multimédias, lecteurs vidéo) : à contrôler au regard de ce test. Exemples : {samples}',
+  'RGAA {test}: {n} non time-based media found (svg, canvas, object, embed): check them against this test. Examples: {samples}':
+    'RGAA {test} : {n} média(s) non temporel(s) détecté(s) (svg, canvas, object, embed) : à contrôler au regard de ce test. Exemples : {samples}',
+  'RGAA {test}: {n} media found of any kind (time-based or not): check them against this test. Examples: {samples}':
+    'RGAA {test} : {n} média(s) détecté(s), temporels ou non : à contrôler au regard de ce test. Exemples : {samples}',
   'RGAA 1.1.4: {n} server-side image map(s) (ismap): check that every clickable zone has an equivalent usable with any pointing device. Examples: {samples}':
     'RGAA 1.1.4 : {n} image(s) réactive(s) côté serveur (ismap) : vérifier que chaque zone cliquable est doublée d’un mécanisme utilisable quel que soit le dispositif de pointage. Exemples : {samples}',
+  'RGAA 1.4.1: {n} image(s) used as a CAPTCHA or test image, with a text alternative: check that the alternative is relevant. Examples: {samples}':
+    'RGAA 1.4.1 : {n} image(s) utilisée(s) comme CAPTCHA ou comme image-test, avec une alternative textuelle : vérifier que cette alternative est pertinente. Exemples : {samples}',
+  'RGAA 1.4.2: {n} zone(s) of an image map used as a CAPTCHA or test image, with a text alternative: check that the alternative is relevant. Examples: {samples}':
+    'RGAA 1.4.2 : {n} zone(s) d’une image réactive utilisée(s) comme CAPTCHA ou comme image-test, avec une alternative textuelle : vérifier que cette alternative est pertinente. Exemples : {samples}',
+  'RGAA 1.4.3: {n} image button(s) used as a CAPTCHA or test image, with a text alternative: check that the alternative is relevant. Examples: {samples}':
+    'RGAA 1.4.3 : {n} bouton(s) image utilisé(s) comme CAPTCHA ou comme image-test, avec une alternative textuelle : vérifier que cette alternative est pertinente. Exemples : {samples}',
+  'RGAA 1.4.5: {n} embedded image(s) (embed) used as a CAPTCHA or test image, with a text alternative: check that the alternative is relevant. Examples: {samples}':
+    'RGAA 1.4.5 : {n} image(s) embarquée(s) (embed) utilisée(s) comme CAPTCHA ou comme image-test, avec une alternative textuelle : vérifier que cette alternative est pertinente. Exemples : {samples}',
   'RGAA 1.5.2: {n} image button(s) used as a CAPTCHA: check that an alternative way to access the content exists. Examples: {samples}':
     'RGAA 1.5.2 : {n} bouton(s) image utilisé(s) comme CAPTCHA : vérifier qu’une solution d’accès alternatif au contenu existe. Exemples : {samples}',
-  'RGAA 2.1.1: {n} frame(s) without a title attribute. Examples: {samples}':
-    'RGAA 2.1.1 : {n} cadre(s) sans attribut title. Exemples : {samples}',
   'RGAA 3.1.5: {n} time-based media found: check that no information is given by colour alone. Examples: {samples}':
     'RGAA 3.1.5 : {n} média(s) temporel(s) détecté(s) : vérifier qu’aucune information n’est donnée uniquement par la couleur. Exemples : {samples}',
   'RGAA 3.1.6: {n} non time-based media found (svg, canvas, object, embed): check that no information is given by colour alone. Examples: {samples}':
     'RGAA 3.1.6 : {n} média(s) non temporel(s) détecté(s) (svg, canvas, object, embed) : vérifier qu’aucune information n’est donnée uniquement par la couleur. Exemples : {samples}',
   'RGAA 7.4.1: {n} script(s) that may change the context (select with onchange, or form with a select and no button): check that the user is warned or has an explicit button. Examples: {samples}':
     'RGAA 7.4.1 : {n} script(s) susceptible(s) de changer le contexte (select avec onchange, ou formulaire avec un select et sans bouton) : vérifier que l’utilisateur est averti ou dispose d’un bouton explicite. Exemples : {samples}',
-  'RGAA 8.3.1: the default language of the page is not declared (no lang attribute on <html>).':
-    'RGAA 8.3.1 : la langue par défaut de la page n’est pas indiquée (pas d’attribut lang sur <html>).',
-  'RGAA 8.5.1: the page has no <title> element in its <head>.':
-    'RGAA 8.5.1 : la page n’a pas de balise <title> dans son <head>.',
-  'RGAA 8.9.1: {n} link(s) without destination (no href, name or id), probably used for presentation. Examples: {samples}':
-    'RGAA 8.9.1 : {n} lien(s) sans destination (ni href, ni name, ni id), probablement utilisé(s) à des fins de présentation. Exemples : {samples}',
-  'RGAA 8.9.1: {n} empty <p> or <li> element(s), probably used for layout. Examples: {samples}':
-    'RGAA 8.9.1 : {n} balise(s) <p> ou <li> vide(s), probablement utilisée(s) à des fins de mise en forme. Exemples : {samples}',
-  'RGAA 8.9.1: {n} <br> element(s) in a row, probably used to space content. Examples: {samples}':
-    'RGAA 8.9.1 : {n} balise(s) <br> consécutive(s), probablement utilisée(s) pour espacer le contenu. Exemples : {samples}',
-  'RGAA 8.10.2: {n} element(s) with a dir attribute (ltr or rtl): check that each change of reading direction is relevant. Examples: {samples}':
-    'RGAA 8.10.2 : {n} élément(s) avec un attribut dir (ltr ou rtl) : vérifier que chaque changement du sens de lecture est pertinent. Exemples : {samples}',
-  'RGAA 9.2.1: the page has no visible <main> element.':
-    'RGAA 9.2.1 : la page n’a pas de balise <main> visible.',
-  'RGAA 9.2.1: {n} visible <main> elements, there should be only one. Examples: {samples}':
-    'RGAA 9.2.1 : {n} balises <main> visibles, il ne doit y en avoir qu’une. Exemples : {samples}',
-  'RGAA 9.2.1: the page has no <header> element outside <article> and <section>.':
-    'RGAA 9.2.1 : la page n’a pas de balise <header> en dehors de <article> et <section>.',
-  'RGAA 9.2.1: the page has no <footer> element outside <article> and <section>.':
-    'RGAA 9.2.1 : la page n’a pas de balise <footer> en dehors de <article> et <section>.',
-  'RGAA 9.2.1: the page has no <nav> element.':
-    'RGAA 9.2.1 : la page n’a pas de balise <nav>.',
-  'RGAA 10.1.2: {n} element(s) with a width or height attribute used for presentation. Examples: {samples}':
-    'RGAA 10.1.2 : {n} élément(s) avec un attribut width ou height servant à la présentation. Exemples : {samples}',
   'RGAA 10.9.2: {n} image(s) found: check that no information is given by shape, size or position alone. Examples: {samples}':
     'RGAA 10.9.2 : {n} image(s) détectée(s) : vérifier qu’aucune information n’est donnée uniquement par la forme, la taille ou la position. Exemples : {samples}',
   'RGAA 10.9.3: {n} time-based media found: check that no information is given by shape, size or position alone. Examples: {samples}':
@@ -238,14 +230,14 @@ export const FR_LIB: Record<string, string> = {
     'RGAA 10.10.3 : {n} média(s) temporel(s) détecté(s) : vérifier que la manière dont la forme, la taille ou la position véhiculent l’information est pertinente. Exemples : {samples}',
   'RGAA 10.10.4: {n} non time-based media found (svg, canvas, object, embed): check that the way shape, size or position convey information is relevant. Examples: {samples}':
     'RGAA 10.10.4 : {n} média(s) non temporel(s) détecté(s) (svg, canvas, object, embed) : vérifier que la manière dont la forme, la taille ou la position véhiculent l’information est pertinente. Exemples : {samples}',
-  'RGAA 11.2.1: {n} label(s) in forms: check that each one tells the exact purpose of its field. Examples: {samples}':
-    'RGAA 11.2.1 : {n} étiquette(s) <label> dans des formulaires : vérifier que chacune permet de connaître la fonction exacte de son champ. Exemples : {samples}',
   'RGAA 11.2.2: {n} field(s) with a title attribute: check that each one tells the exact purpose of the field. Examples: {samples}':
     'RGAA 11.2.2 : {n} champ(s) avec un attribut title : vérifier que chacun permet de connaître la fonction exacte du champ. Exemples : {samples}',
   'RGAA 11.2.3: {n} field(s) with an aria-label: check that each one tells the exact purpose of the field. Examples: {samples}':
     'RGAA 11.2.3 : {n} champ(s) avec un aria-label : vérifier que chacun permet de connaître la fonction exacte du champ. Exemples : {samples}',
   'RGAA 11.2.4: {n} field(s) with an aria-labelledby: check that the text it points to tells the exact purpose of the field. Examples: {samples}':
     'RGAA 11.2.4 : {n} champ(s) avec un aria-labelledby : vérifier que le texte référencé permet de connaître la fonction exacte du champ. Exemples : {samples}',
+  'RGAA 11.2.1: {n} label(s) in forms: check that each one tells the exact purpose of its field. Examples: {samples}':
+    'RGAA 11.2.1 : {n} étiquette(s) <label> dans des formulaires : vérifier que chacune permet de connaître la fonction exacte de son champ. Exemples : {samples}',
   'RGAA 11.10.5: {n} form(s) or field(s): check that the instructions about the expected data type and format are visible and tied to the field. Examples: {samples}':
     'RGAA 11.10.5 : {n} formulaire(s) ou champ(s) : vérifier que les instructions sur le type de données et le format attendus sont visibles et associées au champ. Exemples : {samples}',
   'RGAA 11.10.6: {n} form(s) or field(s): check that error messages give the expected data type and format and name the field. Examples: {samples}':
@@ -264,10 +256,80 @@ export const FR_LIB: Record<string, string> = {
     'RGAA 11.13.1 : {n} formulaire(s) ou champ(s) : vérifier que la finalité de chaque champ concernant l’utilisateur peut être déduite (attribut autocomplete). Exemples : {samples}',
   'RGAA 13.1.1: {n} element(s) that may refresh the page (svg, canvas, object, embed, meta refresh): check that the user controls the time limit. Examples: {samples}':
     'RGAA 13.1.1 : {n} élément(s) pouvant rafraîchir la page (svg, canvas, object, embed, meta refresh) : vérifier que l’utilisateur a le contrôle de la limite de temps. Exemples : {samples}',
-  'RGAA 13.1.2: {n} <meta> redirection(s) that are not immediate. Examples: {samples}':
-    'RGAA 13.1.2 : {n} redirection(s) via <meta> qui ne sont pas immédiates. Exemples : {samples}',
   'RGAA 13.7.1: {n} image(s) or media element(s) found: check that none flashes or changes brightness abruptly. Examples: {samples}':
     'RGAA 13.7.1 : {n} image(s) ou élément(s) multimédia détecté(s) : vérifier qu’aucun ne provoque de flash ou de changement brusque de luminosité. Exemples : {samples}',
+  'RGAA 2.1.1: {n} frame(s) without a title attribute. Examples: {samples}':
+    'RGAA 2.1.1 : {n} cadre(s) sans attribut title. Exemples : {samples}',
+  'RGAA 2.2.1: {n} frame(s) whose title is empty, has no letter, or is found in its address. Examples: {samples}':
+    'RGAA 2.2.1 : {n} cadre(s) dont le titre est vide, ne contient aucune lettre ou se retrouve dans l’adresse du cadre. Exemples : {samples}',
+  'RGAA 2.2.1: {n} frame(s) with a title: check that each title is relevant. Examples: {samples}':
+    'RGAA 2.2.1 : {n} cadre(s) avec un titre : vérifier que chaque titre est pertinent. Exemples : {samples}',
+  'RGAA 8.1.1: the page has no document type declaration (doctype).':
+    'RGAA 8.1.1 : la page n’a pas de déclaration de type de document (doctype).',
+  'RGAA 8.1.2: the document type declaration is not one of the valid ones: {detail}':
+    'RGAA 8.1.2 : la déclaration de type de document ne fait pas partie des déclarations valides : {detail}',
+  'RGAA 8.3.1: the default language of the page is not declared (no lang attribute on <html>, nor on any element).':
+    'RGAA 8.3.1 : la langue par défaut de la page n’est pas indiquée (ni attribut lang sur <html>, ni sur aucun élément).',
+  'RGAA 8.3.1: no lang attribute on <html>, and {n} text element(s) have none either, nor a parent that has one. Examples: {samples}':
+    'RGAA 8.3.1 : pas d’attribut lang sur <html>, et {n} élément(s) de texte n’en ont pas non plus, ni de parent qui en ait un. Exemples : {samples}',
+  'RGAA 8.4.1: the language code of the page is malformed: {detail}':
+    'RGAA 8.4.1 : le code de langue de la page est mal formé : {detail}',
+  'RGAA 8.4.1: the language code of the page is not a known language: {detail}':
+    'RGAA 8.4.1 : le code de langue de la page ne correspond à aucune langue connue : {detail}',
+  'RGAA 8.4.1: the language code is valid ({detail}): check that it is the language of the page.':
+    'RGAA 8.4.1 : le code de langue est valide ({detail}) : vérifier qu’il correspond bien à la langue de la page.',
+  'RGAA 8.5.1: {n} <title> elements in the <head>, there should be only one. Examples: {samples}':
+    'RGAA 8.5.1 : {n} balises <title> dans le <head>, il ne doit y en avoir qu’une. Exemples : {samples}',
+  'RGAA 8.5.1: the page has no <title> element in its <head>.':
+    'RGAA 8.5.1 : la page n’a pas de balise <title> dans son <head>.',
+  'RGAA 8.6.1: the page title is empty, has no letter, or is a generic one (for example "home", "untitled"). Examples: {samples}':
+    'RGAA 8.6.1 : le titre de la page est vide, ne contient aucune lettre ou est un titre générique (par exemple « accueil », « sans titre »). Exemples : {samples}',
+  'RGAA 8.6.1: check that the page title ({detail}) is relevant.':
+    'RGAA 8.6.1 : vérifier que le titre de la page ({detail}) est pertinent.',
+  'RGAA 8.9.1: {n} link(s) without destination (no href, name or id), probably used for presentation. Examples: {samples}':
+    'RGAA 8.9.1 : {n} lien(s) sans destination (ni href, ni name, ni id), probablement utilisé(s) à des fins de présentation. Exemples : {samples}',
+  'RGAA 8.9.1: {n} empty <p> or <li> element(s), probably used for layout. Examples: {samples}':
+    'RGAA 8.9.1 : {n} balise(s) <p> ou <li> vide(s), probablement utilisée(s) à des fins de mise en forme. Exemples : {samples}',
+  'RGAA 8.9.1: {n} <br> element(s) in a row, probably used to space content. Examples: {samples}':
+    'RGAA 8.9.1 : {n} balise(s) <br> consécutive(s), probablement utilisée(s) pour espacer le contenu. Exemples : {samples}',
+  'RGAA 8.10.2: {n} element(s) with a dir attribute that is neither ltr nor rtl. Examples: {samples}':
+    'RGAA 8.10.2 : {n} élément(s) avec un attribut dir qui n’est ni ltr ni rtl. Exemples : {samples}',
+  'RGAA 8.10.2: {n} element(s) with a dir attribute (ltr or rtl): check that each change of reading direction is relevant. Examples: {samples}':
+    'RGAA 8.10.2 : {n} élément(s) avec un attribut dir (ltr ou rtl) : vérifier que chaque changement du sens de lecture est pertinent. Exemples : {samples}',
+  'RGAA 9.1.2: {n} heading(s) that are empty or have no letter. Examples: {samples}':
+    'RGAA 9.1.2 : {n} titre(s) de section vide(s) ou sans aucune lettre. Exemples : {samples}',
+  'RGAA 9.1.2: {n} heading(s): check that each one is relevant. Examples: {samples}':
+    'RGAA 9.1.2 : {n} titre(s) de section : vérifier que chacun est pertinent. Exemples : {samples}',
+  'RGAA 9.2.1: the page has no visible <main> element.':
+    'RGAA 9.2.1 : la page n’a pas de balise <main> visible.',
+  'RGAA 9.2.1: {n} visible <main> elements, there should be only one. Examples: {samples}':
+    'RGAA 9.2.1 : {n} balises <main> visibles, il ne doit y en avoir qu’une. Exemples : {samples}',
+  'RGAA 9.2.1: the page has no <header> element outside <article> and <section>.':
+    'RGAA 9.2.1 : la page n’a pas de balise <header> en dehors de <article> et <section>.',
+  'RGAA 9.2.1: the page has no <footer> element outside <article> and <section>.':
+    'RGAA 9.2.1 : la page n’a pas de balise <footer> en dehors de <article> et <section>.',
+  'RGAA 9.2.1: the page has no <nav> element.':
+    'RGAA 9.2.1 : la page n’a pas de balise <nav>.',
+  'RGAA 9.2.1: the main, header, footer and nav elements are there: check that the structure of the document is relevant.':
+    'RGAA 9.2.1 : les balises main, header, footer et nav sont présentes : vérifier que la structure du document est pertinente.',
+  'RGAA 10.1.1: {n} tag(s) used for presentation only: {detail}. Examples: {samples}':
+    'RGAA 10.1.1 : {n} balise(s) servant uniquement à la présentation : {detail}. Exemples : {samples}',
+  'RGAA 10.1.2: {n} element(s) with attributes used for presentation ({detail}). Examples: {samples}':
+    'RGAA 10.1.2 : {n} élément(s) avec des attributs servant à la présentation ({detail}). Exemples : {samples}',
+  'RGAA 13.1.2: {n} <meta> redirection(s) that are not immediate. Examples: {samples}':
+    'RGAA 13.1.2 : {n} redirection(s) via <meta> qui ne sont pas immédiates. Exemples : {samples}',
+  'RGAA {test}: {n} link(s) whose address has no recognised file name: check that none gives access to an office document. Examples: {samples}':
+    'RGAA {test} : {n} lien(s) dont l’adresse ne comporte pas de nom de fichier reconnu : vérifier qu’aucun ne donne accès à un document bureautique. Exemples : {samples}',
+  'RGAA {test}: the page has a form: check that it does not give access to an office document.':
+    'RGAA {test} : la page comporte un formulaire : vérifier qu’il ne donne pas accès à un document bureautique.',
+  'RGAA {test}: {n} link(s) whose text is not explicit by itself (only punctuation, or "click here", "more"…) and that have no context. Examples: {samples}':
+    'RGAA {test} : {n} lien(s) dont l’intitulé n’est pas explicite par lui-même (ponctuation seule, ou « cliquez ici », « plus »…) et sans contexte. Exemples : {samples}',
+  'RGAA {test}: {n} link(s): check that the link text, alone or with its context, tells where the link goes. Examples: {samples}':
+    'RGAA {test} : {n} lien(s) : vérifier que l’intitulé, seul ou avec son contexte, indique la destination. Exemples : {samples}',
+  'RGAA 13.3.1: {n} link(s) to office documents ({detail}): check that each one is accessible or has an accessible version. Examples: {samples}':
+    'RGAA 13.3.1 : {n} lien(s) vers des documents bureautiques ({detail}) : vérifier que chacun est accessible ou dispose d’une version accessible. Exemples : {samples}',
+  'RGAA 13.4.1: {n} link(s) to office documents ({detail}): check that each one is accessible, or has an accessible version, in a format that can be consulted. Examples: {samples}':
+    'RGAA 13.4.1 : {n} lien(s) vers des documents bureautiques ({detail}) : vérifier que chacun est accessible, ou dispose d’une version accessible, dans un format consultable. Exemples : {samples}',
   // --- Asqatasun-derived: end ---
   'Is this link explicit: does its text (or its context) say where it goes or what it does?': 'Ce lien est-il explicite : son texte (ou son contexte) dit-il où il mène ou ce qu’il fait ?',
   'The link text, read alone or with its sentence, list item, cell or heading, tells the destination or the action (test 6.1.1).': 'L’intitulé du lien, lu seul ou avec sa phrase, son élément de liste, sa cellule ou son titre, indique la destination ou l’action (test 6.1.1).',

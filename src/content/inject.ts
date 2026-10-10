@@ -1,7 +1,7 @@
 import type { ImageElementInfo, RawFinding } from '../lib/types'
 // --- Asqatasun-derived: begin ---
 // Imported by this script only (no other file imports the table), so it stays inside this bundle.
-import { ASQ_CRITERION_TESTS, ASQ_NA_TEXT, ASQ_RULES, type AsqExtra, type AsqRule } from '../lib/asqatasun-rules'
+import { evaluateAsqRules, type AsqFinding } from '../lib/asqatasun-rules'
 // --- Asqatasun-derived: end ---
 
 const OVERLAY_ID = 'rgaa-assistant-overlay'
@@ -1304,28 +1304,7 @@ function runRgaaRules(): { url: string; findings: { key: string; count: number; 
     if (els.length) out.push({ key, count: els.length, detail, samples: samples(els) })
   }
 
-  // 8.1 — document type
-  if (!document.doctype || document.compatMode === 'BackCompat') out.push({ key: 'doctype', count: 1, detail: document.doctype ? document.doctype.name : 'no doctype' })
-  else {
-    const dt = document.doctype
-    out.push({ key: 'doctype-found', count: 0, detail: `<!DOCTYPE ${dt.name}${dt.publicId ? ` PUBLIC "${dt.publicId}"` : ''}${dt.systemId ? ` "${dt.systemId}"` : ''}> · ${document.compatMode === 'CSS1Compat' ? 'standards mode' : document.compatMode}` })
-  }
-
-  // 10.1 — tags and attributes that only serve presentation
-  const tags = all('basefont, big, blink, center, font, marquee, s, strike, tt')
-  if (tags.length) {
-    const names = [...new Set(tags.map((e) => e.tagName.toLowerCase()))]
-    push('presentation-tags', tags, names.join(', '))
-  }
-  const ATTRS = ['align', 'alink', 'background', 'bgcolor', 'border', 'cellpadding', 'cellspacing', 'clear', 'color', 'compact', 'face', 'frameborder', 'hspace', 'link', 'marginheight', 'marginwidth', 'noshade', 'nowrap', 'scrolling', 'text', 'valign', 'vlink', 'vspace']
-  const withAttrs = all(ATTRS.map((a) => `[${a}]`).join(',')).filter((e) => !e.closest('svg') && ATTRS.some((a) => e.hasAttribute(a) && !(['link', 'text', 'alink', 'vlink'].includes(a) && e.tagName !== 'BODY')))
-  if (withAttrs.length) {
-    const names = [...new Set(withAttrs.flatMap((e) => ATTRS.filter((a) => e.hasAttribute(a))))]
-    push('presentation-attrs', withAttrs, names.slice(0, 8).join(', '))
-  }
-
-  // 8.10 — reading direction
-  push('dir-invalid', all('[dir]').filter((e) => !/^(ltr|rtl)$/i.test(e.getAttribute('dir') ?? '')))
+  // 8.1 (document type), 8.10 (reading direction) and 10.1 (presentation tags and attributes) are Asqatasun's tests, see runAsqatasunRules()
 
   // 13.2 — links that open a new window without saying so
   const INFORMS = /(nouvelle\s+(fen[eê]tre|onglet)|nouvel\s+onglet|new\s+(window|tab)|external)/i
@@ -1350,15 +1329,10 @@ function runRgaaRules(): { url: string; findings: { key: string; count: number; 
     }),
   )
 
-  // 13.3 / 13.4 — office documents
-  const DOC = /\.(pdf|docx?|odt|xlsx?|ods|pptx?|odp|rtf)(?:[?#]|$)/i
-  const docs = all('a[href]').filter((a) => DOC.test(a.getAttribute('href') ?? ''))
-  if (docs.length) push('downloads', docs, [...new Set(docs.map((a) => (/\.(\w+)(?:[?#]|$)/.exec(a.getAttribute('href') ?? '')?.[1] ?? '').toLowerCase()))].join(', '))
+  // 13.3 / 13.4 (office documents) are Asqatasun's tests, see runAsqatasunRules()
 
-  // 4 — multimedia: present (to check) or absent (not applicable)
-  const media = all('video, audio, object, embed, bgsound, iframe[src*="youtube"], iframe[src*="youtu.be"], iframe[src*="vimeo"], iframe[src*="dailymotion"]')
-  if (media.length) push('media-found', media, [...new Set(media.map((e) => e.tagName.toLowerCase()))].join(', '))
-  else out.push({ key: 'no-media', count: 0 })
+  // 4 — multimedia: the tests 4.1 to 4.13 are Asqatasun's (one per test), this only says that there is no sound at all (4.10)
+  if (!all('video, audio, object, embed, bgsound, iframe[src*="youtube"], iframe[src*="youtu.be"], iframe[src*="vimeo"], iframe[src*="dailymotion"]').length) out.push({ key: 'no-media', count: 0 })
 
   // 5 — tables
   const tables = all('table, [role="table"], [role="grid"], [role="treegrid"]')
@@ -1389,84 +1363,13 @@ function runRgaaRules(): { url: string; findings: { key: string; count: number; 
 
 // --- Asqatasun-derived: begin ---
 /**
- * The RGAA tests ported from Asqatasun (AGPL-3.0, see NOTICE.md): the rules are data in lib/asqatasun-rules.ts, this
- * function only runs them. Findings are keyed `asq:<rule key>`; a criterion whose every test found nothing to check
- * comes back as `asq:na:<criterion>`. Each finding carries what the panel needs (criterion, verdict, wording).
+ * The RGAA tests ported from Asqatasun (AGPL-3.0, see NOTICE.md): the rules and their evaluation are in
+ * lib/asqatasun-rules.ts (the same code runs in jsdom, see scripts/check-asqatasun.mjs); this only hides our own
+ * overlay from them. Findings are keyed `asq:<rule key>`; a criterion whose every test found nothing to check comes
+ * back as `asq:na:<criterion>`. Each finding carries what the panel needs (criterion, verdict, wording).
  */
-function runAsqatasunRules(): { key: string; count: number; samples?: string[]; asq: AsqExtra }[] {
-  const found: { key: string; count: number; samples?: string[]; asq: AsqExtra }[] = []
-  const mine = (el: Element) => !el.closest(`[id^="${OVERLAY_ID}"]`)
-  const query = (selector: string): Element[] => Array.from(document.querySelectorAll(selector)).filter(mine)
-  const ownText = (el: Element): string =>
-    Array.from(el.childNodes)
-      .filter((n) => n.nodeType === Node.TEXT_NODE)
-      .map((n) => n.textContent ?? '')
-      .join(' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-  const dt = document.doctype
-  const html5 = Boolean(dt && dt.name.toLowerCase() === 'html' && !dt.publicId && (!dt.systemId || dt.systemId === 'about:legacy-compat'))
-  const mentionsCaptcha = (el: Element): boolean =>
-    el !== document.documentElement && el !== document.body && (/captcha/i.test(ownText(el)) || Array.from(el.attributes).some((a) => /captcha/i.test(a.value)))
-  let pageMentionsCaptcha: boolean | undefined
-  const ancestorsMention = (el: Element, test: (x: Element) => boolean): boolean => {
-    for (let a = el.parentElement; a; a = a.parentElement) if (test(a)) return true
-    return false
-  }
-
-  const select = (r: AsqRule): Element[] => {
-    let els = query(r.selector)
-    if (r.exclude) els = els.filter((el) => !el.matches(r.exclude as string))
-    if (r.ownText) {
-      const re = new RegExp(r.ownText)
-      els = els.filter((el) => re.test(ownText(el)))
-    }
-    if (r.attrRe) {
-      const [attr, source] = r.attrRe
-      const re = new RegExp(source, 'i')
-      els = els.filter((el) => re.test(el.getAttribute(attr) ?? ''))
-    }
-    if (r.followedBySameTag) {
-      els = els.filter((el) => {
-        let next = el.nextSibling
-        while (next && (next.nodeType === Node.COMMENT_NODE || (next.nodeType === Node.TEXT_NODE && !(next.textContent ?? '').trim()))) next = next.nextSibling
-        return next?.nodeType === Node.ELEMENT_NODE && (next as Element).tagName === el.tagName
-      })
-    }
-    if (r.captcha && els.length) {
-      pageMentionsCaptcha ??= /captcha/i.test(document.documentElement.outerHTML)
-      els = pageMentionsCaptcha
-        ? els.filter((el) => {
-            // a sibling or an ancestor counts when it is another kind of element (or a div)
-            const other = (x: Element) => (x.tagName !== el.tagName || el.tagName === 'DIV') && mentionsCaptcha(x)
-            return mentionsCaptcha(el) || Array.from(el.parentElement?.children ?? []).some((s) => s !== el && other(s)) || ancestorsMention(el, other)
-          })
-        : []
-    }
-    return els
-  }
-
-  // per test: did every rule of the test find nothing to check ("na"), or did one find something / say pass?
-  const naTests = new Set<string>()
-  const busyTests = new Set<string>()
-  for (const r of ASQ_RULES) {
-    try {
-      if (r.html5 && !html5) continue
-      const els = select(r)
-      if (els.length && els.length >= (r.minCount ?? 1)) {
-        busyTests.add(r.test)
-        found.push({ key: `asq:${r.key ?? r.test}`, count: els.length, samples: els.slice(0, 3).map(shortSelector), asq: { criterion: r.criterion, status: r.whenFound, text: r.text } })
-      } else if (r.whenNone === 'na' && !(r.scope ? query(r.scope).length : els.length)) {
-        naTests.add(r.test)
-      } else busyTests.add(r.test)
-    } catch {
-      busyTests.add(r.test) // a selector this browser does not understand: say nothing
-    }
-  }
-  for (const [criterion, tests] of Object.entries(ASQ_CRITERION_TESTS)) {
-    if (tests.every((t) => naTests.has(t) && !busyTests.has(t))) found.push({ key: `asq:na:${criterion}`, count: 0, asq: { criterion, status: 'na', text: ASQ_NA_TEXT } })
-  }
-  return found
+function runAsqatasunRules(): AsqFinding[] {
+  return evaluateAsqRules(document, (el) => Boolean(el.closest(`[id^="${OVERLAY_ID}"]`))).findings
 }
 // --- Asqatasun-derived: end ---
 

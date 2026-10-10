@@ -2957,10 +2957,16 @@ function rulesToResults(url: string, findings: RuleFinding[]): { own: ToolResult
     for (const criterion of meta.criteria) answers.push({ criterion, status: meta.status, note, rule: f.key })
   }
   // --- Asqatasun-derived: begin ---
-  // Tests ported from Asqatasun: nc = fails, review = a note only, na = not applicable (a pass is never recorded).
+  // Tests ported from Asqatasun: nc = fails, review = a note only, na = not applicable. A criterion where every test ported for it
+  // passed comes as `pass`: it goes to passedChecks ("nothing found", and the criterion is pre-filled "compliant, to confirm").
+  const asqPassed: ToolResults['passedChecks'] = []
   for (const f of findings as (RuleFinding & { asq?: AsqExtra })[]) {
     if (!f.asq) continue
-    const note = t(f.asq.text, { n: f.count, samples: (f.samples ?? []).join(', '), criterion: f.asq.criterion })
+    if (f.asq.status === 'pass') {
+      asqPassed.push({ criterion: f.asq.criterion, rule: f.key, detail: f.detail })
+      continue
+    }
+    const note = t(f.asq.text, { n: f.count, samples: (f.samples ?? []).join(', '), criterion: f.asq.criterion, test: f.asq.test, detail: f.detail ?? '' })
     asqAnswers.push({ criterion: f.asq.criterion, status: f.asq.status === 'review' ? null : f.asq.status, note, rule: f.key })
   }
   // --- Asqatasun-derived: end ---
@@ -2972,7 +2978,7 @@ function rulesToResults(url: string, findings: RuleFinding[]): { own: ToolResult
     if (meta.status === 'nc' && !found.has(key)) for (const criterion of meta.criteria) passedChecks.push({ criterion, rule: key, detail: seen.get(`${key}-found`) })
   }
   // --- Asqatasun-derived: begin ---
-  const asq: ToolResults = { tool: 'Asqatasun', url, violations: [], answers: asqAnswers, incomplete: 0, passes: 0, passedChecks: [] }
+  const asq: ToolResults = { tool: 'Asqatasun', url, violations: [], answers: asqAnswers, incomplete: 0, passes: asqPassed.length, passedChecks: asqPassed }
   // --- Asqatasun-derived: end ---
   return { own: { tool: 'RGAA', url, violations: [], answers, incomplete: 0, passes: passedChecks.length, passedChecks }, asq }
 }
@@ -2997,7 +3003,9 @@ async function runAutoChecks(): Promise<void> {
     }
     const split = rulesToResults(own.url, own.findings ?? [])
     const ownReport = applyToolResults(rec, split.own, { addThemes: true })
+    // --- Asqatasun-derived: begin ---
     const asqReport = applyToolResults(rec, split.asq, { addThemes: true })
+    // --- Asqatasun-derived: end ---
     const report = applyToolResults(rec, results, { addThemes: true })
     step = 'html'
     try {
