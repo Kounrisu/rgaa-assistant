@@ -510,4 +510,7 @@ export const FR_PANEL: Record<string, string> = {
   '{label} now points to {url}.': '{label} pointe maintenant vers {url}.',
   '{label} has no address. The browser is on {other}: open the page of {label} in the browser, then select {label} again.': '{label} n’a pas d’adresse. Le navigateur est sur {other} : ouvrez la page de {label} dans le navigateur, puis resélectionnez {label}.',
   'Could not run the automatic checks ({reason}). Reload the page (F5) if you just reloaded the extension, check the extension may access this site, then try again.': 'Impossible de lancer les contrôles automatiques ({reason}). Rechargez la page (F5) si vous venez de recharger l’extension, vérifiez que l’extension peut accéder à ce site, puis réessayez.',
+  'No automatic check covers this criterion.': 'Aucun contrôle automatique ne couvre ce critère.',
+  'Automatic checks ({tool}): nothing found by {rules}. This does not prove the criterion is met: check the rest by hand.': 'Contrôles automatiques ({tool}) : rien trouvé par {rules}. Cela ne prouve pas que le critère est respecté : vérifiez le reste à la main.',
+  'Automatic checks ({tool}) found a problem: {rules}.': 'Les contrôles automatiques ({tool}) ont trouvé un problème : {rules}.',
 }

@@ -16,7 +16,7 @@ import type { AsqExtra } from '../lib/asqatasun-rules' // a type only: the table
 // --- Asqatasun-derived: end ---
 import { FINDING_CRITERIA, findingCriterionIds, hintForFinding, suggestFinding, type FindingCriterion } from '../lib/findings'
 import { FINDING_THEMES, SCANNED_THEMES, THEMES, THEME_LABEL, themeByNumber } from '../lib/themes'
-import type { Audit, AuditItem, AuditSummary, ChecklistVerdict, Detected, FindingItem, ImageElementInfo, ImageKind, ImageReview, PageRecord, RawFinding, Verdict } from '../lib/types'
+import type { Audit, AuditItem, AuditSummary, ChecklistAnswer, ChecklistVerdict, Detected, FindingItem, ImageElementInfo, ImageKind, ImageReview, PageRecord, RawFinding, Verdict } from '../lib/types'
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T
 
@@ -1426,6 +1426,21 @@ function perFindingIds(): string[] {
   return findingCriterionIds(theme)
 }
 
+/** What the automatic checks found for a criterion (or that none covers it, once they have been run on the page). */
+function autoHints(answer: ChecklistAnswer): HTMLElement[] {
+  const entries = Object.entries(answer.autoResults ?? {})
+  if (!entries.length) return (page?.imports?.length ?? 0) > 0 ? [h('p', { class: 'hint-line' }, t('No automatic check covers this criterion.'))] : []
+  return entries.map(([tool, r]) =>
+    h(
+      'p',
+      { class: `hint ${r.result === 'pass' ? 'ok' : 'warn'}` },
+      r.result === 'pass'
+        ? t('Automatic checks ({tool}): nothing found by {rules}. This does not prove the criterion is met: check the rest by hand.', { tool, rules: r.rules.join(', ') })
+        : t('Automatic checks ({tool}) found a problem: {rules}.', { tool, rules: r.rules.join(', ') }),
+    ),
+  )
+}
+
 function renderChecklist(host: HTMLElement = themeEl): void {
   const def = themeByNumber(theme)
   if (!page || !def) return
@@ -1482,6 +1497,7 @@ function renderChecklist(host: HTMLElement = themeEl): void {
       ),
       h('p', { class: 'question' }, c.title.replace(/`/g, '')),
       h('p', { class: 'hint info' }, c.note),
+      ...autoHints(answer),
       ...(answer.source ? [h('p', { class: 'hint info source-note' }, t('Pre-filled from {tool}: confirm it or change it.', { tool: answer.source }))] : []),
       h(
         'details',
@@ -2820,17 +2836,23 @@ function rulesToResults(url: string, findings: RuleFinding[]): ToolResults {
     const meta = RULES[f.key]
     if (!meta) continue
     const note = t(meta.text, { n: f.count, detail: f.detail ? t(f.detail) : '', samples: (f.samples ?? []).join(', ') })
-    for (const criterion of meta.criteria) answers.push({ criterion, status: meta.status, note })
+    for (const criterion of meta.criteria) answers.push({ criterion, status: meta.status, note, rule: f.key })
   }
   // --- Asqatasun-derived: begin ---
   // Tests ported from Asqatasun: nc = fails, review = a note only, na = not applicable (a pass is never recorded).
   for (const f of findings as (RuleFinding & { asq?: AsqExtra })[]) {
     if (!f.asq) continue
     const note = t(f.asq.text, { n: f.count, samples: (f.samples ?? []).join(', '), criterion: f.asq.criterion })
-    answers.push({ criterion: f.asq.criterion, status: f.asq.status === 'review' ? null : f.asq.status, note })
+    answers.push({ criterion: f.asq.criterion, status: f.asq.status === 'review' ? null : f.asq.status, note, rule: f.key })
   }
   // --- Asqatasun-derived: end ---
-  return { tool: 'RGAA', url, violations: [], answers, incomplete: 0, passes: 0 }
+  // our checks that look for a failure and found none: shown as "checked" on their criteria
+  const found = new Set(findings.map((f) => f.key))
+  const passedChecks: ToolResults['passedChecks'] = []
+  for (const [key, meta] of Object.entries(RULES)) {
+    if (meta.status === 'nc' && !found.has(key)) for (const criterion of meta.criteria) passedChecks.push({ criterion, rule: key })
+  }
+  return { tool: 'RGAA', url, violations: [], answers, incomplete: 0, passes: passedChecks.length, passedChecks }
 }
 
 async function runAutoChecks(): Promise<void> {

@@ -72,6 +72,8 @@ export interface ChecklistAnswer {
   note: string
   /** Name of the tool that pre-filled the verdict (axe…); cleared when the auditor answers. */
   source?: string
+  /** What the automatic checks found for this criterion, by tool, at the last run. */
+  autoResults?: Record<string, { result: 'pass' | 'fail'; rules: string[] }>
 }
 
 /** What an import of another tool's results did on a page. */

@@ -1251,7 +1251,8 @@ async function runAxe(locale: unknown): Promise<Record<string, unknown>> {
     const r = (await axe.run(document, { resultTypes: ['violations', 'incomplete'] })) as {
       violations: { id: string; impact: string | null; help: string; nodes: { html: string; target: unknown[]; any?: { data?: unknown }[] }[] }[]
       incomplete: unknown[]
-      passes: unknown[]
+      passes: { id: string }[]
+      inapplicable: { id: string }[]
     }
     return {
       url: location.href,
@@ -1263,6 +1264,8 @@ async function runAxe(locale: unknown): Promise<Record<string, unknown>> {
       })),
       incomplete: r.incomplete.length,
       passes: r.passes?.length ?? 0,
+      passedRules: (r.passes ?? []).map((p) => p.id),
+      inapplicableRules: (r.inapplicable ?? []).map((p) => p.id),
     }
   } catch (err) {
     return { error: String(err) }
