@@ -668,3 +668,9 @@ dialog.confirm { width: min(460px, 92vw); }
 .progress .meter { width: 120px; height: 8px; border-radius: 4px; background: var(--border); overflow: hidden; display: inline-flex; }
 .progress .meter i { display: block; height: 100%; }
 .progress .meter .c { background: var(--ok); } .progress .meter .nc { background: var(--bad); } .progress .meter .na { background: #94a3b8; }
+
+/* Retry next to the "not saved" pill */
+.error-retry { border: 1px solid #b42318; background: #fff; color: #b42318; font-weight: 600; cursor: pointer; }
+.error-retry[hidden] { display: none; }
+.error-retry:hover { background: #fde8e8; }
+#choice-actions { flex-wrap: wrap; }

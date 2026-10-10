@@ -1,7 +1,9 @@
 import { DETECTED_LABEL, criteriaFor, criterionUrl, detectedOf, hintFor, suggestedKind, type Criterion } from '../lib/rgaa'
 import { auditSheets, auditStats, buildWorkbook, countsOf, isProvisional, levelStats, pageSheets, pct2, rateExact, rateOf, thumbKey, type Counts, type PageInput } from '../lib/audit-sheet'
 import { confirm as confirmVerdict, evidenceConflicts as evidenceConflictsOf } from '../lib/evidence'
-import { auditFromFile, auditToFile, copyOf, createPage, deleteAuditById, emptyAudit, FILE_EXTENSION, findPage, listAudits, loadActiveAudit, loadAuditById, normalizeUrl, saveAudit, setActiveId } from '../lib/audit-store'
+import { createPage, emptyAudit, FILE_EXTENSION, findPage, listAudits, normalizeUrl } from '../lib/audit-store'
+import { createAuditSession, describeAuditError, type Choice } from './audit-session'
+import type { CaptureResponse, TabInfoResponse } from '../lib/messages'
 import { getLang, setLang, t, translateStatic, type Lang } from '../lib/i18n'
 import type { Sheet } from '../lib/xlsx'
 import { makeThumbs } from '../lib/thumbs'
@@ -237,25 +239,7 @@ function fileName(src: string): string {
 /* ------------------------------------------------------------------ */
 
 const reviewKey = (el: Item) => el.key
-let saveTimer: number | undefined
-type SaveState = 'saved' | 'saving' | 'error'
-let saveState: SaveState = 'saved'
-let savedAt = 0
-
-/** Writes the audit now. The status next to the audit name follows: saving, saved at…, or not saved. */
-async function saveNow(): Promise<void> {
-  window.clearTimeout(saveTimer)
-  saveTimer = undefined
-  try {
-    await saveAudit(audit)
-    saveState = 'saved'
-    savedAt = Date.now()
-  } catch (err) {
-    saveState = 'error'
-    console.error(err)
-  }
-  renderAuditBar()
-}
+// The save state machine, the retry and the audit lifecycle live in ./audit-session (see `session`, further down).
 
 function persist(): void {
   const now = Date.now()
@@ -264,11 +248,8 @@ function persist(): void {
     page.updatedAt = now
   }
   audit.updatedAt = now
-  saveState = 'saving'
-  renderAuditBar()
+  session.markDirty()
   pushStates()
-  window.clearTimeout(saveTimer)
-  saveTimer = window.setTimeout(() => void saveNow(), 400)
 }
 const saveReviews = persist
 
@@ -1739,9 +1720,12 @@ async function captureShots(list: FindingItem[]): Promise<number> {
       const loc = await sendToPage(tabId, { type: 'RGAA_LOCATE', theme: f.theme, id: f.id }).catch(() => null)
       if (!loc?.rect) continue
       await sleep(180)
-      const cap = await chrome.runtime.sendMessage({ type: 'RGAA_CAPTURE', tabId })
-      if (!cap?.dataUrl) {
-        say(t('Could not take previews ({error}). Check that the extension may access this site.', { error: cap?.error ?? t('no screenshot') }))
+      const cap: CaptureResponse | undefined = await chrome.runtime.sendMessage({ type: 'RGAA_CAPTURE', tabId })
+      if (!cap || !('dataUrl' in cap) || !cap.dataUrl) {
+        // nothing is saved: a picture of another tab must never be attached to this page
+        const code = cap && 'code' in cap ? cap.code : undefined
+        if (code === 'not-active' || code === 'changed') say(t('The inspected tab is not the one shown. Switch back to it, then try again.'))
+        else say(t('Could not take previews ({error}). Check that the extension may access this site.', { error: cap && 'error' in cap ? cap.error : t('no screenshot') }))
         break
       }
       f.shot = await cropShot(cap.dataUrl, loc)
@@ -2638,7 +2622,7 @@ function inspectedEval(expression: string): Promise<string> {
 }
 
 async function tabInfo(): Promise<{ url: string; title: string }> {
-  const info = await chrome.runtime.sendMessage({ type: 'RGAA_TAB_INFO', tabId: inspectedTabId() }).catch(() => null)
+  const info: TabInfoResponse | null = await chrome.runtime.sendMessage({ type: 'RGAA_TAB_INFO', tabId: inspectedTabId() }).catch(() => null)
   return { url: typeof info?.url === 'string' ? info.url : '', title: typeof info?.title === 'string' ? info.title : '' }
 }
 
@@ -3138,6 +3122,7 @@ autoBtn.addEventListener('click', () => void runEverything())
 
 const auditNameBtn = $<HTMLButtonElement>('audit-name-btn')
 const saveStateEl = $('save-state')
+const saveRetryBtn = $<HTMLButtonElement>('save-retry-btn')
 const backupStateEl = $('backup-state')
 const auditsBtn = $<HTMLButtonElement>('audits-btn')
 const saveFileBtn = $<HTMLButtonElement>('save-file-btn')
@@ -3158,10 +3143,24 @@ const auditTitle = (a: { name: string }) => a.name || t('Untitled audit')
 function renderAuditBar(): void {
   auditNameBtn.textContent = auditTitle(audit)
   auditNameBtn.title = t('Rename this audit')
+  const { saveState, savedAt, blocked, lastError } = session
   saveStateEl.className = `pill ${saveState === 'saved' ? '' : saveState}`
   saveStateEl.textContent =
-    saveState === 'saving' ? t('Saving…') : saveState === 'error' ? t('Not saved! Save to a file now.') : t('Saved {time}', { time: timeOf(savedAt || audit.updatedAt) })
-  saveStateEl.title = saveState === 'error' ? t('Not saved: browser storage full or unavailable. Save to a file now.') : t('Saved in the browser at {time}', { time: timeOf(savedAt || audit.updatedAt) })
+    saveState === 'saving'
+      ? t('Saving…')
+      : saveState === 'error'
+        ? blocked
+          ? t('Not loaded! The saved audit cannot be read; nothing will be written over it.')
+          : t('Not saved! Retry, or save to a file now.')
+        : t('Saved {time}', { time: timeOf(savedAt || audit.updatedAt) })
+  saveStateEl.title =
+    saveState === 'error'
+      ? blocked
+        ? lastError
+        : t('Not saved: browser storage full or unavailable ({error}). Retry, or save to a file now.', { error: lastError || '—' })
+      : t('Saved in the browser at {time}', { time: timeOf(savedAt || audit.updatedAt) })
+  saveRetryBtn.hidden = saveState !== 'error'
+  saveRetryBtn.textContent = blocked ? t('Retry loading') : t('Retry')
   const never = audit.exportedAt === undefined
   const changed = !never && audit.updatedAt > (audit.exportedAt ?? 0)
   backupStateEl.className = `pill ${never || changed ? (audit.pages.length ? 'warn' : 'muted') : 'muted'}`
@@ -3213,102 +3212,6 @@ function askText(title: string, label: string, initial = '', okLabel = t('OK')):
   })
 }
 
-async function renameAudit(): Promise<void> {
-  const name = await askText(t('Rename this audit'), t('Name of the audit'), audit.name)
-  if (name === null || name === audit.name) return
-  audit.name = name
-  persist()
-  renderAuditBar()
-  if (view === 'audits') void renderAuditsView()
-  say(t('Audit renamed “{name}”.', { name }))
-}
-
-/** Opens `next` in the panel: the current audit is saved first. */
-async function activateAudit(next: Audit): Promise<void> {
-  if (saveTimer !== undefined) await saveNow()
-  audit = next
-  await setActiveId(next.id).catch(() => undefined)
-  scannedThisSession.clear()
-  findingSel = null
-  theme = 1
-  void clearBoxes()
-  loadPage((liveUrl ? findPage(audit, liveUrl) : undefined) ?? audit.pages.find((p) => p.id === audit.current) ?? audit.pages[0] ?? null)
-  saveState = 'saved'
-  savedAt = audit.updatedAt
-  setView('review')
-  renderAll()
-  renderAuditBar()
-}
-
-async function newAudit(): Promise<void> {
-  const name = await askText(t('New audit'), t('Name of the audit'), '', t('Create'))
-  if (name === null) return
-  const fresh = emptyAudit(name)
-  try {
-    await saveAudit(fresh)
-  } catch {
-    return void say(t('Could not create the audit: browser storage is full or unavailable.'))
-  }
-  await activateAudit(fresh)
-  say(t('Audit “{name}” created. Add the first page of your sample to start.', { name }))
-}
-
-async function openAuditById(id: string): Promise<void> {
-  if (id === audit.id) return setView('review')
-  const next = await loadAuditById(id)
-  if (!next) return void say(t('This audit could not be read.'))
-  await activateAudit(next)
-  say(t('Audit “{name}” opened: {n} page(s).', { name: auditTitle(next), n: next.pages.length }))
-}
-
-async function duplicateAuditById(id: string): Promise<void> {
-  const source = id === audit.id ? audit : await loadAuditById(id)
-  if (!source) return
-  const name = await askText(t('Duplicate this audit'), t('Name of the copy'), t('{name} (copy)', { name: auditTitle(source) }), t('Duplicate'))
-  if (name === null) return
-  if (source === audit && saveTimer !== undefined) await saveNow()
-  const copy = copyOf(source, name)
-  try {
-    await saveAudit(copy)
-  } catch {
-    return void say(t('Could not create the audit: browser storage is full or unavailable.'))
-  }
-  say(t('Copy “{name}” created. It is in the list; open it when you want.', { name }))
-  void renderAuditsView()
-}
-
-async function renameAuditById(id: string): Promise<void> {
-  if (id === audit.id) return renameAudit()
-  const other = await loadAuditById(id)
-  if (!other) return
-  const name = await askText(t('Rename this audit'), t('Name of the audit'), other.name)
-  if (name === null) return
-  other.name = name
-  await saveAudit(other).catch(() => say(t('Could not save the audit.')))
-  void renderAuditsView()
-}
-
-async function deleteAuditFlow(id: string): Promise<void> {
-  const target = id === audit.id ? audit : await loadAuditById(id)
-  if (!target) return
-  const ok = await askConfirm(
-    t('Delete the audit “{name}”?', { name: auditTitle(target) }),
-    t('This deletes its {n} page(s), scans, answers and notes from the browser. A file you saved stays where it is. It cannot be undone.', { n: target.pages.length }),
-    t('Delete'),
-  )
-  if (!ok) return
-  await deleteAuditById(id)
-  if (id === audit.id) {
-    const rest = (await listAudits()).sort((a, b) => b.updatedAt - a.updatedAt)[0]
-    const next = (rest ? await loadAuditById(rest.id) : null) ?? emptyAudit(t('Untitled audit'))
-    if (!rest) await saveAudit(next).catch(() => undefined)
-    saveTimer = undefined
-    await activateAudit(next)
-    setView('audits')
-  } else void renderAuditsView()
-  say(t('Audit “{name}” deleted.', { name: auditTitle(target) }))
-}
-
 /** Downloads the whole audit as a .rgaa.json file. */
 const hostName = (url: string): string => { try { return new URL(url).hostname.replace(/^www\./, '') } catch { return '' } }
 
@@ -3328,51 +3231,73 @@ function adoptSite(url: string): void {
   if (!audit.name.trim() || audit.name === 'Untitled audit' || audit.name === 'Audit sans titre') audit.name = audit.meta.site
 }
 
-async function saveAuditToFile(id: string = audit.id): Promise<void> {
-  const target = id === audit.id ? audit : await loadAuditById(id)
-  if (!target) return
-  target.exportedAt = target.updatedAt
-  const file = auditFileName(target)
-  download(auditToFile(target), 'application/json', file)
-  if (target === audit) await saveNow()
-  else await saveAudit(target).catch(() => undefined)
-  renderAuditBar()
-  if (view === 'audits') void renderAuditsView()
-  say(t('Audit saved as {file} (in your Downloads folder). Reopen it any time with “Open from a file”.', { file }))
+const choiceDialog = $<HTMLDialogElement>('choice-dialog')
+
+/** A question with several answers (buttons); null when it is dismissed. */
+function askChoice(title: string, text: string, choices: Choice[]): Promise<string | null> {
+  return new Promise((resolve) => {
+    $('choice-title').textContent = title
+    $('choice-text').textContent = text
+    const box = $('choice-actions')
+    box.replaceChildren()
+    const finish = (id: string | null) => {
+      choiceDialog.removeEventListener('cancel', onCancel)
+      if (choiceDialog.open) choiceDialog.close()
+      resolve(id)
+    }
+    const onCancel = (event: Event) => {
+      event.preventDefault() // Escape would otherwise close the dialog without answering
+      finish(null)
+    }
+    for (const c of choices) box.append(h('button', { type: 'button', class: c.primary ? 'primary' : '', onclick: () => finish(c.id) }, c.label))
+    choiceDialog.addEventListener('cancel', onCancel)
+    choiceDialog.showModal()
+  })
 }
 
-async function importAuditFile(file: File): Promise<void> {
-  let incoming: Audit
-  try {
-    incoming = auditFromFile(await file.text())
-  } catch (err) {
-    return void say((err as Error).message === 'not-json' ? t('This file is not valid JSON.') : t('This file is not an RGAA Assistant audit.'))
-  }
-  const existing = (await listAudits()).find((a) => a.id === incoming.id)
-  if (existing) {
-    const replace = await askConfirm(
-      t('This audit is already in the browser'),
-      t('“{name}” (saved {date}) has the same identifier as the file. Replace it with the file, or cancel to choose another option?', { name: existing.name, date: dateTimeOf(existing.updatedAt) }),
-      t('Replace it'),
-    )
-    if (!replace) {
-      const asCopy = await askConfirm(t('Import as a copy?'), t('The file is imported as a new audit and the one in the browser is kept.'), t('Import as a copy'))
-      if (!asCopy) return void say(t('Import cancelled.'))
-      incoming = copyOf(incoming, t('{name} (imported)', { name: auditTitle(incoming) }))
-    }
-  }
-  try {
-    await saveAudit(incoming)
-  } catch {
-    return void say(t('Could not import the audit: browser storage is full or unavailable.'))
-  }
-  await activateAudit(incoming)
-  say(t('Audit “{name}” reopened from the file: {n} page(s). You can carry on.', { name: auditTitle(incoming), n: incoming.pages.length }))
+/** The open audit and everything that stores it: see audit-session.ts. */
+const session = createAuditSession({
+  getAudit: () => audit,
+  setAudit: (next) => { audit = next },
+  onActivated: () => {
+    scannedThisSession.clear()
+    findingSel = null
+    theme = 1
+    void clearBoxes()
+    loadPage((liveUrl ? findPage(audit, liveUrl) : undefined) ?? audit.pages.find((p) => p.id === audit.current) ?? audit.pages[0] ?? null)
+    setView('review')
+    renderAll()
+  },
+  onState: () => renderAuditBar(),
+  onListChanged: () => { if (view === 'audits') void renderAuditsView() },
+  say,
+  askText,
+  askConfirm,
+  askChoice,
+  download,
+  fileNameOf: auditFileName,
+})
+
+const renameAudit = (): Promise<unknown> => session.renameAuditById(audit.id).then(() => { renderAuditBar(); if (view === 'audits') void renderAuditsView() })
+const newAudit = (): Promise<boolean> => session.newAudit()
+const openAuditById = (id: string): Promise<boolean> => session.openAuditById(id).then((ok) => { if (ok) setView('review'); return ok })
+const duplicateAuditById = (id: string): Promise<void> => session.duplicateAuditById(id)
+const renameAuditById = (id: string): Promise<unknown> => session.renameAuditById(id)
+const saveAuditToFile = (id?: string): Promise<void> => session.saveAuditToFile(id)
+const importAuditFile = (file: File): Promise<boolean> => session.importAuditFile(file)
+async function deleteAuditFlow(id: string): Promise<void> {
+  const wasOpen = id === audit.id
+  if ((await session.deleteAuditFlow(id)) && wasOpen) setView('audits')
 }
 
 async function renderAuditsView(): Promise<void> {
-  if (saveTimer !== undefined) await saveNow()
-  const list: AuditSummary[] = (await listAudits()).sort((a, b) => b.updatedAt - a.updatedAt)
+  await session.flush()
+  let list: AuditSummary[]
+  try {
+    list = (await listAudits()).sort((a, b) => b.updatedAt - a.updatedAt)
+  } catch (err) {
+    return void say(describeAuditError(err))
+  }
   if (view !== 'audits') return
   auditsEl.replaceChildren(
     h(
@@ -3440,18 +3365,17 @@ importInput.addEventListener('change', () => {
   if (file) void importAuditFile(file)
 })
 // the last edits are written when the panel is hidden or closed
-window.addEventListener('pagehide', () => { if (saveTimer !== undefined) void saveNow() })
-document.addEventListener('visibilitychange', () => { if (document.hidden && saveTimer !== undefined) void saveNow() })
+window.addEventListener('pagehide', () => { if (session.hasPending()) void session.saveNow() })
+document.addEventListener('visibilitychange', () => { if (document.hidden && session.hasPending()) void session.saveNow() })
+saveRetryBtn.addEventListener('click', () => void session.retry())
 
 async function init(): Promise<void> {
   setLang(getLang())
   translateStatic()
   initPageTools(pageToolsEl, { send: (payload) => sendToPage(inspectedTabId(), payload), say })
-  audit = await loadActiveAudit(t('Untitled audit'))
-  saveState = 'saved'
-  savedAt = audit.updatedAt
+  const loaded = await session.loadInitial()
   const firstUrl = audit.pages.find((p) => p.url)?.url
-  if (!audit.meta.site.trim() && firstUrl) {
+  if (loaded && !audit.meta.site.trim() && firstUrl) {
     adoptSite(firstUrl)
     persist()
   }
@@ -3460,6 +3384,6 @@ async function init(): Promise<void> {
   renderAll()
   renderAuditBar()
   if (liveUrl) showNavBanner(liveUrl)
-  say(t('Audit “{name}” opened: {n} page(s).', { name: auditTitle(audit), n: audit.pages.length }))
+  if (loaded) say(t('Audit “{name}” opened: {n} page(s).', { name: auditTitle(audit), n: audit.pages.length }))
 }
 void init()
