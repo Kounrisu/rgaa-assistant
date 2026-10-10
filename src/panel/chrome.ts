@@ -1,4 +1,7 @@
-import { type Outcome } from '../lib/results'
+/**
+ * The frame around the views: totals and their jumps, page bar, theme bar and its menu, address reminder, audit bar, empty screen.
+ */
+import type { Outcome } from '../lib/results'
 import { state } from './state'
 import { pageInput, pageLabel, adoptSite, persist, nextPageLabel } from './model'
 import { t, getLang } from '../lib/i18n'

@@ -1,3 +1,6 @@
+/**
+ * Types shared by the panel modules.
+ */
 import type { AuditItem, Detected } from '../lib/types'
 
 export type Item = AuditItem

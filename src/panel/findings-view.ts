@@ -1,3 +1,6 @@
+/**
+ * The themes reviewed finding by finding (Frames, Colours, Tables, Links, Structure, Forms): list, filters, detail and criteria cards.
+ */
 import type { FindingItem, ImageReview, Verdict } from '../lib/types'
 import { state } from './state'
 import { persist, pageLabel } from './model'

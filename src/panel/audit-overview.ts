@@ -1,3 +1,6 @@
+/**
+ * The audit overview: dashboard (level tables, charts, results per page) and the sheets of all pages.
+ */
 import { h, dom } from './dom'
 import { t } from '../lib/i18n'
 import { pct2, type Counts, rateExact, type PageInput, auditStats, levelStats, isProvisional, auditSheets } from '../lib/audit-sheet'

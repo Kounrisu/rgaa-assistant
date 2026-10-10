@@ -1,3 +1,6 @@
+/**
+ * The list of audits, and the audit actions behind its buttons (open, rename, duplicate, save to file, delete).
+ */
 import { state } from './state'
 import { renderAuditBar } from './chrome'
 import type { AuditSummary } from '../lib/types'

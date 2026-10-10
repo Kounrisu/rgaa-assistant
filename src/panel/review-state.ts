@@ -1,3 +1,7 @@
+/**
+ * What the reviews say: the status of an image or a finding, the list filters, and the colour code of the boxes on the page.
+ * Reads the shared state; touches no DOM.
+ */
 import type { Item, Status, Filter, FStatus, FindingFilter } from './types'
 import type { ImageReview, FindingItem } from '../lib/types'
 import { state } from './state'

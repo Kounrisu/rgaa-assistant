@@ -1,3 +1,7 @@
+/**
+ * Everything that talks to the inspected tab: the typed messages to the content script, the boxes on the page (show, hide, colour code),
+ * its address and title, the small pictures of the findings.
+ */
 import type { ContentMessage, ContentResponse, CaptureResponse, TabInfoResponse } from '../lib/messages'
 import { state } from './state'
 import { say, dom } from './dom'

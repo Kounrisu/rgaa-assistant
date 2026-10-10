@@ -1,3 +1,6 @@
+/**
+ * The results of the page (one grid per official test), and the sheet tables shared with the audit overview.
+ */
 import { h, dom } from './dom'
 import { t } from '../lib/i18n'
 import { state } from './state'

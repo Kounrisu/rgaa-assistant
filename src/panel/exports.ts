@@ -1,3 +1,6 @@
+/**
+ * Getting data out of the panel: the Excel grid and the HTML report.
+ */
 import { type PageInput, thumbKey, buildWorkbook } from '../lib/audit-sheet'
 import type { Sheet } from '../lib/xlsx'
 import { say, download } from './dom'

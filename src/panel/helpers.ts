@@ -1,3 +1,7 @@
+/**
+ * Pure helpers of the panel: fingerprints, file names, slugs, the translation of the scan's English texts, HTML pretty-printing.
+ * No DOM, no shared state.
+ */
 import type { ImageElementInfo, Audit } from '../lib/types'
 import { t, getLang } from '../lib/i18n'
 import type { Item } from './types'

@@ -1,8 +1,12 @@
+/**
+ * The page of the sample in use: its label, the input of the results computation, loading it into the shared state,
+ * and persist(), called after any change so the audit is saved.
+ */
 import { state } from './state'
 import { pushStates } from './page-bridge'
 import type { PageRecord, ImageElementInfo } from '../lib/types'
 import { pad, hostName } from './helpers'
-import { type PageInput } from '../lib/audit-sheet'
+import type { PageInput } from '../lib/audit-sheet'
 import type { Item } from './types'
 import { computeThemes } from '../lib/results'
 import { detectedOf } from '../lib/rgaa'

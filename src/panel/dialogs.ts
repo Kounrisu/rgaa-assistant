@@ -1,6 +1,9 @@
+/**
+ * Questions asked inside the panel (confirm, text, choice). The browser's own popups are not shown in a DevTools panel.
+ */
 import { $, dom, h } from './dom'
 import { t } from '../lib/i18n'
-import { type Choice } from './audit-session'
+import type { Choice } from './audit-session'
 
 /**
  * Asks a question inside the panel. The browser's own confirm() popup is not shown in a DevTools panel

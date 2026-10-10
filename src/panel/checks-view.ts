@@ -1,3 +1,6 @@
+/**
+ * The Checks view: automatic checks, the page HTML card, scan coverage, the reports of each tool and the manual checks.
+ */
 import type { PageRecord } from '../lib/types'
 import { MANUAL_CHECKS, MANUAL_GROUPS } from '../lib/manual-checks'
 import { h, dom, keepScroll, download, say } from './dom'

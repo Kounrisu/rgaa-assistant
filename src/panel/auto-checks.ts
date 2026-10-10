@@ -1,3 +1,6 @@
+/**
+ * The automatic checks: capture and validate the page HTML, turn our RGAA rules into tool results, run axe + RGAA + Asqatasun-derived rules + HTML.
+ */
 import type { PageRecord } from '../lib/types'
 import { sendToPage, inspectedTabId } from './page-bridge'
 import { packSnapshot } from '../lib/snapshot'
