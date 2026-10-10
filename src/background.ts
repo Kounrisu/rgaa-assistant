@@ -16,6 +16,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       .then((tab) => sendResponse({ url: tab.url ?? '', title: tab.title ?? '' }), () => sendResponse({ url: '', title: '' }))
     return true
   }
+  // Automatic checks: the axe engine is injected into the page only when asked, then run there.
+  if (message?.type === 'RGAA_AXE') {
+    chrome.scripting
+      .executeScript({ target: { tabId: message.tabId }, files: ['axe.min.js'] })
+      .then(() => chrome.tabs.sendMessage(message.tabId, { type: 'RGAA_AXE_RUN', locale: message.locale ?? null }))
+      .then(sendResponse, (err) => sendResponse({ error: String(err) }))
+    return true
+  }
   if (message?.type !== 'RGAA_RELAY') return undefined
   chrome.tabs
     .sendMessage(message.tabId, message.payload)
