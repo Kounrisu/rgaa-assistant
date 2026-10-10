@@ -6,7 +6,7 @@ import { state } from './state'
 import { persist, pageLabel } from './model'
 import { say, dom, keepScroll, h } from './dom'
 import { t } from '../lib/i18n'
-import { listedFindings, findingMatches, findingStatus, STATUS_LABEL, findingReview } from './review-state'
+import { listedFindings, findingMatches, findingStatus, findingFails, STATUS_LABEL, findingReview } from './review-state'
 import type { FindingFilter } from './types'
 import { FINDING_THEMES, themeByNumber } from '../lib/themes'
 import { renderChecklist } from './checklist-view'
@@ -104,7 +104,7 @@ export function renderFindingsView(): void {
     const listEl2 = h('ol', { class: 'finding-list' })
     for (const f of shown) {
       const st = findingStatus(f)
-      const bad = f.type === 'contrast-fail' || (f.type !== 'contrast-ok' && f.type !== 'contrast-unknown' && f.facts.title === null)
+      const bad = findingFails(f)
       listEl2.append(
         h(
           'li',

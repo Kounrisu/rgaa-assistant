@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { criteriaFor } from '../src/lib/rgaa'
 import { createPage, emptyAudit } from '../src/lib/audit-store'
 import type { FindingItem, ImageKind, ImageReview, Verdict } from '../src/lib/types'
-import { boxStates, findingMatches, findingNeedsReview, findingReview, findingStatus, listedFindings, matches, needsReview, nextToReview, reviewOf, statusOf, visibleElements } from '../src/panel/review-state'
+import { boxStates, findingFails, findingMatches, findingNeedsReview, findingReview, findingStatus, listedFindings, matches, needsReview, nextToReview, reviewOf, statusOf, visibleElements } from '../src/panel/review-state'
 import { state } from '../src/panel/state'
 import type { Item } from '../src/panel/types'
 
@@ -203,5 +203,22 @@ describe('review state of the findings', () => {
     expect(findingMatches(hidden, 'all')).toBe(true)
     expect(listedFindings(3)).toEqual([]) // the passing line is not listed
     expect(listedFindings(6).map((f) => f.type)).toEqual(['link', 'link-skip', 'link-skip-broken'])
+  })
+})
+
+describe('findingFails: one definition for the box colour and the list highlight', () => {
+  const finding = (over: Partial<FindingItem>): FindingItem =>
+    ({ id: 1, key: 'k', theme: 2, type: 'iframe', label: 'x', summary: '', facts: {}, html: '', contextHtml: '', count: 1, data: {}, present: true, scan: 1, ...over }) as FindingItem
+
+  it('a frame with no title or a blank title fails, a frame with a title does not', () => {
+    expect(findingFails(finding({ facts: { title: null } }))).toBe(true)
+    expect(findingFails(finding({ facts: { title: '   ' } }))).toBe(true)
+    expect(findingFails(finding({ facts: { title: 'Carte' } }))).toBe(false)
+  })
+  it('a link, a table or a field never fails just because its own title attribute is missing', () => {
+    expect(findingFails(finding({ theme: 6, type: 'link', facts: { title: null } }))).toBe(false)
+    expect(findingFails(finding({ theme: 6, type: 'link-empty', facts: { title: null } }))).toBe(true)
+    expect(findingFails(finding({ theme: 11, type: 'field-nolabel', facts: {} }))).toBe(true)
+    expect(findingFails(finding({ theme: 5, type: 'table-data', facts: { title: null } }))).toBe(false)
   })
 })

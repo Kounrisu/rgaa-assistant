@@ -31,17 +31,28 @@ export function mergeFindings(themeNo: number, raw: RawFinding[]): { map: { from
     for (const f of mine) if (f.type === 'contrast-ok') f.id = 0
     mine.filter((x) => x.type !== 'contrast-ok').sort((a, b) => a.id - b.id).forEach((f, i) => (f.id = i + 1))
   }
-  const byKey = new Map(rec.findings.filter((f) => f.theme === themeNo).map((f) => [f.key, f]))
-  const seen = new Set<string>()
+  // The key of every finding of this scan (same key twice: ~1, ~2…), before anything is numbered.
   const occurrences = new Map<string, number>()
-  const map: { from: number; to: number }[] = []
-  let added = 0
-  for (const r of raw) {
+  const rawKeys = raw.map((r) => {
     const base = keyOfFinding(themeNo, r)
     const n = occurrences.get(base) ?? 0
     occurrences.set(base, n + 1)
-    const key = n ? `${base}~${n}` : base
-    seen.add(key)
+    return n ? `${base}~${n}` : base
+  })
+  const seen = new Set(rawKeys)
+  // A finding that is gone and was never touched by a human only adds noise: drop it FIRST, so the numbers it frees
+  // are reused by the new findings and the numbering stays 1, 2, 3… instead of 1, 3.
+  const worked = (f: FindingItem) => {
+    const r = rec.findingReviews[f.key]
+    return Boolean(r && (r.note.trim() || (!r.auto && Object.keys(r.answers).length)))
+  }
+  for (const f of rec.findings.filter((x) => x.theme === themeNo && !seen.has(x.key) && !worked(x))) delete rec.findingReviews[f.key]
+  rec.findings = rec.findings.filter((x) => x.theme !== themeNo || seen.has(x.key) || worked(x))
+  const byKey = new Map(rec.findings.filter((f) => f.theme === themeNo).map((f) => [f.key, f]))
+  const map: { from: number; to: number }[] = []
+  let added = 0
+  raw.forEach((r, i) => {
+    const key = rawKeys[i]
     const existing = byKey.get(key)
     if (existing) {
       Object.assign(existing, r, { id: existing.id, key, theme: themeNo, present: true, scan: existing.scan })
@@ -53,15 +64,9 @@ export function mergeFindings(themeNo: number, raw: RawFinding[]): { map: { from
       map.push({ from: r.id, to: item.id })
       added++
     }
-  }
+  })
+  // what is still here but not in this scan (a finding the auditor worked on) stays, marked as gone
   for (const f of rec.findings) if (f.theme === themeNo && !seen.has(f.key)) f.present = false
-  // A finding that is gone and was never touched by a human only adds noise (and gaps in the numbering).
-  const worked = (f: FindingItem) => {
-    const r = rec.findingReviews[f.key]
-    return Boolean(r && (r.note.trim() || (!r.auto && Object.keys(r.answers).length)))
-  }
-  for (const f of rec.findings.filter((x) => x.theme === themeNo && !x.present && !worked(x))) delete rec.findingReviews[f.key]
-  rec.findings = rec.findings.filter((x) => x.theme !== themeNo || x.present || worked(x))
   // default verdicts from the markup, only where nothing was answered yet
   for (const f of rec.findings) {
     if (f.theme !== themeNo || !f.present) continue
