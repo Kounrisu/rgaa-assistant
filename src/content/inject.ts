@@ -1241,6 +1241,15 @@ function runAsqatasunRules(): { key: string; count: number; samples?: string[]; 
 }
 // --- Asqatasun-derived: end ---
 
+/** The generated HTML of the page (what the browser holds now, after scripts), without our own markers. */
+function takeSnapshot(): { url: string; title: string; html: string } {
+  const clone = document.documentElement.cloneNode(true) as HTMLElement
+  clone.querySelectorAll(`[id^="${OVERLAY_ID}"], #${STYLE_ID}`).forEach((el) => el.remove())
+  const dt = document.doctype
+  const doctype = dt ? `<!DOCTYPE ${dt.name}${dt.publicId ? ` PUBLIC "${dt.publicId}"` : ''}${dt.systemId ? ` "${dt.systemId}"` : ''}>\n` : ''
+  return { url: location.href, title: document.title, html: doctype + clone.outerHTML }
+}
+
 /** Runs the axe engine (injected by the background page just before) and sends back a light copy of its findings. */
 async function runAxe(locale: unknown): Promise<Record<string, unknown>> {
   type AxeApi = { run: (ctx: Document, opts: object) => Promise<Record<string, unknown>>; configure: (c: object) => void }
@@ -1274,6 +1283,10 @@ async function runAxe(locale: unknown): Promise<Record<string, unknown>> {
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (!isCurrent()) return undefined
+  if (message?.type === 'RGAA_SNAPSHOT') {
+    sendResponse(takeSnapshot())
+    return true
+  }
   if (message?.type === 'RGAA_RULES_RUN') {
     sendResponse(runRgaaRules())
     return true

@@ -11,6 +11,8 @@ import { MANUAL_CHECKS, MANUAL_GROUPS } from '../lib/manual-checks'
 import axeFrench from 'axe-core/locales/fr.json'
 import { applyToolResults, fromAxe, type ToolResults } from '../lib/axe-import'
 import { RULES, type RuleFinding } from '../lib/rgaa-rules'
+import { packSnapshot, unpackSnapshot } from '../lib/snapshot'
+import { checkHtml } from '../lib/html-check'
 // --- Asqatasun-derived: begin ---
 import type { AsqExtra } from '../lib/asqatasun-rules' // a type only: the table itself stays in the page script
 // --- Asqatasun-derived: end ---
@@ -2814,6 +2816,7 @@ function renderChecks(): void {
       h('p', { class: 'hint-line' }, t('Runs our own RGAA checks and the axe engine on the page you are inspecting. A failure becomes a pre-filled “non-compliant” to confirm; a theme that clearly does not apply (no table, no media, no form…) is pre-filled “not applicable”. Finding nothing never marks a criterion compliant. It covers only part of the RGAA: the manual checks below are still needed.')),
       h('div', { class: 'nav' }, h('button', { type: 'button', class: 'primary', disabled: axeRunning, onclick: () => void runAutoChecks() }, axeRunning ? t('Running the checks…') : t('Run the automatic checks'))),
     ),
+    htmlCard(rec),
     ...reports.map((r) =>
       h(
         'div',
@@ -2826,6 +2829,88 @@ function renderChecks(): void {
       ),
     ),
     body,
+  )
+}
+
+/** The HTML of the page, captured now, kept in the audit and checked against the HTML specification (RGAA 8.2). */
+async function captureAndCheckHtml(rec: PageRecord): Promise<void> {
+  const snap = await sendToPage(inspectedTabId(), { type: 'RGAA_SNAPSHOT' })
+  if (typeof snap.html !== 'string') throw new Error('no html')
+  rec.snapshot = packSnapshot(snap.html, snap.url, snap.title)
+  await validateSnapshot(rec, snap.html)
+}
+
+async function validateSnapshot(rec: PageRecord, html: string): Promise<void> {
+  const result = await checkHtml(html)
+  rec.htmlCheck = result
+  const answers: ToolResults['answers'] = []
+  const passedChecks: ToolResults['passedChecks'] = []
+  if (result.errors) {
+    const top = result.groups.slice(0, 4).map((g) => `${g.rule} ×${g.count}`).join(', ')
+    answers.push({ criterion: '8.2', status: 'nc', note: t('{n} HTML error(s) in the generated code ({rules}). Details on the Checks page.', { n: result.errors, rules: top }), rule: 'html-validate' })
+  } else passedChecks.push({ criterion: '8.2', rule: 'html-validate' })
+  applyToolResults(rec, { tool: 'html-validate', url: rec.snapshot?.url ?? rec.url, violations: [], answers, incomplete: 0, passes: passedChecks.length, passedChecks })
+}
+
+const kb = (bytes: number) => `${Math.max(1, Math.round(bytes / 1024))} KB`
+
+function downloadSnapshot(rec: PageRecord): void {
+  if (!rec.snapshot) return
+  const date = new Date(rec.snapshot.at).toISOString().slice(0, 10)
+  download(unpackSnapshot(rec.snapshot), 'text/html', `${slugOf(audit.meta.site || audit.name)}_${pageLabel(rec)}_${date}.html`)
+}
+
+let htmlBusy = false
+function htmlCard(rec: PageRecord): HTMLElement {
+  const snap = rec.snapshot
+  const check = rec.htmlCheck
+  const run = async (fn: () => Promise<void>) => {
+    if (htmlBusy) return
+    htmlBusy = true
+    keepScroll(checksEl, renderChecks)
+    try {
+      await fn()
+      persist()
+      renderAll()
+    } catch (err) {
+      say(t('Could not capture or check the HTML ({reason}).', { reason: String((err as Error)?.message ?? err) }))
+    } finally {
+      htmlBusy = false
+      if (view === 'checks') keepScroll(checksEl, renderChecks)
+    }
+  }
+  return h(
+    'div',
+    { class: 'card' },
+    h('h3', {}, t('Page HTML')),
+    h('p', { class: 'hint-line' }, t('The HTML as the browser holds it now (after scripts) is kept in the audit and checked against the HTML specification, on this computer: nothing is sent anywhere. This is what RGAA 8.2 asks (valid generated source code).')),
+    snap
+      ? h('p', { class: 'hint info' }, t('Captured {date} · {size} (stored as {packed}) · {url}', { date: dateTimeOf(snap.at), size: kb(snap.bytes), packed: kb(snap.gz.length * 0.75), url: snap.url }))
+      : h('p', { class: 'hint info' }, t('Not captured yet. Run the automatic checks (they capture it), or capture it now.')),
+    h(
+      'div',
+      { class: 'nav' },
+      h('button', { type: 'button', class: 'primary', disabled: htmlBusy, onclick: () => void run(() => captureAndCheckHtml(rec)) }, htmlBusy ? t('Working…') : snap ? t('Capture again and check') : t('Capture and check the HTML')),
+      snap ? h('button', { type: 'button', onclick: () => downloadSnapshot(rec) }, t('Download the HTML')) : null,
+      snap ? h('button', { type: 'button', disabled: htmlBusy, onclick: () => void run(() => validateSnapshot(rec, unpackSnapshot(snap))) }, t('Check again')) : null,
+    ),
+    check
+      ? check.errors === 0
+        ? h('p', { class: 'hint ok' }, t('No HTML error found in the generated code.'))
+        : h(
+            'div',
+            {},
+            h('p', { class: 'hint warn' }, t('{n} HTML error(s) found, in {k} kind(s).', { n: check.errors, k: check.groups.length })),
+            ...check.groups.map((g) =>
+              h(
+                'details',
+                {},
+                h('summary', {}, `${g.rule} ×${g.count} — ${g.message}`),
+                h('ul', { class: 'checks' }, ...g.examples.map((e) => h('li', {}, `${t('line {line}', { line: e.line })}${e.selector ? ` · ${e.selector}` : ''} — ${e.message}`))),
+              ),
+            ),
+          )
+      : null,
   )
 }
 
@@ -2875,6 +2960,13 @@ async function runAutoChecks(): Promise<void> {
     }
     const ownReport = applyToolResults(rec, rulesToResults(own.url, own.findings ?? []))
     const report = applyToolResults(rec, results)
+    step = 'html'
+    try {
+      await captureAndCheckHtml(rec)
+    } catch (err) {
+      console.error(err)
+      say(t('Could not capture or check the HTML ({reason}).', { reason: String((err as Error)?.message ?? err) }))
+    }
     persist()
     renderAll()
     say(t('Automatic checks on {label}: {n} rule(s) failed, {set} verdict(s) pre-filled, {noted} element note(s). Confirm them in the themes.', { label: pageLabel(rec), n: results.violations.length + (own.findings ?? []).filter((f: RuleFinding) => RULES[f.key]?.status === 'nc').length, set: report.set + ownReport.set, noted: report.noted + ownReport.noted }))
