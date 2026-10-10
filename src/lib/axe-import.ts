@@ -27,7 +27,7 @@ export interface ToolResults {
   incomplete: number
   passes: number
   /** Checks that ran and found nothing, by criterion (a pass is shown, and only fills a fully automatic criterion). */
-  passedChecks: { criterion: string; rule: string }[]
+  passedChecks: { criterion: string; rule: string; detail?: string }[]
 }
 
 /** axe-core rule → RGAA 4.1 criterion. Only the rules whose meaning is clear are listed. */
@@ -223,7 +223,12 @@ export function applyToolResults(rec: PageRecord, res: ToolResults, opts: { addT
   // the source is kept so the card says so) unless something else failed
   const failedNow = new Set(res.violations.map((v) => AXE_TO_RGAA[v.rule]).filter(Boolean).concat(res.answers.filter((a) => a.status === 'nc').map((a) => a.criterion)))
   const byCriterion = new Map<string, string[]>()
-  for (const p of res.passedChecks) if (!failedNow.has(p.criterion)) byCriterion.set(p.criterion, [...(byCriterion.get(p.criterion) ?? []), p.rule])
+  const seenDetails = new Map<string, string[]>()
+  for (const p of res.passedChecks) {
+    if (failedNow.has(p.criterion)) continue
+    byCriterion.set(p.criterion, [...(byCriterion.get(p.criterion) ?? []), p.rule])
+    if (p.detail) seenDetails.set(p.criterion, [...(seenDetails.get(p.criterion) ?? []), p.detail])
+  }
   for (const [criterion, rules] of byCriterion) {
     const theme = themeOfCriterion(criterion)
     if (theme <= 3) continue
@@ -232,7 +237,7 @@ export function applyToolResults(rec: PageRecord, res: ToolResults, opts: { addT
       rec.themes = [...rec.themes, theme].sort((a, b) => a - b)
     }
     const ans = (rec.checklist[criterion] ??= { note: '' })
-    ;(ans.autoResults ??= {})[tool] = { result: 'pass', rules: [...new Set(rules)] }
+    ;(ans.autoResults ??= {})[tool] = { result: 'pass', rules: [...new Set(rules)], ...(seenDetails.has(criterion) ? { details: seenDetails.get(criterion) } : {}) }
     for (const rule of new Set(rules)) report.items!.push({ criterion, rule, result: 'pass', text: '' })
     touched.add(criterion)
     const anyFail = Object.values(ans.autoResults).some((r) => r.result === 'fail')

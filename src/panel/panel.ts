@@ -1445,7 +1445,7 @@ function autoHints(answer: ChecklistAnswer): HTMLElement[] {
       'p',
       { class: `hint ${r.result === 'pass' ? 'ok' : 'warn'}` },
       r.result === 'pass'
-        ? t('Automatic checks ({tool}): nothing found by {rules}. This does not prove the criterion is met: check the rest by hand.', { tool, rules: r.rules.join(', ') })
+        ? `${t('Automatic checks ({tool}): nothing found by {rules}. This does not prove the criterion is met: check the rest by hand.', { tool, rules: r.rules.join(', ') })}${r.details?.length ? ` ${t('Seen: {details}.', { details: r.details.map((d) => d.replace(/ · standards mode$/, ` · ${t('standards mode')}`)).join(' ; ') })}` : ''}`
         : t('Automatic checks ({tool}) found a problem: {rules}.', { tool, rules: r.rules.join(', ') }),
     ),
   )
@@ -2967,8 +2967,9 @@ function rulesToResults(url: string, findings: RuleFinding[]): { own: ToolResult
   // our checks that look for a failure and found none: shown as "checked" on their criteria
   const found = new Set(findings.map((f) => f.key))
   const passedChecks: ToolResults['passedChecks'] = []
+  const seen = new Map(findings.filter((f) => f.detail).map((f) => [f.key, f.detail as string]))
   for (const [key, meta] of Object.entries(RULES)) {
-    if (meta.status === 'nc' && !found.has(key)) for (const criterion of meta.criteria) passedChecks.push({ criterion, rule: key })
+    if (meta.status === 'nc' && !found.has(key)) for (const criterion of meta.criteria) passedChecks.push({ criterion, rule: key, detail: seen.get(`${key}-found`) })
   }
   // --- Asqatasun-derived: begin ---
   const asq: ToolResults = { tool: 'Asqatasun', url, violations: [], answers: asqAnswers, incomplete: 0, passes: 0, passedChecks: [] }
