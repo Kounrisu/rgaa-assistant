@@ -1,9 +1,11 @@
+import { suggest } from './evidence'
 import type { ChecklistVerdict, ImportReport, PageRecord } from './types'
 
 /**
- * Results of the automatic scan (the axe engine run on the page) turned into pre-filled answers.
- * A finding only ever sets "non-compliant, to confirm": a scan that finds nothing does not prove a criterion
- * is met, so passes are never turned into "compliant".
+ * Results of the automatic scan (the axe engine run on the page), kept as EVIDENCE (`autoResults`) and offered as
+ * SUGGESTED verdicts ("compliant / non-compliant, to confirm"). Nothing here ever writes a confirmed `verdict`:
+ * a scan that finds nothing does not prove a criterion is met (it may cover only part of it), so results.ts keeps
+ * such criteria pending until the auditor confirms. See evidence.ts.
  */
 
 export interface ToolNode {
@@ -124,10 +126,8 @@ export function applyToolResults(rec: PageRecord, res: ToolResults, opts: { addT
     }
     const ans = (rec.checklist[criterion] ??= { note: '' })
     if (verdict === 'nc') (ans.autoResults ??= {})[tool] = { result: 'fail', rules: [...new Set([...(ans.autoResults?.[tool]?.result === 'fail' ? ans.autoResults[tool].rules : []), rule])] }
-    if (verdict && (ans.verdict === undefined || (ans.source && ans.verdict !== verdict))) {
-      ans.verdict = verdict
-      ans.source = tool
-      report.set++
+    if (verdict && ans.verdict === undefined) {
+      if (suggest(ans, verdict, tool)) report.set++
     } else if (verdict === 'nc' && ans.verdict && ans.verdict !== 'nc') report.conflicts.push(`${criterion}: ${line}`)
     ans.note = addLine(ans.note, line)
   }
@@ -219,8 +219,8 @@ export function applyToolResults(rec: PageRecord, res: ToolResults, opts: { addT
     touchCriterion(a.criterion, a.status, a.note ? `${mark} ${a.criterion}: ${a.note}` : `${mark} ${a.criterion}: ${a.status?.toUpperCase()}`, a.rule ?? a.criterion)
   }
 
-  // checks that ran and found nothing: shown on the criterion, and the criterion is pre-filled "compliant" (to confirm,
-  // the source is kept so the card says so) unless something else failed
+  // checks that ran and found nothing: shown on the criterion as evidence, and "compliant (to confirm)" is suggested
+  // unless something else failed. It does not count as compliance until the auditor confirms.
   const failedNow = new Set(res.violations.map((v) => AXE_TO_RGAA[v.rule]).filter(Boolean).concat(res.answers.filter((a) => a.status === 'nc').map((a) => a.criterion)))
   const byCriterion = new Map<string, string[]>()
   const seenDetails = new Map<string, string[]>()
@@ -241,11 +241,8 @@ export function applyToolResults(rec: PageRecord, res: ToolResults, opts: { addT
     for (const rule of new Set(rules)) report.items!.push({ criterion, rule, result: 'pass', text: '' })
     touched.add(criterion)
     const anyFail = Object.values(ans.autoResults).some((r) => r.result === 'fail')
-    if (!anyFail && (ans.verdict === undefined || (ans.source && ans.verdict !== 'c'))) {
-      ans.verdict = 'c'
-      ans.source = tool
-      report.set++
-    }
+    // a pass is a suggestion only (it may cover part of the criterion); a human verdict is never touched
+    if (!anyFail && ans.verdict === undefined && suggest(ans, 'c', tool)) report.set++
   }
 
   // two tools giving opposite answers on a criterion: say so
