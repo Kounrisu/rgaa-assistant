@@ -6,6 +6,16 @@ import { t } from '../lib/i18n'
  */
 type Tool = 'reveal' | 'tables' | 'taborder' | 'nocss' | 'spacing' | 'lang'
 
+/** The RGAA themes where each tool belongs: it is the one to reach for while checking those criteria. */
+const TOOL_THEMES: Record<Tool, number[]> = {
+  reveal: [1, 2, 5, 6, 9, 11, 12],
+  tables: [5],
+  taborder: [6, 7, 11, 12],
+  nocss: [5, 9, 10],
+  spacing: [10],
+  lang: [8],
+}
+
 const TOOLS: { id: Tool; label: string; title: string }[] = [
   { id: 'reveal', label: 'Hidden content', title: 'Show what is visually hidden but read by screen readers (hidden tables, skip links…), outlined in magenta. Switch off to put it back.' },
   { id: 'tables', label: 'Tables', title: 'On every table: its caption (or the lack of one), and on every header cell its scope, id and the headers attributes of the cells (RGAA 5.4 to 5.7).' },
@@ -23,6 +33,8 @@ interface Deps {
 let host: HTMLElement | null = null
 let deps: Deps | null = null
 const on = new Set<Tool>()
+let currentTheme = 1
+let showAll = false
 
 export function renderPageTools(): void {
   if (!host) return
@@ -31,15 +43,39 @@ export function renderPageTools(): void {
   label.className = 'toolsbar-label'
   label.textContent = t('Page tools')
   host.append(label)
-  for (const tool of TOOLS) {
+  // the tools of this theme, those switched on (so they can be switched off), then the rest on demand
+  const relevant = TOOLS.filter((x) => TOOL_THEMES[x.id].includes(currentTheme) || on.has(x.id))
+  const others = TOOLS.filter((x) => !relevant.includes(x))
+  const add = (tool: (typeof TOOLS)[number]) => {
     const button = document.createElement('button')
     button.type = 'button'
     button.textContent = t(tool.label)
     button.title = t(tool.title)
     button.setAttribute('aria-pressed', String(on.has(tool.id)))
     button.addEventListener('click', () => void toggle(tool.id))
-    host.append(button)
+    host!.append(button)
   }
+  relevant.forEach(add)
+  if (others.length) {
+    const more = document.createElement('button')
+    more.type = 'button'
+    more.className = 'ghost-btn'
+    more.textContent = showAll ? t('Fewer tools') : relevant.length ? t('Other tools') : t('Show the tools')
+    more.setAttribute('aria-expanded', String(showAll))
+    more.addEventListener('click', () => {
+      showAll = !showAll
+      renderPageTools()
+    })
+    host.append(more)
+    if (showAll) others.forEach(add)
+  }
+}
+
+/** The theme being shown: the bar leads with the tools that belong to it. */
+export function setPageToolsTheme(theme: number): void {
+  if (theme === currentTheme) return
+  currentTheme = theme
+  renderPageTools()
 }
 
 async function toggle(tool: Tool): Promise<void> {

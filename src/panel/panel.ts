@@ -12,7 +12,7 @@ import axeFrench from 'axe-core/locales/fr.json'
 import { applyToolResults, AXE_TO_RGAA, fromAxe, type ToolResults } from '../lib/axe-import'
 import { RULES, type RuleFinding } from '../lib/rgaa-rules'
 import { packSnapshot, unpackSnapshot } from '../lib/snapshot'
-import { initPageTools, renderPageTools, resetPageTools } from './page-tools-ui'
+import { initPageTools, renderPageTools, resetPageTools, setPageToolsTheme } from './page-tools-ui'
 import { buildReportHtml } from '../lib/report'
 import { checkHtml } from '../lib/html-check'
 // --- Asqatasun-derived: begin ---
@@ -1562,6 +1562,7 @@ const imagesHeadEl = $('images-head')
 
 /** Buttons that act on the boxes of the current theme live in that theme's own toolbar. */
 function updateTools(): void {
+  setPageToolsTheme(theme)
   void applyBoxes()
   const reviewing = Boolean(page) && view === 'review'
   imagesHeadEl.hidden = !(reviewing && theme === 1)

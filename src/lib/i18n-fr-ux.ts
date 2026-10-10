@@ -83,4 +83,7 @@ export const FR_UX: Record<string, string> = {
   'Go to the next element or criterion that still needs your answer, in any theme (shortcut: n)': 'Aller au prochain élément ou critère qui attend encore votre réponse, dans n’importe quelle thématique (raccourci : n)',
   '{done}/{total} criteria answered': '{done}/{total} critères renseignés',
   'Progress of {label}': 'Avancement de {label}',
+  'Other tools': 'Autres outils',
+  'Fewer tools': 'Moins d’outils',
+  'Show the tools': 'Afficher les outils',
 }
