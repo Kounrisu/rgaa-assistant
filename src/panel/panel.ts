@@ -1145,9 +1145,18 @@ deletePageBtn.addEventListener('click', () => removePage())
 let navDismissed = ''
 
 function showNavBanner(url: string): void {
-  // the current page has lost its address: offer the one the browser is on
+  navBannerBtn.hidden = false
+  // the current page has lost its address
   if (page && !page.url && url) {
     const rec = page
+    const owner = findPage(audit, url)
+    if (owner && owner !== rec) {
+      // the browser is on another page of the sample: say how to register this one, without offering a duplicate address
+      navBannerText.textContent = t('{label} has no address. The browser is on {other}: open the page of {label} in the browser, then select {label} again.', { label: pageLabel(rec), other: pageLabel(owner) })
+      navBannerBtn.hidden = true
+      navBanner.hidden = false
+      return
+    }
     navBannerText.textContent = t('{label} has no address. The browser is on {url}.', { label: pageLabel(rec), url })
     navBannerBtn.textContent = t('Use this address for {label}', { label: pageLabel(rec) })
     navBannerBtn.onclick = () => {
