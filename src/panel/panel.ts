@@ -1105,12 +1105,13 @@ function switchTo(id: string, navigate = false): void {
   if (rec !== page) loadPage(rec)
   // you chose this page yourself: the “the browser is on another page” reminder no longer applies
   navBanner.hidden = true
-  navDismissed = liveUrl ? normalizeUrl(liveUrl) : ''
+  navDismissed = liveUrl && rec.url ? normalizeUrl(liveUrl) : ''
   setView(['sample', 'audit', 'audits', 'checks'].includes(view) ? 'review' : view)
   renderAll()
   persist()
   const label = pageLabel(rec)
   if (navigate && !rec.url) {
+    showNavBanner(liveUrl)
     say(t('{label} has no address yet: open its page in the browser and click “Scan {label}”.', { label }))
   } else if (navigate && (!liveUrl || normalizeUrl(rec.url) !== normalizeUrl(liveUrl))) {
     goTo(rec.url)
@@ -1144,6 +1145,22 @@ deletePageBtn.addEventListener('click', () => removePage())
 let navDismissed = ''
 
 function showNavBanner(url: string): void {
+  // the current page has lost its address: offer the one the browser is on
+  if (page && !page.url && url) {
+    const rec = page
+    navBannerText.textContent = t('{label} has no address. The browser is on {url}.', { label: pageLabel(rec), url })
+    navBannerBtn.textContent = t('Use this address for {label}', { label: pageLabel(rec) })
+    navBannerBtn.onclick = () => {
+      rec.url = normalizeUrl(url)
+      adoptSite(rec.url)
+      navBanner.hidden = true
+      persist()
+      renderAll()
+      say(t('{label} now points to {url}.', { label: pageLabel(rec), url: rec.url }))
+    }
+    navBanner.hidden = false
+    return
+  }
   if (navDismissed && normalizeUrl(url) === navDismissed) return void (navBanner.hidden = true)
   const known = findPage(audit, url)
   if (known && known === page) return void (navBanner.hidden = true)

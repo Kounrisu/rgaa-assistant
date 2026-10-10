@@ -506,4 +506,7 @@ export const FR_PANEL: Record<string, string> = {
   'Run the automatic RGAA checks (axe and Asqatasun-derived rules) on the page in the browser': 'Lancer les contrôles RGAA automatiques (axe et règles dérivées d’Asqatasun) sur la page du navigateur',
   'Checks': 'Contrôles',
   '{label} has no address yet: open its page in the browser and click “Scan {label}”.': '{label} n’a pas encore d’adresse : ouvrez sa page dans le navigateur et cliquez sur « Analyser {label} ».',
+  '{label} has no address. The browser is on {url}.': '{label} n’a pas d’adresse. Le navigateur est sur {url}.',
+  'Use this address for {label}': 'Utiliser cette adresse pour {label}',
+  '{label} now points to {url}.': '{label} pointe maintenant vers {url}.',
 }
