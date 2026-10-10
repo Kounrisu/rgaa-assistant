@@ -204,6 +204,9 @@ function tDyn(text: string): string {
     [/^(\d+) h1$/, (m) => t('{n} h1', { n: m[1] })],
     [/^h(\d) \(empty\)$/, (m) => t('h{n} (empty)', { n: m[1] })],
     [/^h(\d) · jump from h(\d)$/, (m) => t('h{a} · jump from h{b}', { a: m[1], b: m[2] })],
+    [/^<(\w+)> without label$/, (m) => t('<{tag}> without label', { tag: m[1] })],
+    [/^table (\d+)×(\d+)$/, (m) => t('table {r}×{c}', { r: m[1], c: m[2] })],
+    [/^(\d+) rows × (\d+) columns · (\d+) header cell\(s\)$/, (m) => t('{r} rows × {c} columns · {h} header cell(s)', { r: m[1], c: m[2], h: m[3] })],
     [/^<(\w+)> without name$/, (m) => t('<{tag}> without name', { tag: m[1] })],
   ]
   for (const [re, fn] of rules) {
@@ -700,7 +703,7 @@ function boxStates(themeNo: number): Record<number, string> {
     if (f.theme !== themeNo || f.type === 'contrast-ok') continue
     const pending = findingNeedsReview(f)
     const status = findingStatus(f)
-    const failing = f.type === 'contrast-fail' || f.type === 'link-empty' || f.type === 'heading-empty' || f.type === 'page-no-h1' || f.type === 'page-no-main' || (themeNo === 2 && !f.facts.title?.trim())
+    const failing = f.type === 'contrast-fail' || f.type === 'link-empty' || f.type === 'heading-empty' || f.type === 'page-no-h1' || f.type === 'page-no-main' || f.type === 'table-nohead' || f.type === 'table-layout-semantic' || f.type === 'field-nolabel' || f.type === 'field-placeholder' || (themeNo === 2 && !f.facts.title?.trim())
     out[f.id] = !pending ? (status === 'nc' ? 'nc' : 'c') : failing ? 'error' : 'review'
   }
   return out
@@ -1713,7 +1716,7 @@ async function captureShots(list: FindingItem[]): Promise<number> {
 /** What the list shows: every finding, except the unnumbered “text that passes” line of Colours. */
 const listedFindings = (themeNo: number): FindingItem[] => (page?.findings ?? []).filter((f) => f.theme === themeNo && f.type !== 'contrast-ok')
 
-type FindingFilter = 'all' | 'review' | 'contrast-fail' | 'contrast-unknown' | 'link-empty' | 'link-generic' | 'headings' | 'landmarks'
+type FindingFilter = 'all' | 'field-nolabel' | 'field-placeholder' | 'table-nohead' | 'table-layout' | 'review' | 'contrast-fail' | 'contrast-unknown' | 'link-empty' | 'link-generic' | 'headings' | 'landmarks'
 let findingFilter: FindingFilter = 'all'
 
 /**
@@ -1729,6 +1732,8 @@ function findingNeedsReview(f: FindingItem): boolean {
   // a link with a usable name is pre-filled compliant and does not ask for attention; empty or generic ones do
   if (f.theme === 6 && f.type === 'link') return false
   if (f.theme === 9 && (f.type === 'heading' || f.type === 'landmark')) return false
+  if (f.theme === 11 && f.type === 'field') return false
+  if (f.theme === 5 && (f.type === 'table-layout' || (f.type === 'table-data' && !f.facts.Title))) return false
   const ids = findingCriteriaOf(f).map((c) => c.id)
   return ids.some((c) => r?.answers[c] === undefined) || Boolean(r?.auto)
 }
@@ -1776,7 +1781,7 @@ function renderFindingsView(): void {
         'div',
         {},
         h('h2', {}, `${def.number}. ${def.name}`),
-        h('p', { class: 'hint-line' }, theme === 2 ? t('Every iframe / frame of the page, with its title.') : theme === 6 ? t('Every link of the page (identical links are grouped), with its name and destination. Links with no name or a generic text are boxed on the page.') : theme === 9 ? t('The outline of the page, like a headings map: headings with their level, and the landmarks, in reading order. Click one to find it on the page; skipped levels and missing areas are flagged.') : t('Only the texts that fail or that a script cannot judge are numbered and boxed on the page. Criteria 3.1 and 3.3 need your eyes (below).')),
+        h('p', { class: 'hint-line' }, theme === 2 ? t('Every iframe / frame of the page, with its title.') : theme === 6 ? t('Every link of the page (identical links are grouped), with its name and destination. Links with no name or a generic text are boxed on the page.') : theme === 5 ? t('Every table of the page: data tables (with their header cells and title) and layout tables. Click one to find it on the page.') : theme === 11 ? t('Every form field of the page, with the name a screen reader would give it. Fields with no label, or only a placeholder, are boxed on the page.') : theme === 9 ? t('The outline of the page, like a headings map: headings with their level, and the landmarks, in reading order. Click one to find it on the page; skipped levels and missing areas are flagged.') : t('Only the texts that fail or that a script cannot judge are numbered and boxed on the page. Criteria 3.1 and 3.3 need your eyes (below).')),
         h('div', { class: 'theme-summary', 'data-theme': String(theme), 'aria-label': t('Totals') }),
       ),
       h('div', { class: 'nav' }, toolsEl),
@@ -1785,7 +1790,7 @@ function renderFindingsView(): void {
   if (!scanned) {
     themeEl.append(h('p', { class: 'hint-line' }, t('Not scanned yet. Open {url} in the browser and click “Scan {label}”.', { url: rec.url, label })))
   } else if (!list.length) {
-    themeEl.append(h('p', { class: 'hint-line' }, theme === 3 && passing ? t('No text with a contrast problem found: {summary}.', { summary: tDyn(passing.summary) }) : theme === 2 ? t('No frames found on the page at the last scan: criteria are not applicable.') : theme === 6 ? t('No links found on the page at the last scan: criteria are not applicable.') : theme === 9 ? t('No heading or landmark found on the page at the last scan.') : t('No text colours found on the page at the last scan: criteria are not applicable.')))
+    themeEl.append(h('p', { class: 'hint-line' }, theme === 3 && passing ? t('No text with a contrast problem found: {summary}.', { summary: tDyn(passing.summary) }) : theme === 2 ? t('No frames found on the page at the last scan: criteria are not applicable.') : theme === 6 ? t('No links found on the page at the last scan: criteria are not applicable.') : theme === 9 ? t('No heading or landmark found on the page at the last scan.') : theme === 5 ? t('No table found on the page at the last scan: criteria are not applicable.') : theme === 11 ? t('No form field found on the page at the last scan: criteria are not applicable.') : t('No text colours found on the page at the last scan: criteria are not applicable.')))
   } else {
     const options: [FindingFilter, string][] =
       theme === 3
@@ -1794,7 +1799,11 @@ function renderFindingsView(): void {
           ? [['all', 'All'], ['review', 'To review'], ['link-empty', 'No name'], ['link-generic', 'Generic text']]
           : theme === 9
             ? [['all', 'All'], ['review', 'To review'], ['headings', 'Headings'], ['landmarks', 'Landmarks']]
-            : [['all', 'All'], ['review', 'To review']]
+            : theme === 11
+              ? [['all', 'All'], ['review', 'To review'], ['field-nolabel', 'No label'], ['field-placeholder', 'Placeholder only']]
+              : theme === 5
+                ? [['all', 'All'], ['review', 'To review'], ['table-nohead', 'No header cell'], ['table-layout', 'Layout tables']]
+                : [['all', 'All'], ['review', 'To review']]
     if (!options.some(([v]) => v === findingFilter)) findingFilter = 'all'
     const shown = list.filter((f) => findingMatches(f, findingFilter))
     if (!shown.some((f) => f.id === findingSel)) findingSel = shown[0]?.id ?? null
@@ -2667,7 +2676,7 @@ async function scan(): Promise<void> {
       const { map, added } = mergeFindings(tn, response?.findings ?? [])
       await sendToPage(inspectedTabId(), { type: 'RGAA_RELABEL', map, theme: tn })
       const n = rec.findings.filter((f) => f.theme === tn).length
-      parts.push(tn === 2 ? t('{n} frame(s)', { n }) : tn === 6 ? t('{n} link(s)', { n }) : tn === 9 ? t('{n} heading(s) and landmark(s)', { n }) : `${t('{n} contrast finding(s)', { n: listedFindings(tn).length })}${added ? ` (${t('{n} new', { n: added })})` : ''}`)
+      parts.push(tn === 2 ? t('{n} frame(s)', { n }) : tn === 6 ? t('{n} link(s)', { n }) : tn === 9 ? t('{n} heading(s) and landmark(s)', { n }) : tn === 5 ? t('{n} table(s)', { n }) : tn === 11 ? t('{n} field(s)', { n }) : `${t('{n} contrast finding(s)', { n: listedFindings(tn).length })}${added ? ` (${t('{n} new', { n: added })})` : ''}`)
     }
     const missing = rec.findings.filter((f) => f.present && !f.shot && f.type !== 'contrast-ok' && rec.themes.includes(f.theme)).slice(0, 80)
     const shots = await captureShots(missing)
