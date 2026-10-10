@@ -1105,11 +1105,14 @@ function switchTo(id: string, navigate = false): void {
   if (rec !== page) loadPage(rec)
   // you chose this page yourself: the “the browser is on another page” reminder no longer applies
   navBanner.hidden = true
+  navDismissed = liveUrl ? normalizeUrl(liveUrl) : ''
   setView(['sample', 'audit', 'audits', 'checks'].includes(view) ? 'review' : view)
   renderAll()
   persist()
   const label = pageLabel(rec)
-  if (navigate && (!liveUrl || normalizeUrl(rec.url) !== normalizeUrl(liveUrl))) {
+  if (navigate && !rec.url) {
+    say(t('{label} has no address yet: open its page in the browser and click “Scan {label}”.', { label }))
+  } else if (navigate && (!liveUrl || normalizeUrl(rec.url) !== normalizeUrl(liveUrl))) {
     goTo(rec.url)
     say(t('Opening {label} in the browser. Click “Scan {label}” once it has loaded.', { label }))
   } else {
@@ -1118,6 +1121,7 @@ function switchTo(id: string, navigate = false): void {
 }
 
 function goTo(url: string): void {
+  if (!url) return // an empty address would only reload the current page
   chrome.devtools.inspectedWindow.eval(`location.href = ${JSON.stringify(url)}`)
 }
 
@@ -1136,7 +1140,11 @@ async function removePage(rec: PageRecord | null = page): Promise<void> {
 pageSelect.addEventListener('change', () => switchTo(pageSelect.value, true))
 deletePageBtn.addEventListener('click', () => removePage())
 
+/** The address the reminder was dismissed for (you chose a page yourself while the browser was there). */
+let navDismissed = ''
+
 function showNavBanner(url: string): void {
+  if (navDismissed && normalizeUrl(url) === navDismissed) return void (navBanner.hidden = true)
   const known = findPage(audit, url)
   if (known && known === page) return void (navBanner.hidden = true)
   if (known) {
@@ -1276,6 +1284,7 @@ function setScanned(): void {
   resultsBtn.disabled = !has
   auditBtn.disabled = !audit.pages.length
   checksBtn.disabled = !page
+  autoBtn.disabled = !page || axeRunning
   scanBtn.disabled = !page
   setView(view === 'page' && !has ? 'review' : view)
 }
@@ -2637,6 +2646,7 @@ chrome.devtools.network.onNavigated.addListener((url: string) => {
   renderList()
   renderStats()
   if (view === 'review') renderEmpty()
+  if (normalizeUrl(url) !== navDismissed) navDismissed = ''
   showNavBanner(url)
 })
 
@@ -2691,6 +2701,7 @@ window.addEventListener('unhandledrejection', (event) => say(t('Panel error: {me
 
 const checksEl = $('checks')
 const checksBtn = $<HTMLButtonElement>('checks-btn')
+const autoBtn = $<HTMLButtonElement>('auto-btn')
 let axeRunning = false
 
 function manualProgress(rec: PageRecord): { done: number; issues: number; total: number } {
@@ -2749,7 +2760,7 @@ function renderChecks(): void {
       h(
         'div',
         {},
-        h('h2', {}, t('Manual checks — {label}', { label: pageLabel(rec) })),
+        h('h2', {}, t('Checks — {label}', { label: pageLabel(rec) })),
         h('p', { class: 'hint-line' }, t('What a script cannot judge: do each check on the page, then tick it. {done}/{total} done, {issues} problem(s).', { done: progress.done, total: progress.total, issues: progress.issues })),
       ),
       h('div', { class: 'nav' }, h('button', { type: 'button', onclick: () => setView('review') }, t('← Back to review'))),
@@ -2800,6 +2811,7 @@ async function runAutoChecks(): Promise<void> {
   if (!page || axeRunning) return
   const rec = page
   axeRunning = true
+  autoBtn.disabled = true
   keepScroll(checksEl, renderChecks)
   say(t('Running the automatic checks on the page…'))
   try {
@@ -2821,11 +2833,16 @@ async function runAutoChecks(): Promise<void> {
     console.error(err)
   } finally {
     axeRunning = false
+    autoBtn.disabled = !page
     if (view === 'checks') keepScroll(checksEl, renderChecks)
   }
 }
 
 checksBtn.addEventListener('click', () => setView(view === 'checks' ? 'review' : 'checks'))
+autoBtn.addEventListener('click', () => {
+  setView('checks')
+  void runAutoChecks()
+})
 
 /* ------------------------------------------------------------------ */
 /* Audits: name, saved state, list of audits, file save / reopen         */

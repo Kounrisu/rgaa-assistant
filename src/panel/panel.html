@@ -31,7 +31,7 @@
       <div class="actions">
         <a class="link-btn" href="../rgaa/rgaa.html" target="_blank" rel="noreferrer" data-i18n>RGAA coverage ↗</a>
         <button id="sample-btn" type="button" aria-pressed="false" title="Register the pages to audit, edit their URLs and the audit fields" data-i18n data-i18n-attrs="title">Audit pages sample</button>
-        <button id="checks-btn" type="button" aria-pressed="false" title="Automatic checks (axe), and the checks a script cannot do: keyboard, zoom, screen reader…" data-i18n data-i18n-attrs="title" disabled>Manual checks</button>
+        <button id="checks-btn" type="button" aria-pressed="false" title="Automatic checks (axe), and the checks a script cannot do: keyboard, zoom, screen reader…" data-i18n data-i18n-attrs="title" disabled>Checks</button>
         <button id="results-btn" type="button" disabled aria-pressed="false" title="Results of this page, one line per official test" data-i18n data-i18n-attrs="title">Audit page results</button>
         <button id="audit-btn" type="button" disabled aria-pressed="false" title="All pages of the sample: dashboard, grid and Excel export" data-i18n data-i18n-attrs="title">Audit pages overview</button>
       </div>
@@ -42,6 +42,7 @@
       <select id="page-select"></select>
       <span id="live-url" class="live-url"></span>
       <button id="scan-btn" type="button" class="primary">Scan page</button>
+      <button id="auto-btn" type="button" title="Run the automatic RGAA checks (axe and Asqatasun-derived rules) on the page in the browser" data-i18n data-i18n-attrs="title" disabled>Automatic checks</button>
       <button id="reset-page-btn" type="button" class="ghost-btn danger" disabled title="Clear the scans and every answer of this page; keep its URL, title and themes" data-i18n data-i18n-attrs="title">Reset page</button>
       <button id="delete-page-btn" type="button" class="ghost-btn" disabled data-i18n>Remove page</button>
     </div>
