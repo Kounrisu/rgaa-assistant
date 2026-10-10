@@ -143,7 +143,7 @@ export function buildReportHtml(audit: Audit, inputs: PageInput[], pages: PageRe
   <div class="kpi"><b>${failing.length}</b>${esc(t('Non-compliant criteria'))}</div>
 </div>
 <p>${esc(t('The audited content is {state}, with a rate of {rate} of the applicable criteria met (C / (C + NC), levels A and AA).', { state: t(CONFORMITY_TEXT[state]), rate: pct(legalRate) }))}</p>
-${provisional ? `<p class="warn"><b>${esc(t('Provisional result.'))}</b> ${esc(t('The audit is incomplete: criteria remain to be tested, some are only partly covered by the tool, or rest on automatic pre-filled answers the auditor has not confirmed. A criterion compliant on only part of its tests counts as not tested. Do not publish this rate as the final conformity level.'))} ${esc(t('{toConfirm} criteria await confirmation of an automatic suggestion; {partial} have partial coverage.', { toConfirm, partial }))}</p>` : ''}
+${provisional ? `<p class="warn"><b>${esc(t('Provisional result.'))}</b> ${esc(t('The audit is incomplete: criteria remain to be tested, some are only partly covered by the tool, or rest on automatic pre-filled answers the auditor has not confirmed. A criterion judged on only part of its tests keeps its result but is flagged. Do not publish this rate as the final conformity level.'))} ${esc(t('{toConfirm} criteria await confirmation of an automatic suggestion; {partial} have partial coverage.', { toConfirm, partial }))}</p>` : ''}
 
 <h2>2. ${esc(t('Sample of pages'))}</h2>
 <table><thead><tr><th>#</th><th>${esc(t('Page'))}</th><th>${esc(t('Rate'))}</th><th>${esc(t('Results'))}</th></tr></thead><tbody>${sample}</tbody></table>

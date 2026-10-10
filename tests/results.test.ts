@@ -9,7 +9,9 @@ describe('rollUp: verdict and coverage are independent', () => {
   it('C + unassessed is compliant on the assessed tests only, with partial coverage', () => {
     const r = rollUp(['c', 'na', 'unassessed'])
     expect(r).toMatchObject({ outcome: 'c', coverage: 'partial', assessedTests: 2, unassessedTests: 1 })
-    expect(statusOf(r)).toBe('NT') // not fully verified compliance
+    // the verdict is kept (the auditor cannot confirm tests this tool never assesses); the coverage flag makes rates provisional
+    expect(statusOf(r)).toBe('C')
+    expect(isProvisional({ C: 1, NC: 0, NA: 0, NT: 0, partial: 1, suggested: 0, unconfirmed: 0 })).toBe(true)
   })
   it('NC + unassessed keeps the failure and the incomplete coverage', () => {
     const r = rollUp(['nc', 'c', 'unassessed'])
@@ -38,8 +40,7 @@ describe('theme 1 aggregation', () => {
     const c11 = res.criteria.find((c) => c.id === '1.1')!
     expect(c11.outcome).toBe('c')
     expect(c11.coverage).toBe('partial')
-    expect(statusOf(c11)).toBe('NT')
-    expect(res.rate).toBeNull() // nothing fully verified, nothing failed
+    expect(statusOf(c11)).toBe('C') // kept, but flagged: the rate that counts it is provisional
   })
   it('a non-compliant image stays NC with partial coverage', () => {
     const bad: Record<number, ImageReview> = { 1: { kind: 'informative', answers: { '1.1': 'nc' }, note: '' } }

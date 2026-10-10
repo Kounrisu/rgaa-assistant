@@ -115,7 +115,9 @@ export type Status = 'C' | 'NC' | 'NA' | 'NT'
  */
 export function statusOf(c: Pick<CriterionResult, 'outcome' | 'coverage'>): Status {
   if (c.outcome === 'nc') return 'NC'
-  if (c.outcome === 'pending' || c.outcome === 'unassessed' || c.coverage !== 'full') return 'NT'
+  // Partial coverage keeps the verdict (an auditor cannot confirm tests this tool never assesses, so they must not block
+  // the criterion for ever); it is reported apart and makes every rate that counts it PROVISIONAL (see isProvisional).
+  if (c.outcome === 'pending' || c.outcome === 'unassessed' || c.coverage === 'none') return 'NT'
   return c.outcome === 'c' ? 'C' : 'NA'
 }
 
