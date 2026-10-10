@@ -11,7 +11,7 @@ Licences below were read from the packages or repositories on 2026-10-10. Nothin
 |---|---|---|---|---|---|
 | **axe-core** 4.14 (Deque) — https://github.com/dequelabs/axe-core | MPL-2.0 | `dist/axe.min.js` (copied from `node_modules` at build by `vite.config.ts`, injected into the page by `src/background.ts` only on click); French rule texts `axe-core/locales/fr.json` imported in `src/panel/panel.ts` | The unmodified engine, run as a library | Keep the licence text (`dist/axe.LICENSE`); if we modify axe's own files, publish those modifications. Using it unmodified in a larger work does not change our licence | `npm uninstall axe-core`; delete the `RGAA_AXE` handler in `src/background.ts`, `runAxe` and its message case in `src/content/inject.ts`, `src/lib/axe-import.ts` mapping of axe rules (`AXE_TO_RGAA`) and the axe call in `runAutoChecks` (`src/panel/panel.ts`); remove the two `copyFileSync` lines in `vite.config.ts` |
 | **fflate** — https://github.com/101arrowz/fflate | MIT | `src/lib/xlsx.ts` (zip for the .xlsx export) | Zip compression | Keep the MIT notice | Replace the zip step in `xlsx.ts` |
-| **Asqatasun** (formerly Tanaguru) — https://github.com/Asqatasun/Asqatasun | AGPL-3.0 | *Being ported (see NOTICE.md once it lands)*: `src/lib/asqatasun-rules.ts` plus marked blocks in `src/content/inject.ts` and `src/panel/panel.ts`, French texts in `src/lib/i18n-fr-lib.ts` | Selectors and rule definitions adapted from its RGAA 4 tests | The whole project is then distributed under **AGPL-3.0**: whoever gets the extension must be able to get its source. No obligation for private use | See "How to remove it" in `NOTICE.md`. Removing the code does not by itself change the licence the project was published under; that is a separate decision |
+| **Asqatasun** (formerly Tanaguru) — https://github.com/Asqatasun/Asqatasun | AGPL-3.0 | `src/lib/asqatasun-rules.ts` (33 of its 99 implemented RGAA 4 tests, as 39 rules) plus the blocks marked `Asqatasun-derived` in `src/content/inject.ts` and `src/panel/panel.ts`, and their French texts in `src/lib/i18n-fr-lib.ts`. Details and exact removal steps: `NOTICE.md` | Selectors and rule definitions adapted from its RGAA 4 tests | The whole project is then distributed under **AGPL-3.0**: whoever gets the extension must be able to get its source. No obligation for private use | See "How to remove it" in `NOTICE.md`. Removing the code does not by itself change the licence the project was published under; that is a separate decision |
 
 ## Build and development only (not shipped)
 
@@ -38,7 +38,7 @@ Licences below were read from the packages or repositories on 2026-10-10. Nothin
 
 ## Things to review later
 
-1. **Licence of the project.** Currently none declared. It becomes AGPL-3.0 once the Asqatasun port is in; decide whether that is what you want to keep.
+1. **Licence of the project.** AGPL-3.0 (`LICENSE`, `package.json`) because of the Asqatasun port; decide whether to keep it. Removing the Asqatasun code is the precondition for relicensing.
 2. **RGAA data licence**: confirm the terms of the official data (see above).
 3. **Rules from Asqatasun worth keeping**: keep the ones that find real problems on your sites; drop the rest. Each rule is one line in `src/lib/asqatasun-rules.ts`.
 4. **axe-core updates**: pin or upgrade deliberately (`npm update axe-core`), then re-check the rule mapping.

@@ -496,4 +496,11 @@ export const FR_PANEL: Record<string, string> = {
   'No button on the page.': 'Pas de bouton sur la page.',
   'No link on the page.': 'Pas de lien sur la page.',
   'The page title looks generic or empty ({detail}): check that it is relevant.': 'Le titre de la page semble générique ou vide ({detail}) : vérifiez qu’il est pertinent.',
+  'Not saved! Save to a file now.': 'Non enregistré ! Enregistrez dans un fichier.',
+  'Saved {time}': 'Enregistré {time}',
+  'No file yet': 'Pas de fichier',
+  'File out of date': 'Fichier périmé',
+  'File up to date': 'Fichier à jour',
+  'Open file': 'Ouvrir',
+  'Save file': 'Enregistrer',
 }

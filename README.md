@@ -45,6 +45,12 @@ This repo intentionally covers Theme 1 (Images) only, as a standalone
 proof of concept for the AI-assisted audit workflow, separate from the
 rule-based engine in the `25-rgaa-extension` project.
 
+## License
+
+Distributed under the **GNU Affero General Public License v3.0** (AGPL-3.0-only), see [LICENSE](LICENSE).
+This is because the project includes rules adapted from [Asqatasun](https://github.com/Asqatasun/Asqatasun) (AGPL-3.0);
+see [NOTICE.md](NOTICE.md) for what was adapted and how to remove it.
+
 ## Third-party
 
 - [axe-core](https://github.com/dequelabs/axe-core) (MPL-2.0) runs the automatic checks. It is copied to `dist/axe.min.js` at build time and injected into the inspected page only when you click “Lancer les contrôles automatiques”.

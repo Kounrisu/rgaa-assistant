@@ -186,4 +186,87 @@ export const FR_LIB: Record<string, string> = {
   'Information is never given by colour alone.': 'L’information n’est jamais donnée par la couleur seule.',
   'Videos and audio have captions, a transcript or an audio description where needed.': 'Les vidéos et sons ont des sous-titres, une transcription ou une audiodescription si nécessaire.',
   'Moving, blinking or auto-updating content can be paused or stopped.': 'Les contenus en mouvement, clignotants ou mis à jour automatiquement peuvent être mis en pause ou arrêtés.',
+  // --- Asqatasun-derived: begin ---
+  /* ---- asqatasun-rules.ts ---- */
+  'RGAA {criterion}: no element to check on this page, not applicable.':
+    'RGAA {criterion} : aucun élément à contrôler sur cette page, non applicable.',
+  'RGAA 1.1.4: {n} server-side image map(s) (ismap): check that every clickable zone has an equivalent usable with any pointing device. Examples: {samples}':
+    'RGAA 1.1.4 : {n} image(s) réactive(s) côté serveur (ismap) : vérifier que chaque zone cliquable est doublée d’un mécanisme utilisable quel que soit le dispositif de pointage. Exemples : {samples}',
+  'RGAA 1.5.2: {n} image button(s) used as a CAPTCHA: check that an alternative way to access the content exists. Examples: {samples}':
+    'RGAA 1.5.2 : {n} bouton(s) image utilisé(s) comme CAPTCHA : vérifier qu’une solution d’accès alternatif au contenu existe. Exemples : {samples}',
+  'RGAA 2.1.1: {n} frame(s) without a title attribute. Examples: {samples}':
+    'RGAA 2.1.1 : {n} cadre(s) sans attribut title. Exemples : {samples}',
+  'RGAA 3.1.5: {n} time-based media found: check that no information is given by colour alone. Examples: {samples}':
+    'RGAA 3.1.5 : {n} média(s) temporel(s) détecté(s) : vérifier qu’aucune information n’est donnée uniquement par la couleur. Exemples : {samples}',
+  'RGAA 3.1.6: {n} non time-based media found (svg, canvas, object, embed): check that no information is given by colour alone. Examples: {samples}':
+    'RGAA 3.1.6 : {n} média(s) non temporel(s) détecté(s) (svg, canvas, object, embed) : vérifier qu’aucune information n’est donnée uniquement par la couleur. Exemples : {samples}',
+  'RGAA 7.4.1: {n} script(s) that may change the context (select with onchange, or form with a select and no button): check that the user is warned or has an explicit button. Examples: {samples}':
+    'RGAA 7.4.1 : {n} script(s) susceptible(s) de changer le contexte (select avec onchange, ou formulaire avec un select et sans bouton) : vérifier que l’utilisateur est averti ou dispose d’un bouton explicite. Exemples : {samples}',
+  'RGAA 8.3.1: the default language of the page is not declared (no lang attribute on <html>).':
+    'RGAA 8.3.1 : la langue par défaut de la page n’est pas indiquée (pas d’attribut lang sur <html>).',
+  'RGAA 8.5.1: the page has no <title> element in its <head>.':
+    'RGAA 8.5.1 : la page n’a pas de balise <title> dans son <head>.',
+  'RGAA 8.9.1: {n} link(s) without destination (no href, name or id), probably used for presentation. Examples: {samples}':
+    'RGAA 8.9.1 : {n} lien(s) sans destination (ni href, ni name, ni id), probablement utilisé(s) à des fins de présentation. Exemples : {samples}',
+  'RGAA 8.9.1: {n} empty <p> or <li> element(s), probably used for layout. Examples: {samples}':
+    'RGAA 8.9.1 : {n} balise(s) <p> ou <li> vide(s), probablement utilisée(s) à des fins de mise en forme. Exemples : {samples}',
+  'RGAA 8.9.1: {n} <br> element(s) in a row, probably used to space content. Examples: {samples}':
+    'RGAA 8.9.1 : {n} balise(s) <br> consécutive(s), probablement utilisée(s) pour espacer le contenu. Exemples : {samples}',
+  'RGAA 8.10.2: {n} element(s) with a dir attribute (ltr or rtl): check that each change of reading direction is relevant. Examples: {samples}':
+    'RGAA 8.10.2 : {n} élément(s) avec un attribut dir (ltr ou rtl) : vérifier que chaque changement du sens de lecture est pertinent. Exemples : {samples}',
+  'RGAA 9.2.1: the page has no visible <main> element.':
+    'RGAA 9.2.1 : la page n’a pas de balise <main> visible.',
+  'RGAA 9.2.1: {n} visible <main> elements, there should be only one. Examples: {samples}':
+    'RGAA 9.2.1 : {n} balises <main> visibles, il ne doit y en avoir qu’une. Exemples : {samples}',
+  'RGAA 9.2.1: the page has no <header> element outside <article> and <section>.':
+    'RGAA 9.2.1 : la page n’a pas de balise <header> en dehors de <article> et <section>.',
+  'RGAA 9.2.1: the page has no <footer> element outside <article> and <section>.':
+    'RGAA 9.2.1 : la page n’a pas de balise <footer> en dehors de <article> et <section>.',
+  'RGAA 9.2.1: the page has no <nav> element.':
+    'RGAA 9.2.1 : la page n’a pas de balise <nav>.',
+  'RGAA 10.1.2: {n} element(s) with a width or height attribute used for presentation. Examples: {samples}':
+    'RGAA 10.1.2 : {n} élément(s) avec un attribut width ou height servant à la présentation. Exemples : {samples}',
+  'RGAA 10.9.2: {n} image(s) found: check that no information is given by shape, size or position alone. Examples: {samples}':
+    'RGAA 10.9.2 : {n} image(s) détectée(s) : vérifier qu’aucune information n’est donnée uniquement par la forme, la taille ou la position. Exemples : {samples}',
+  'RGAA 10.9.3: {n} time-based media found: check that no information is given by shape, size or position alone. Examples: {samples}':
+    'RGAA 10.9.3 : {n} média(s) temporel(s) détecté(s) : vérifier qu’aucune information n’est donnée uniquement par la forme, la taille ou la position. Exemples : {samples}',
+  'RGAA 10.9.4: {n} non time-based media found (svg, canvas, object, embed): check that no information is given by shape, size or position alone. Examples: {samples}':
+    'RGAA 10.9.4 : {n} média(s) non temporel(s) détecté(s) (svg, canvas, object, embed) : vérifier qu’aucune information n’est donnée uniquement par la forme, la taille ou la position. Exemples : {samples}',
+  'RGAA 10.10.2: {n} image(s) found: check that the way shape, size or position convey information is relevant. Examples: {samples}':
+    'RGAA 10.10.2 : {n} image(s) détectée(s) : vérifier que la manière dont la forme, la taille ou la position véhiculent l’information est pertinente. Exemples : {samples}',
+  'RGAA 10.10.3: {n} time-based media found: check that the way shape, size or position convey information is relevant. Examples: {samples}':
+    'RGAA 10.10.3 : {n} média(s) temporel(s) détecté(s) : vérifier que la manière dont la forme, la taille ou la position véhiculent l’information est pertinente. Exemples : {samples}',
+  'RGAA 10.10.4: {n} non time-based media found (svg, canvas, object, embed): check that the way shape, size or position convey information is relevant. Examples: {samples}':
+    'RGAA 10.10.4 : {n} média(s) non temporel(s) détecté(s) (svg, canvas, object, embed) : vérifier que la manière dont la forme, la taille ou la position véhiculent l’information est pertinente. Exemples : {samples}',
+  'RGAA 11.2.1: {n} label(s) in forms: check that each one tells the exact purpose of its field. Examples: {samples}':
+    'RGAA 11.2.1 : {n} étiquette(s) <label> dans des formulaires : vérifier que chacune permet de connaître la fonction exacte de son champ. Exemples : {samples}',
+  'RGAA 11.2.2: {n} field(s) with a title attribute: check that each one tells the exact purpose of the field. Examples: {samples}':
+    'RGAA 11.2.2 : {n} champ(s) avec un attribut title : vérifier que chacun permet de connaître la fonction exacte du champ. Exemples : {samples}',
+  'RGAA 11.2.3: {n} field(s) with an aria-label: check that each one tells the exact purpose of the field. Examples: {samples}':
+    'RGAA 11.2.3 : {n} champ(s) avec un aria-label : vérifier que chacun permet de connaître la fonction exacte du champ. Exemples : {samples}',
+  'RGAA 11.2.4: {n} field(s) with an aria-labelledby: check that the text it points to tells the exact purpose of the field. Examples: {samples}':
+    'RGAA 11.2.4 : {n} champ(s) avec un aria-labelledby : vérifier que le texte référencé permet de connaître la fonction exacte du champ. Exemples : {samples}',
+  'RGAA 11.10.5: {n} form(s) or field(s): check that the instructions about the expected data type and format are visible and tied to the field. Examples: {samples}':
+    'RGAA 11.10.5 : {n} formulaire(s) ou champ(s) : vérifier que les instructions sur le type de données et le format attendus sont visibles et associées au champ. Exemples : {samples}',
+  'RGAA 11.10.6: {n} form(s) or field(s): check that error messages give the expected data type and format and name the field. Examples: {samples}':
+    'RGAA 11.10.6 : {n} formulaire(s) ou champ(s) : vérifier que les messages d’erreur indiquent le type de données et le format attendus et identifient le champ. Exemples : {samples}',
+  'RGAA 11.10.7: {n} form(s) or field(s): check that fields with aria-invalid="true" give the expected data type and format in their label or associated text. Examples: {samples}':
+    'RGAA 11.10.7 : {n} formulaire(s) ou champ(s) : vérifier que les champs ayant aria-invalid="true" indiquent le type de données et le format attendus dans leur étiquette ou leur passage de texte associé. Exemples : {samples}',
+  'RGAA 11.11.1: {n} form(s) or field(s): check that, after an input error, the data types and formats are suggested where needed. Examples: {samples}':
+    'RGAA 11.11.1 : {n} formulaire(s) ou champ(s) : vérifier que, après une erreur de saisie, les types et formats de données sont suggérés si nécessaire. Exemples : {samples}',
+  'RGAA 11.11.2: {n} form(s) or field(s): check that, after an input error, examples of expected values are suggested where needed. Examples: {samples}':
+    'RGAA 11.11.2 : {n} formulaire(s) ou champ(s) : vérifier que, après une erreur de saisie, des exemples de valeurs attendues sont suggérés si nécessaire. Exemples : {samples}',
+  'RGAA 11.12.1: {n} form(s) or field(s): for forms that change or delete data, check that the user can undo, review or confirm. Examples: {samples}':
+    'RGAA 11.12.1 : {n} formulaire(s) ou champ(s) : pour les formulaires qui modifient ou suppriment des données, vérifier que l’utilisateur peut annuler, vérifier ou confirmer. Exemples : {samples}',
+  'RGAA 11.12.2: {n} form(s) or field(s): for forms that change or delete financial, legal or personal data, check that deleted data can be recovered or that an explicit confirmation is asked. Examples: {samples}':
+    'RGAA 11.12.2 : {n} formulaire(s) ou champ(s) : pour les formulaires qui modifient ou suppriment des données financières, juridiques ou personnelles, vérifier que les données supprimées peuvent être récupérées ou qu’une confirmation explicite est demandée. Exemples : {samples}',
+  'RGAA 11.13.1: {n} form(s) or field(s): check that the purpose of each field about the user can be deduced (autocomplete attribute). Examples: {samples}':
+    'RGAA 11.13.1 : {n} formulaire(s) ou champ(s) : vérifier que la finalité de chaque champ concernant l’utilisateur peut être déduite (attribut autocomplete). Exemples : {samples}',
+  'RGAA 13.1.1: {n} element(s) that may refresh the page (svg, canvas, object, embed, meta refresh): check that the user controls the time limit. Examples: {samples}':
+    'RGAA 13.1.1 : {n} élément(s) pouvant rafraîchir la page (svg, canvas, object, embed, meta refresh) : vérifier que l’utilisateur a le contrôle de la limite de temps. Exemples : {samples}',
+  'RGAA 13.1.2: {n} <meta> redirection(s) that are not immediate. Examples: {samples}':
+    'RGAA 13.1.2 : {n} redirection(s) via <meta> qui ne sont pas immédiates. Exemples : {samples}',
+  'RGAA 13.7.1: {n} image(s) or media element(s) found: check that none flashes or changes brightness abruptly. Examples: {samples}':
+    'RGAA 13.7.1 : {n} image(s) ou élément(s) multimédia détecté(s) : vérifier qu’aucun ne provoque de flash ou de changement brusque de luminosité. Exemples : {samples}',
+  // --- Asqatasun-derived: end ---
 }

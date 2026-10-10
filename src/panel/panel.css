@@ -391,7 +391,7 @@ body { display: block; }
   .cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
   .col { overflow: visible; padding-bottom: 0; }
   /* verdicts stay in view while you read the evidence */
-  .decision { position: sticky; top: 8px; align-self: start; max-height: calc(100vh - 16px); overflow-y: auto; }
+  .decision { align-self: start; }
 }
 @media (max-width: 640px) { .layout { grid-template-columns: minmax(0, 1fr); } .list-pane { position: static; max-height: 240px; } }
 
@@ -644,3 +644,13 @@ dialog.confirm { width: min(460px, 92vw); }
 .code-sample { background: var(--code-bg); color: var(--code-text); padding: 10px 12px; border-radius: 8px; overflow-x: auto; font-size: 12px; }
 .checks-body { display: grid; gap: 14px; margin-top: 14px; }
 #checks .card { margin-top: 14px; }
+
+/* One header line: product, audit, saved state, audit actions */
+.auditbar { padding: 8px 16px; background: var(--surface); }
+.brand-inline { margin: 0; font-size: 15px; line-height: 1.2; white-space: nowrap; }
+.auditbar-sep { color: var(--muted); font-size: 16px; }
+.topbar { border-top: 0; }
+
+.auditbar { gap: 6px 8px; }
+.auditbar > button, .auditbar .lang button { padding: 4px 9px; font-size: 12.5px; }
+.pill { white-space: nowrap; }

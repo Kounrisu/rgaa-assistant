@@ -11,6 +11,9 @@ import { MANUAL_CHECKS, MANUAL_GROUPS } from '../lib/manual-checks'
 import axeFrench from 'axe-core/locales/fr.json'
 import { applyToolResults, fromAxe, type ToolResults } from '../lib/axe-import'
 import { RULES, type RuleFinding } from '../lib/rgaa-rules'
+// --- Asqatasun-derived: begin ---
+import type { AsqExtra } from '../lib/asqatasun-rules' // a type only: the table itself stays in the page script
+// --- Asqatasun-derived: end ---
 import { FINDING_CRITERIA, findingCriterionIds, hintForFinding, suggestFinding, type FindingCriterion } from '../lib/findings'
 import { FINDING_THEMES, SCANNED_THEMES, THEMES, THEME_LABEL, themeByNumber } from '../lib/themes'
 import type { Audit, AuditItem, AuditSummary, ChecklistVerdict, Detected, FindingItem, ImageElementInfo, ImageKind, ImageReview, PageRecord, RawFinding, Verdict } from '../lib/types'
@@ -2782,6 +2785,14 @@ function rulesToResults(url: string, findings: RuleFinding[]): ToolResults {
     const note = t(meta.text, { n: f.count, detail: f.detail ? t(f.detail) : '', samples: (f.samples ?? []).join(', ') })
     for (const criterion of meta.criteria) answers.push({ criterion, status: meta.status, note })
   }
+  // --- Asqatasun-derived: begin ---
+  // Tests ported from Asqatasun: nc = fails, review = a note only, na = not applicable (a pass is never recorded).
+  for (const f of findings as (RuleFinding & { asq?: AsqExtra })[]) {
+    if (!f.asq) continue
+    const note = t(f.asq.text, { n: f.count, samples: (f.samples ?? []).join(', '), criterion: f.asq.criterion })
+    answers.push({ criterion: f.asq.criterion, status: f.asq.status === 'review' ? null : f.asq.status, note })
+  }
+  // --- Asqatasun-derived: end ---
   return { tool: 'RGAA', url, violations: [], answers, incomplete: 0, passes: 0 }
 }
 
@@ -2844,11 +2855,13 @@ function renderAuditBar(): void {
   auditNameBtn.title = t('Rename this audit')
   saveStateEl.className = `pill ${saveState === 'saved' ? '' : saveState}`
   saveStateEl.textContent =
-    saveState === 'saving' ? t('Saving…') : saveState === 'error' ? t('Not saved: browser storage full or unavailable. Save to a file now.') : t('Saved in the browser at {time}', { time: timeOf(savedAt || audit.updatedAt) })
+    saveState === 'saving' ? t('Saving…') : saveState === 'error' ? t('Not saved! Save to a file now.') : t('Saved {time}', { time: timeOf(savedAt || audit.updatedAt) })
+  saveStateEl.title = saveState === 'error' ? t('Not saved: browser storage full or unavailable. Save to a file now.') : t('Saved in the browser at {time}', { time: timeOf(savedAt || audit.updatedAt) })
   const never = audit.exportedAt === undefined
   const changed = !never && audit.updatedAt > (audit.exportedAt ?? 0)
   backupStateEl.className = `pill ${never || changed ? (audit.pages.length ? 'warn' : 'muted') : 'muted'}`
-  backupStateEl.textContent = never ? t('No file saved yet') : changed ? t('Changed since the file of {time}', { time: timeOf(audit.exportedAt ?? 0) }) : t('File saved at {time}', { time: timeOf(audit.exportedAt ?? 0) })
+  backupStateEl.textContent = never ? t('No file yet') : changed ? t('File out of date') : t('File up to date')
+  backupStateEl.title = never ? t('No file saved yet') : changed ? t('Changed since the file of {time}', { time: timeOf(audit.exportedAt ?? 0) }) : t('File saved at {time}', { time: timeOf(audit.exportedAt ?? 0) })
   auditsBtn.setAttribute('aria-pressed', String(view === 'audits'))
   langFrBtn.setAttribute('aria-pressed', String(getLang() === 'fr'))
   langEnBtn.setAttribute('aria-pressed', String(getLang() === 'en'))
@@ -3102,6 +3115,7 @@ async function renderAuditsView(): Promise<void> {
 /** Changes the language of the whole panel, now. */
 function applyLanguage(lang: Lang): void {
   setLang(lang)
+  statusEl.textContent = '' // an old message would stay in the previous language
   translateStatic()
   renderAll()
   renderAuditBar()

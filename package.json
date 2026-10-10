@@ -1,6 +1,7 @@
 {
   "name": "rgaa-assistant",
   "private": true,
+  "license": "AGPL-3.0-only",
   "version": "0.1.0",
   "description": "AI-assisted RGAA 4.1 auditor — Theme 1 (Images) only. Numbers images on the page, builds the element list, and prepares the AI prompt for a chat UI.",
   "type": "module",

@@ -8,14 +8,15 @@
   </head>
   <body>
     <div class="auditbar" role="region" aria-label="Current audit" data-i18n-attrs="aria-label">
-      <span class="auditbar-label" data-i18n>Audit</span>
+      <h1 class="brand-inline">RGAA Assistant</h1>
+      <span class="auditbar-sep" aria-hidden="true">›</span>
       <button id="audit-name-btn" type="button" class="audit-name" title="Rename this audit" data-i18n-attrs="title"></button>
       <span id="save-state" class="pill" role="status" aria-live="polite"></span>
       <span id="backup-state" class="pill muted"></span>
       <span class="spacer"></span>
       <button id="audits-btn" type="button" aria-pressed="false" data-i18n>Audits</button>
-      <button id="open-file-btn" type="button" title="Reopen an audit saved earlier in a .rgaa.json file, to carry on" data-i18n data-i18n-attrs="title">Open from a file</button>
-      <button id="save-file-btn" type="button" title="Download the whole audit as a .rgaa.json file, to keep or to reopen later" data-i18n data-i18n-attrs="title">Save to file</button>
+      <button id="open-file-btn" type="button" title="Reopen an audit saved earlier in a .rgaa.json file, to carry on" data-i18n data-i18n-attrs="title">Open file</button>
+      <button id="save-file-btn" type="button" title="Download the whole audit as a .rgaa.json file, to keep or to reopen later" data-i18n data-i18n-attrs="title">Save file</button>
       <div class="lang" role="group" aria-label="Language" data-i18n-attrs="aria-label">
         <button id="lang-fr" type="button" aria-pressed="true">FR</button>
         <button id="lang-en" type="button" aria-pressed="false">EN</button>
@@ -23,10 +24,6 @@
     </div>
 
     <header class="topbar">
-      <div class="brand">
-        <h1>RGAA Assistant</h1>
-        <p data-i18n>RGAA 4.1 audit</p>
-      </div>
       <div class="top-info">
         <div id="page-summary" class="theme-summary page-totals" data-scope="page" aria-label="Totals of the chosen themes on this page" data-i18n-attrs="aria-label"></div>
         <p id="status" role="status" class="status top-status"></p>
