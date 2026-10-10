@@ -1,4 +1,4 @@
-import { OUTCOME_LABEL, type CriterionResult, type Outcome, type Theme1Results, type ThemeResult } from './results'
+import { OUTCOME_LABEL, statusOf, type CriterionResult, type Outcome, type Status, type Theme1Results, type ThemeResult } from './results'
 import { CRITERION_LEVEL, THEME_LABEL, type Level } from './themes'
 import type { Thumb } from './thumbs'
 import { buildXlsx, type CellInput, type Sheet } from './xlsx'
@@ -7,7 +7,7 @@ import { tFr } from './i18n'
 import { MANUAL_CHECKS } from './manual-checks'
 import type { AuditMeta, ChecklistAnswer, Detected, FindingItem, ImageElementInfo, ImageReview, ManualCheckAnswer } from './types'
 
-type Status = 'C' | 'NC' | 'NA' | 'NT'
+/** Status of one TEST (theme 1 detail). Criteria use `statusOf`, which also looks at coverage. */
 const STATUS: Record<Outcome, Status> = { c: 'C', nc: 'NC', na: 'NA', pending: 'NT', unassessed: 'NT' }
 const DETECTED_FR: Record<Detected, string> = {
   ignored: 'Ignorée par les technologies d’assistance',
@@ -46,16 +46,39 @@ export const thumbKey = (pageIndex: number, imageId: number) => pageIndex * 1000
 /* Statistics                                                          */
 /* ------------------------------------------------------------------ */
 
-export interface Counts { C: number; NC: number; NA: number; NT: number }
+/**
+ * C / NC / NA / NT per status (see `statusOf`: a compliant criterion whose coverage is partial counts as NT), plus
+ * flags kept apart from the verdict: `partial` = criteria (any status) with incomplete coverage, `suggested` = criteria
+ * waiting for the auditor to confirm a tool suggestion, `unconfirmed` = counted C/NC/NA that still rest on a pre-filled
+ * verdict nobody confirmed.
+ */
+export interface Counts { C: number; NC: number; NA: number; NT: number; partial: number; suggested: number; unconfirmed: number }
 export const rateOf = (c: Counts): number | null => (c.C + c.NC ? Math.round((c.C / (c.C + c.NC)) * 100) : null)
-const emptyCounts = (): Counts => ({ C: 0, NC: 0, NA: 0, NT: 0 })
+const emptyCounts = (): Counts => ({ C: 0, NC: 0, NA: 0, NT: 0, partial: 0, suggested: 0, unconfirmed: 0 })
+
+/**
+ * A rate is PROVISIONAL while the audit is incomplete: some criteria are not tested (NT: pending, not assessed or
+ * only partly covered) or a counted verdict is still an unconfirmed pre-fill. Only a rate with NT = 0 and nothing
+ * unconfirmed is final for its scope.
+ */
+export const isProvisional = (c: Counts): boolean => c.NT > 0 || c.unconfirmed > 0
+export const PROVISIONAL_FR = 'provisoire'
+export const PROVISIONAL_NOTE_FR =
+  'Taux provisoire : des critères restent à tester, ne sont couverts que partiellement par RGAA Assistant (les critères conformes sur une partie seulement des tests comptent comme non testés), ou reposent sur un pré-remplissage automatique non confirmé. Seule une relecture complète par l’auditeur donne un taux définitif.'
+export const withProvisional = (text: string, c: Counts): string => (text !== '—' && text !== 'indisponible' && isProvisional(c) ? `${text} (${PROVISIONAL_FR})` : text)
 
 /** Every criterion of the referential, in official order, with its theme. */
 const flat = (p: PageInput) => p.themes.flatMap((theme) => theme.criteria.map((c) => ({ theme, c })))
 
 export function countsOf(p: PageInput): Counts {
   const n = emptyCounts()
-  for (const { c } of flat(p)) n[STATUS[c.outcome]]++
+  for (const { c } of flat(p)) {
+    const st = statusOf(c)
+    n[st]++
+    if (c.coverage === 'partial') n.partial++
+    if (c.outcome === 'pending' && c.suggested) n.suggested++
+    if (c.unconfirmed && st !== 'NT') n.unconfirmed++
+  }
   return n
 }
 
@@ -73,7 +96,7 @@ export interface AuditStats {
   averageRate: number | null
   sampleCounts: Counts
   sampleRate: number | null
-  sampleCriteria: { id: string; title: string; theme: number; status: Status }[]
+  sampleCriteria: { id: string; title: string; theme: number; status: Status; partial: boolean; suggested: boolean; unconfirmed: boolean }[]
   perTheme: { number: number; name: string; audited: boolean; counts: Counts; rate: number | null }[]
 }
 
@@ -96,13 +119,22 @@ export function auditStats(pages: PageInput[]): AuditStats {
     id: c.id,
     title: c.title,
     theme: theme.number,
-    status: sampleStatus(pages.map((p) => STATUS[flat(p)[i].c.outcome])),
+    status: sampleStatus(pages.map((p) => statusOf(flat(p)[i].c))),
+    partial: pages.some((p) => flat(p)[i].c.coverage === 'partial'),
+    suggested: pages.some((p) => flat(p)[i].c.outcome === 'pending' && flat(p)[i].c.suggested),
+    unconfirmed: pages.some((p) => flat(p)[i].c.unconfirmed),
   }))
   const sampleCounts = emptyCounts()
-  for (const c of sampleCriteria) sampleCounts[c.status]++
+  const tally = (counts: Counts, c: (typeof sampleCriteria)[number]) => {
+    counts[c.status]++
+    if (c.partial) counts.partial++
+    if (c.suggested && c.status === 'NT') counts.suggested++
+    if (c.unconfirmed && c.status !== 'NT') counts.unconfirmed++
+  }
+  for (const c of sampleCriteria) tally(sampleCounts, c)
   const perTheme = (pages[0]?.themes ?? []).map((theme) => {
     const counts = emptyCounts()
-    for (const c of sampleCriteria.filter((x) => x.theme === theme.number)) counts[c.status]++
+    for (const c of sampleCriteria.filter((x) => x.theme === theme.number)) tally(counts, c)
     return {
       number: theme.number,
       name: theme.name,
@@ -131,6 +163,8 @@ export interface LevelStats {
   /** The legal level (AA) includes the A criteria. */
   legal: Counts
   pages: { label: string; title: string; counts: Counts; rate: number | null }[]
+  /** The average of page rates is provisional as soon as one page rate is. */
+  averageProvisional: boolean
   average: number | null
   best: { label: string; rate: number } | null
   worst: { label: string; rate: number } | null
@@ -140,9 +174,15 @@ export interface LevelStats {
 
 export function levelStats(stats: AuditStats): LevelStats {
   const perLevel: Record<Level, Counts> = { A: emptyCounts(), AA: emptyCounts(), AAA: emptyCounts() }
-  for (const c of stats.sampleCriteria) perLevel[CRITERION_LEVEL[c.id] ?? 'A'][c.status]++
+  for (const c of stats.sampleCriteria) {
+    const counts = perLevel[CRITERION_LEVEL[c.id] ?? 'A']
+    counts[c.status]++
+    if (c.partial) counts.partial++
+    if (c.suggested && c.status === 'NT') counts.suggested++
+    if (c.unconfirmed && c.status !== 'NT') counts.unconfirmed++
+  }
   const legal = emptyCounts()
-  for (const k of ['C', 'NC', 'NA', 'NT'] as const) legal[k] = perLevel.A[k] + perLevel.AA[k]
+  for (const k of Object.keys(legal) as (keyof Counts)[]) legal[k] = perLevel.A[k] + perLevel.AA[k]
   const pages = stats.perPage.map((p) => ({ label: p.label, title: p.title, counts: p.counts, rate: rateExact(p.counts) }))
   const rated = pages.filter((p): p is typeof p & { rate: number } => p.rate !== null)
   const average = rated.length ? rated.reduce((a, p) => a + p.rate, 0) / rated.length : null
@@ -150,6 +190,7 @@ export function levelStats(stats: AuditStats): LevelStats {
     perLevel,
     legal,
     pages,
+    averageProvisional: pages.some((p) => isProvisional(p.counts)),
     average,
     best: rated.length ? rated.reduce((a, b) => (b.rate > a.rate ? b : a)) : null,
     worst: rated.length ? rated.reduce((a, b) => (b.rate < a.rate ? b : a)) : null,
@@ -191,12 +232,12 @@ export function summarySheet(pages: PageInput[]): Sheet {
     rows: [
       title('Synthèse de l’audit RGAA 4.1.2'),
       [],
-      [{ v: 'Taux d’accessibilité (moyenne des pages)', s: 'head' }, { v: pct(stats.averageRate), s: 'crit' }],
-      [{ v: 'Critères respectés sur l’ensemble de l’échantillon', s: 'head' }, { v: pct(stats.sampleRate), s: 'crit' }],
+      [{ v: 'Taux d’accessibilité (moyenne des pages)', s: 'head' }, { v: stats.perPage.some((p) => isProvisional(p.counts)) ? `${pct(stats.averageRate)} (${PROVISIONAL_FR})` : pct(stats.averageRate), s: 'crit' }],
+      [{ v: 'Critères respectés sur l’ensemble de l’échantillon', s: 'head' }, { v: withProvisional(pct(stats.sampleRate), stats.sampleCounts), s: 'crit' }],
       [{ v: 'Pages auditées', s: 'head' }, pages.length],
       [],
       title('Synthèse par page'),
-      head(['Page', 'Titre', 'URL', 'Thématiques', 'Images', 'C', 'NC', 'NA', 'NT', 'Critères respectés']),
+      head(['Page', 'Titre', 'URL', 'Thématiques', 'Images', 'C', 'NC', 'NA', 'NT', 'Critères respectés', 'À confirmer', 'Couverture partielle']),
       ...stats.perPage.map((p) => [
         p.label,
         { v: p.title, s: 'wrap' as const },
@@ -207,7 +248,9 @@ export function summarySheet(pages: PageInput[]): Sheet {
         { v: p.counts.NC, s: 'NC' as const },
         { v: p.counts.NA, s: 'NA' as const },
         { v: p.counts.NT, s: 'NT' as const },
-        { v: pct(p.rate), s: 'crit' as const },
+        { v: withProvisional(pct(p.rate), p.counts), s: 'crit' as const },
+        p.counts.suggested,
+        p.counts.partial,
       ]),
       [],
       title('Synthèse par thématiques et par statuts (échantillon)'),
@@ -216,9 +259,12 @@ export function summarySheet(pages: PageInput[]): Sheet {
       themeRow('NC – Non conforme', 'NC', (c) => c.NC),
       themeRow('NA – Non applicable', 'NA', (c) => c.NA),
       themeRow('NT – Non testé', 'NT', (c) => c.NT),
-      [{ v: 'Critères respectés', s: 'head' }, ...stats.perTheme.map((t) => ({ v: pct(t.rate), s: 'crit' }) as CellInput)],
+      themeRow('dont suggestion automatique à confirmer', 'NT', (c) => c.suggested),
+      themeRow('Couverture partielle (tests non évalués)', 'NT', (c) => c.partial),
+      [{ v: 'Critères respectés', s: 'head' }, ...stats.perTheme.map((t) => ({ v: withProvisional(pct(t.rate), t.counts), s: 'crit' }) as CellInput)],
       [],
-      [{ v: 'Pourcentage = C / (C + NC). Les critères NA et NT sont exclus du calcul.', s: 'default' }],
+      [{ v: 'Pourcentage = C / (C + NC). Les critères NA et NT sont exclus du calcul. Un pré-remplissage automatique n’est pas une validation : tant que l’auditeur ne l’a pas confirmé, le critère reste NT.', s: 'default' }],
+      [{ v: PROVISIONAL_NOTE_FR, s: 'default' }],
     ],
   }
 }
@@ -229,7 +275,7 @@ export function resultsSheet(pages: PageInput[]): Sheet {
   const lv = levelStats(stats)
   const row = (label: string, c: Counts): CellInput[] => [
     { v: label, s: 'crit' },
-    { v: pct2(rateExact(c)), s: 'C' },
+    { v: withProvisional(pct2(rateExact(c)), c), s: 'C' },
     { v: c.C + c.NC ? pct2((c.NC / (c.C + c.NC)) * 100) : '—', s: 'NC' },
   ]
   const counts = (label: string, c: Counts): CellInput[] => [{ v: label, s: 'crit' }, c.C, c.NC]
@@ -263,17 +309,18 @@ export function resultsSheet(pages: PageInput[]): Sheet {
         { v: p.counts.C, s: 'C' as const },
         { v: p.counts.NC, s: 'NC' as const },
         { v: p.counts.NA, s: 'NA' as const },
-        { v: pct2(p.rate), s: 'crit' as const },
+        { v: withProvisional(pct2(p.rate), p.counts), s: 'crit' as const },
       ]),
       [],
       head(['Résultats : moyennes', '', '', '', '', '']),
-      [{ v: 'Moyenne', s: 'crit' }, '', '', '', '', pct2(lv.average)],
+      [{ v: 'Moyenne', s: 'crit' }, '', '', '', '', lv.averageProvisional && lv.average !== null ? `${pct2(lv.average)} (${PROVISIONAL_FR})` : pct2(lv.average)],
       [{ v: 'Meilleure page', s: 'crit' }, lv.best?.label ?? '', '', '', '', pct2(lv.best?.rate ?? null)],
       [{ v: 'Plus mauvaise page', s: 'crit' }, lv.worst?.label ?? '', '', '', '', pct2(lv.worst?.rate ?? null)],
       [],
       title('Calcul de la conformité'),
       ['La conformité globale est calculée de la manière suivante : C / (C + NC) où C est le nombre de critères conformes et NC le nombre de critères non conformes. C’est ce nombre qui est la référence légale, il représente le taux de conformité de l’échantillon.'],
       ['Les niveaux A / AA / AAA sont déduits des critères WCAG référencés par chaque critère RGAA.'],
+      [PROVISIONAL_NOTE_FR],
     ],
   }
 }
@@ -293,7 +340,7 @@ export function criteriaSheet(pages: PageInput[]): Sheet {
       { v: c.id, s: 'crit' },
       { v: c.title, s: 'wrap' },
       ...perPage.map((f) => {
-        const st = STATUS[f[i].c.outcome]
+        const st = statusOf(f[i].c)
         return { v: st, s: st } as CellInput
       }),
       { v: c.status, s: c.status },
@@ -303,7 +350,26 @@ export function criteriaSheet(pages: PageInput[]): Sheet {
   return { name: 'Critères', widths: [20, 9, 70, ...pages.map(() => 7), 13], rows, freezeRow: 3 }
 }
 
+/** Evidence lines added to the "modifications" column: partial coverage, pending suggestion, conflicting evidence. */
+function evidenceNotes(criterion: CriterionResult): string[] {
+  const out: string[] = []
+  if (criterion.coverage === 'partial') out.push(`Couverture partielle : ${criterion.unassessedTests} test(s) sur ${(criterion.assessedTests ?? 0) + (criterion.unassessedTests ?? 0)} non évalué(s) par RGAA Assistant (à vérifier à la main).`)
+  if (criterion.suggested) {
+    const word = { c: 'conforme', nc: 'non conforme', na: 'non applicable' }[criterion.suggested]
+    out.push(`Suggestion automatique : ${word}, à confirmer par l’auditeur.`)
+  }
+  if (criterion.unconfirmed && !criterion.suggested) out.push('Repose sur un pré-remplissage automatique non confirmé.')
+  for (const c of criterion.conflicts ?? []) out.push(`Résultats contradictoires : ${c}.`)
+  return out
+}
+
 function modifications(theme: ThemeResult, criterion: CriterionResult, page: PageInput): string {
+  const base = modificationsText(theme, criterion, page)
+  if (!theme.selected) return base
+  return [base, ...evidenceNotes(criterion)].filter(Boolean).join('\n')
+}
+
+function modificationsText(theme: ThemeResult, criterion: CriterionResult, page: PageInput): string {
   if (!theme.selected) return 'Thématique non auditée sur cette page.'
   if (theme.number === 1) {
     const ids = [...new Set(criterion.tests.flatMap((t) => t.nc))].sort((a, b) => a - b)
@@ -336,7 +402,7 @@ export function gridSheet(page: PageInput): Sheet {
   ]
   for (const theme of page.themes) {
     theme.criteria.forEach((c, i) => {
-      const status = STATUS[c.outcome]
+      const status = statusOf(c)
       rows.push([
         { v: i === 0 ? theme.name.toUpperCase() : '', s: 'crit' },
         { v: c.id, s: 'crit' },

@@ -1,3 +1,4 @@
+import { migrateEvidence } from './evidence'
 import type { Audit, AuditSummary, PageRecord } from './types'
 
 const LEGACY_KEY = 'rgaa-audit'
@@ -109,6 +110,7 @@ export function migrate(audit: Audit): Audit {
     p.scannedThemes ??= p.scanCount ? [1] : []
     p.nextFindingId ??= 1
     p.nextFindingIds ??= {}
+    migrateEvidence(p) // tool-prefilled verdicts become suggestions (src/lib/evidence.ts)
   }
   return a
 }
