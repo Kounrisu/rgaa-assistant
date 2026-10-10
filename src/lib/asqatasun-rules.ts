@@ -634,7 +634,8 @@ const presentationTags = check('10.1.1', (c) => {
 })
 
 // Attributes of DeprecatedRepresentationAttributesV3 on any element that is not an <svg> or inside one, plus width and height
-// on elements other than img, svg, object, embed and canvas.
+// on elements other than img, svg, object, embed and canvas. Deviation from Asqatasun: iframe, video, input and source are
+// also left out, because HTML5 allows width and height on them (YouTube embeds are not presentation markup).
 const presentationAttributes = check('10.1.2', (c) => {
   const found = new Map<string, Element[]>()
   for (const attr of DEPRECATED_ATTRIBUTES) {
@@ -642,7 +643,7 @@ const presentationAttributes = check('10.1.2', (c) => {
     if (els.length) found.set(attr, els)
   }
   for (const attr of ['width', 'height']) {
-    const els = c.query(`:not(img):not(svg):not(object):not(embed):not(canvas)[${attr}]:not(svg [${attr}])`)
+    const els = c.query(`:not(img):not(svg):not(object):not(embed):not(canvas):not(iframe):not(video):not(input):not(source)[${attr}]:not(svg [${attr}])`)
     if (els.length) found.set(attr, els)
   }
   if (!found.size) return { outcome: 'passed' }

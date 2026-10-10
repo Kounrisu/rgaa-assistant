@@ -24,7 +24,7 @@ A browser extension (Chrome, Firefox) that helps an auditor check a page against
 - **axe-core** (Deque): MPL-2.0, with a minimal patch applied at build time (removes `Function()`/`eval` calls so it runs on sites with a strict CSP); the patch is public in the repository (`scripts/patch-axe.mjs`).
 - **fflate**: MIT (compression for the Excel export and the HTML copies).
 - **html-validate**: MIT, validates the captured HTML, entirely local.
-- **Asqatasun / Tanaguru**: AGPL-3.0. Selectors and RGAA rule definitions are adapted from it, **isolated in one file** so they can be removed. While they are present the project is distributed under **AGPL-3.0**: anyone who receives the extension can obtain its source. For internal use without passing it to third parties, the obligations are limited (to confirm with legal).
+- **Asqatasun / Tanaguru**: AGPL-3.0. Selectors and RGAA rule definitions are adapted from it, **isolated in a data file and marked blocks** so they can be removed (removal also drops our checks that were replaced by Asqatasun's: see `NOTICE.md`). While they are present the project is distributed under **AGPL-3.0**: anyone who receives the extension can obtain its source. For internal use without passing it to third parties, the obligations are limited (to confirm with legal).
 - Official RGAA data: DINUM (reuse terms to verify).
 - Detailed inventory and removal steps: `THIRD-PARTY.md` and `NOTICE.md` at the repository root.
 

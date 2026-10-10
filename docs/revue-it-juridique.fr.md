@@ -24,7 +24,7 @@ Extension de navigateur (Chrome, Firefox) qui aide un auditeur ou une auditrice 
 - **axe-core** (Deque) : MPL-2.0, avec un correctif minimal appliqué à la compilation (suppression des appels `Function()`/`eval`, pour fonctionner sur les sites à politique CSP stricte) ; le correctif est public dans le dépôt (`scripts/patch-axe.mjs`).
 - **fflate** : MIT (compression de l'export Excel et des copies du HTML).
 - **html-validate** : MIT, validation du HTML capturé, entièrement locale.
-- **Asqatasun / Tanaguru** : AGPL-3.0. Des sélecteurs et définitions de règles RGAA en sont adaptés, **isolés dans un seul fichier** pour pouvoir être retirés. Tant qu'ils sont présents, le projet est diffusé sous **AGPL-3.0** : qui reçoit l'extension peut obtenir son code source. Pour un usage interne sans diffusion à des tiers, les obligations sont limitées (à valider par le juridique).
+- **Asqatasun / Tanaguru** : AGPL-3.0. Des sélecteurs et définitions de règles RGAA en sont adaptés, **isolés dans un fichier de données et des blocs balisés** pour pouvoir être retirés (le retrait supprime aussi nos contrôles remplacés par ceux d’Asqatasun : voir `NOTICE.md`). Tant qu'ils sont présents, le projet est diffusé sous **AGPL-3.0** : qui reçoit l'extension peut obtenir son code source. Pour un usage interne sans diffusion à des tiers, les obligations sont limitées (à valider par le juridique).
 - Données RGAA officielles : DINUM (conditions de réutilisation à vérifier).
 - Inventaire détaillé et marche à suivre pour retirer un composant : `THIRD-PARTY.md` et `NOTICE.md` à la racine du dépôt.
 

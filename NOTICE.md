@@ -94,3 +94,5 @@ rows in `RULES`) if they are still wanted.
 Removing the code is a precondition to relicensing the project (for example to another licence than the AGPL-3.0);
 whether to do it is the owner's decision. Search `Asqatasun` in the whole project (`grep -ri asqatasun src scripts`) to check
 that nothing is left: only the notes of the marked blocks and this file should mention it.
+
+- 10.1.2 (width/height): `iframe`, `video`, `input` and `source` are also left out, because HTML5 allows these attributes on them; Asqatasun reports them. The fixtures still agree (see `npm run check:asqatasun`).
