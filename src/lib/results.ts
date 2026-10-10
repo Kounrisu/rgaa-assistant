@@ -2,7 +2,8 @@ import { t as tr } from './i18n'
 import theme1 from './rgaa-theme1.json'
 import { THEMES } from './themes'
 import { FINDING_CRITERIA } from './findings'
-import type { ChecklistAnswer, FindingItem, ImageElementInfo, ImageKind, ImageReview } from './types'
+import { evidenceConflicts } from './evidence'
+import type { ChecklistAnswer, ChecklistVerdict, FindingItem, ImageElementInfo, ImageKind, ImageReview } from './types'
 
 export type Outcome = 'c' | 'nc' | 'na' | 'pending' | 'unassessed'
 
@@ -66,26 +67,63 @@ export interface TestResult {
   reason: string
   imageIds: number[]
   nc: number[]
+  /** A counted answer still rests on a pre-filled (unconfirmed) per-element verdict. */
+  unconfirmed?: boolean
 }
+
+/**
+ * How much of a criterion the tool could actually assess, independently of the verdict.
+ * full = every test is assessed (or the criterion is a single judgement); partial = some tests are not supported
+ * ("unassessed") while others are; none = nothing is assessed.
+ */
+export type Coverage = 'full' | 'partial' | 'none'
+
 export interface CriterionResult {
   id: string
   title: string
+  /** What was found. With partial coverage it only speaks for the assessed tests. */
   outcome: Outcome
   tests: TestResult[]
+  coverage: Coverage
+  /** Tests assessed vs not supported by this tool (theme 1 only; 0/0 for single-judgement criteria). */
+  assessedTests?: number
+  unassessedTests?: number
+  /** A tool suggestion waiting for the auditor (outcome 'pending', or 'nc' when the failure is already counted). */
+  suggested?: ChecklistVerdict
+  /** The counted outcome rests on a pre-filled verdict nobody has confirmed yet. */
+  unconfirmed?: boolean
+  /** Evidence that disagrees (tools against each other, a tool failure against a human "compliant"). */
+  conflicts?: string[]
   /** Non-compliant findings with their notes (frames, colours). */
   ncRefs?: { id: number; label: string; note: string }[]
 }
 export interface Theme1Results {
   criteria: CriterionResult[]
+  /** C ÷ (C + NC) over the criteria fully assessed; see `statusOf`. Provisional while anything is pending or partial. */
   rate: number | null
   counts: Record<Outcome, number>
+}
+
+export type Status = 'C' | 'NC' | 'NA' | 'NT'
+
+/**
+ * The status a criterion counts as in rates and exports.
+ * DECISION: a compliant (or not-applicable) outcome with PARTIAL or no coverage is NOT verified: it counts as NT
+ * ("not tested") like pending, and is shown separately as partial coverage. A known non-compliance is kept as NC
+ * even when coverage is incomplete (the failure is real whatever else was not looked at). C/(C+NC) therefore keeps
+ * its usual meaning for fully assessed criteria.
+ */
+export function statusOf(c: Pick<CriterionResult, 'outcome' | 'coverage'>): Status {
+  if (c.outcome === 'nc') return 'NC'
+  if (c.outcome === 'pending' || c.outcome === 'unassessed' || c.coverage !== 'full') return 'NT'
+  return c.outcome === 'c' ? 'C' : 'NA'
 }
 
 function testOutcome(
   testId: string,
   images: ImageElementInfo[],
   reviewOf: (el: ImageElementInfo) => ImageReview | undefined,
-): Pick<TestResult, 'outcome' | 'reason' | 'imageIds' | 'nc' | 'scope'> {
+): Pick<TestResult, 'outcome' | 'reason' | 'imageIds' | 'nc' | 'scope' | 'unconfirmed'> {
   const scope = SCOPE[testId]
   if (!Array.isArray(scope)) return { outcome: 'unassessed', reason: tr(UNASSESSED_REASON[scope]), imageIds: [], nc: [], scope: null }
 
@@ -98,6 +136,7 @@ function testOutcome(
   const answered: number[] = []
   let pending = 0
   let compliant = 0
+  let unconfirmed = false
   for (const el of inScope) {
     const review = reviewOf(el)
     if (!review?.kind) {
@@ -109,23 +148,28 @@ function testOutcome(
     if (!verdict) pending++
     else {
       answered.push(el.id)
+      if (review.auto) unconfirmed = true
       if (verdict === 'nc') nc.push(el.id)
       if (verdict === 'c') compliant++
     }
   }
   const imageIds = inScope.map((e) => e.id)
-  if (nc.length) return { outcome: 'nc', reason: tr('{n} non-compliant image(s).', { n: nc.length }), imageIds, nc, scope }
+  if (nc.length) return { outcome: 'nc', reason: tr('{n} non-compliant image(s).', { n: nc.length }), imageIds, nc, scope, unconfirmed }
   if (pending) return { outcome: 'pending', reason: tr('{n} image(s) still to review.', { n: pending }), imageIds, nc, scope }
-  if (compliant) return { outcome: 'c', reason: tr('{n} image(s) checked.', { n: compliant }), imageIds, nc, scope }
+  if (compliant) return { outcome: 'c', reason: tr('{n} image(s) checked.', { n: compliant }), imageIds, nc, scope, unconfirmed }
   return { outcome: 'na', reason: tr('No image of this kind concerned by the test.'), imageIds, nc, scope }
 }
 
-function rollUp(outcomes: Outcome[]): Outcome {
-  if (outcomes.includes('nc')) return 'nc'
-  if (outcomes.includes('pending')) return 'pending'
-  if (outcomes.includes('c')) return 'c'
-  if (outcomes.includes('na')) return 'na'
-  return 'unassessed'
+/**
+ * Rolls the tests of a criterion up. The verdict keeps the precedence NC > pending > C > NA > unassessed, but
+ * coverage is computed on its own so that "C + unassessed" is not mistaken for a fully verified compliance.
+ */
+export function rollUp(outcomes: Outcome[]): { outcome: Outcome; coverage: Coverage; assessedTests: number; unassessedTests: number } {
+  const unassessedTests = outcomes.filter((o) => o === 'unassessed').length
+  const assessedTests = outcomes.length - unassessedTests
+  const coverage: Coverage = !outcomes.length ? 'full' : unassessedTests === 0 ? 'full' : assessedTests === 0 ? 'none' : 'partial'
+  const outcome: Outcome = outcomes.includes('nc') ? 'nc' : outcomes.includes('pending') ? 'pending' : outcomes.includes('c') ? 'c' : outcomes.includes('na') ? 'na' : 'unassessed'
+  return { outcome, coverage, assessedTests, unassessedTests }
 }
 
 export function computeTheme1(
@@ -135,12 +179,16 @@ export function computeTheme1(
   const present = images
   const criteria: CriterionResult[] = theme1.criteria.map((c) => {
     const tests = c.tests.map((t) => ({ id: t.id, text: t.text, ...testOutcome(t.id, present, reviewOf) }))
-    return { id: c.id, title: c.title, outcome: rollUp(tests.map((t) => t.outcome)), tests }
+    const rolled = rollUp(tests.map((t) => t.outcome))
+    const unconfirmed = ['c', 'nc', 'na'].includes(rolled.outcome) && tests.some((t) => t.unconfirmed)
+    return { id: c.id, title: c.title, tests, ...rolled, ...(unconfirmed ? { unconfirmed } : {}) }
   })
   const counts: Record<Outcome, number> = { c: 0, nc: 0, na: 0, pending: 0, unassessed: 0 }
   for (const c of criteria) counts[c.outcome]++
-  const decided = counts.c + counts.nc
-  return { criteria, counts, rate: decided ? Math.round((counts.c / decided) * 100) : null }
+  const st = criteria.map(statusOf)
+  const C = st.filter((x) => x === 'C').length
+  const NC = st.filter((x) => x === 'NC').length
+  return { criteria, counts, rate: C + NC ? Math.round((C / (C + NC)) * 100) : null }
 }
 
 /** The official test number of `criterion` that covers this element type, e.g. 1.1.1 for an <img>. */
@@ -174,23 +222,40 @@ export interface FindingInputs {
 }
 
 /** Outcome of one criterion over the findings of a theme. Never scanned means undecided. */
-function findingOutcome(theme: number, criterion: string, input: FindingInputs): Pick<CriterionResult, 'outcome' | 'ncRefs'> {
+function findingOutcome(theme: number, criterion: string, input: FindingInputs): Pick<CriterionResult, 'outcome' | 'ncRefs' | 'unconfirmed'> {
   if (!input.scannedThemes.includes(theme)) return { outcome: 'pending' }
   const def = (FINDING_CRITERIA[theme] ?? []).find((c) => c.id === criterion)
   const list = input.findings.filter((f) => f.theme === theme && (!def?.types || def.types.includes(f.type)))
   if (!list.length) return { outcome: 'na' }
   let pending = 0
   let compliant = 0
+  let unconfirmed = false
   const ncRefs: { id: number; label: string; note: string }[] = []
   for (const f of list) {
     const verdict = input.reviews[f.key]?.answers[criterion]
+    if (verdict && input.reviews[f.key]?.auto) unconfirmed = true
     if (!verdict) pending++
     else if (verdict === 'nc') ncRefs.push({ id: f.id, label: f.label, note: input.reviews[f.key]?.note?.trim() ?? '' })
     else if (verdict === 'c') compliant++
   }
-  if (ncRefs.length) return { outcome: 'nc', ncRefs }
+  const flag = unconfirmed ? { unconfirmed } : {}
+  if (ncRefs.length) return { outcome: 'nc', ncRefs, ...flag }
   if (pending) return { outcome: 'pending' }
-  return { outcome: compliant ? 'c' : 'na' }
+  return { outcome: compliant ? 'c' : 'na', ...flag }
+}
+
+/**
+ * Outcome of a checklist criterion. Only the auditor's verdict is confirmed. A tool suggestion stays "to review"
+ * (pending) with the suggestion attached, except a suggested failure: it is a known failure, kept as non-compliant
+ * but flagged as unconfirmed so that rates built on it are labelled provisional.
+ */
+export function checklistOutcome(a: ChecklistAnswer | undefined): Pick<CriterionResult, 'outcome' | 'suggested' | 'unconfirmed' | 'conflicts'> {
+  const conflicts = evidenceConflicts(a)
+  const extra = conflicts.length ? { conflicts } : {}
+  if (a?.verdict) return { outcome: a.verdict, ...extra }
+  if (a?.suggested === 'nc') return { outcome: 'nc', suggested: 'nc', unconfirmed: true, ...extra }
+  if (a?.suggested) return { outcome: 'pending', suggested: a.suggested, ...extra }
+  return { outcome: 'pending', ...extra }
 }
 
 /**
@@ -215,7 +280,11 @@ export function computeThemes(
         selected: isSelected,
         // never scanned: nothing can be called "not applicable" yet
         criteria: imageResults.criteria.map((c) =>
-          !isSelected ? { ...c, outcome: 'unassessed' as Outcome, tests: [] } : !fi.scannedThemes.includes(1) && c.outcome === 'na' ? { ...c, outcome: 'pending' as Outcome } : c,
+          !isSelected
+            ? { id: c.id, title: c.title, outcome: 'unassessed' as Outcome, tests: [], coverage: 'none' as Coverage }
+            : !fi.scannedThemes.includes(1) && c.outcome === 'na'
+            ? { ...c, outcome: 'pending' as Outcome }
+            : c,
         ),
       }
     }
@@ -225,10 +294,9 @@ export function computeThemes(
       name: theme.name,
       selected: isSelected,
       criteria: theme.criteria.map((c) => {
-        if (!isSelected) return { id: c.id, title: c.title, outcome: 'unassessed' as Outcome, tests: [] }
-        if (perFinding.includes(c.id)) return { id: c.id, title: c.title, tests: [], ...findingOutcome(theme.number, c.id, fi) }
-        const verdict = checklist[c.id]?.verdict
-        return { id: c.id, title: c.title, outcome: (verdict ?? 'pending') as Outcome, tests: [] }
+        if (!isSelected) return { id: c.id, title: c.title, outcome: 'unassessed' as Outcome, tests: [], coverage: 'none' as Coverage }
+        if (perFinding.includes(c.id)) return { id: c.id, title: c.title, tests: [], coverage: 'full' as Coverage, ...findingOutcome(theme.number, c.id, fi) }
+        return { id: c.id, title: c.title, tests: [], coverage: 'full' as Coverage, ...checklistOutcome(checklist[c.id]) }
       }),
     }
   })
