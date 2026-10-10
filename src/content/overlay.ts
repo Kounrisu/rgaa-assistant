@@ -3,6 +3,7 @@
  * states, labels, focus, numbering and clean-up. Imported by the content script only (inlined in its bundle).
  */
 import { DEFAULT_COLOR, OVERLAY_ID, STYLE_ID, removeById } from './dom-utils'
+import type { LocatedElement } from '../lib/messages'
 import { noteCut } from './scan-coverage'
 
 const FOCUS_COLOR = '#facc15'
@@ -258,7 +259,7 @@ export function focusThemeFinding(theme: number, id: number, scroll: boolean): b
 let savedScroll: { x: number; y: number } | null = null
 
 /** Scrolls a finding's element to the middle of the screen (instantly) and reports where it is, so the panel can photograph it. */
-export function locateTheme(theme: number, id: number): Record<string, unknown> | null {
+export function locateTheme(theme: number, id: number): LocatedElement | null {
   const el = themeOverlays.get(theme)?.items.get(id)?.els[0]
   if (!el) return null
   if (!savedScroll) savedScroll = { x: window.scrollX, y: window.scrollY }

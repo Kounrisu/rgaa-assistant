@@ -2,18 +2,19 @@
  * Colour picker: a screenshot of the page under a magnifier that follows the cursor. Imported by the content script
  * only (inlined in its bundle).
  */
+import type { PickResponse } from '../lib/messages'
 import { OVERLAY_ID } from './dom-utils'
 
 /* Colour picker: a screenshot of the page under a magnifier that follows the cursor and shows the colour's hex. */
 let pickLayer: HTMLElement | null = null
-let pickDone: ((r: Record<string, unknown>) => void) | null = null
+let pickDone: ((r: PickResponse) => void) | null = null
 let pickToken = 0
 
 const overlayRoots = (): HTMLElement[] =>
   Array.from(document.querySelectorAll<HTMLElement>(`[id^="${OVERLAY_ID}"]`)).filter((el) => el.id !== `${OVERLAY_ID}-pick`)
 const setOverlaysHidden = (hidden: boolean): void => overlayRoots().forEach((el) => (el.style.visibility = hidden ? 'hidden' : ''))
 
-export function endPick(result: Record<string, unknown>): void {
+export function endPick(result: PickResponse): void {
   pickToken++
   window.removeEventListener('keydown', onPickKey, true)
   pickLayer?.remove()
@@ -32,7 +33,7 @@ function onPickKey(e: KeyboardEvent): void {
 
 const nextFrame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
 
-export async function startPick(respond: (r: Record<string, unknown>) => void): Promise<void> {
+export async function startPick(respond: (r: PickResponse) => void): Promise<void> {
   endPick({ cancelled: true })
   pickDone = respond
   const token = ++pickToken

@@ -1,9 +1,10 @@
 /**
  * Runs the axe engine in the page. Imported by the content script only (inlined in its bundle).
  */
+import type { AxeRunResponse } from '../lib/messages'
 
 /** Runs the axe engine (injected by the background page just before) and sends back a light copy of its findings. */
-export async function runAxe(locale: unknown, rules: unknown): Promise<Record<string, unknown>> {
+export async function runAxe(locale: unknown, rules: unknown): Promise<AxeRunResponse> {
   type AxeApi = { run: (ctx: Document, opts: object) => Promise<Record<string, unknown>>; configure: (c: object) => void }
   const axe = ((globalThis as unknown as { axe?: AxeApi }).axe ?? (window as unknown as { axe?: AxeApi }).axe) as AxeApi | undefined
   if (!axe) return { error: 'axe-not-loaded' }
