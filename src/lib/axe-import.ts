@@ -23,7 +23,7 @@ export interface ToolResults {
   tool: string
   url: string
   violations: ToolViolation[]
-  answers: { criterion: string; status: ChecklistVerdict; note: string }[]
+  answers: { criterion: string; status: ChecklistVerdict | null; note: string }[]
   incomplete: number
   passes: number
 }
@@ -101,7 +101,11 @@ export function applyToolResults(rec: PageRecord, res: ToolResults): ImportRepor
 
   const touchCriterion = (criterion: string, verdict: ChecklistVerdict | null, line: string): void => {
     const theme = themeOfCriterion(criterion)
-    if (!rec.themes.includes(theme)) rec.themes = [...rec.themes, theme].sort((a, b) => a - b)
+    if (!rec.themes.includes(theme)) {
+      // only a failure brings a theme into the page; "not applicable" and notes stay in the themes you chose to audit
+      if (verdict !== 'nc') return
+      rec.themes = [...rec.themes, theme].sort((a, b) => a - b)
+    }
     const ans = (rec.checklist[criterion] ??= { note: '' })
     if (verdict && ans.verdict === undefined) {
       ans.verdict = verdict
@@ -173,10 +177,10 @@ export function applyToolResults(rec: PageRecord, res: ToolResults): ImportRepor
   for (const a of res.answers) {
     const theme = themeOfCriterion(a.criterion)
     if (theme <= 3 && ['1.1', '2.1', '2.2', '3.2'].includes(a.criterion)) {
-      report.unmapped.push(`${a.criterion}: ${a.status.toUpperCase()}${a.note ? ` — ${a.note}` : ''}`)
+      report.unmapped.push(`${a.criterion}: ${a.status?.toUpperCase() ?? ''}${a.note ? ` — ${a.note}` : ''}`)
       continue
     }
-    touchCriterion(a.criterion, a.status, a.note ? `${mark} ${a.criterion}: ${a.note}` : `${mark} ${a.criterion}: ${a.status.toUpperCase()}`)
+    touchCriterion(a.criterion, a.status, a.note ? `${mark} ${a.criterion}: ${a.note}` : `${mark} ${a.criterion}: ${a.status?.toUpperCase()}`)
   }
 
   ;(rec.imports ??= []).push(report)

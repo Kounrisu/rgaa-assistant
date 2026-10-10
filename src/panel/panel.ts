@@ -9,7 +9,8 @@ import { colorOf } from '../lib/theme-colors'
 import { contrastRatio, parseHex, toHex } from '../lib/contrast'
 import { MANUAL_CHECKS, MANUAL_GROUPS } from '../lib/manual-checks'
 import axeFrench from 'axe-core/locales/fr.json'
-import { applyToolResults, fromAxe } from '../lib/axe-import'
+import { applyToolResults, fromAxe, type ToolResults } from '../lib/axe-import'
+import { RULES, type RuleFinding } from '../lib/rgaa-rules'
 import { FINDING_CRITERIA, findingCriterionIds, hintForFinding, suggestFinding, type FindingCriterion } from '../lib/findings'
 import { FINDING_THEMES, SCANNED_THEMES, THEMES, THEME_LABEL, themeByNumber } from '../lib/themes'
 import type { Audit, AuditItem, AuditSummary, ChecklistVerdict, Detected, FindingItem, ImageElementInfo, ImageKind, ImageReview, PageRecord, RawFinding, Verdict } from '../lib/types'
@@ -1099,6 +1100,8 @@ function switchTo(id: string, navigate = false): void {
   const rec = audit.pages.find((p) => p.id === id)
   if (!rec) return
   if (rec !== page) loadPage(rec)
+  // you chose this page yourself: the “the browser is on another page” reminder no longer applies
+  navBanner.hidden = true
   setView(['sample', 'audit', 'audits', 'checks'].includes(view) ? 'review' : view)
   renderAll()
   persist()
@@ -2752,7 +2755,7 @@ function renderChecks(): void {
       'div',
       { class: 'card' },
       h('h3', {}, t('Automatic checks')),
-      h('p', { class: 'hint-line' }, t('Runs the axe engine on the page you are inspecting and maps what it finds to RGAA criteria. A finding becomes a pre-filled “non-compliant” to confirm; finding nothing never marks a criterion compliant. It covers only part of the RGAA: the manual checks below are still needed.')),
+      h('p', { class: 'hint-line' }, t('Runs our own RGAA checks and the axe engine on the page you are inspecting. A failure becomes a pre-filled “non-compliant” to confirm; a theme that clearly does not apply (no table, no media, no form…) is pre-filled “not applicable”. Finding nothing never marks a criterion compliant. It covers only part of the RGAA: the manual checks below are still needed.')),
       h('div', { class: 'nav' }, h('button', { type: 'button', class: 'primary', disabled: axeRunning, onclick: () => void runAutoChecks() }, axeRunning ? t('Running the checks…') : t('Run the automatic checks'))),
     ),
     ...reports.map((r) =>
@@ -2770,6 +2773,18 @@ function renderChecks(): void {
   )
 }
 
+/** Our own RGAA checks: the page sends what it found, the wording and the criteria come from lib/rgaa-rules.ts. */
+function rulesToResults(url: string, findings: RuleFinding[]): ToolResults {
+  const answers: ToolResults['answers'] = []
+  for (const f of findings) {
+    const meta = RULES[f.key]
+    if (!meta) continue
+    const note = t(meta.text, { n: f.count, detail: f.detail ? t(f.detail) : '', samples: (f.samples ?? []).join(', ') })
+    for (const criterion of meta.criteria) answers.push({ criterion, status: meta.status, note })
+  }
+  return { tool: 'RGAA', url, violations: [], answers, incomplete: 0, passes: 0 }
+}
+
 async function runAutoChecks(): Promise<void> {
   if (!page || axeRunning) return
   const rec = page
@@ -2777,6 +2792,7 @@ async function runAutoChecks(): Promise<void> {
   keepScroll(checksEl, renderChecks)
   say(t('Running the automatic checks on the page…'))
   try {
+    const own = await sendToPage(inspectedTabId(), { type: 'RGAA_RULES_RUN' })
     const response = await chrome.runtime.sendMessage({ type: 'RGAA_AXE', tabId: inspectedTabId(), locale: getLang() === 'fr' ? axeFrench : null })
     if (!response || response.error) throw new Error(response?.error ?? 'no response')
     const results = fromAxe(response)
@@ -2784,10 +2800,11 @@ async function runAutoChecks(): Promise<void> {
       const ok = await askConfirm(t('The browser is on another page'), t('The browser is on {url}, but {label} is registered for {registered}. Apply them to {label} anyway?', { url: results.url, label: pageLabel(rec), registered: rec.url }), t('Apply anyway'))
       if (!ok) return void say(t('Scan cancelled.'))
     }
+    const ownReport = applyToolResults(rec, rulesToResults(own.url, own.findings ?? []))
     const report = applyToolResults(rec, results)
     persist()
     renderAll()
-    say(t('Automatic checks on {label}: {n} rule(s) failed, {set} verdict(s) pre-filled, {noted} element note(s). Confirm them in the themes.', { label: pageLabel(rec), n: results.violations.length, set: report.set, noted: report.noted }))
+    say(t('Automatic checks on {label}: {n} rule(s) failed, {set} verdict(s) pre-filled, {noted} element note(s). Confirm them in the themes.', { label: pageLabel(rec), n: results.violations.length + (own.findings ?? []).filter((f: RuleFinding) => RULES[f.key]?.status === 'nc').length, set: report.set + ownReport.set, noted: report.noted + ownReport.noted }))
   } catch (err) {
     say(t('Could not run the automatic checks. Reload the tab, check the extension may access this site, and try again.'))
     console.error(err)
