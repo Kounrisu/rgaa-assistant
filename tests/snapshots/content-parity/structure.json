@@ -1,0 +1,1118 @@
+{
+  "highlight images": {
+    "returned": true,
+    "response": {
+      "elements": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 2": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 3": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "contrast-ok",
+          "id": 0,
+          "label": "Text with sufficient contrast",
+          "summary": "8 text element(s) · 1 colour pair(s)",
+          "facts": {
+            "Text elements checked": "8",
+            "Sufficient contrast": "8",
+            "To review (listed below)": "0",
+            "Not listed (limit)": null
+          },
+          "html": "",
+          "contextHtml": "",
+          "count": 8,
+          "data": {
+            "humanNeeded": false,
+            "checked": 8,
+            "okCount": 8
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 5": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 6": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 9": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "page-many-h1",
+          "id": 1,
+          "label": "2 h1",
+          "summary": "",
+          "facts": {
+            "Count": "2"
+          },
+          "html": "",
+          "contextHtml": "",
+          "count": 0,
+          "data": {
+            "humanNeeded": true,
+            "group": "page",
+            "level": 0,
+            "badge": ""
+          }
+        },
+        {
+          "type": "landmark",
+          "id": 2,
+          "label": "banner",
+          "summary": "<header>",
+          "facts": {
+            "Role": "banner",
+            "Name": null,
+            "Element": "<header>"
+          },
+          "html": "<header>Titre</header>",
+          "contextHtml": "<body>\n<header data-rgaa-target=\"\"><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div></body>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "landmark",
+            "level": 1,
+            "badge": "banner"
+          }
+        },
+        {
+          "type": "heading",
+          "id": 3,
+          "label": "“Titre”",
+          "summary": "h1",
+          "facts": {
+            "Level": "h1",
+            "Text": "Titre",
+            "Previous level": null,
+            "Visibility": null,
+            "Element": "<h1>"
+          },
+          "html": "<h1>Titre</h1>",
+          "contextHtml": "<header><h1 data-rgaa-target=\"\">Titre</h1></header>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "heading",
+            "level": 1,
+            "badge": "h1",
+            "hidden": null
+          }
+        },
+        {
+          "type": "landmark",
+          "id": 4,
+          "label": "navigation “Menu”",
+          "summary": "<nav>",
+          "facts": {
+            "Role": "navigation",
+            "Name": "Menu",
+            "Element": "<nav>"
+          },
+          "html": "<nav aria-label=\"Menu\">Menu</nav>",
+          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\" data-rgaa-target=\"\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div></body>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "landmark",
+            "level": 1,
+            "badge": "navigation"
+          }
+        },
+        {
+          "type": "heading",
+          "id": 5,
+          "label": "“Menu”",
+          "summary": "h2",
+          "facts": {
+            "Level": "h2",
+            "Text": "Menu",
+            "Previous level": "h1",
+            "Visibility": null,
+            "Element": "<h2>"
+          },
+          "html": "<h2>Menu</h2>",
+          "contextHtml": "<nav aria-label=\"Menu\"><h2 data-rgaa-target=\"\">Menu</h2></nav>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "heading",
+            "level": 2,
+            "badge": "h2",
+            "hidden": null
+          }
+        },
+        {
+          "type": "heading-jump",
+          "id": 6,
+          "label": "“Saut de niveau”",
+          "summary": "h4 · jump from h2",
+          "facts": {
+            "Level": "h4",
+            "Text": "Saut de niveau",
+            "Previous level": "h2",
+            "Visibility": null,
+            "Element": "<h4>"
+          },
+          "html": "<h4>Saut de niveau</h4>",
+          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4 data-rgaa-target=\"\">Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div></body>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "group": "heading",
+            "level": 4,
+            "badge": "h4",
+            "hidden": null
+          }
+        },
+        {
+          "type": "heading-empty",
+          "id": 7,
+          "label": "h2 (empty)",
+          "summary": "h2",
+          "facts": {
+            "Level": "h2",
+            "Text": null,
+            "Previous level": "h4",
+            "Visibility": null,
+            "Element": "<h2>"
+          },
+          "html": "<h2></h2>",
+          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2 data-rgaa-target=\"\"></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div></body>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "group": "heading",
+            "level": 2,
+            "badge": "h2",
+            "hidden": null
+          }
+        },
+        {
+          "type": "heading",
+          "id": 8,
+          "label": "“Titre ARIA”",
+          "summary": "h3",
+          "facts": {
+            "Level": "h3",
+            "Text": "Titre ARIA",
+            "Previous level": "h2",
+            "Visibility": null,
+            "Element": "<div>"
+          },
+          "html": "<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>",
+          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\" data-rgaa-target=\"\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div></body>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "heading",
+            "level": 3,
+            "badge": "h3",
+            "hidden": null
+          }
+        },
+        {
+          "type": "heading",
+          "id": 9,
+          "label": "“Deuxième h1”",
+          "summary": "h1",
+          "facts": {
+            "Level": "h1",
+            "Text": "Deuxième h1",
+            "Previous level": "h3",
+            "Visibility": null,
+            "Element": "<h1>"
+          },
+          "html": "<h1>Deuxième h1</h1>",
+          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1 data-rgaa-target=\"\">Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div></body>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "heading",
+            "level": 1,
+            "badge": "h1",
+            "hidden": null
+          }
+        },
+        {
+          "type": "landmark",
+          "id": 10,
+          "label": "main",
+          "summary": "<main>",
+          "facts": {
+            "Role": "main",
+            "Name": null,
+            "Element": "<main>"
+          },
+          "html": "<main>Section sans nom Section nommée Masqué</main>",
+          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main data-rgaa-target=\"\">\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div></body>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "landmark",
+            "level": 1,
+            "badge": "main"
+          }
+        },
+        {
+          "type": "heading-jump",
+          "id": 11,
+          "label": "“Section sans nom”",
+          "summary": "h3 · jump from h1",
+          "facts": {
+            "Level": "h3",
+            "Text": "Section sans nom",
+            "Previous level": "h1",
+            "Visibility": null,
+            "Element": "<h3>"
+          },
+          "html": "<h3>Section sans nom</h3>",
+          "contextHtml": "<section><h3 data-rgaa-target=\"\">Section sans nom</h3></section>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "group": "heading",
+            "level": 3,
+            "badge": "h3",
+            "hidden": null
+          }
+        },
+        {
+          "type": "landmark",
+          "id": 12,
+          "label": "region “Avec nom”",
+          "summary": "<section>",
+          "facts": {
+            "Role": "region",
+            "Name": "Avec nom",
+            "Element": "<section>"
+          },
+          "html": "<section aria-label=\"Avec nom\">Section nommée</section>",
+          "contextHtml": "<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\" data-rgaa-target=\"\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "landmark",
+            "level": 1,
+            "badge": "region"
+          }
+        },
+        {
+          "type": "heading",
+          "id": 13,
+          "label": "“Section nommée”",
+          "summary": "h3",
+          "facts": {
+            "Level": "h3",
+            "Text": "Section nommée",
+            "Previous level": "h3",
+            "Visibility": null,
+            "Element": "<h3>"
+          },
+          "html": "<h3>Section nommée</h3>",
+          "contextHtml": "<section aria-label=\"Avec nom\"><h3 data-rgaa-target=\"\">Section nommée</h3></section>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "heading",
+            "level": 3,
+            "badge": "h3",
+            "hidden": null
+          }
+        },
+        {
+          "type": "landmark",
+          "id": 14,
+          "label": "complementary",
+          "summary": "<aside>",
+          "facts": {
+            "Role": "complementary",
+            "Name": null,
+            "Element": "<aside>"
+          },
+          "html": "<aside>Masqué</aside>",
+          "contextHtml": "<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside data-rgaa-target=\"\"><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "landmark",
+            "level": 1,
+            "badge": "complementary"
+          }
+        },
+        {
+          "type": "landmark",
+          "id": 15,
+          "label": "search",
+          "summary": "<div>",
+          "facts": {
+            "Role": "search",
+            "Name": null,
+            "Element": "<div>"
+          },
+          "html": "<div role=\"search\"></div>",
+          "contextHtml": "<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\" data-rgaa-target=\"\"></div>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "landmark",
+            "level": 1,
+            "badge": "search"
+          }
+        },
+        {
+          "type": "landmark",
+          "id": 16,
+          "label": "contentinfo",
+          "summary": "<footer>",
+          "facts": {
+            "Role": "contentinfo",
+            "Name": null,
+            "Element": "<footer>"
+          },
+          "html": "<footer>Pied</footer>",
+          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer data-rgaa-target=\"\">Pied</footer>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div></body>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "landmark",
+            "level": 1,
+            "badge": "contentinfo"
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 11": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "field",
+          "id": 1,
+          "label": "“Q”",
+          "summary": "text · aria-label",
+          "facts": {
+            "Type": "text",
+            "Accessible name": "Q",
+            "Name comes from": "aria-label",
+            "Autocomplete": null,
+            "Required": null,
+            "name": null,
+            "Visibility": null,
+            "Element": "<input>"
+          },
+          "html": "<input type=\"text\" aria-label=\"Q\">",
+          "contextHtml": "<form><input type=\"text\" aria-label=\"Q\" data-rgaa-target=\"\"></form>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "personal": false,
+            "hasAutocomplete": false,
+            "hidden": null
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "rules run": {
+    "returned": true,
+    "response": {
+      "url": "https://page.test/start",
+      "findings": [
+        {
+          "key": "no-media",
+          "count": 0
+        },
+        {
+          "key": "no-table",
+          "count": 0
+        },
+        {
+          "key": "no-button",
+          "count": 0
+        },
+        {
+          "key": "no-link",
+          "count": 0
+        },
+        {
+          "key": "asq:11.2.3",
+          "count": 1,
+          "samples": [
+            "input"
+          ],
+          "asq": {
+            "criterion": "11.2",
+            "test": "11.2.3",
+            "status": "review",
+            "text": "RGAA 11.2.3: {n} field(s) with an aria-label: check that each one tells the exact purpose of the field. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:11.10.5",
+          "count": 1,
+          "samples": [
+            "form"
+          ],
+          "asq": {
+            "criterion": "11.10",
+            "test": "11.10.5",
+            "status": "review",
+            "text": "RGAA 11.10.5: {n} form(s) or field(s): check that the instructions about the expected data type and format are visible and tied to the field. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:11.10.6",
+          "count": 1,
+          "samples": [
+            "form"
+          ],
+          "asq": {
+            "criterion": "11.10",
+            "test": "11.10.6",
+            "status": "review",
+            "text": "RGAA 11.10.6: {n} form(s) or field(s): check that error messages give the expected data type and format and name the field. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:11.10.7",
+          "count": 1,
+          "samples": [
+            "form"
+          ],
+          "asq": {
+            "criterion": "11.10",
+            "test": "11.10.7",
+            "status": "review",
+            "text": "RGAA 11.10.7: {n} form(s) or field(s): check that fields with aria-invalid=\"true\" give the expected data type and format in their label or associated text. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:11.11.1",
+          "count": 1,
+          "samples": [
+            "form"
+          ],
+          "asq": {
+            "criterion": "11.11",
+            "test": "11.11.1",
+            "status": "review",
+            "text": "RGAA 11.11.1: {n} form(s) or field(s): check that, after an input error, the data types and formats are suggested where needed. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:11.11.2",
+          "count": 1,
+          "samples": [
+            "form"
+          ],
+          "asq": {
+            "criterion": "11.11",
+            "test": "11.11.2",
+            "status": "review",
+            "text": "RGAA 11.11.2: {n} form(s) or field(s): check that, after an input error, examples of expected values are suggested where needed. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:11.12.1",
+          "count": 1,
+          "samples": [
+            "form"
+          ],
+          "asq": {
+            "criterion": "11.12",
+            "test": "11.12.1",
+            "status": "review",
+            "text": "RGAA 11.12.1: {n} form(s) or field(s): for forms that change or delete data, check that the user can undo, review or confirm. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:11.12.2",
+          "count": 1,
+          "samples": [
+            "form"
+          ],
+          "asq": {
+            "criterion": "11.12",
+            "test": "11.12.2",
+            "status": "review",
+            "text": "RGAA 11.12.2: {n} form(s) or field(s): for forms that change or delete financial, legal or personal data, check that deleted data can be recovered or that an explicit confirmation is asked. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:11.13.1",
+          "count": 1,
+          "samples": [
+            "form"
+          ],
+          "asq": {
+            "criterion": "11.13",
+            "test": "11.13.1",
+            "status": "review",
+            "text": "RGAA 11.13.1: {n} form(s) or field(s): check that the purpose of each field about the user can be deduced (autocomplete attribute). Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:8.4.1-relevance",
+          "count": 1,
+          "detail": "fr",
+          "asq": {
+            "criterion": "8.4",
+            "test": "8.4.1",
+            "status": "review",
+            "text": "RGAA 8.4.1: the language code is valid ({detail}): check that it is the language of the page."
+          }
+        },
+        {
+          "key": "asq:8.6.1",
+          "count": 1,
+          "detail": "Structure",
+          "asq": {
+            "criterion": "8.6",
+            "test": "8.6.1",
+            "status": "review",
+            "text": "RGAA 8.6.1: check that the page title ({detail}) is relevant."
+          }
+        },
+        {
+          "key": "asq:9.1.2-fail",
+          "count": 1,
+          "samples": [
+            "h2"
+          ],
+          "asq": {
+            "criterion": "9.1",
+            "test": "9.1.2",
+            "status": "nc",
+            "text": "RGAA 9.1.2: {n} heading(s) that are empty or have no letter. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:9.1.2",
+          "count": 8,
+          "samples": [
+            "h1",
+            "h2",
+            "h4"
+          ],
+          "asq": {
+            "criterion": "9.1",
+            "test": "9.1.2",
+            "status": "review",
+            "text": "RGAA 9.1.2: {n} heading(s): check that each one is relevant. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:9.2.1",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "review",
+            "text": "RGAA 9.2.1: the main, header, footer and nav elements are there: check that the structure of the document is relevant."
+          }
+        },
+        {
+          "key": "asq:na:2.1",
+          "count": 0,
+          "asq": {
+            "criterion": "2.1",
+            "test": "2.1.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:2.2",
+          "count": 0,
+          "asq": {
+            "criterion": "2.2",
+            "test": "2.2.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.1",
+          "count": 0,
+          "asq": {
+            "criterion": "4.1",
+            "test": "4.1.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.2",
+          "count": 0,
+          "asq": {
+            "criterion": "4.2",
+            "test": "4.2.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.3",
+          "count": 0,
+          "asq": {
+            "criterion": "4.3",
+            "test": "4.3.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.4",
+          "count": 0,
+          "asq": {
+            "criterion": "4.4",
+            "test": "4.4.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.5",
+          "count": 0,
+          "asq": {
+            "criterion": "4.5",
+            "test": "4.5.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.6",
+          "count": 0,
+          "asq": {
+            "criterion": "4.6",
+            "test": "4.6.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.7",
+          "count": 0,
+          "asq": {
+            "criterion": "4.7",
+            "test": "4.7.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.8",
+          "count": 0,
+          "asq": {
+            "criterion": "4.8",
+            "test": "4.8.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.9",
+          "count": 0,
+          "asq": {
+            "criterion": "4.9",
+            "test": "4.9.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.11",
+          "count": 0,
+          "asq": {
+            "criterion": "4.11",
+            "test": "4.11.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.12",
+          "count": 0,
+          "asq": {
+            "criterion": "4.12",
+            "test": "4.12.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.13",
+          "count": 0,
+          "asq": {
+            "criterion": "4.13",
+            "test": "4.13.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:13.3",
+          "count": 0,
+          "asq": {
+            "criterion": "13.3",
+            "test": "13.3.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:13.4",
+          "count": 0,
+          "asq": {
+            "criterion": "13.4",
+            "test": "13.4.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:pass:8.1",
+          "count": 0,
+          "detail": "<!DOCTYPE html>",
+          "asq": {
+            "criterion": "8.1",
+            "test": "8.1.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:8.3",
+          "count": 0,
+          "asq": {
+            "criterion": "8.3",
+            "test": "8.3.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:8.5",
+          "count": 0,
+          "asq": {
+            "criterion": "8.5",
+            "test": "8.5.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:10.1",
+          "count": 0,
+          "asq": {
+            "criterion": "10.1",
+            "test": "10.1.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "skip-link-missing",
+          "count": 1
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "snapshot": {
+    "returned": true,
+    "response": {
+      "url": "https://page.test/start",
+      "title": "Structure",
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      },
+      "html": "<!DOCTYPE html>\n<html lang=\"fr\" data-rgaa-instance=\"X\"><head><meta charset=\"utf-8\"><title>Structure</title></head>\n<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n</body></html>"
+    }
+  },
+  "overlay after scans": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"banner\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · banner</span></div><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"3\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">3 · h1</span></div><div style=\"position: absolute; left: 8px; top: 218px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"4\" data-badge=\"navigation\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">4 · navigation</span></div><div style=\"position: absolute; left: 8px; top: 248px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"5\" data-badge=\"h2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">5 · h2</span></div><div style=\"position: absolute; left: 8px; top: 278px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"6\" data-badge=\"h4\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">6 · h4</span></div><div style=\"position: absolute; left: 8px; top: 308px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"7\" data-badge=\"h2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">7 · h2</span></div><div style=\"position: absolute; left: 8px; top: 338px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"8\" data-badge=\"h3\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">8 · h3</span></div><div style=\"position: absolute; left: 8px; top: 368px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"9\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">9 · h1</span></div><div style=\"position: absolute; left: 8px; top: 398px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"10\" data-badge=\"main\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">10 · main</span></div><div style=\"position: absolute; left: 8px; top: 458px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"11\" data-badge=\"h3\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">11 · h3</span></div><div style=\"position: absolute; left: 8px; top: 488px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"12\" data-badge=\"region\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">12 · region</span></div><div style=\"position: absolute; left: 8px; top: 518px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"13\" data-badge=\"h3\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">13 · h3</span></div><div style=\"position: absolute; left: 8px; top: 548px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"14\" data-badge=\"complementary\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">14 · complementary</span></div><div style=\"position: absolute; left: 8px; top: 668px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"15\" data-badge=\"search\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">15 · search</span></div><div style=\"position: absolute; left: 8px; top: 698px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"16\" data-badge=\"contentinfo\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">16 · contentinfo</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t11\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 638px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 11); background: rgba(0, 0, 11, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#00000b\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 11);\">1</span></div></div>"
+  ],
+  "states theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "states theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay options": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "focus image 1": {
+    "returned": true,
+    "response": {
+      "ok": false
+    }
+  },
+  "focus link 2": {
+    "returned": true,
+    "response": {
+      "ok": false
+    }
+  },
+  "focus unknown": {
+    "returned": true,
+    "response": {
+      "ok": false
+    }
+  },
+  "show only theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "show only theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "locate": {
+    "returned": true,
+    "response": {
+      "rect": null
+    }
+  },
+  "locate unknown": {
+    "returned": true,
+    "response": {
+      "rect": null
+    }
+  },
+  "scroll restore": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "unfocus": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "relabel theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "relabel theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay options 2": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "tool reveal on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 0
+    }
+  },
+  "tool tables on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 0
+    }
+  },
+  "tool taborder on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 1
+    }
+  },
+  "overlay after interactions": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"banner\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · banner</span></div><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"3\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">3 · h1</span></div><div style=\"position: absolute; left: 8px; top: 218px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"4\" data-badge=\"navigation\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">4 · navigation</span></div><div style=\"position: absolute; left: 8px; top: 248px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"5\" data-badge=\"h2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">5 · h2</span></div><div style=\"position: absolute; left: 8px; top: 278px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"6\" data-badge=\"h4\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">6 · h4</span></div><div style=\"position: absolute; left: 8px; top: 308px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"7\" data-badge=\"h2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">7 · h2</span></div><div style=\"position: absolute; left: 8px; top: 338px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"8\" data-badge=\"h3\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">8 · h3</span></div><div style=\"position: absolute; left: 8px; top: 368px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"9\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">9 · h1</span></div><div style=\"position: absolute; left: 8px; top: 398px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"10\" data-badge=\"main\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">10 · main</span></div><div style=\"position: absolute; left: 8px; top: 458px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"11\" data-badge=\"h3\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">11 · h3</span></div><div style=\"position: absolute; left: 8px; top: 488px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"12\" data-badge=\"region\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">12 · region</span></div><div style=\"position: absolute; left: 8px; top: 518px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"13\" data-badge=\"h3\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">13 · h3</span></div><div style=\"position: absolute; left: 8px; top: 548px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"14\" data-badge=\"complementary\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">14 · complementary</span></div><div style=\"position: absolute; left: 8px; top: 668px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"15\" data-badge=\"search\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">15 · search</span></div><div style=\"position: absolute; left: 8px; top: 698px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"16\" data-badge=\"contentinfo\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">16 · contentinfo</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t11\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 638px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 11); background: rgba(0, 0, 11, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#00000b\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 11);\">1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-tools\" style=\"position: absolute; top: 0px; left: 0px; width: 0px; height: 0px; z-index: 2147483645; pointer-events: none;\"><div data-tool=\"tables\"></div><div data-tool=\"taborder\"><div title=\"input\" style=\"position: absolute; left: 4px; top: 634px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">1</div></div></div>"
+  ],
+  "tools reset": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "pick cancel": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "unknown message": {},
+  "clear theme 3": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "clear theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay after clear themes": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"banner\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · banner</span></div><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"3\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">3 · h1</span></div><div style=\"position: absolute; left: 8px; top: 218px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"4\" data-badge=\"navigation\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">4 · navigation</span></div><div style=\"position: absolute; left: 8px; top: 248px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"5\" data-badge=\"h2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">5 · h2</span></div><div style=\"position: absolute; left: 8px; top: 278px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"6\" data-badge=\"h4\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">6 · h4</span></div><div style=\"position: absolute; left: 8px; top: 308px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"7\" data-badge=\"h2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">7 · h2</span></div><div style=\"position: absolute; left: 8px; top: 338px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"8\" data-badge=\"h3\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">8 · h3</span></div><div style=\"position: absolute; left: 8px; top: 368px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"9\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">9 · h1</span></div><div style=\"position: absolute; left: 8px; top: 398px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"10\" data-badge=\"main\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">10 · main</span></div><div style=\"position: absolute; left: 8px; top: 458px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"11\" data-badge=\"h3\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">11 · h3</span></div><div style=\"position: absolute; left: 8px; top: 488px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"12\" data-badge=\"region\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">12 · region</span></div><div style=\"position: absolute; left: 8px; top: 518px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"13\" data-badge=\"h3\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">13 · h3</span></div><div style=\"position: absolute; left: 8px; top: 548px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"14\" data-badge=\"complementary\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">14 · complementary</span></div><div style=\"position: absolute; left: 8px; top: 668px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"15\" data-badge=\"search\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">15 · search</span></div><div style=\"position: absolute; left: 8px; top: 698px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"16\" data-badge=\"contentinfo\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">16 · contentinfo</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t11\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 638px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 11); background: rgba(0, 0, 11, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#00000b\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 11);\">1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-tools\" style=\"position: absolute; top: 0px; left: 0px; width: 0px; height: 0px; z-index: 2147483645; pointer-events: none;\"></div>"
+  ],
+  "clear highlights": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay after clear all": []
+}

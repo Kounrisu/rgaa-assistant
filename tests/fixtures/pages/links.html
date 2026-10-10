@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>Liens</title></head>
+<body>
+<a href="#contenu">Aller au contenu</a>
+<a href="#absent">Passer au menu</a>
+<header><nav aria-label="Principal">
+  <a href="/">Accueil</a>
+  <a href="/a">En savoir plus</a>
+  <a href="/b">En savoir plus</a>
+  <a href="/c"></a>
+  <a href="/d"><img src="x.png" alt="Logo"></a>
+  <a href="/e" aria-label="Libellé">Texte</a>
+  <a href="/f" title="Titre seul"></a>
+  <a href="https://example.test" target="_blank">Externe</a>
+  <a href="/same">Doublon</a><a href="/same">Doublon</a>
+  <a href="/sr" style="position:absolute;left:-9999px">Lien hors écran</a>
+  <a href="/gone" style="display:none">Lien caché</a>
+  <span role="link" tabindex="0">Pseudo-lien</span>
+</nav></header>
+<main id="contenu"><h1>Liens</h1><p>Voir <a href="/lire">cliquez ici</a>.</p></main>
+</body>
+</html>
