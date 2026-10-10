@@ -3,7 +3,7 @@
   "private": true,
   "license": "AGPL-3.0-only",
   "version": "0.1.0",
-  "description": "AI-assisted RGAA 4.1 auditor — Theme 1 (Images) only. Numbers images on the page, builds the element list, and prepares the AI prompt for a chat UI.",
+  "description": "RGAA 4.1 audit assistant for the browser DevTools: element-by-element review, automatic and manual checks, saved audits, Excel grid and printable report.",
   "type": "module",
   "scripts": {
     "dev": "vite",
