@@ -4,7 +4,7 @@
 import { h, dom } from './dom'
 import { t } from '../lib/i18n'
 import { pct2, type Counts, rateExact, type PageInput, auditStats, levelStats, isProvisional, auditSheets } from '../lib/audit-sheet'
-import { PROVISIONAL_HELP, tabsFor, sheetTable } from './results-view'
+import { provisionalHelp, tabsFor, sheetTable } from './results-view'
 import { state } from './state'
 import { pageLabel, allPageInputs } from './model'
 import { exportWorkbook, openReport } from './exports'
@@ -91,7 +91,7 @@ export function dashboard(inputs: PageInput[]): HTMLElement {
       'section',
       { class: 'dash-col' },
       miniTable(t('RGAA 4 compliance'), ['', 'C', 'NC'], [['A', cOf(lv.perLevel.A), nOf(lv.perLevel.A)], [t('AA (legal)'), cOf(lv.legal), nOf(lv.legal)], ['AAA', cOf(lv.perLevel.AAA), nOf(lv.perLevel.AAA)]], 'level-table'),
-      ...(isProvisional(lv.legal) ? [h('p', { class: 'hint warn' }, `${t('provisional')} — ${PROVISIONAL_HELP()}`)] : []),
+      ...(isProvisional(lv.legal) ? [h('p', { class: 'hint warn' }, `${t('provisional')} — ${provisionalHelp()}`)] : []),
       h('p', { class: 'dash-note' }, t('These figures are the overall compliance level to report in the conformity statement. The reference is the legal level AA (A + AA): a site is declared compliant at 100 %. Other figures are indicative.')),
       miniTable(t('Compliance for each level'), ['', 'C', 'NC'], [['A', cOf(lv.perLevel.A), nOf(lv.perLevel.A)], ['AA', cOf(lv.perLevel.AA), nOf(lv.perLevel.AA)], ['AAA', cOf(lv.perLevel.AAA), nOf(lv.perLevel.AAA)]], 'level-table'),
       miniTable(t('Results by level'), ['', 'C', 'NC'], [['A', lv.perLevel.A.C, lv.perLevel.A.NC], ['AA', lv.perLevel.AA.C, lv.perLevel.AA.NC], ['AAA', lv.perLevel.AAA.C, lv.perLevel.AAA.NC], [t('Total'), lv.perLevel.A.C + lv.perLevel.AA.C + lv.perLevel.AAA.C, lv.perLevel.A.NC + lv.perLevel.AA.NC + lv.perLevel.AAA.NC]]),
@@ -124,7 +124,7 @@ export function dashboard(inputs: PageInput[]): HTMLElement {
               h('td', { class: 's-C' }, String(p.counts.C)),
               h('td', { class: 's-NC' }, String(p.counts.NC)),
               h('td', { class: 's-NA' }, String(p.counts.NA)),
-              h('td', { class: `rate-cell ${tone(p.rate)}`, title: isProvisional(p.counts) ? PROVISIONAL_HELP() : '' }, pct2(p.rate) + (p.rate !== null && isProvisional(p.counts) ? '*' : '')),
+              h('td', { class: `rate-cell ${tone(p.rate)}`, title: isProvisional(p.counts) ? provisionalHelp() : '' }, pct2(p.rate) + (p.rate !== null && isProvisional(p.counts) ? '*' : '')),
             )
           }),
         ),
@@ -150,7 +150,7 @@ export function dashboard(inputs: PageInput[]): HTMLElement {
         h('td', { class: 's-NC' }, String(th.counts.NC)),
         h('td', { class: 's-NA' }, String(th.counts.NA)),
         h('td', { class: 's-NT' }, String(th.counts.NT)),
-        h('td', {}, h('div', { class: 'meter', role: 'img', 'aria-label': t('{rate}% respected', { rate: th.rate ?? 0 }) }, h('i', { style: `width:${th.rate ?? 0}%` })), h('span', { class: 'meter-num', title: th.rate !== null && isProvisional(th.counts) ? PROVISIONAL_HELP() : '' }, th.rate === null ? '—' : `${th.rate}%${isProvisional(th.counts) ? '*' : ''}`)),
+        h('td', {}, h('div', { class: 'meter', role: 'img', 'aria-label': t('{rate}% respected', { rate: th.rate ?? 0 }) }, h('i', { style: `width:${th.rate ?? 0}%` })), h('span', { class: 'meter-num', title: th.rate !== null && isProvisional(th.counts) ? provisionalHelp() : '' }, th.rate === null ? '—' : `${th.rate}%${isProvisional(th.counts) ? '*' : ''}`)),
       ),
     )
   }
@@ -196,5 +196,5 @@ export function renderAudit(): void {
     { name: t('Detail by test (Images)'), render: () => sheetTable(named('Détail par test (Images)')) },
     { name: t('Detail by image'), render: () => sheetTable(named('Détail par image')) },
     ...(sheets.some((x) => x.name === 'Détail cadres et couleurs') ? [{ name: t('Frames and colours'), render: () => sheetTable(named('Détail cadres et couleurs')) }] : []),
-  ])
+  ], 'overviewSheet')
 }

@@ -38,8 +38,9 @@ export interface PanelState {
   focusTintOn: boolean
   /** The address the “the browser is on another page” reminder was dismissed for. */
   navDismissed: string
-  /** The sheet tab open in the results and the audit overview. */
-  activeSheet: number
+  /** The sheet tab open in the page results, and the one open in the audit overview (each view keeps its own). */
+  resultsSheet: number
+  overviewSheet: number
   /** The automatic checks are running. */
   axeRunning: boolean
   /** The last scan() went through (runEverything goes on to the checks only then). */
@@ -68,7 +69,8 @@ export const state: PanelState = {
   showAltOn: (() => { try { return localStorage.getItem('rgaa-show-alt') === 'on' } catch { return false } })(),
   focusTintOn: (() => { try { return localStorage.getItem('rgaa-focus-tint') !== 'off' } catch { return true } })(),
   navDismissed: '',
-  activeSheet: 0,
+  resultsSheet: 0,
+  overviewSheet: 0,
   axeRunning: false,
   lastScanOk: false,
   session: undefined as unknown as AuditSession,

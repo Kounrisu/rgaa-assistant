@@ -3,7 +3,7 @@
  */
 import type { Outcome } from '../lib/results'
 import { state } from './state'
-import { pageInput, pageLabel, adoptSite, persist, nextPageLabel } from './model'
+import { pageInput, pageLabel, adoptSite, persist, nextPageLabel, normalizeTheme } from './model'
 import { t, getLang } from '../lib/i18n'
 import { h, say, dom, $, tNodes } from './dom'
 import { reviewKey, needsReview, findingNeedsReview, statusOf } from './review-state'
@@ -176,7 +176,7 @@ export function goToFirst(n: number, outcome: Outcome): void {
 
 /** Opens the page grid on a criterion's row (for totals that have no element to point at). */
 export function openGridAt(criterionId: string): void {
-  state.activeSheet = 0
+  state.resultsSheet = 0
   actions.setView('page')
   const row = dom.resultsEl.querySelector<HTMLElement>(`tr[data-crit="${criterionId}"]`)
   row?.scrollIntoView({ block: 'center' })
@@ -277,7 +277,7 @@ export function themeProgress(rec: PageRecord, n: number): { done: number; total
 
 export function setThemes(rec: PageRecord, themes: number[]): void {
   rec.themes = [...new Set(themes)].sort((a, b) => a - b)
-  if (rec === state.page && !rec.themes.includes(state.theme)) state.theme = rec.themes[0] ?? 1
+  if (rec === state.page) normalizeTheme()
   persist()
   // keep the menu open while ticking several themes
   if (state.view === 'sample') {
@@ -334,7 +334,6 @@ export function renderThemeBar(): void {
   if (!state.page) return
   const rec = state.page
   const selected = [...rec.themes].sort((a, b) => a - b)
-  if (!selected.includes(state.theme)) state.theme = selected[0] ?? 1
   const tabs = h('div', { class: 'theme-tabs', role: 'tablist', 'aria-label': t('RGAA themes of this page') })
   for (const n of selected) {
     const { done, total } = themeProgress(rec, n)
