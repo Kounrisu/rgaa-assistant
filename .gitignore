@@ -4,3 +4,6 @@ dist/
 .DS_Store
 *.local
 .claude/worktrees/
+e2e/.build/
+test-results/
+playwright-report/

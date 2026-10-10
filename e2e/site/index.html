@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Site de test RGAA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body { font-family: sans-serif; margin: 1rem 2rem; }
+      .skip { position: absolute; left: -999px; }
+      .skip:focus { left: 0; }
+      .faint { color: #bbb; background: #fff; }
+      img { width: 80px; height: 40px; background: #cde; }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main">Aller au contenu</a>
+    <header>
+      <nav aria-label="Principal">
+        <a href="/index.html">Accueil</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/vide.html"></a>
+      </nav>
+    </header>
+    <main id="main">
+      <h1>Bienvenue sur le site de test</h1>
+      <h2>Nos images</h2>
+      <img id="img-alt" src="pixel.png" alt="Logo de la société" />
+      <img id="img-noalt" src="pixel.png" />
+      <img id="img-deco" src="pixel.png" alt="" />
+      <h2>Chiffres</h2>
+      <table>
+        <tr><td>Année</td><td>Total</td></tr>
+        <tr><td>2024</td><td>12</td></tr>
+      </table>
+      <p class="faint">Un texte très pâle sur fond blanc.</p>
+      <h2>Contact</h2>
+      <form action="#" onsubmit="return false">
+        <input type="text" name="nom" placeholder="Votre nom" />
+        <label for="mail">Courriel</label>
+        <input type="email" id="mail" name="mail" />
+        <button type="submit">Envoyer</button>
+      </form>
+    </main>
+    <footer><p>Pied de page</p></footer>
+  </body>
+</html>

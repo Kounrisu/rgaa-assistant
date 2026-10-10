@@ -12,10 +12,12 @@
     "check:asqatasun": "node scripts/check-asqatasun.mjs",
     "test": "vitest run",
     "check:i18n": "node scripts/check-i18n.mjs",
-    "check": "npm run typecheck && npm test && npm run check:i18n && npm run build"
+    "check": "npm run typecheck && npm test && npm run check:i18n && npm run build",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.7.1",
+    "@playwright/test": "1.64.0",
     "@types/chrome": "^0.0.287",
     "esbuild": "^0.28.2",
     "jsdom": "^29.1.1",
