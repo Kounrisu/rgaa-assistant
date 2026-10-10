@@ -108,16 +108,17 @@ function addLine(note: string, line: string): string {
  * Applies the results to a page: criterion answers, and notes on the elements the tool pointed at.
  * Never overwrites a verdict a human gave. Returns what was done, for the report.
  */
-export function applyToolResults(rec: PageRecord, res: ToolResults): ImportReport {
+export function applyToolResults(rec: PageRecord, res: ToolResults, opts: { addThemes?: boolean } = {}): ImportReport {
   const tool = res.tool
   const mark = MARK(tool)
-  const report: ImportReport = { tool, at: Date.now(), url: res.url, set: 0, noted: 0, conflicts: [], unmatched: [], unmapped: [], incomplete: res.incomplete, passes: res.passes }
+  const report: ImportReport = { tool, at: Date.now(), url: res.url, set: 0, noted: 0, conflicts: [], unmatched: [], unmapped: [], incomplete: res.incomplete, passes: res.passes, items: [] }
+  const touched = new Set<string>()
 
   const touchCriterion = (criterion: string, verdict: ChecklistVerdict | null, line: string, rule: string): void => {
     const theme = themeOfCriterion(criterion)
     if (!rec.themes.includes(theme)) {
-      // only a failure brings a theme into the page; "not applicable" and notes stay in the themes you chose to audit
-      if (verdict !== 'nc') return
+      // only a failure brings a theme into the page (a full run brings in every theme it has something to say about)
+      if (verdict !== 'nc' && !opts.addThemes) return
       rec.themes = [...rec.themes, theme].sort((a, b) => a - b)
     }
     const ans = (rec.checklist[criterion] ??= { note: '' })
@@ -137,6 +138,7 @@ export function applyToolResults(rec: PageRecord, res: ToolResults): ImportRepor
     const line = `${mark} ${v.rule}${v.impact ? ` (${v.impact})` : ''}: ${v.help} — ${count} element(s)${where ? `: ${where}` : ''}`
     if (!criterion) {
       report.unmapped.push(`${v.rule} (${count})`)
+      report.items!.push({ criterion: '—', rule: v.rule, result: 'note', text: `${v.help} — ${count} element(s)` })
       continue
     }
     const theme = themeOfCriterion(criterion)
@@ -194,9 +196,13 @@ export function applyToolResults(rec: PageRecord, res: ToolResults): ImportRepor
     }
 
     touchCriterion(criterion, 'nc', line, v.rule)
+    report.items!.push({ criterion, rule: v.rule, result: 'nc', text: `${v.help} — ${count} element(s)` })
+    touched.add(criterion)
   }
 
   for (const a of res.answers) {
+    report.items!.push({ criterion: a.criterion, rule: a.rule ?? a.criterion, result: a.status === 'nc' ? 'nc' : a.status === 'na' ? 'na' : 'note', text: a.note })
+    touched.add(a.criterion)
     const theme = themeOfCriterion(a.criterion)
     if (theme <= 3 && ['1.1', '2.1', '2.2', '3.2'].includes(a.criterion)) {
       report.unmapped.push(`${a.criterion}: ${a.status?.toUpperCase() ?? ''}${a.note ? ` — ${a.note}` : ''}`)
@@ -212,15 +218,29 @@ export function applyToolResults(rec: PageRecord, res: ToolResults): ImportRepor
   for (const p of res.passedChecks) if (!failedNow.has(p.criterion)) byCriterion.set(p.criterion, [...(byCriterion.get(p.criterion) ?? []), p.rule])
   for (const [criterion, rules] of byCriterion) {
     const theme = themeOfCriterion(criterion)
-    if (theme <= 3 || !rec.themes.includes(theme)) continue
+    if (theme <= 3) continue
+    if (!rec.themes.includes(theme)) {
+      if (!opts.addThemes) continue
+      rec.themes = [...rec.themes, theme].sort((a, b) => a - b)
+    }
     const ans = (rec.checklist[criterion] ??= { note: '' })
     ;(ans.autoResults ??= {})[tool] = { result: 'pass', rules: [...new Set(rules)] }
+    for (const rule of new Set(rules)) report.items!.push({ criterion, rule, result: 'pass', text: '' })
+    touched.add(criterion)
     const anyFail = Object.values(ans.autoResults).some((r) => r.result === 'fail')
     if (!anyFail && (ans.verdict === undefined || (ans.source && ans.verdict !== 'c'))) {
       ans.verdict = 'c'
       ans.source = tool
       report.set++
     }
+  }
+
+  // two tools giving opposite answers on a criterion: say so
+  for (const criterion of touched) {
+    const results = Object.entries(rec.checklist[criterion]?.autoResults ?? {})
+    const failed = results.filter(([, r]) => r.result === 'fail').map(([name]) => name)
+    const passed = results.filter(([, r]) => r.result === 'pass').map(([name]) => name)
+    if (failed.length && passed.length) report.conflicts.push(`${criterion}: ${failed.join(', ')} ≠ ${passed.join(', ')}`)
   }
 
   ;(rec.imports ??= []).push(report)

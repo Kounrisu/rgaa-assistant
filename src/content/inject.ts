@@ -97,7 +97,7 @@ function refreshLabel(box: HTMLElement): void {
   if (!label) return
   const glyph = STATE_STYLE[box.dataset.state ?? '']?.glyph
   const alt = showAlt && box.dataset.alt ? ` · ${box.dataset.alt}` : ''
-  label.textContent = `${glyph ? `${glyph} ` : ''}${box.dataset.id ?? ''}${alt}`
+  label.textContent = `${glyph ? `${glyph} ` : ''}${box.dataset.id ?? ''}${box.dataset.badge ? ` · ${box.dataset.badge}` : ''}${alt}`
   label.style.whiteSpace = 'nowrap'
   label.style.maxWidth = showAlt ? '360px' : ''
   label.style.overflow = showAlt ? 'hidden' : ''
@@ -446,7 +446,7 @@ function highlightImages(): ImageElementInfo[] {
 interface ThemeOverlay {
   color: string
   container: HTMLElement
-  items: Map<number, { els: Element[]; boxes: HTMLElement[]; persistent: boolean }>
+  items: Map<number, { els: Element[]; boxes: HTMLElement[]; persistent: boolean; badge?: string }>
   focused: number | null
 }
 const themeOverlays = new Map<number, ThemeOverlay>()
@@ -471,7 +471,7 @@ function themeOverlayFor(theme: number, color: string): ThemeOverlay {
   return overlay
 }
 
-function makeThemeBoxes(overlay: ThemeOverlay, id: number, els: Element[]): HTMLElement[] {
+function makeThemeBoxes(overlay: ThemeOverlay, id: number, els: Element[], badge = ''): HTMLElement[] {
   if (!overlay.container.isConnected) document.body.appendChild(overlay.container)
   ensureStyle()
   const boxes: HTMLElement[] = []
@@ -488,6 +488,7 @@ function makeThemeBoxes(overlay: ThemeOverlay, id: number, els: Element[]): HTML
     box.appendChild(label)
     box.dataset.color = overlay.color
     box.dataset.id = String(id)
+    if (badge) box.dataset.badge = badge
     box.dataset.state = themeStates.get(overlay)?.[id] ?? ''
     overlay.container.appendChild(box)
     refreshLabel(box)
@@ -501,9 +502,9 @@ function makeThemeBoxes(overlay: ThemeOverlay, id: number, els: Element[]): HTML
  * Registers a finding. Boxes stay on the page only when a human has to decide (`persistent`);
  * the others get a box when you click or hover them in the panel.
  */
-function drawThemeBoxes(theme: number, id: number, els: Element[], persistent: boolean): void {
+function drawThemeBoxes(theme: number, id: number, els: Element[], persistent: boolean, badge = ''): void {
   const overlay = themeOverlays.get(theme)!
-  overlay.items.set(id, { els, boxes: persistent ? makeThemeBoxes(overlay, id, els) : [], persistent })
+  overlay.items.set(id, { els, boxes: persistent ? makeThemeBoxes(overlay, id, els, badge) : [], persistent, badge })
 }
 
 function clearTemporary(overlay: ThemeOverlay): void {
@@ -523,7 +524,7 @@ function focusThemeFinding(theme: number, id: number, scroll: boolean): boolean 
   if (!overlay || !item) return false
   if (overlay.focused !== id) clearTemporary(overlay)
   overlay.focused = id
-  if (!item.boxes.length && item.els.length) item.boxes = makeThemeBoxes(overlay, id, item.els)
+  if (!item.boxes.length && item.els.length) item.boxes = makeThemeBoxes(overlay, id, item.els, item.badge ?? '')
   item.boxes.forEach((b) => styleBox(b, true))
   if (scroll && item.els[0]) {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -547,7 +548,7 @@ function locateTheme(theme: number, id: number): Record<string, unknown> | null 
 function relabelTheme(theme: number, map: { from: number; to: number }[]): void {
   const overlay = themeOverlays.get(theme)
   if (!overlay) return
-  const next = new Map<number, { els: Element[]; boxes: HTMLElement[]; persistent: boolean }>()
+  const next = new Map<number, { els: Element[]; boxes: HTMLElement[]; persistent: boolean; badge?: string }>()
   for (const { from, to } of map) {
     const item = overlay.items.get(from)
     if (!item) continue
@@ -878,10 +879,85 @@ function scanLinks(): { findings: RawFinding[]; els: Element[][] } {
   return { findings, els }
 }
 
+/** Structure (RGAA theme 9): headings with their level, and landmarks, in document order, plus page-level problems. */
+const LANDMARK_BY_TAG: Record<string, string> = { nav: 'navigation', main: 'main', aside: 'complementary', form: 'form', section: 'region' }
+const LANDMARK_ROLES = new Set(['banner', 'navigation', 'main', 'complementary', 'contentinfo', 'search', 'region', 'form'])
+
+function landmarkRole(el: Element): string | null {
+  const explicit = el.getAttribute('role')?.trim().toLowerCase() ?? ''
+  if (LANDMARK_ROLES.has(explicit)) return explicit
+  const tag = el.tagName.toLowerCase()
+  if (tag === 'header' || tag === 'footer') return el.closest('article, aside, main, nav, section') ? null : tag === 'header' ? 'banner' : 'contentinfo'
+  const role = LANDMARK_BY_TAG[tag]
+  if (!role) return null
+  const named = Boolean(el.getAttribute('aria-label') || el.getAttribute('aria-labelledby'))
+  return (tag === 'form' || tag === 'section') && !named ? null : role
+}
+
+function scanStructure(): { findings: RawFinding[]; els: Element[][] } {
+  const findings: RawFinding[] = []
+  const els: Element[][] = []
+  const nodes = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6, [role="heading"], header, footer, nav, main, aside, form, section, [role]')).filter((e) => !e.closest(`[id^="${OVERLAY_ID}"]`) && visible(e))
+  let previous = 0
+  let h1 = 0
+  let main = 0
+  const named = (e: Element) => (labelledByTextFor(e) || e.getAttribute('aria-label') || '').trim()
+  for (const el of nodes) {
+    const tag = el.tagName.toLowerCase()
+    const isHeading = /^h[1-6]$/.test(tag) || el.getAttribute('role') === 'heading'
+    if (isHeading) {
+      const level = /^h[1-6]$/.test(tag) ? Number(tag[1]) : Number(el.getAttribute('aria-level')) || 2
+      const text = (labelledByTextFor(el) || el.getAttribute('aria-label') || el.textContent || '').replace(/\s+/g, ' ').trim() || (el.querySelector('img[alt]')?.getAttribute('alt') ?? '').trim()
+      const empty = !text
+      const jump = previous > 0 && level > previous + 1
+      if (level === 1) h1++
+      findings.push({
+        type: empty ? 'heading-empty' : jump ? 'heading-jump' : 'heading',
+        id: findings.length + 1,
+        label: empty ? `h${level} (empty)` : `“${text.length > 56 ? `${text.slice(0, 55)}…` : text}”`,
+        summary: `h${level}${jump ? ` · jump from h${previous}` : ''}`,
+        facts: { Level: `h${level}`, Text: text || null, 'Previous level': previous ? `h${previous}` : null, Element: `<${tag}>` },
+        html: shortHtml(el),
+        contextHtml: boundedContext(el),
+        count: 1,
+        data: { humanNeeded: empty || jump, group: 'heading', level, badge: `h${level}` },
+      })
+      els.push([el])
+      previous = level
+      continue
+    }
+    const role = landmarkRole(el)
+    if (!role) continue
+    if (role === 'main') main++
+    const name = named(el)
+    findings.push({
+      type: 'landmark',
+      id: findings.length + 1,
+      label: `${role}${name ? ` “${name}”` : ''}`,
+      summary: `<${tag}>`,
+      facts: { Role: role, Name: name || null, Element: `<${tag}>` },
+      html: shortHtml(el),
+      contextHtml: boundedContext(el),
+      count: 1,
+      data: { humanNeeded: false, group: 'landmark', level: 1, badge: role },
+    })
+    els.push([el])
+  }
+  const page = (type: string, label: string, facts: Record<string, string | null>) => {
+    findings.unshift({ type, id: 0, label, summary: '', facts, html: '', contextHtml: '', count: 0, data: { humanNeeded: true, group: 'page', level: 0, badge: '' } })
+    els.unshift([])
+  }
+  if (!main) page('page-no-main', 'No main landmark', {})
+  if (h1 > 1) page('page-many-h1', `${h1} h1`, { Count: String(h1) })
+  if (!h1) page('page-no-h1', 'No h1', {})
+  findings.forEach((f, i) => (f.id = i + 1))
+  return { findings, els }
+}
+
 function scanTheme(theme: number, color: string): RawFinding[] {
-  const { findings, els } = theme === 2 ? scanFrames() : theme === 6 ? scanLinks() : scanContrast()
+  const { findings, els } = theme === 2 ? scanFrames() : theme === 6 ? scanLinks() : theme === 9 ? scanStructure() : scanContrast()
   themeOverlayFor(theme, color)
-  findings.forEach((f, i) => drawThemeBoxes(theme, f.id, els[i], theme === 3 ? f.type !== 'contrast-ok' : f.data.humanNeeded === true))
+  findings.forEach((f, i) => drawThemeBoxes(theme, f.id, els[i], theme === 3 ? f.type !== 'contrast-ok' : theme === 9 ? els[i].length > 0 : f.data.humanNeeded === true, typeof f.data.badge === 'string' ? f.data.badge : ''))
   return findings
 }
 
@@ -974,7 +1050,7 @@ function showOnly(theme: number, ids: number[] | null): void {
   for (const [id, item] of overlay.items) {
     const want = ids ? ids.includes(id) : item.persistent
     if (want) {
-      if (!item.boxes.length && item.els.length) item.boxes = makeThemeBoxes(overlay, id, item.els)
+      if (!item.boxes.length && item.els.length) item.boxes = makeThemeBoxes(overlay, id, item.els, item.badge ?? '')
       item.boxes.forEach((b) => (b.style.display = ''))
     } else if (overlay.focused !== id) {
       if (item.persistent) item.boxes.forEach((b) => (b.style.display = 'none'))
