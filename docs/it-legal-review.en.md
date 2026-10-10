@@ -21,7 +21,7 @@ A browser extension (Chrome, Firefox) that helps an auditor check a page against
 - No remote code is loaded: the axe-core engine is a local copy shipped with the extension.
 
 ## 4. Component licences
-- **axe-core** (Deque): MPL-2.0, used unmodified.
+- **axe-core** (Deque): MPL-2.0, with a minimal patch applied at build time (removes `Function()`/`eval` calls so it runs on sites with a strict CSP); the patch is public in the repository (`scripts/patch-axe.mjs`).
 - **fflate**: MIT (compression for the Excel export).
 - **Asqatasun / Tanaguru**: AGPL-3.0. Selectors and RGAA rule definitions are adapted from it, **isolated in one file** so they can be removed. While they are present the project is distributed under **AGPL-3.0**: anyone who receives the extension can obtain its source. For internal use without passing it to third parties, the obligations are limited (to confirm with legal).
 - Official RGAA data: DINUM (reuse terms to verify).
