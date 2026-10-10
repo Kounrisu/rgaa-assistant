@@ -9,8 +9,9 @@ export const OVERLAY_ID = 'rgaa-assistant-overlay'
 export const STYLE_ID = 'rgaa-assistant-style'
 
 // The panel sends each theme's colour with its scan (single source: lib/theme-colors.ts).
-// This file must stay free of shared imports: a shared chunk would turn it into an ES module,
-// which a content script cannot be.
+// The content script modules (this one included) must stay free of runtime imports shared with the panel or the
+// background: a shared chunk would turn the content script into an ES module, which a content script cannot be.
+// Type-only imports are erased and are fine.
 export const DEFAULT_COLOR = '#e11d48'
 
 /** Removes every overlay container with this id, even duplicates left by an older copy. */
