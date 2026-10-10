@@ -1,3 +1,4 @@
+import { THEMES } from './themes'
 import type { ChecklistVerdict, ImportReport, PageRecord } from './types'
 
 /**
@@ -23,9 +24,11 @@ export interface ToolResults {
   tool: string
   url: string
   violations: ToolViolation[]
-  answers: { criterion: string; status: ChecklistVerdict | null; note: string }[]
+  answers: { criterion: string; status: ChecklistVerdict | null; note: string; rule?: string }[]
   incomplete: number
   passes: number
+  /** Checks that ran and found nothing, by criterion (a pass is shown, and only fills a fully automatic criterion). */
+  passedChecks: { criterion: string; rule: string }[]
 }
 
 /** axe-core rule → RGAA 4.1 criterion. Only the rules whose meaning is clear are listed. */
@@ -65,7 +68,18 @@ export function fromAxe(o: Record<string, unknown>): ToolResults {
     })),
     data: firstData(v),
   }))
-  return { tool: 'axe', url: clean(o.url), violations, answers: [], incomplete: Number(o.incomplete) || 0, passes: Number(o.passes) || 0 }
+  const passed = new Set((Array.isArray(o.passedRules) ? o.passedRules : []).map(String))
+  const inapplicable = new Set((Array.isArray(o.inapplicableRules) ? o.inapplicableRules : []).map(String))
+  const failed = new Set(violations.map((v) => v.rule))
+  // a criterion is "checked" when every axe rule that maps to it ran: at least one passed, none failed
+  const byCriterion = new Map<string, string[]>()
+  for (const [rule, criterion] of Object.entries(AXE_TO_RGAA)) byCriterion.set(criterion, [...(byCriterion.get(criterion) ?? []), rule])
+  const passedChecks: ToolResults['passedChecks'] = []
+  for (const [criterion, rules] of byCriterion) {
+    if (rules.some((r) => failed.has(r)) || !rules.every((r) => passed.has(r) || inapplicable.has(r) || failed.has(r))) continue
+    for (const rule of rules.filter((r) => passed.has(r))) passedChecks.push({ criterion, rule })
+  }
+  return { tool: 'axe', url: clean(o.url), violations, answers: [], incomplete: Number(o.incomplete) || 0, passes: Number(o.passes) || 0, passedChecks }
 }
 
 function firstData(v: Record<string, unknown>): Record<string, unknown> | undefined {
@@ -99,7 +113,7 @@ export function applyToolResults(rec: PageRecord, res: ToolResults): ImportRepor
   const mark = MARK(tool)
   const report: ImportReport = { tool, at: Date.now(), url: res.url, set: 0, noted: 0, conflicts: [], unmatched: [], unmapped: [], incomplete: res.incomplete, passes: res.passes }
 
-  const touchCriterion = (criterion: string, verdict: ChecklistVerdict | null, line: string): void => {
+  const touchCriterion = (criterion: string, verdict: ChecklistVerdict | null, line: string, rule: string): void => {
     const theme = themeOfCriterion(criterion)
     if (!rec.themes.includes(theme)) {
       // only a failure brings a theme into the page; "not applicable" and notes stay in the themes you chose to audit
@@ -107,7 +121,8 @@ export function applyToolResults(rec: PageRecord, res: ToolResults): ImportRepor
       rec.themes = [...rec.themes, theme].sort((a, b) => a - b)
     }
     const ans = (rec.checklist[criterion] ??= { note: '' })
-    if (verdict && ans.verdict === undefined) {
+    if (verdict === 'nc') (ans.autoResults ??= {})[tool] = { result: 'fail', rules: [...new Set([...(ans.autoResults?.[tool]?.result === 'fail' ? ans.autoResults[tool].rules : []), rule])] }
+    if (verdict && (ans.verdict === undefined || (ans.source && ans.verdict !== verdict))) {
       ans.verdict = verdict
       ans.source = tool
       report.set++
@@ -171,7 +186,7 @@ export function applyToolResults(rec: PageRecord, res: ToolResults): ImportRepor
       continue
     }
 
-    touchCriterion(criterion, 'nc', line)
+    touchCriterion(criterion, 'nc', line, v.rule)
   }
 
   for (const a of res.answers) {
@@ -180,7 +195,26 @@ export function applyToolResults(rec: PageRecord, res: ToolResults): ImportRepor
       report.unmapped.push(`${a.criterion}: ${a.status?.toUpperCase() ?? ''}${a.note ? ` — ${a.note}` : ''}`)
       continue
     }
-    touchCriterion(a.criterion, a.status, a.note ? `${mark} ${a.criterion}: ${a.note}` : `${mark} ${a.criterion}: ${a.status?.toUpperCase()}`)
+    touchCriterion(a.criterion, a.status, a.note ? `${mark} ${a.criterion}: ${a.note}` : `${mark} ${a.criterion}: ${a.status?.toUpperCase()}`, a.rule ?? a.criterion)
+  }
+
+  // checks that ran and found nothing: shown on the criterion; they fill it (compliant, to confirm) only when the
+  // criterion is fully automatic and nothing else failed
+  const failedNow = new Set(res.violations.map((v) => AXE_TO_RGAA[v.rule]).filter(Boolean).concat(res.answers.filter((a) => a.status === 'nc').map((a) => a.criterion)))
+  const byCriterion = new Map<string, string[]>()
+  for (const p of res.passedChecks) if (!failedNow.has(p.criterion)) byCriterion.set(p.criterion, [...(byCriterion.get(p.criterion) ?? []), p.rule])
+  for (const [criterion, rules] of byCriterion) {
+    const theme = themeOfCriterion(criterion)
+    if (theme <= 3 || !rec.themes.includes(theme)) continue
+    const ans = (rec.checklist[criterion] ??= { note: '' })
+    ;(ans.autoResults ??= {})[tool] = { result: 'pass', rules: [...new Set(rules)] }
+    const fullyAutomatic = THEMES.some((t) => t.criteria.some((c) => c.id === criterion && c.automation === 'auto'))
+    const anyFail = Object.values(ans.autoResults).some((r) => r.result === 'fail')
+    if (fullyAutomatic && !anyFail && (ans.verdict === undefined || (ans.source && ans.verdict !== 'c'))) {
+      ans.verdict = 'c'
+      ans.source = tool
+      report.set++
+    }
   }
 
   ;(rec.imports ??= []).push(report)
