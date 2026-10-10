@@ -1,5 +1,6 @@
 import data from './rgaa-tests.json'
 import { CRITERIA } from '../lib/rgaa'
+import { getLang, setLang, t, translateStatic, type Lang } from '../lib/i18n'
 
 type Level = 'auto' | 'semi' | 'manual'
 interface TestRow { id: string; text: string; conditions: string[]; automation: Level; note: string; script: string | null; human: string | null }
@@ -7,7 +8,7 @@ interface CriterionRow { id: string; title: string; wcag: string[]; automation: 
 interface ThemeRow { number: number; name: string; criteria: CriterionRow[] }
 
 const topics = data.topics as ThemeRow[]
-const LABEL: Record<Level, string> = { auto: 'Automatic', semi: 'Semi-automatic', manual: 'Manual' }
+const labelOf = (l: Level): string => t(l === 'auto' ? 'Automatic' : l === 'semi' ? 'Semi-automatic' : 'Manual')
 const LEVELS: Level[] = ['auto', 'semi', 'manual']
 const implemented = new Set(CRITERIA.map((c) => c.id))
 const OFFICIAL = 'https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/'
@@ -39,7 +40,7 @@ function bar(c: Record<Level, number>): HTMLElement {
   const total = c.auto + c.semi + c.manual || 1
   const b = el('div', 'bar')
   b.setAttribute('role', 'img')
-  b.setAttribute('aria-label', `${c.auto} automatic, ${c.semi} semi-automatic, ${c.manual} manual`)
+  b.setAttribute('aria-label', t('{auto} automatic, {semi} semi-automatic, {manual} manual', { auto: c.auto, semi: c.semi, manual: c.manual }))
   for (const l of LEVELS) {
     const seg = el('i', l)
     seg.style.width = `${(c[l] / total) * 100}%`
@@ -53,9 +54,9 @@ function renderSummary(): void {
   const c = count(all)
   const host = $('summary')
   host.replaceChildren()
-  host.append(el('div', 'stat', el('div', 'n', String(all.length)), el('div', 'l', `tests in ${topics.reduce((n, t) => n + t.criteria.length, 0)} criteria, ${topics.length} themes`)))
+  host.append(el('div', 'stat', el('div', 'n', String(all.length)), el('div', 'l', t('tests in {criteria} criteria, {themes} themes', { criteria: topics.reduce((n, th) => n + th.criteria.length, 0), themes: topics.length }))))
   for (const l of LEVELS) {
-    host.append(el('div', `stat ${l}`, el('div', 'n', `${c[l]}`), el('div', 'l', `${LABEL[l]} · ${Math.round((c[l] / all.length) * 100)}%`)))
+    host.append(el('div', `stat ${l}`, el('div', 'n', `${c[l]}`), el('div', 'l', `${labelOf(l)} · ${Math.round((c[l] / all.length) * 100)}%`)))
   }
   host.append(bar(c))
 }
@@ -86,8 +87,8 @@ function render(): void {
       el(
         'summary',
         '',
-        el('span', '', `${theme.number}. ${theme.name} `, el('span', 'meta', `· ${criteria.length} criteria · ${themeTests.length} tests`)),
-        el('span', 'meta', LEVELS.filter((l) => counts[l]).map((l) => `${counts[l]} ${LABEL[l].toLowerCase()}`).join(' · ')),
+        el('span', '', `${theme.number}. ${theme.name} `, el('span', 'meta', t('· {criteria} criteria · {tests} tests', { criteria: criteria.length, tests: themeTests.length }))),
+        el('span', 'meta', LEVELS.filter((l) => counts[l]).map((l) => `${counts[l]} ${labelOf(l).toLowerCase()}`).join(' · ')),
         bar(counts),
       ),
     )
@@ -95,21 +96,21 @@ function render(): void {
     for (const { c, tests } of criteria) {
       const cEl = el('details', 'criterion')
       cEl.open = Boolean(query) || level !== 'all' ? allOpen || Boolean(query) : allOpen
-      const here = implemented.has(c.id) ? el('span', 'here', 'in this extension') : null
+      const here = implemented.has(c.id) ? el('span', 'here', t('in this extension')) : null
       cEl.append(
-        el('summary', '', el('span', '', el('span', 'cid', c.id), ...rich(c.title), ...(here ? [here] : [])), el('span', `badge ${c.automation}`, LABEL[c.automation])),
+        el('summary', '', el('span', '', el('span', 'cid', c.id), ...rich(c.title), ...(here ? [here] : [])), el('span', `badge ${c.automation}`, labelOf(c.automation))),
       )
-      if (c.wcag.length) cEl.append(el('p', 'wcag', `WCAG: ${c.wcag.join(' · ')}`))
+      if (c.wcag.length) cEl.append(el('p', 'wcag', t('WCAG: {list}', { list: c.wcag.join(' · ') })))
       const ul = el('ul', 'tests')
-      for (const t of tests) {
+      for (const tt of tests) {
         const li = el('li', 'test')
-        const body = el('div', '', el('p', '', ...rich(t.text)))
-        if (t.conditions.length) body.append(el('ul', '', ...t.conditions.map((x) => el('li', '', ...rich(x)))))
+        const body = el('div', '', el('p', '', ...rich(tt.text)))
+        if (tt.conditions.length) body.append(el('ul', '', ...tt.conditions.map((x) => el('li', '', ...rich(x)))))
         const why = el('div', 'why')
-        if (t.script) why.append(el('p', '', el('strong', '', 'Script: '), t.script))
-        if (t.human) why.append(el('p', '', el('strong', '', 'Human: '), t.human))
+        if (tt.script) why.append(el('p', '', el('strong', '', t('Script: ')), tt.script))
+        if (tt.human) why.append(el('p', '', el('strong', '', t('Human: ')), tt.human))
         body.append(why)
-        li.append(el('span', 'tid', t.id), el('span', `badge ${t.automation}`, LABEL[t.automation]), body)
+        li.append(el('span', 'tid', tt.id), el('span', `badge ${tt.automation}`, labelOf(tt.automation)), body)
         ul.append(li)
       }
       cEl.append(ul)
@@ -118,15 +119,13 @@ function render(): void {
     themeEl.append(list)
     host.append(themeEl)
   }
-  $('count').textContent = shown
-    ? `${shown} test(s) shown. Official wording: ${OFFICIAL}`
-    : 'No test matches this filter.'
+  $('count').textContent = shown ? t('{n} test(s) shown. Official wording: {url}', { n: shown, url: OFFICIAL }) : t('No test matches this filter.')
 }
 
 function renderFilters(): void {
   const host = $('filters')
   host.replaceChildren()
-  const chips: [Level | 'all', string][] = [['all', 'All'], ['auto', 'Automatic'], ['semi', 'Semi-automatic'], ['manual', 'Manual']]
+  const chips: [Level | 'all', string][] = [['all', t('All')], ['auto', t('Automatic')], ['semi', t('Semi-automatic')], ['manual', t('Manual')]]
   for (const [value, label] of chips) {
     const b = el('button', 'chip', label)
     b.type = 'button'
@@ -146,10 +145,25 @@ $('search').addEventListener('input', (event) => {
 })
 $('toggle').addEventListener('click', () => {
   allOpen = !allOpen
-  $('toggle').textContent = allOpen ? 'Collapse all' : 'Expand all'
+  $('toggle').textContent = allOpen ? t('Collapse all') : t('Expand all')
   render()
 })
 
-renderSummary()
-renderFilters()
-render()
+function renderAll(): void {
+  translateStatic()
+  $('toggle').textContent = allOpen ? t('Collapse all') : t('Expand all')
+  renderSummary()
+  renderFilters()
+  render()
+  document.querySelectorAll<HTMLButtonElement>('[data-lang]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === getLang())))
+}
+
+document.querySelectorAll<HTMLButtonElement>('[data-lang]').forEach((b) =>
+  b.addEventListener('click', () => {
+    setLang(b.dataset.lang as Lang)
+    renderAll()
+  }),
+)
+
+setLang(getLang())
+renderAll()

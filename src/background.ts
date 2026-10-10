@@ -9,6 +9,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       .then((dataUrl) => sendResponse({ dataUrl }), (err) => sendResponse({ error: String(err) }))
     return true
   }
+  // Firefox sometimes gives DevTools no result for eval('location.href'): ask the tab itself.
+  if (message?.type === 'RGAA_TAB_INFO') {
+    chrome.tabs
+      .get(message.tabId)
+      .then((tab) => sendResponse({ url: tab.url ?? '', title: tab.title ?? '' }), () => sendResponse({ url: '', title: '' }))
+    return true
+  }
   if (message?.type !== 'RGAA_RELAY') return undefined
   chrome.tabs
     .sendMessage(message.tabId, message.payload)

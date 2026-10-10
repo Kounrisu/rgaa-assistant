@@ -1,3 +1,4 @@
+import { t } from './i18n'
 import type { Detected, ImageElementInfo, ImageKind } from './types'
 
 export interface Criterion {
@@ -138,34 +139,38 @@ export function hintFor(criterionId: string, el: ImageElementInfo): Hint | null 
   const extra = [el.ariaLabel && 'aria-label', el.labelledByText && 'aria-labelledby', el.title && 'title', el.svgTitle && '<title>'].filter(Boolean)
   switch (criterionId) {
     case '1.1':
-      if (el.ignoredBy) return { tone: 'warn', text: `Ignored by assistive tech (${el.ignoredBy}) — is it really decorative?` }
-      if (!name) return { tone: 'warn', text: `No accessible name found on this ${el.type}.` }
-      return { tone: 'ok', text: `Accessible name found: “${name}”` }
+      if (el.ignoredBy) return { tone: 'warn', text: t('Ignored by assistive tech ({by}) — is it really decorative?', { by: el.ignoredBy }) }
+      if (!name) return { tone: 'warn', text: t('No accessible name found on this {type}.', { type: el.type }) }
+      return { tone: 'ok', text: t('Accessible name found: “{name}”', { name }) }
     case '1.2': {
       const hiddenOutright = el.ignoredBy?.startsWith('aria-hidden') || el.ignoredBy?.startsWith('role=')
       if (hiddenOutright) {
         return {
           tone: 'ok',
-          text: `Hidden from assistive tech (${el.ignoredBy}).${extra.length ? ` It also has ${extra.join(', ')}, which assistive tech will not read — remove it if it is not needed.` : ''}`,
+          text: extra.length
+            ? t('Hidden from assistive tech ({by}). It also has {extra}, which assistive tech will not read — remove it if it is not needed.', { by: el.ignoredBy ?? '', extra: extra.join(', ') })
+            : t('Hidden from assistive tech ({by}).', { by: el.ignoredBy ?? '' }),
         }
       }
-      if (el.ignoredBy && !extra.length) return { tone: 'ok', text: `Ignored by assistive tech (${el.ignoredBy}) and has no accessible name.` }
-      if (el.ignoredBy) return { tone: 'warn', text: `Ignored (${el.ignoredBy}) but also has ${extra.join(', ')} — remove it.` }
-      if (extra.length) return { tone: 'warn', text: `Has ${extra.join(', ')} — a decorative image must not have an accessible name.` }
-      if (el.alt === null) return { tone: 'warn', text: `Not hidden from assistive tech: add aria-hidden="true"${el.tag === 'img' ? ' or alt=""' : ''}.` }
-      return { tone: 'warn', text: `Not ignored: alt is “${el.alt}” — a decorative image should have alt="".` }
+      if (el.ignoredBy && !extra.length) return { tone: 'ok', text: t('Ignored by assistive tech ({by}) and has no accessible name.', { by: el.ignoredBy }) }
+      if (el.ignoredBy) return { tone: 'warn', text: t('Ignored ({by}) but also has {extra} — remove it.', { by: el.ignoredBy, extra: extra.join(', ') }) }
+      if (extra.length) return { tone: 'warn', text: t('Has {extra} — a decorative image must not have an accessible name.', { extra: extra.join(', ') }) }
+      if (el.alt === null) {
+        return { tone: 'warn', text: el.tag === 'img' ? t('Not hidden from assistive tech: add aria-hidden="true" or alt="".') : t('Not hidden from assistive tech: add aria-hidden="true".') }
+      }
+      return { tone: 'warn', text: t('Not ignored: alt is “{alt}” — a decorative image should have alt="".', { alt: el.alt }) }
     }
     case '1.3':
-      if (el.deterministic.altMatchesFilenamePattern) return { tone: 'warn', text: 'The alternative looks like a file name.' }
-      if (name && name.length > 150) return { tone: 'warn', text: `The alternative is ${name.length} characters long — it should be short and concise (1.3.9).` }
-      if (el.isInsideLink && name) return { tone: 'info', text: 'Image is inside a link: the alternative should describe where the link goes.' }
+      if (el.deterministic.altMatchesFilenamePattern) return { tone: 'warn', text: t('The alternative looks like a file name.') }
+      if (name && name.length > 150) return { tone: 'warn', text: t('The alternative is {n} characters long — it should be short and concise (1.3.9).', { n: name.length }) }
+      if (el.isInsideLink && name) return { tone: 'info', text: t('Image is inside a link: the alternative should describe where the link goes.') }
       return null
     case '1.6':
-      return { tone: 'info', text: 'Only charts, maps, diagrams and infographics usually need a detailed description.' }
+      return { tone: 'info', text: t('Only charts, maps, diagrams and infographics usually need a detailed description.') }
     case '1.9':
       return el.figcaption
-        ? { tone: 'ok', text: `<figcaption> found: “${el.figcaption.slice(0, 120)}”` }
-        : { tone: 'info', text: 'No <figcaption> found around this image.' }
+        ? { tone: 'ok', text: t('<figcaption> found: “{caption}”', { caption: el.figcaption.slice(0, 120) }) }
+        : { tone: 'info', text: t('No <figcaption> found around this image.') }
     default:
       return null
   }

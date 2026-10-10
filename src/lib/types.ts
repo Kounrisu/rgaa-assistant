@@ -102,7 +102,15 @@ export interface AuditMeta {
 }
 
 export interface Audit {
-  version: 2
+  version: 3
+  /** Stable identifier: the same audit keeps it through renames, file saves and re-imports. */
+  id: string
+  name: string
+  createdAt: number
+  /** Last change made by the user. */
+  updatedAt: number
+  /** Value of `updatedAt` when the audit was last saved to a file; older than `updatedAt` = changes not in the file. */
+  exportedAt?: number
   meta: AuditMeta
   pages: PageRecord[]
   current: string | null
@@ -133,4 +141,15 @@ export interface FindingItem extends RawFinding {
   key: string
   present: boolean
   scan: number
+}
+
+/** One line of the list of audits (kept apart so the list does not load every audit). */
+export interface AuditSummary {
+  id: string
+  name: string
+  site: string
+  pages: number
+  createdAt: number
+  updatedAt: number
+  exportedAt?: number
 }

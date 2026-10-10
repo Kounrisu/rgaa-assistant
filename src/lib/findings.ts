@@ -1,3 +1,4 @@
+import { t } from './i18n'
 import type { FindingItem, Verdict } from './types'
 import type { Hint } from './rgaa'
 
@@ -47,19 +48,19 @@ export function hintForFinding(f: FindingItem, criterionId: string): Hint | null
   const title = f.facts.title
   switch (criterionId) {
     case '2.1':
-      if (title === null) return { tone: 'warn', text: 'No title attribute on this frame.' }
-      if (!title.trim()) return { tone: 'warn', text: 'The title attribute is empty.' }
-      return { tone: 'ok', text: `title found: “${title}”` }
+      if (title === null) return { tone: 'warn', text: t('No title attribute on this frame.') }
+      if (!title.trim()) return { tone: 'warn', text: t('The title attribute is empty.') }
+      return { tone: 'ok', text: t('title found: “{title}”', { title }) }
     case '2.2': {
-      if (!title || !title.trim()) return { tone: 'warn', text: 'No title to judge: 2.1 fails first.' }
-      if (GENERIC_TITLE.test(title.trim())) return { tone: 'warn', text: `“${title}” is generic: it does not say what the frame contains.` }
-      if (/^https?:\/\//i.test(title) || /\.(html?|php|aspx?)$/i.test(title)) return { tone: 'warn', text: 'The title looks like a URL or a file name.' }
-      return { tone: 'info', text: 'Read the title and the frame content: does it describe them?' }
+      if (!title || !title.trim()) return { tone: 'warn', text: t('No title to judge: 2.1 fails first.') }
+      if (GENERIC_TITLE.test(title.trim())) return { tone: 'warn', text: t('“{title}” is generic: it does not say what the frame contains.', { title }) }
+      if (/^https?:\/\//i.test(title) || /\.(html?|php|aspx?)$/i.test(title)) return { tone: 'warn', text: t('The title looks like a URL or a file name.') }
+      return { tone: 'info', text: t('Read the title and the frame content: does it describe them?') }
     }
     case '3.2': {
-      if (f.type === 'contrast-ok') return { tone: 'ok', text: `${f.facts['Sufficient contrast']} text element(s) pass their threshold (checked ${f.facts['Text elements checked']}).` }
-      if (f.type === 'contrast-unknown') return { tone: 'info', text: 'The background is an image, a gradient, a translucent layer or something placed over the text: a script cannot compute the ratio. Check it by eye or with a colour picker.' }
-      return { tone: 'warn', text: `Ratio ${f.facts.Ratio} is below the required ${f.facts.Required}. Check the exceptions (disabled, decorative, logo) before confirming.` }
+      if (f.type === 'contrast-ok') return { tone: 'ok', text: t('{pass} text element(s) pass their threshold (checked {total}).', { pass: (f.facts['Sufficient contrast'] ?? ''), total: (f.facts['Text elements checked'] ?? '') }) }
+      if (f.type === 'contrast-unknown') return { tone: 'info', text: t('The background is an image, a gradient, a translucent layer or something placed over the text: a script cannot compute the ratio. Check it by eye or with a colour picker.') }
+      return { tone: 'warn', text: t('Ratio {ratio} is below the required {required}. Check the exceptions (disabled, decorative, logo) before confirming.', { ratio: f.facts.Ratio ?? '', required: f.facts.Required ?? '' }) }
     }
     default:
       return null

@@ -75,16 +75,51 @@ function setFocused(id: number | null): void {
   if (current) styleBox(current.box, true)
 }
 
-/** The yellow wash over the focused element hides its real colours; the panel can turn it off. */
+/** How a box looks according to where its review stands (sent by the panel). */
+const STATE_STYLE: Record<string, { color: string; dash: string; width: number; glyph: string; glow: boolean }> = {
+  error: { color: '#ff1744', dash: 'solid', width: 4, glyph: '!', glow: true },
+  review: { color: '#ff1744', dash: 'dashed', width: 3, glyph: '?', glow: true },
+  ignored: { color: '#7f1d1d', dash: 'dashed', width: 2, glyph: '', glow: false },
+  c: { color: '#16a34a', dash: 'solid', width: 3, glyph: '✓', glow: false },
+  nc: { color: '#ff1744', dash: 'solid', width: 4, glyph: '✕', glow: true },
+}
+
+/** Alt text written next to each image box (toggle in the panel). */
+let showAlt = false
+
+/** The text of a box's label: its number, a mark for its state, and optionally what the page says as alternative. */
+function refreshLabel(box: HTMLElement): void {
+  const label = box.firstElementChild as HTMLElement | null
+  if (!label) return
+  const glyph = STATE_STYLE[box.dataset.state ?? '']?.glyph
+  const alt = showAlt && box.dataset.alt ? ` · ${box.dataset.alt}` : ''
+  label.textContent = `${glyph ? `${glyph} ` : ''}${box.dataset.id ?? ''}${alt}`
+  label.style.whiteSpace = 'nowrap'
+  label.style.maxWidth = showAlt ? '360px' : ''
+  label.style.overflow = showAlt ? 'hidden' : ''
+  label.style.textOverflow = showAlt ? 'ellipsis' : ''
+}
+
+/** The yellow border and wash on the focused element hide its real colours; the panel can turn them off. */
 let focusTint = true
 
 function styleBox(box: HTMLElement, focused: boolean): void {
   const label = box.firstElementChild as HTMLElement
   const color = box.dataset.color ?? DEFAULT_COLOR
   box.dataset.focused = String(focused)
-  if (focused) {
+  if (focused && !focusTint) {
+    // plain mode: a thin black dashed line with a white halo (readable on any background, no colour cast on the element)
+    box.style.border = '2px dashed #111'
+    box.style.background = 'transparent'
+    box.style.boxShadow = '0 0 0 2px #fff'
+    box.style.animation = 'none'
+    box.style.zIndex = '1'
+    label.style.background = '#111'
+    label.style.color = '#fff'
+    label.style.fontSize = '14px'
+  } else if (focused) {
     box.style.border = `4px solid ${FOCUS_COLOR}`
-    box.style.background = focusTint ? 'rgba(250, 204, 21, 0.25)' : 'transparent'
+    box.style.background = 'rgba(250, 204, 21, 0.25)'
     box.style.boxShadow = `0 0 0 3px ${color}, 0 0 0 5px #000${box.dataset.dim === '1' ? ', 0 0 0 9999px rgba(0, 0, 0, 0.3)' : ''}`
     box.style.animation = 'rgaa-assistant-pulse 0.9s ease-in-out 3'
     box.style.zIndex = '1'
@@ -92,12 +127,14 @@ function styleBox(box: HTMLElement, focused: boolean): void {
     label.style.color = '#000'
     label.style.fontSize = '16px'
   } else {
-    box.style.border = `3px solid ${color}`
-    box.style.background = tint(color, 0.12)
-    box.style.boxShadow = '0 0 0 1px #fff'
+    const st = STATE_STYLE[box.dataset.state ?? '']
+    const c = st?.color ?? color
+    box.style.border = `${st?.width ?? 3}px ${st?.dash ?? 'solid'} ${c}`
+    box.style.background = tint(c, st?.glow ? 0.16 : 0.1)
+    box.style.boxShadow = st?.glow ? `0 0 0 1px #fff, 0 0 10px 2px ${tint(c, 0.75)}` : '0 0 0 1px #fff'
     box.style.animation = 'none'
     box.style.zIndex = '0'
-    label.style.background = color
+    label.style.background = c
     label.style.color = '#fff'
     label.style.fontSize = '12px'
   }
@@ -275,7 +312,7 @@ function isFixed(el: Element): boolean {
   return false
 }
 
-function drawBox(container: HTMLElement, id: number, img: Element, rect: DOMRect): void {
+function drawBox(container: HTMLElement, id: number, img: Element, rect: DOMRect, alt: string): void {
   const box = document.createElement('div')
   const fixed = isFixed(img)
   box.style.cssText = `
@@ -302,10 +339,35 @@ function drawBox(container: HTMLElement, id: number, img: Element, rect: DOMRect
   box.appendChild(label)
   box.dataset.color = imageColor
   box.dataset.dim = '1'
+  box.dataset.id = String(id)
+  box.dataset.alt = alt
+  box.dataset.state = imageStates[id] ?? ''
   container.appendChild(box)
+  refreshLabel(box)
   styleBox(box, false)
   boxes.set(id, { img, box })
 }
+
+/** What the page offers as text alternative, in a few words, for the label next to the image. */
+function altSummaryFor(el: Element): string {
+  const tag = el.tagName.toLowerCase()
+  const q = (v: string) => `“${v.replace(/\s+/g, ' ').trim().slice(0, 80)}”`
+  const alt = ['img', 'input', 'area'].includes(tag) ? el.getAttribute('alt') : null
+  const labelled = labelledByTextFor(el)
+  if (labelled) return `aria-labelledby ${q(labelled)}`
+  const aria = el.getAttribute('aria-label')
+  if (aria) return `aria-label ${q(aria)}`
+  if (alt) return `alt ${q(alt)}`
+  const svg = svgTitleFor(el)
+  if (svg) return `title ${q(svg)}`
+  const title = el.getAttribute('title')
+  if (title) return `title ${q(title)}`
+  if (alt === '') return 'alt=""'
+  if (hasExplicitHiddenAncestor(el)) return 'aria-hidden'
+  return 'no alternative'
+}
+
+const imageStates: Record<number, string> = {}
 
 function highlightImages(): ImageElementInfo[] {
   clearOverlay()
@@ -328,7 +390,7 @@ function highlightImages(): ImageElementInfo[] {
       id = nextId++
       registry.set(el, id)
     }
-    drawBox(container, id, el, rect)
+    drawBox(container, id, el, rect, altSummaryFor(el))
 
     const tag = el.tagName.toLowerCase()
     const alt = ['img', 'input', 'area'].includes(tag) ? el.getAttribute('alt') : null
@@ -384,6 +446,7 @@ interface ThemeOverlay {
   focused: number | null
 }
 const themeOverlays = new Map<number, ThemeOverlay>()
+const themeStates = new Map<ThemeOverlay, Record<number, string>>()
 
 function themeOverlayFor(theme: number, color: string): ThemeOverlay {
   let overlay = themeOverlays.get(theme)
@@ -420,7 +483,10 @@ function makeThemeBoxes(overlay: ThemeOverlay, id: number, els: Element[]): HTML
     if (i > 0) label.style.display = 'none'
     box.appendChild(label)
     box.dataset.color = overlay.color
+    box.dataset.id = String(id)
+    box.dataset.state = themeStates.get(overlay)?.[id] ?? ''
     overlay.container.appendChild(box)
+    refreshLabel(box)
     styleBox(box, false)
     boxes.push(box)
   })
@@ -482,9 +548,10 @@ function relabelTheme(theme: number, map: { from: number; to: number }[]): void 
     const item = overlay.items.get(from)
     if (!item) continue
     next.set(to, item)
-    const label = item.boxes[0]?.firstElementChild
-    if (label) label.textContent = String(to)
-    for (const b of item.boxes.slice(1)) if (b.firstElementChild) b.firstElementChild.textContent = String(to)
+    for (const b of item.boxes) {
+      b.dataset.id = String(to)
+      refreshLabel(b)
+    }
   }
   overlay.items = next
   overlay.focused = null
@@ -786,13 +853,39 @@ function relabel(map: { from: number; to: number }[]): void {
     if (!entry) continue
     next.set(to, entry)
     registry.set(entry.img, to)
-    const label = entry.box.firstElementChild
-    if (label) label.textContent = String(to)
+    entry.box.dataset.id = String(to)
+    entry.box.dataset.state = imageStates[to] ?? ''
+    refreshLabel(entry.box)
+    styleBox(entry.box, false)
     nextId = Math.max(nextId, to + 1)
   }
   boxes.clear()
   for (const [id, entry] of next) boxes.set(id, entry)
   focusedId = null
+}
+
+/** Colours the boxes of a theme by where each element's review stands. */
+function setStates(theme: number, states: Record<number, string>): void {
+  if (theme === 1) {
+    for (const k of Object.keys(imageStates)) delete imageStates[Number(k)]
+    Object.assign(imageStates, states)
+    for (const [id, { box }] of boxes) {
+      box.dataset.state = states[id] ?? ''
+      refreshLabel(box)
+      if (box.dataset.focused !== 'true') styleBox(box, false)
+    }
+    return
+  }
+  const overlay = themeOverlays.get(theme)
+  if (!overlay) return
+  themeStates.set(overlay, states)
+  for (const [id, item] of overlay.items) {
+    for (const b of item.boxes) {
+      b.dataset.state = states[id] ?? ''
+      refreshLabel(b)
+      if (b.dataset.focused !== 'true') styleBox(b, false)
+    }
+  }
 }
 
 function setVisibility(map: Record<number, boolean>): void {
@@ -1006,7 +1099,16 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     sendResponse({ ok: true })
     return true
   }
+  if (message?.type === 'RGAA_STATES') {
+    setStates(message.theme, message.states ?? {})
+    sendResponse({ ok: true })
+    return true
+  }
   if (message?.type === 'RGAA_OVERLAY') {
+    if (typeof message.alt === 'boolean' && message.alt !== showAlt) {
+      showAlt = message.alt
+      for (const { box } of boxes.values()) refreshLabel(box)
+    }
     if (typeof message.tint === 'boolean' && message.tint !== focusTint) {
       focusTint = message.tint
       for (const o of themeOverlays.values()) o.container.querySelectorAll<HTMLElement>('[data-focused="true"]').forEach((b) => styleBox(b, true))
