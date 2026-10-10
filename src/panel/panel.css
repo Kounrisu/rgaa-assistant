@@ -661,3 +661,10 @@ dialog.confirm { width: min(460px, 92vw); }
 .toolsbar-label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 .toolsbar button { padding: 3px 10px; font-size: 12.5px; }
 .toolsbar button[aria-pressed='true'] { background: var(--accent-soft); border-color: var(--accent); font-weight: 600; }
+
+/* Audit progress of the page */
+.progress { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
+.progress:empty { display: none; }
+.progress .meter { width: 120px; height: 8px; border-radius: 4px; background: var(--border); overflow: hidden; display: inline-flex; }
+.progress .meter i { display: block; height: 100%; }
+.progress .meter .c { background: var(--ok); } .progress .meter .nc { background: var(--bad); } .progress .meter .na { background: #94a3b8; }

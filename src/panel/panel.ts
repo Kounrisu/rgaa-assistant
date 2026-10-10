@@ -1,5 +1,5 @@
 import { DETECTED_LABEL, criteriaFor, criterionUrl, detectedOf, hintFor, suggestedKind, type Criterion } from '../lib/rgaa'
-import { auditSheets, auditStats, buildWorkbook, levelStats, pageSheets, pct2, rateExact, rateOf, thumbKey, type Counts, type PageInput } from '../lib/audit-sheet'
+import { auditSheets, auditStats, buildWorkbook, countsOf, levelStats, pageSheets, pct2, rateExact, rateOf, thumbKey, type Counts, type PageInput } from '../lib/audit-sheet'
 import { auditFromFile, auditToFile, copyOf, createPage, deleteAuditById, emptyAudit, FILE_EXTENSION, findPage, listAudits, loadActiveAudit, loadAuditById, normalizeUrl, saveAudit, setActiveId } from '../lib/audit-store'
 import { getLang, setLang, t, translateStatic, type Lang } from '../lib/i18n'
 import type { Sheet } from '../lib/xlsx'
@@ -1015,6 +1015,8 @@ function select(id: number, scroll: boolean): void {
 
 const pageSelect = $<HTMLSelectElement>('page-select')
 const pageToolsEl = $('page-tools')
+const progressEl = $('progress')
+const nextBtn = $<HTMLButtonElement>('next-btn')
 const liveUrlEl = $('live-url')
 const deletePageBtn = $<HTMLButtonElement>('delete-page-btn')
 const resetPageBtn = $<HTMLButtonElement>('reset-page-btn')
@@ -1081,6 +1083,17 @@ function renderPageBar(): void {
   }
   pageSelect.disabled = !audit.pages.length
   pageToolsEl.hidden = !page
+  nextBtn.disabled = !page
+  progressEl.replaceChildren()
+  if (page) {
+    const c = countsOf(pageInput(page))
+    const total = c.C + c.NC + c.NA + c.NT || 1
+    const answered = c.C + c.NC + c.NA
+    progressEl.append(
+      h('span', {}, t('{done}/{total} criteria answered', { done: answered, total })),
+      h('span', { class: 'meter', role: 'img', 'aria-label': t('Progress of {label}', { label: pageLabel(page) }) }, ...[['c', c.C], ['nc', c.NC], ['na', c.NA]].map(([k, n]) => h('i', { class: String(k), style: `width:${(Number(n) / total) * 100}%` }))),
+    )
+  }
   deletePageBtn.disabled = !page
   resetPageBtn.disabled = !page
   const onLive = Boolean(page && liveUrl && normalizeUrl(page.url) === normalizeUrl(liveUrl))
@@ -2784,8 +2797,11 @@ resultsBtn.addEventListener('click', () => setView(view === 'page' ? 'review' : 
 auditBtn.addEventListener('click', () => setView(view === 'audit' ? 'review' : 'audit'))
 
 /* Keyboard: j / k move between images (outside text fields). */
+nextBtn.addEventListener('click', () => goToFirstOnPage('pending'))
+
 document.addEventListener('keydown', (event) => {
   const target = event.target as HTMLElement
+  if (event.key === 'n' && !event.ctrlKey && !event.metaKey && !['TEXTAREA', 'INPUT', 'SELECT'].includes(target.tagName) && page && view === 'review') return void goToFirstOnPage('pending')
   if (['TEXTAREA', 'INPUT', 'SELECT'].includes(target.tagName) || view !== 'review' || theme !== 1 || !elements.length || selectedId === null) return
   const index = elements.findIndex((e) => e.id === selectedId)
   const next = event.key === 'j' ? index + 1 : event.key === 'k' ? index - 1 : -1
