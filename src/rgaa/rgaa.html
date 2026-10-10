@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RGAA 4.1 — Test automation coverage</title>
+    <link rel="stylesheet" href="rgaa.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="wrap">
+        <h1>RGAA 4.1 — what can be automated?</h1>
+        <p class="lead">
+          Every test of the 13 themes, classified as <strong>automatic</strong>, <strong>semi-automatic</strong>
+          or <strong>manual</strong>. Official data from
+          <a href="https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/" target="_blank" rel="noreferrer">accessibilite.numerique.gouv.fr</a>;
+          the classification is this project's own estimate, not an official one.
+        </p>
+        <div id="summary" class="summary"></div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section class="legend" aria-label="Legend">
+        <div><span class="badge auto">Automatic</span> A script can reach a pass / fail verdict from the page (DOM, CSS, source) with no human judgement.</div>
+        <div><span class="badge semi">Semi-automatic</span> A script finds the elements and checks the technical part; a human confirms scope or relevance.</div>
+        <div><span class="badge manual">Manual</span> Needs a human: reading, listening, keyboard or assistive-technology testing, or several pages.</div>
+      </section>
+
+      <section class="controls" aria-label="Filters">
+        <label class="search"><span class="sr-only">Search criteria and tests</span>
+          <input id="search" type="search" placeholder="Search a criterion, a tag, a word… (e.g. alt, contraste, 11.1)" />
+        </label>
+        <div id="filters" class="filters" role="group" aria-label="Filter by automation level"></div>
+        <button id="toggle" type="button" class="ghost">Expand all</button>
+      </section>
+
+      <p id="count" class="count" role="status"></p>
+      <div id="themes"></div>
+    </main>
+
+    <script type="module" src="rgaa.ts"></script>
+  </body>
+</html>

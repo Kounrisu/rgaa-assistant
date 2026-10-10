@@ -1,3 +1,17 @@
-// MV3 requires a service worker to be declared; nothing to do here yet —
-// the popup talks directly to the content script (src/content/inject.ts).
-export {}
+// DevTools pages can't use chrome.tabs, so the panel asks us to relay
+// messages to the content script of the inspected tab.
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  // A picture of what the tab shows; the panel crops it to the element it is interested in.
+  if (message?.type === 'RGAA_CAPTURE') {
+    chrome.tabs
+      .get(message.tabId ?? sender.tab?.id)
+      .then((tab) => chrome.tabs.captureVisibleTab(tab.windowId, { format: 'png' }))
+      .then((dataUrl) => sendResponse({ dataUrl }), (err) => sendResponse({ error: String(err) }))
+    return true
+  }
+  if (message?.type !== 'RGAA_RELAY') return undefined
+  chrome.tabs
+    .sendMessage(message.tabId, message.payload)
+    .then(sendResponse, (err) => sendResponse({ error: String(err) }))
+  return true
+})
