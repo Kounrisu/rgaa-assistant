@@ -47,7 +47,7 @@ export const thumbKey = (pageIndex: number, imageId: number) => pageIndex * 1000
 /* ------------------------------------------------------------------ */
 
 /**
- * C / NC / NA / NT per status (see `statusOf`: a compliant criterion whose coverage is partial counts as NT), plus
+ * C / NC / NA / NT per status (see `statusOf`: a criterion with partial coverage keeps its verdict), plus
  * flags kept apart from the verdict: `partial` = criteria (any status) with incomplete coverage, `suggested` = criteria
  * waiting for the auditor to confirm a tool suggestion, `unconfirmed` = counted C/NC/NA that still rest on a pre-filled
  * verdict nobody confirmed.
@@ -57,14 +57,14 @@ export const rateOf = (c: Counts): number | null => (c.C + c.NC ? Math.round((c.
 const emptyCounts = (): Counts => ({ C: 0, NC: 0, NA: 0, NT: 0, partial: 0, suggested: 0, unconfirmed: 0 })
 
 /**
- * A rate is PROVISIONAL while the audit is incomplete: some criteria are not tested (NT: pending, not assessed or
- * only partly covered) or a counted verdict is still an unconfirmed pre-fill. Only a rate with NT = 0 and nothing
- * unconfirmed is final for its scope.
+ * A rate is PROVISIONAL while the audit is incomplete: some criteria are not tested (NT), some counted criteria are
+ * only partly covered by this tool, or a counted verdict is still an unconfirmed pre-fill. Only a rate with NT = 0,
+ * no partial coverage and nothing unconfirmed is final for its scope.
  */
-export const isProvisional = (c: Counts): boolean => c.NT > 0 || c.unconfirmed > 0
+export const isProvisional = (c: Counts): boolean => c.NT > 0 || c.unconfirmed > 0 || c.partial > 0
 export const PROVISIONAL_FR = 'provisoire'
 export const PROVISIONAL_NOTE_FR =
-  'Taux provisoire : des critères restent à tester, ne sont couverts que partiellement par RGAA Assistant (les critères conformes sur une partie seulement des tests comptent comme non testés), ou reposent sur un pré-remplissage automatique non confirmé. Seule une relecture complète par l’auditeur donne un taux définitif.'
+  'Taux provisoire : des critères restent à tester, ne sont couverts que partiellement par RGAA Assistant (leur résultat ne porte que sur les tests que l’outil sait évaluer), ou reposent sur un pré-remplissage automatique non confirmé. Seule une relecture complète par l’auditeur donne un taux définitif.'
 export const withProvisional = (text: string, c: Counts): string => (text !== '—' && text !== 'indisponible' && isProvisional(c) ? `${text} (${PROVISIONAL_FR})` : text)
 
 /** Every criterion of the referential, in official order, with its theme. */

@@ -352,7 +352,7 @@ function renderSummaries(): void {
     const unconfirmedNc = criteria.filter((c) => c.unconfirmed && c.outcome === 'nc').length
     if (toConfirm) host.append(h('span', { class: 'pill warn-pill', title: t('A tool suggests an answer for these criteria. Confirm or change each one: until then they count as to review.') }, t('{n} to confirm', { n: toConfirm })))
     if (unconfirmedNc) host.append(h('span', { class: 'pill warn-pill', title: t('Failures found by a tool and not yet confirmed. They are counted as non-compliant, so the rate is provisional.') }, t('{n} failure(s) to confirm', { n: unconfirmedNc })))
-    if (partial) host.append(h('span', { class: 'pill warn-pill', title: t('Some tests of these criteria are not supported by this tool. A compliant result on the other tests is counted as not tested; a failure is kept.') }, t('{n} partly covered', { n: partial })))
+    if (partial) host.append(h('span', { class: 'pill warn-pill', title: t('Some tests of these criteria are not supported by this tool. The result counts, but only for the tests this tool can assess, so the rate stays provisional; a failure is always kept.') }, t('{n} partly covered', { n: partial })))
     if (!pageScope && n === 1 && elements.length) {
       const prefilled = elements.filter((e) => reviews[reviewKey(e)]?.auto).length
       host.append(
@@ -2372,7 +2372,7 @@ async function exportWorkbook(pages: PageInput[], sheets: Sheet[], fileName: str
 
 /** Why a rate is marked provisional, and how criteria with unconfirmed or partial results are counted. */
 const PROVISIONAL_HELP = (): string =>
-  t('Provisional rate: some criteria are still to test, are only partly covered by this tool, or rest on an automatic answer you have not confirmed. A compliant result on only part of a criterion counts as not tested; a suggested compliance counts as to review until you confirm it; a failure is always kept.')
+  t('Provisional rate: some criteria are still to test, are only partly covered by this tool, or rest on an automatic answer you have not confirmed. A criterion judged on only part of its tests keeps its result but keeps the rate provisional; a suggested compliance counts as to review until you confirm it; a failure is always kept.')
 
 function renderResults(): void {
   resultsEl.replaceChildren()
@@ -2563,7 +2563,7 @@ function dashboard(inputs: PageInput[]): HTMLElement {
     { class: 'calc' },
     h('h3', {}, t('How compliance is calculated')),
     h('p', {}, t('Overall compliance is C ÷ (C + NC), where C is the number of compliant criteria and NC the number of non-compliant ones. Criteria that are not applicable (NA) or not tested (NT) are left out. This is the legal reference: it is the compliance rate of the sample.')),
-    h('p', {}, t('Rates marked provisional (or with an asterisk) come from an incomplete audit. A criterion compliant on only part of its tests counts as not tested, a suggestion from a tool counts as to review until you confirm it, and a known failure is always kept.')),
+    h('p', {}, t('Rates marked provisional (or with an asterisk) come from an incomplete audit. A criterion judged on only part of its tests keeps its result but flags the rate, a suggestion from a tool counts as to review until you confirm it, and a known failure is always kept.')),
     h('p', {}, t('Levels A / AA / AAA are derived from the WCAG success criteria each RGAA criterion references. The accessibility rate used elsewhere in this panel is the average of the page rates.')),
   )
   return h('div', {}, wrap, h('div', { class: 'results-scroll' }, themeTable), calc)
