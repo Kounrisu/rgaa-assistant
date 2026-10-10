@@ -105,7 +105,7 @@ function setFocused(id: number | null): void {
 const STATE_STYLE: Record<string, { color: string; dash: string; width: number; glyph: string; glow: boolean }> = {
   error: { color: '#ff1744', dash: 'solid', width: 4, glyph: '!', glow: true },
   review: { color: '#ff1744', dash: 'dashed', width: 3, glyph: '?', glow: true },
-  ignored: { color: '#7f1d1d', dash: 'dashed', width: 2, glyph: '', glow: false },
+  ignored: { color: '#f9a8b8', dash: 'dashed', width: 2, glyph: '', glow: false },
   c: { color: '#16a34a', dash: 'solid', width: 3, glyph: '✓', glow: false },
   nc: { color: '#ff1744', dash: 'solid', width: 4, glyph: '✕', glow: true },
 }
@@ -1104,7 +1104,9 @@ function scanFields(): { findings: RawFinding[]; els: Element[][] } {
 function scanTheme(theme: number, color: string): RawFinding[] {
   const { findings, els } = theme === 2 ? scanFrames() : theme === 6 ? scanLinks() : theme === 9 ? scanStructure() : theme === 5 ? scanTables() : theme === 11 ? scanFields() : scanContrast()
   themeOverlayFor(theme, color)
-  findings.forEach((f, i) => drawThemeBoxes(theme, f.id, els[i], theme === 3 ? f.type !== 'contrast-ok' : [2, 5, 6, 9, 11].includes(theme) ? els[i].length > 0 : f.data.humanNeeded === true, typeof f.data.badge === 'string' ? f.data.badge : ''))
+  // every element keeps its box, unless the page has so many that only the ones to look at stay (hundreds of boxes slow a page down)
+  const many = findings.length > 350
+  findings.forEach((f, i) => drawThemeBoxes(theme, f.id, els[i], theme === 3 ? f.type !== 'contrast-ok' : [2, 5, 6, 9, 11].includes(theme) && !many ? els[i].length > 0 : f.data.humanNeeded === true, typeof f.data.badge === 'string' ? f.data.badge : ''))
   return findings
 }
 
@@ -1532,21 +1534,35 @@ function runAsqatasunRules(): { key: string; count: number; samples?: string[]; 
 
 /** The generated HTML of the page (what the browser holds now, after scripts), without our own markers. */
 function takeSnapshot(): { url: string; title: string; html: string } {
-  const clone = document.documentElement.cloneNode(true) as HTMLElement
-  clone.querySelectorAll(`[id^="${OVERLAY_ID}"], #${STYLE_ID}`).forEach((el) => el.remove())
+  // no deep copy of the page (heavy on big pages): our own markers are lifted out for a moment, the page is serialized, they go back
+  const lifted: { node: Element; parent: Node; next: Node | null }[] = []
+  for (const node of Array.from(document.querySelectorAll(`[id^="${OVERLAY_ID}"], #${STYLE_ID}`))) {
+    if (node.parentNode) lifted.push({ node, parent: node.parentNode, next: node.nextSibling })
+  }
+  for (const { node } of lifted) node.remove()
+  let html = ''
+  try {
+    html = document.documentElement.outerHTML
+  } finally {
+    for (const { node, parent, next } of lifted.reverse()) parent.insertBefore(node, next)
+  }
   const dt = document.doctype
   const doctype = dt ? `<!DOCTYPE ${dt.name}${dt.publicId ? ` PUBLIC "${dt.publicId}"` : ''}${dt.systemId ? ` "${dt.systemId}"` : ''}>\n` : ''
-  return { url: location.href, title: document.title, html: doctype + clone.outerHTML }
+  // a very large page is cut: the audit file and the validation stay manageable
+  const MAX = 6_000_000
+  return { url: location.href, title: document.title, html: doctype + (html.length > MAX ? `${html.slice(0, MAX)}\n<!-- cut: page larger than ${MAX} characters -->` : html) }
 }
 
 /** Runs the axe engine (injected by the background page just before) and sends back a light copy of its findings. */
-async function runAxe(locale: unknown): Promise<Record<string, unknown>> {
+async function runAxe(locale: unknown, rules: unknown): Promise<Record<string, unknown>> {
   type AxeApi = { run: (ctx: Document, opts: object) => Promise<Record<string, unknown>>; configure: (c: object) => void }
   const axe = ((globalThis as unknown as { axe?: AxeApi }).axe ?? (window as unknown as { axe?: AxeApi }).axe) as AxeApi | undefined
   if (!axe) return { error: 'axe-not-loaded' }
   try {
     if (locale) axe.configure({ locale })
-    const r = (await axe.run(document, { resultTypes: ['violations', 'incomplete'] })) as {
+    // only the rules that map to an RGAA criterion, in this frame (waiting for other frames can hang a page for a minute)
+    const only = Array.isArray(rules) && rules.length ? { runOnly: { type: 'rule', values: rules.map(String) } } : {}
+    const r = (await axe.run(document, { resultTypes: ['violations', 'incomplete'], iframes: false, elementRef: false, ...only })) as {
       violations: { id: string; impact: string | null; help: string; nodes: { html: string; target: unknown[]; any?: { data?: unknown }[] }[] }[]
       incomplete: unknown[]
       passes: { id: string }[]
@@ -1591,7 +1607,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true
   }
   if (message?.type === 'RGAA_AXE_RUN') {
-    void runAxe(message.locale).then(sendResponse)
+    void runAxe(message.locale, message.rules).then(sendResponse)
     return true
   }
   if (message?.type === 'RGAA_PICK_START') {

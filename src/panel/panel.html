@@ -74,6 +74,16 @@
     <main id="app" class="layout" hidden>
       <nav class="list-pane" aria-label="Images found on the page" data-i18n-attrs="aria-label">
         <div id="filters" class="filters" role="group" aria-label="Filter images" data-i18n-attrs="aria-label"></div>
+        <div class="legend" aria-hidden="true">
+          <span class="lg"><i class="bar unnamed"></i><span data-i18n>No text alternative</span></span>
+          <span class="lg"><i class="bar named"></i><span data-i18n>Has a text alternative</span></span>
+          <span class="lg"><i class="bar ignored"></i><span data-i18n>Ignored by assistive tech</span></span>
+          <span class="lg"><i class="dot"></i><span data-i18n>Not reviewed</span></span>
+          <span class="lg"><i class="dot progress"></i><span data-i18n>In progress</span></span>
+          <span class="lg"><i class="dot c"></i><span data-i18n>Compliant</span></span>
+          <span class="lg"><i class="dot nc"></i><span data-i18n>Non-compliant</span></span>
+        </div>
+        <p class="legend-note" data-i18n>On the page: solid red = error, dashed red = to review, light red = ignored, green = reviewed and compliant.</p>
         <ol id="element-list"></ol>
       </nav>
       <section id="detail" class="detail-pane" aria-label="Image details" data-i18n-attrs="aria-label"></section>
