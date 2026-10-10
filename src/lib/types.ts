@@ -125,6 +125,10 @@ export interface PageRecord {
   manualChecks?: Record<string, ManualCheckAnswer>
   /** Imports of other tools' results made on this page. */
   imports?: ImportReport[]
+  /** The generated HTML of the page when it was last captured (gzip, base64). */
+  snapshot?: import('./snapshot').HtmlSnapshot
+  /** What the HTML validation found in that snapshot. */
+  htmlCheck?: import('./html-check').HtmlCheck
 }
 
 export interface AuditMeta {

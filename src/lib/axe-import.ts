@@ -1,4 +1,3 @@
-import { THEMES } from './themes'
 import type { ChecklistVerdict, ImportReport, PageRecord } from './types'
 
 /**
@@ -198,8 +197,8 @@ export function applyToolResults(rec: PageRecord, res: ToolResults): ImportRepor
     touchCriterion(a.criterion, a.status, a.note ? `${mark} ${a.criterion}: ${a.note}` : `${mark} ${a.criterion}: ${a.status?.toUpperCase()}`, a.rule ?? a.criterion)
   }
 
-  // checks that ran and found nothing: shown on the criterion; they fill it (compliant, to confirm) only when the
-  // criterion is fully automatic and nothing else failed
+  // checks that ran and found nothing: shown on the criterion, and the criterion is pre-filled "compliant" (to confirm,
+  // the source is kept so the card says so) unless something else failed
   const failedNow = new Set(res.violations.map((v) => AXE_TO_RGAA[v.rule]).filter(Boolean).concat(res.answers.filter((a) => a.status === 'nc').map((a) => a.criterion)))
   const byCriterion = new Map<string, string[]>()
   for (const p of res.passedChecks) if (!failedNow.has(p.criterion)) byCriterion.set(p.criterion, [...(byCriterion.get(p.criterion) ?? []), p.rule])
@@ -208,9 +207,8 @@ export function applyToolResults(rec: PageRecord, res: ToolResults): ImportRepor
     if (theme <= 3 || !rec.themes.includes(theme)) continue
     const ans = (rec.checklist[criterion] ??= { note: '' })
     ;(ans.autoResults ??= {})[tool] = { result: 'pass', rules: [...new Set(rules)] }
-    const fullyAutomatic = THEMES.some((t) => t.criteria.some((c) => c.id === criterion && c.automation === 'auto'))
     const anyFail = Object.values(ans.autoResults).some((r) => r.result === 'fail')
-    if (fullyAutomatic && !anyFail && (ans.verdict === undefined || (ans.source && ans.verdict !== 'c'))) {
+    if (!anyFail && (ans.verdict === undefined || (ans.source && ans.verdict !== 'c'))) {
       ans.verdict = 'c'
       ans.source = tool
       report.set++
