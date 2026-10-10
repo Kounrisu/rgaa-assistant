@@ -477,7 +477,6 @@ export const FR_PANEL: Record<string, string> = {
   'Running the automatic checks on the page…': 'Contrôles automatiques de la page en cours…',
   'The browser is on {url}, but {label} is registered for {registered}. Apply them to {label} anyway?': 'Le navigateur est sur {url}, mais {label} est enregistrée pour {registered}. Appliquer quand même les résultats à {label} ?',
   'Automatic checks on {label}: {n} rule(s) failed, {set} verdict(s) pre-filled, {noted} element note(s). Confirm them in the themes.': 'Contrôles automatiques de {label} : {n} règle(s) en échec, {set} verdict(s) pré-rempli(s), {noted} note(s) sur des éléments. Confirmez-les dans les thématiques.',
-  'Could not run the automatic checks. Reload the tab, check the extension may access this site, and try again.': 'Impossible de lancer les contrôles automatiques. Rechargez l’onglet, vérifiez que l’extension peut accéder à ce site, puis réessayez.',
   'Runs our own RGAA checks and the axe engine on the page you are inspecting. A failure becomes a pre-filled “non-compliant” to confirm; a theme that clearly does not apply (no table, no media, no form…) is pre-filled “not applicable”. Finding nothing never marks a criterion compliant. It covers only part of the RGAA: the manual checks below are still needed.': 'Lance nos propres contrôles RGAA et le moteur axe sur la page inspectée. Un échec devient un « non conforme » pré-rempli à confirmer ; une thématique qui ne s’applique clairement pas (pas de tableau, pas de média, pas de formulaire…) est pré-remplie « non applicable ». Ne rien trouver ne marque jamais un critère comme conforme. Cela ne couvre qu’une partie du RGAA : les contrôles manuels ci-dessous restent nécessaires.',
   'no doctype': 'pas de doctype',
   'empty': 'vide',
@@ -510,4 +509,5 @@ export const FR_PANEL: Record<string, string> = {
   'Use this address for {label}': 'Utiliser cette adresse pour {label}',
   '{label} now points to {url}.': '{label} pointe maintenant vers {url}.',
   '{label} has no address. The browser is on {other}: open the page of {label} in the browser, then select {label} again.': '{label} n’a pas d’adresse. Le navigateur est sur {other} : ouvrez la page de {label} dans le navigateur, puis resélectionnez {label}.',
+  'Could not run the automatic checks ({reason}). Reload the page (F5) if you just reloaded the extension, check the extension may access this site, then try again.': 'Impossible de lancer les contrôles automatiques ({reason}). Rechargez la page (F5) si vous venez de recharger l’extension, vérifiez que l’extension peut accéder à ce site, puis réessayez.',
 }
