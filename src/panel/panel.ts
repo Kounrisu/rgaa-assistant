@@ -2,12 +2,12 @@ import { DETECTED_LABEL, criteriaFor, criterionUrl, detectedOf, hintFor, suggest
 import { auditSheets, auditStats, buildWorkbook, countsOf, isProvisional, levelStats, pageSheets, pct2, rateExact, rateOf, thumbKey, type Counts, type PageInput } from '../lib/audit-sheet'
 import { confirm as confirmVerdict, evidenceConflicts as evidenceConflictsOf } from '../lib/evidence'
 import { createPage, emptyAudit, findPage, listAudits, normalizeUrl } from '../lib/audit-store'
-import { createAuditSession, describeAuditError, type Choice } from './audit-session'
-import type { CaptureResponse, ContentMessage, ContentResponse, TabInfoResponse } from '../lib/messages'
+import { createAuditSession, describeAuditError } from './audit-session'
+import type { ContentMessage } from '../lib/messages'
 import { getLang, setLang, t, translateStatic, type Lang } from '../lib/i18n'
 import type { Sheet } from '../lib/xlsx'
 import { makeThumbs } from '../lib/thumbs'
-import { computeThemes, testIdFor, type Outcome } from '../lib/results'
+import { testIdFor, type Outcome } from '../lib/results'
 import { colorOf } from '../lib/theme-colors'
 import { contrastRatio, parseHex, toHex } from '../lib/contrast'
 import { MANUAL_CHECKS, MANUAL_GROUPS } from '../lib/manual-checks'
@@ -25,11 +25,15 @@ import type { AsqExtra } from '../lib/asqatasun-rules' // a type only: the table
 import { findingCriteriaOf, findingCriterionIds, hintForFinding, suggestFinding, type FindingCriterion } from '../lib/findings'
 import { FINDING_THEMES, SCANNED_THEMES, THEMES, THEME_LABEL, themeByNumber } from '../lib/themes'
 import type { Audit, AuditSummary, ChecklistAnswer, ChecklistVerdict, FindingItem, ImageElementInfo, ImageKind, ImageReview, PageRecord, RawFinding, Verdict } from '../lib/types'
-import type { Item, Filter, Status, View, FStatus, FindingFilter } from './types'
-import { labelOf, formatHtml, fileName, pad, hash, sleep, tDyn, slugOf, keyOf, dateTimeOf, kb, auditTitle, timeOf, hostName, auditFileName } from './helpers'
+import type { Item, Filter, View, FindingFilter } from './types'
+import { labelOf, formatHtml, fileName, hash, sleep, tDyn, slugOf, keyOf, dateTimeOf, kb, auditTitle, timeOf, auditFileName } from './helpers'
 import { $, h, keepScroll, tNodes, download, dom, say } from './dom'
 import { state } from './state'
 import { registerActions } from './actions'
+import { askConfirm, askText, askChoice } from './dialogs'
+import { visibleElements, findingMatches, reviewKey, needsReview, findingNeedsReview, statusOf, matches, altLabel, STATUS_LABEL, reviewOf, nextToReview, listedFindings, findingStatus, findingReview } from './review-state'
+import { syncFilterBoxes, focusFinding, focusOnPage, goTo, clearBoxes, applyBoxes, sendToPage, inspectedTabId, inspectedTitle, inspectedUrl, captureShots } from './page-bridge'
+import { pageInput, saveReviews, pageLabel, loadPage, persist, adoptSite, nextPageLabel, allPageInputs } from './model'
 
 
 /* ------------------------------------------------------------------ */
@@ -37,128 +41,12 @@ import { registerActions } from './actions'
 /* ------------------------------------------------------------------ */
 
 
-function inspectedTabId(): number {
-  return chrome.devtools.inspectedWindow.tabId
-}
-
-async function sendToPage<M extends ContentMessage>(tabId: number, payload: M): Promise<ContentResponse<M>> {
-  const response = await chrome.runtime.sendMessage({ type: 'RGAA_RELAY', tabId, payload })
-  if (!response || response.error) throw new Error(response?.error ?? 'No response from page')
-  return response
-}
-
-const focusOnPage = async (id: number, scroll: boolean, themeNo = 1) => {
-  if (scroll && state.boxesOn[themeNo] === false) {
-    state.boxesOn[themeNo] = true
-    await applyBoxes()
-  }
-  return sendToPage(inspectedTabId(), { type: 'RGAA_FOCUS_IMAGE', id, scroll, theme: themeNo })
-    .then((response) => {
-      if (response?.ok === false && scroll) say(t('This image is not on the page right now (popin closed?). Reopen it, then click Rescan.'))
-    })
-    .catch(console.error)
-}
-
-
-/** Only the theme you are in shows boxes on the page, and only if its own toggle is on. */
-async function applyBoxes(): Promise<void> {
-  const on = state.boxesOn[state.theme] !== false
-  const name = t(THEME_LABEL[state.theme] ?? '')
-  dom.boxesBtn.setAttribute('aria-pressed', String(on))
-  dom.boxesBtn.textContent = on ? t('Hide {name} boxes', { name }) : t('Show {name} boxes', { name })
-  try { localStorage.setItem('rgaa-boxes-by-theme', JSON.stringify(state.boxesOn)) } catch { /* optional */ }
-  const visibility: Record<number, boolean> = {}
-  for (const n of SCANNED_THEMES) visibility[n] = n === state.theme && state.boxesOn[n] !== false
-  dom.tintBtn.setAttribute('aria-pressed', String(state.focusTintOn))
-  dom.tintBtn.textContent = state.focusTintOn ? t('Yellow highlight: on') : t('Yellow highlight: off')
-  dom.altBtn.setAttribute('aria-pressed', String(state.showAltOn))
-  dom.altBtn.textContent = state.showAltOn ? t('Alt text: on') : t('Alt text: off')
-  dom.altBtn.hidden = state.theme !== 1
-  await sendToPage(inspectedTabId(), { type: 'RGAA_OVERLAY', visibility, tint: state.focusTintOn, alt: state.showAltOn }).catch(() => undefined)
-  pushStates()
-  await syncFilterBoxes()
-}
-
-/** The list filter also decides which boxes are on the page (Images and Colours). */
-async function syncFilterBoxes(): Promise<void> {
-  let ids: number[] | null = null
-  if (state.theme === 1 && state.filter !== 'all') ids = visibleElements().map((e) => e.id)
-  if (FINDING_THEMES.has(state.theme) && state.findingFilter !== 'all' && state.page) ids = state.page.findings.filter((f) => f.theme === state.theme && findingMatches(f, state.findingFilter)).map((f) => f.id)
-  if (state.theme !== 1 && !FINDING_THEMES.has(state.theme)) return
-  await sendToPage(inspectedTabId(), { type: 'RGAA_SHOW_ONLY', theme: state.theme, ids }).catch(() => undefined)
-}
-
-/**
- * Asks a question inside the panel. The browser's own confirm() popup is not shown in a DevTools panel
- * (it returns "no" at once), so a reset would silently do nothing.
- */
-function askConfirm(title: string, text: string, okLabel?: string): Promise<boolean> {
-  return new Promise((resolve) => {
-    const ok = $('confirm-ok')
-    const cancel = $('confirm-cancel')
-    $('confirm-title').textContent = title
-    $('confirm-text').textContent = text
-    ok.textContent = okLabel ?? t('Confirm')
-    const finish = (answer: boolean) => {
-      ok.removeEventListener('click', onOk)
-      cancel.removeEventListener('click', onNo)
-      dom.confirmDialog.removeEventListener('cancel', onNo)
-      if (dom.confirmDialog.open) dom.confirmDialog.close()
-      resolve(answer)
-    }
-    const onOk = () => finish(true)
-    const onNo = (event: Event) => {
-      event.preventDefault() // Escape would otherwise close the dialog without answering
-      finish(false)
-    }
-    ok.addEventListener('click', onOk)
-    cancel.addEventListener('click', onNo)
-    dom.confirmDialog.addEventListener('cancel', onNo)
-    dom.confirmDialog.showModal()
-  })
-}
-
-
 /* ------------------------------------------------------------------ */
 /* Persistence (the whole audit, in chrome.storage.local)               */
 /* ------------------------------------------------------------------ */
 
-const reviewKey = (el: Item) => el.key
 // The save state machine, the retry and the audit lifecycle live in ./audit-session (see `session`, further down).
 
-function persist(): void {
-  const now = Date.now()
-  if (state.page) {
-    state.page.scanCount = state.scanCount
-    state.page.updatedAt = now
-  }
-  state.audit.updatedAt = now
-  state.session.markDirty()
-  pushStates()
-}
-const saveReviews = persist
-
-function reviewOf(el: Item): ImageReview {
-  return (state.reviews[reviewKey(el)] ??= { answers: {}, note: '' })
-}
-
-function statusOf(el: Item): Status {
-  const review = state.reviews[reviewKey(el)]
-  if (!review?.kind) return 'todo'
-  const applicable = criteriaFor(review.kind)
-  const answers = applicable.map((c) => review.answers[c.id])
-  if (answers.includes('nc')) return 'nc'
-  if (answers.some((a) => a === undefined)) return 'progress'
-  return 'c'
-}
-
-/** English labels: translate with t() where they are shown. */
-const STATUS_LABEL: Record<Status, string> = {
-  todo: 'Not reviewed',
-  progress: 'In progress',
-  c: 'Compliant',
-  nc: 'Non-compliant',
-}
 
 /* ------------------------------------------------------------------ */
 /* Header stats                                                        */
@@ -333,31 +221,6 @@ function openGridAt(criterionId: string): void {
 /* List                                                                */
 /* ------------------------------------------------------------------ */
 
-function altLabel(el: Item): { text: string; missing: boolean } {
-  const detected = detectedOf(el)
-  if (detected === 'ignored') return { text: t('Ignored — {by}', { by: el.ignoredBy ?? '' }), missing: false }
-  if (detected === 'unnamed') return { text: t('No text alternative'), missing: true }
-  return { text: `“${el.accessibleName}”`, missing: false }
-}
-
-function visibleElements(): Item[] {
-  return state.elements.filter((el) => matches(el, state.filter))
-}
-
-/** Present on the page but not fully answered: no type chosen, or a criterion still unanswered. */
-function needsReview(el: Item): boolean {
-  const status = statusOf(el)
-  return status === 'todo' || status === 'progress'
-}
-
-function matches(el: Item, f: Filter): boolean {
-  if (f === 'all') return true
-  if (f === 'dialog') return el.inDialog
-  if (f === 'gone') return !el.present
-  if (f === 'review') return needsReview(el)
-  if (f === 'prefilled') return Boolean(state.reviews[reviewKey(el)]?.auto)
-  return detectedOf(el) === f
-}
 
 function renderFilters(): void {
   dom.filtersEl.replaceChildren()
@@ -530,46 +393,6 @@ function fact(label: string, value: string | null, opts: { missingIfNull?: boole
   else if (value === '') dd = h('dd', { class: opts.emptyHint ? 'empty-val' : '' }, t('"" (empty)'))
   else dd = h('dd', {}, value)
   return [h('dt', {}, label), dd]
-}
-
-function nextToReview(from: Item): Item | undefined {
-  const list = state.elements.filter((e) => needsReview(e) && e.id !== from.id)
-  return list.find((e) => e.id > from.id) ?? list[0]
-}
-
-/**
- * The colour code of the boxes on the page, from where each element's review stands:
- * error = no alternative / failing, review = still to judge, ignored = ignored by assistive tech,
- * c = reviewed and compliant, nc = reviewed and non-compliant.
- */
-function boxStates(themeNo: number): Record<number, string> {
-  const out: Record<number, string> = {}
-  if (themeNo === 1) {
-    for (const el of state.elements) {
-      const status = statusOf(el)
-      const pending = status === 'todo' || status === 'progress' || Boolean(state.reviews[reviewKey(el)]?.auto)
-      const detected = detectedOf(el)
-      out[el.id] = !pending ? (status === 'nc' ? 'nc' : 'c') : detected === 'unnamed' ? 'error' : detected === 'ignored' ? 'ignored' : 'review'
-    }
-    return out
-  }
-  for (const f of state.page?.findings ?? []) {
-    if (f.theme !== themeNo || f.type === 'contrast-ok') continue
-    const pending = findingNeedsReview(f)
-    const status = findingStatus(f)
-    const failing = f.type === 'contrast-fail' || f.type === 'link-empty' || f.type === 'heading-empty' || f.type === 'page-no-h1' || f.type === 'page-no-main' || f.type === 'table-nohead' || f.type === 'table-layout-semantic' || f.type === 'field-nolabel' || f.type === 'field-placeholder' || (themeNo === 2 && !f.facts.title?.trim())
-    out[f.id] = !pending ? (status === 'nc' ? 'nc' : 'c') : failing ? 'error' : 'review'
-  }
-  return out
-}
-
-let statesTimer: number | undefined
-/** Sends the colour code to the page, shortly after the last change. */
-function pushStates(): void {
-  window.clearTimeout(statesTimer)
-  statesTimer = window.setTimeout(() => {
-    for (const n of SCANNED_THEMES) void sendToPage(inspectedTabId(), { type: 'RGAA_STATES', theme: n, states: boxStates(n) }).catch(() => undefined)
-  }, 120)
 }
 
 
@@ -851,42 +674,6 @@ function select(id: number, scroll: boolean): void {
 /* ------------------------------------------------------------------ */
 
 
-/** P01, P02… follow the order of the sample, so reordering renumbers the pages. */
-const pageLabel = (rec: PageRecord) => `P${pad(state.audit.pages.indexOf(rec) + 1)}`
-
-function pageInput(rec: PageRecord): PageInput {
-  const reviewOfRec = (el: ImageElementInfo) => rec.reviews[(el as Item).key]
-  const computed = computeThemes(rec.items, reviewOfRec, rec.themes, rec.checklist, { findings: rec.findings, reviews: rec.findingReviews, scannedThemes: rec.scannedThemes })
-  return {
-    label: pageLabel(rec),
-    results: computed.images,
-    themes: computed.themes,
-    checklist: rec.checklist,
-    findings: rec.findings,
-    findingReviews: rec.findingReviews,
-    images: rec.items,
-    reviewOf: reviewOfRec,
-    detectedOf,
-    pageUrl: rec.url,
-    pageTitle: rec.title || rec.url,
-    manualChecks: rec.manualChecks,
-  }
-}
-
-const allPageInputs = (): PageInput[] => state.audit.pages.map(pageInput)
-
-function loadPage(rec: PageRecord | null): void {
-  state.page = rec
-  state.elements = rec ? rec.items : []
-  state.reviews = rec ? rec.reviews : {}
-  state.scanCount = rec ? rec.scanCount : 0
-  state.selectedId = state.elements[0]?.id ?? null
-  state.filter = 'all'
-  state.audit.current = rec ? rec.id : null
-  // Images of a page that was not scanned in this session are shown as they were last seen.
-  if (rec && !state.scannedThisSession.has(rec.id)) for (const el of state.elements) el.present = true
-}
-
 function renderPageBar(): void {
   dom.pageSelect.replaceChildren()
   if (!state.audit.pages.length) dom.pageSelect.append(h('option', { value: '' }, t('No page yet — add page 1 in “Audit pages sample”')))
@@ -923,9 +710,6 @@ function renderPageBar(): void {
     : t('Add a page to the sample first')
 }
 
-function nextPageLabel(): string {
-  return `P${pad(state.audit.pages.length + 1)}`
-}
 
 function renderAll(): void {
   renderPageBar()
@@ -963,10 +747,6 @@ function switchTo(id: string, navigate = false): void {
   }
 }
 
-function goTo(url: string): void {
-  if (!url) return // an empty address would only reload the current page
-  chrome.devtools.inspectedWindow.eval(`location.href = ${JSON.stringify(url)}`)
-}
 
 async function removePage(rec: PageRecord | null = state.page): Promise<void> {
   if (!rec) return
@@ -1035,10 +815,6 @@ function showNavBanner(url: string): void {
 /* Resets: one theme of a page, one page, the whole audit               */
 /* ------------------------------------------------------------------ */
 
-async function clearBoxes(themeNo?: number): Promise<void> {
-  const payload: ContentMessage = themeNo ? { type: 'RGAA_CLEAR_THEME', theme: themeNo } : { type: 'RGAA_CLEAR_HIGHLIGHTS' }
-  await sendToPage(inspectedTabId(), payload).catch(() => undefined)
-}
 
 function resetThemeData(rec: PageRecord, n: number): void {
   if (n === 1) {
@@ -1480,112 +1256,6 @@ function nextFindingNumber(rec: PageRecord, themeNo: number): number {
   return used + 1
 }
 
-function findingReview(f: FindingItem): ImageReview {
-  return (state.page!.findingReviews[f.key] ??= { answers: {}, note: '' })
-}
-
-function findingStatus(f: FindingItem): FStatus {
-  const answers = findingCriteriaOf(f).map((c) => state.page!.findingReviews[f.key]?.answers[c.id])
-  if (answers.includes('nc')) return 'nc'
-  if (answers.every((a) => a === undefined)) return 'todo'
-  return answers.some((a) => a === undefined) ? 'progress' : 'c'
-}
-
-const focusFinding = (f: FindingItem, scroll: boolean) => {
-  if (scroll && f.type === 'contrast-ok') say(t('This line stands for every text that passes: there is nothing to show on the page.'))
-  return focusOnPage(f.id, scroll, f.theme)
-}
-
-
-/** Crops a screenshot of the page to one element, small enough to live in the audit and in the Excel file. */
-function cropShot(dataUrl: string, loc: { rect: { x: number; y: number; w: number; h: number }; vw: number }): Promise<string | null> {
-  return new Promise((resolve) => {
-    const img = new Image()
-    img.onload = () => {
-      const k = img.naturalWidth / loc.vw
-      const pad = 8
-      const x = Math.max(0, (loc.rect.x - pad) * k)
-      const y = Math.max(0, (loc.rect.y - pad) * k)
-      const w = Math.min(img.naturalWidth - x, (loc.rect.w + pad * 2) * k)
-      const h = Math.min(img.naturalHeight - y, (loc.rect.h + pad * 2) * k)
-      if (w < 4 || h < 4) return resolve(null)
-      const scale = Math.min(1, 280 / w, 140 / h)
-      const canvas = document.createElement('canvas')
-      canvas.width = Math.max(1, Math.round(w * scale))
-      canvas.height = Math.max(1, Math.round(h * scale))
-      canvas.getContext('2d')!.drawImage(img, x, y, w, h, 0, 0, canvas.width, canvas.height)
-      resolve(canvas.toDataURL('image/png'))
-    }
-    img.onerror = () => resolve(null)
-    img.src = dataUrl
-  })
-}
-
-/**
- * Takes a small picture of each finding: scroll it to the middle of the screen, photograph the tab,
- * crop. The boxes are hidden meanwhile so they are not in the pictures, and the scroll position is restored.
- */
-async function captureShots(list: FindingItem[]): Promise<number> {
-  if (!list.length) return 0
-  const tabId = inspectedTabId()
-  let done = 0
-  try {
-    await sendToPage(tabId, { type: 'RGAA_OVERLAY', visibility: { 1: false, 2: false, 3: false } })
-    for (const f of list) {
-      say(t('Taking previews… {done}/{total}', { done, total: list.length }))
-      const loc = await sendToPage(tabId, { type: 'RGAA_LOCATE', theme: f.theme, id: f.id }).catch(() => null)
-      if (!loc?.rect) continue
-      await sleep(180)
-      const cap: CaptureResponse | undefined = await chrome.runtime.sendMessage({ type: 'RGAA_CAPTURE', tabId })
-      if (!cap || !('dataUrl' in cap) || !cap.dataUrl) {
-        // nothing is saved: a picture of another tab must never be attached to this page
-        const code = cap && 'code' in cap ? cap.code : undefined
-        if (code === 'not-active' || code === 'changed') say(t('The inspected tab is not the one shown. Switch back to it, then try again.'))
-        else say(t('Could not take previews ({error}). Check that the extension may access this site.', { error: cap && 'error' in cap ? cap.error : t('no screenshot') }))
-        break
-      }
-      f.shot = await cropShot(cap.dataUrl, loc)
-      if (f.shot) done++
-    }
-  } finally {
-    await sendToPage(tabId, { type: 'RGAA_SCROLL_RESTORE' }).catch(() => undefined)
-    await applyBoxes()
-  }
-  return done
-}
-
-/** What the list shows: every finding, except the unnumbered “text that passes” line of Colours. */
-const listedFindings = (themeNo: number): FindingItem[] => (state.page?.findings ?? []).filter((f) => f.theme === themeNo && f.type !== 'contrast-ok')
-
-
-/**
- * Needs a human: colours that failed or that the script could not judge, until the verdict is confirmed
- * (a pre-filled verdict does not count as confirmed). Frames: any criterion unanswered or still pre-filled.
- */
-function findingNeedsReview(f: FindingItem): boolean {
-  const r = state.page?.findingReviews[f.key]
-  if (f.theme === 3) {
-    if (f.type !== 'contrast-fail' && f.type !== 'contrast-unknown') return false
-    return !(r && r.answers['3.2'] !== undefined && !r.auto)
-  }
-  // a link with a usable name is pre-filled compliant and does not ask for attention; empty or generic ones do
-  if (f.theme === 6 && (f.type === 'link' || f.type === 'link-skip')) return false
-  if (f.theme === 9 && (f.type === 'heading' || f.type === 'landmark')) return false
-  if (f.theme === 11 && f.type === 'field') return false
-  if (f.theme === 5 && (f.type === 'table-layout' || (f.type === 'table-data' && !f.facts.Title))) return false
-  const ids = findingCriteriaOf(f).map((c) => c.id)
-  return ids.some((c) => r?.answers[c] === undefined) || Boolean(r?.auto)
-}
-
-function findingMatches(f: FindingItem, value: FindingFilter): boolean {
-  if (value === 'all') return true
-  if (value === 'review') return findingNeedsReview(f)
-  if (value === 'hidden') return Boolean(f.data.hidden)
-  if (value === 'link-skip') return f.type === 'link-skip' || f.type === 'link-skip-broken'
-  if (value === 'headings') return f.data.group === 'heading'
-  if (value === 'landmarks') return f.data.group === 'landmark'
-  return f.type === value
-}
 
 function updateFindingChips(): void {
   if (!state.page) return
@@ -2415,30 +2085,6 @@ function renderAudit(): void {
 /* Scanning                                                            */
 /* ------------------------------------------------------------------ */
 
-/** Evaluates an expression in the inspected page; '' when DevTools gives no usable string. */
-function inspectedEval(expression: string): Promise<string> {
-  return new Promise((resolve) => {
-    try {
-      chrome.devtools.inspectedWindow.eval(expression, (result: unknown, error: unknown) => resolve(error || typeof result !== 'string' ? '' : result))
-    } catch {
-      resolve('')
-    }
-  })
-}
-
-async function tabInfo(): Promise<{ url: string; title: string }> {
-  const info: TabInfoResponse | null = await chrome.runtime.sendMessage({ type: 'RGAA_TAB_INFO', tabId: inspectedTabId() }).catch(() => null)
-  return { url: typeof info?.url === 'string' ? info.url : '', title: typeof info?.title === 'string' ? info.title : '' }
-}
-
-async function inspectedUrl(): Promise<string> {
-  const url = await inspectedEval('location.href')
-  return /^https?:|^file:/i.test(url) ? url : (await tabInfo()).url
-}
-
-async function inspectedTitle(): Promise<string> {
-  return (await inspectedEval('document.title')) || (await tabInfo()).title
-}
 
 /** Ignored by assistive tech and nameless: decorative + 1.2 compliant, until a human says otherwise. */
 function prefill(el: Item): void {
@@ -2953,77 +2599,6 @@ function renderAuditBar(): void {
   document.title = `${auditTitle(state.audit)} — RGAA Assistant`
 }
 
-/** A text question inside the panel (the browser's prompt() is not shown in a DevTools panel). */
-function askText(title: string, label: string, initial = '', okLabel = t('OK')): Promise<string | null> {
-  return new Promise((resolve) => {
-    const input = $<HTMLInputElement>('text-input')
-    $('text-title').textContent = title
-    $('text-label').textContent = label
-    $('text-ok').textContent = okLabel
-    $('text-cancel').textContent = t('Cancel')
-    input.value = initial
-    let done = false
-    const finish = (value: string | null) => {
-      if (done) return
-      done = true
-      dom.textDialog.removeEventListener('cancel', onCancel)
-      form.removeEventListener('submit', onSubmit)
-      cancel.removeEventListener('click', onCancelClick)
-      dom.textDialog.close()
-      resolve(value)
-    }
-    const form = $<HTMLFormElement>('text-form')
-    const cancel = $('text-cancel')
-    const onSubmit = (e: Event) => {
-      e.preventDefault()
-      const value = input.value.trim()
-      if (value) finish(value)
-      else input.focus()
-    }
-    const onCancel = (e: Event) => {
-      e.preventDefault()
-      finish(null)
-    }
-    const onCancelClick = () => finish(null)
-    form.addEventListener('submit', onSubmit)
-    cancel.addEventListener('click', onCancelClick)
-    dom.textDialog.addEventListener('cancel', onCancel)
-    dom.textDialog.showModal()
-    input.select()
-  })
-}
-
-
-/** The first page registered gives the audit its site, and its name while it still has the placeholder one. */
-function adoptSite(url: string): void {
-  const host = hostName(url)
-  if (!host) return
-  if (!state.audit.meta.site.trim()) state.audit.meta.site = host
-  if (!state.audit.name.trim() || state.audit.name === 'Untitled audit' || state.audit.name === 'Audit sans titre') state.audit.name = state.audit.meta.site
-}
-
-
-/** A question with several answers (buttons); null when it is dismissed. */
-function askChoice(title: string, text: string, choices: Choice[]): Promise<string | null> {
-  return new Promise((resolve) => {
-    $('choice-title').textContent = title
-    $('choice-text').textContent = text
-    const box = $('choice-actions')
-    box.replaceChildren()
-    const finish = (id: string | null) => {
-      dom.choiceDialog.removeEventListener('cancel', onCancel)
-      if (dom.choiceDialog.open) dom.choiceDialog.close()
-      resolve(id)
-    }
-    const onCancel = (event: Event) => {
-      event.preventDefault() // Escape would otherwise close the dialog without answering
-      finish(null)
-    }
-    for (const c of choices) box.append(h('button', { type: 'button', class: c.primary ? 'primary' : '', onclick: () => finish(c.id) }, c.label))
-    dom.choiceDialog.addEventListener('cancel', onCancel)
-    dom.choiceDialog.showModal()
-  })
-}
 
 /** The open audit and everything that stores it: see audit-session.ts. */
 state.session = createAuditSession({
