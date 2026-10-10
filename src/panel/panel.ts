@@ -1,7 +1,7 @@
 import { DETECTED_LABEL, criteriaFor, criterionUrl, detectedOf, hintFor, suggestedKind, type Criterion } from '../lib/rgaa'
 import { auditSheets, auditStats, buildWorkbook, countsOf, isProvisional, levelStats, pageSheets, pct2, rateExact, rateOf, thumbKey, type Counts, type PageInput } from '../lib/audit-sheet'
 import { confirm as confirmVerdict, evidenceConflicts as evidenceConflictsOf } from '../lib/evidence'
-import { createPage, emptyAudit, FILE_EXTENSION, findPage, listAudits, normalizeUrl } from '../lib/audit-store'
+import { createPage, emptyAudit, findPage, listAudits, normalizeUrl } from '../lib/audit-store'
 import { createAuditSession, describeAuditError, type Choice } from './audit-session'
 import type { CaptureResponse, ContentMessage, ContentResponse, TabInfoResponse } from '../lib/messages'
 import { getLang, setLang, t, translateStatic, type Lang } from '../lib/i18n'
@@ -24,7 +24,9 @@ import type { AsqExtra } from '../lib/asqatasun-rules' // a type only: the table
 // --- Asqatasun-derived: end ---
 import { findingCriteriaOf, findingCriterionIds, hintForFinding, suggestFinding, type FindingCriterion } from '../lib/findings'
 import { FINDING_THEMES, SCANNED_THEMES, THEMES, THEME_LABEL, themeByNumber } from '../lib/themes'
-import type { Audit, AuditItem, AuditSummary, ChecklistAnswer, ChecklistVerdict, Detected, FindingItem, ImageElementInfo, ImageKind, ImageReview, PageRecord, RawFinding, Verdict } from '../lib/types'
+import type { Audit, AuditSummary, ChecklistAnswer, ChecklistVerdict, FindingItem, ImageElementInfo, ImageKind, ImageReview, PageRecord, RawFinding, Verdict } from '../lib/types'
+import type { Item, Filter, Child, Status, View, FStatus, FindingFilter } from './types'
+import { labelOf, formatHtml, fileName, pad, hash, sleep, tDyn, slugOf, keyOf, dateTimeOf, kb, auditTitle, timeOf, hostName, auditFileName } from './helpers'
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T
 
@@ -47,16 +49,6 @@ const altBtn = $<HTMLButtonElement>('alt-btn')
 let showAltOn = (() => { try { return localStorage.getItem('rgaa-show-alt') === 'on' } catch { return false } })()
 let focusTintOn = (() => { try { return localStorage.getItem('rgaa-focus-tint') !== 'off' } catch { return true } })()
 
-type Item = AuditItem
-
-function hash(text: string): string {
-  let h = 2166136261
-  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619)
-  return (h >>> 0).toString(36)
-}
-
-const keyOf = (el: ImageElementInfo) =>
-  `${el.type}|${el.src && !el.src.startsWith('data:') ? el.src : hash(el.html)}|${hash(el.contextHtml)}`
 
 let audit: Audit = emptyAudit()
 let page: PageRecord | null = null
@@ -67,14 +59,12 @@ let scanCount = 0
 let selectedId: number | null = null
 let reviews: Record<string, ImageReview> = {}
 let theme = 1
-type Filter = 'all' | Detected | 'dialog' | 'gone' | 'review' | 'prefilled'
 let filter: Filter = 'all'
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
 /* ------------------------------------------------------------------ */
 
-type Child = Node | string | null | undefined | false
 function h<K extends keyof HTMLElementTagNameMap>(
   tag: K,
   props: Record<string, unknown> = {},
@@ -193,46 +183,6 @@ function askConfirm(title: string, text: string, okLabel?: string): Promise<bool
   })
 }
 
-/**
- * The scan texts come from the page script in English, with the numbers and colours inside. They are stored that way
- * (the identity of a finding must not depend on the language) and translated here when shown.
- */
-function tDyn(text: string): string {
-  const rules: [RegExp, (m: RegExpExecArray) => string][] = [
-    [/^(\d+) text element\(s\) · (\d+) colour pair\(s\)$/, (m) => t('{n} text element(s) · {pairs} colour pair(s)', { n: m[1], pairs: m[2] })],
-    [/^(\S+) on (.+) · ratio cannot be computed$/, (m) => t('{fg} on {bg} · ratio cannot be computed', { fg: tDyn(m[1]), bg: tDyn(m[2]) })],
-    [/^(#[0-9A-F]{6}) on (#[0-9A-F]{6}) · ([\d.]+):1 \(needs ([\d.]+):1\)$/, (m) => t('{fg} on {bg} · {ratio}:1 (needs {need}:1)', { fg: m[1], bg: m[2], ratio: m[3], need: m[4] })],
-    [/^([\d.]+):1 \((large|normal) text\)$/, (m) => t('{need}:1 ({kind} text)', { need: m[1], kind: t(m[2]) })],
-    [/^(\d+) other element\(s\)$/, (m) => t('{n} other element(s)', { n: m[1] })],
-    [/^(.+) — cannot be computed$/, (m) => t('{what} — cannot be computed', { what: tDyn(m[1]) })],
-    [/^(\d+)px( bold)?$/, (m) => `${m[1]} px${m[2] ? ` ${t('bold')}` : ''}`],
-    [/^<(\w+)> without title$/, (m) => t('<{tag}> without title', { tag: m[1] })],
-    [/^(\d+) h1$/, (m) => t('{n} h1', { n: m[1] })],
-    [/^h(\d) \(empty\)$/, (m) => t('h{n} (empty)', { n: m[1] })],
-    [/^h(\d) · jump from h(\d)$/, (m) => t('h{a} · jump from h{b}', { a: m[1], b: m[2] })],
-    [/^<(\w+)> without label$/, (m) => t('<{tag}> without label', { tag: m[1] })],
-    [/^table (\d+)×(\d+)$/, (m) => t('table {r}×{c}', { r: m[1], c: m[2] })],
-    [/^(\d+) rows × (\d+) columns · (\d+) header cell\(s\)$/, (m) => t('{r} rows × {c} columns · {h} header cell(s)', { r: m[1], c: m[2], h: m[3] })],
-    [/^<(\w+)> without name$/, (m) => t('<{tag}> without name', { tag: m[1] })],
-  ]
-  for (const [re, fn] of rules) {
-    const m = re.exec(text)
-    if (m) return fn(m)
-  }
-  return t(text)
-}
-
-function labelOf(el: Item): string {
-  return el.src && !el.src.startsWith('data:') ? fileName(el.src) : `<${el.type}>`
-}
-
-function fileName(src: string): string {
-  try {
-    return decodeURIComponent(new URL(src).pathname.split('/').pop() || src)
-  } catch {
-    return src
-  }
-}
 
 /* ------------------------------------------------------------------ */
 /* Persistence (the whole audit, in chrome.storage.local)               */
@@ -257,7 +207,6 @@ function reviewOf(el: Item): ImageReview {
   return (reviews[reviewKey(el)] ??= { answers: {}, note: '' })
 }
 
-type Status = 'todo' | 'progress' | 'c' | 'nc'
 function statusOf(el: Item): Status {
   const review = reviews[reviewKey(el)]
   if (!review?.kind) return 'todo'
@@ -575,30 +524,8 @@ function refreshListState(): void {
 /* Code rendering                                                      */
 /* ------------------------------------------------------------------ */
 
-const VOID_TAGS = new Set(['img', 'br', 'hr', 'input', 'meta', 'link', 'source', 'area', 'col', 'embed', 'wbr', 'track', 'param'])
 const A11Y_ATTR = /^(alt|role|title|aria-[\w-]+|longdesc|tabindex|figcaption)$/i
 
-function formatHtml(source: string): string[] {
-  const tokens = source.match(/<!--[\s\S]*?-->|<[^>]*>?|[^<]+/g) ?? []
-  const lines: string[] = []
-  let depth = 0
-  for (const token of tokens) {
-    if (token.startsWith('</')) {
-      depth = Math.max(0, depth - 1)
-      lines.push('  '.repeat(depth) + token)
-    } else if (token.startsWith('<!--')) {
-      lines.push('  '.repeat(depth) + token)
-    } else if (token.startsWith('<')) {
-      lines.push('  '.repeat(depth) + token)
-      const name = /^<([a-z][\w-]*)/i.exec(token)?.[1]?.toLowerCase()
-      if (name && !VOID_TAGS.has(name) && !token.endsWith('/>')) depth++
-    } else {
-      const text = token.replace(/\s+/g, ' ').trim()
-      if (text) lines.push('  '.repeat(depth) + text)
-    }
-  }
-  return lines
-}
 
 function highlightLine(line: string): HTMLElement {
   const indent = /^\s*/.exec(line)![0]
@@ -1024,7 +951,6 @@ const emptyText = $('empty-text')
 const emptyAddBtn = $<HTMLButtonElement>('empty-add-btn')
 const emptyGoBtn = $<HTMLButtonElement>('empty-go-btn')
 
-const pad = (n: number) => String(n).padStart(2, '0')
 /** P01, P02… follow the order of the sample, so reordering renumbers the pages. */
 const pageLabel = (rec: PageRecord) => `P${pad(audit.pages.indexOf(rec) + 1)}`
 
@@ -1285,7 +1211,6 @@ resetPageBtn.addEventListener('click', () => resetPage())
 /* Views: review | page results | audit overview                        */
 /* ------------------------------------------------------------------ */
 
-type View = 'review' | 'page' | 'audit' | 'sample' | 'audits' | 'checks'
 let view: View = 'review'
 
 function setView(next: View): void {
@@ -1666,7 +1591,6 @@ function findingReview(f: FindingItem): ImageReview {
   return (page!.findingReviews[f.key] ??= { answers: {}, note: '' })
 }
 
-type FStatus = 'todo' | 'progress' | 'c' | 'nc'
 function findingStatus(f: FindingItem): FStatus {
   const answers = findingCriteriaOf(f).map((c) => page!.findingReviews[f.key]?.answers[c.id])
   if (answers.includes('nc')) return 'nc'
@@ -1679,7 +1603,6 @@ const focusFinding = (f: FindingItem, scroll: boolean) => {
   return focusOnPage(f.id, scroll, f.theme)
 }
 
-const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
 
 /** Crops a screenshot of the page to one element, small enough to live in the audit and in the Excel file. */
 function cropShot(dataUrl: string, loc: { rect: { x: number; y: number; w: number; h: number }; vw: number }): Promise<string | null> {
@@ -1741,7 +1664,6 @@ async function captureShots(list: FindingItem[]): Promise<number> {
 /** What the list shows: every finding, except the unnumbered “text that passes” line of Colours. */
 const listedFindings = (themeNo: number): FindingItem[] => (page?.findings ?? []).filter((f) => f.theme === themeNo && f.type !== 'contrast-ok')
 
-type FindingFilter = 'all' | 'hidden' | 'link-skip' | 'field-nolabel' | 'field-placeholder' | 'table-nohead' | 'table-layout' | 'review' | 'contrast-fail' | 'contrast-unknown' | 'link-empty' | 'link-generic' | 'headings' | 'landmarks'
 let findingFilter: FindingFilter = 'all'
 
 /**
@@ -2951,7 +2873,6 @@ async function validateSnapshot(rec: PageRecord, html: string): Promise<void> {
   applyToolResults(rec, { tool: 'html-validate', url: rec.snapshot?.url ?? rec.url, violations: [], answers, incomplete: 0, passes: passedChecks.length, passedChecks }, { addThemes: true })
 }
 
-const kb = (bytes: number) => `${Math.max(1, Math.round(bytes / 1024))} KB`
 
 function downloadSnapshot(rec: PageRecord): void {
   if (!rec.snapshot) return
@@ -3133,11 +3054,6 @@ const langFrBtn = $<HTMLButtonElement>('lang-fr')
 const langEnBtn = $<HTMLButtonElement>('lang-en')
 const textDialog = $<HTMLDialogElement>('text-dialog')
 
-const slugOf = (name: string): string =>
-  name.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'audit'
-const timeOf = (ms: number) => new Date(ms).toLocaleTimeString(getLang(), { hour: '2-digit', minute: '2-digit' })
-const dateTimeOf = (ms: number) => new Date(ms).toLocaleString(getLang(), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
-const auditTitle = (a: { name: string }) => a.name || t('Untitled audit')
 
 /** Which audit is open, and whether it is saved (in the browser, and in a file). Always visible. */
 function renderAuditBar(): void {
@@ -3212,16 +3128,6 @@ function askText(title: string, label: string, initial = '', okLabel = t('OK')):
   })
 }
 
-/** Downloads the whole audit as a .rgaa.json file. */
-const hostName = (url: string): string => { try { return new URL(url).hostname.replace(/^www\./, '') } catch { return '' } }
-
-/** site_audit-name_date.rgaa.json: sorts by site, tells the audits apart, and a new save never overwrites an older one. */
-function auditFileName(a: Audit): string {
-  const site = slugOf(a.meta.site)
-  const name = slugOf(a.name)
-  const parts = [site !== 'audit' ? site : '', name !== 'audit' && !(site !== 'audit' && name.includes(site)) ? name : '', new Date().toISOString().slice(0, 10)].filter(Boolean)
-  return `${parts.join('_')}${FILE_EXTENSION}`
-}
 
 /** The first page registered gives the audit its site, and its name while it still has the placeholder one. */
 function adoptSite(url: string): void {
