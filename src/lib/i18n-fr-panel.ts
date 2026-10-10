@@ -509,4 +509,5 @@ export const FR_PANEL: Record<string, string> = {
   '{label} has no address. The browser is on {url}.': '{label} n’a pas d’adresse. Le navigateur est sur {url}.',
   'Use this address for {label}': 'Utiliser cette adresse pour {label}',
   '{label} now points to {url}.': '{label} pointe maintenant vers {url}.',
+  '{label} has no address. The browser is on {other}: open the page of {label} in the browser, then select {label} again.': '{label} n’a pas d’adresse. Le navigateur est sur {other} : ouvrez la page de {label} dans le navigateur, puis resélectionnez {label}.',
 }
