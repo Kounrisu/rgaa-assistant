@@ -70,8 +70,14 @@ npm run build        # type-check + production build into dist/
 npm test             # unit tests (Vitest, no network)
 npm run check        # types, tests, translations, build (what CI runs)
 npm run check:i18n   # every text has a French version
+npm run test:e2e     # browser smoke test (Playwright + Chromium): needs `npm run build` first
 npm run check:asqatasun   # run the ported rules on Asqatasun's own test pages (downloads them, pinned revision)
 ```
+
+The smoke test (`e2e/`) opens the **built** panel and the **built** content script in two Chromium pages, with a
+fixture site and a thin stub of the extension API in between, and runs scan, review, save, reload and export. First
+run: `npx playwright install chromium`. It does not touch the network, and it does not replace a manual check in a real
+DevTools panel or in Firefox.
 
 Load `dist/` as an unpacked extension (`chrome://extensions` with Developer mode, or `about:debugging` in
 Firefox), then reload the page you inspect after reloading the extension.
