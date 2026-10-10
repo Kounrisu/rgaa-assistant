@@ -64,6 +64,14 @@ export function nextToReview(from: Item): Item | undefined {
   return list.find((e) => e.id > from.id) ?? list[0]
 }
 
+/** Does the markup alone say this finding fails (no name, no title, no label, no header…)? One definition for the box colour and the list. */
+export function findingFails(f: FindingItem): boolean {
+  return (
+    ['contrast-fail', 'link-empty', 'heading-empty', 'page-no-h1', 'page-no-main', 'table-nohead', 'table-layout-semantic', 'field-nolabel', 'field-placeholder'].includes(f.type) ||
+    (f.theme === 2 && !f.facts.title?.trim())
+  )
+}
+
 /**
  * The colour code of the boxes on the page, from where each element's review stands:
  * error = no alternative / failing, review = still to judge, ignored = ignored by assistive tech,
@@ -84,8 +92,7 @@ export function boxStates(themeNo: number): Record<number, string> {
     if (f.theme !== themeNo || f.type === 'contrast-ok') continue
     const pending = findingNeedsReview(f)
     const status = findingStatus(f)
-    const failing = f.type === 'contrast-fail' || f.type === 'link-empty' || f.type === 'heading-empty' || f.type === 'page-no-h1' || f.type === 'page-no-main' || f.type === 'table-nohead' || f.type === 'table-layout-semantic' || f.type === 'field-nolabel' || f.type === 'field-placeholder' || (themeNo === 2 && !f.facts.title?.trim())
-    out[f.id] = !pending ? (status === 'nc' ? 'nc' : 'c') : failing ? 'error' : 'review'
+    out[f.id] = !pending ? (status === 'nc' ? 'nc' : 'c') : findingFails(f) ? 'error' : 'review'
   }
   return out
 }

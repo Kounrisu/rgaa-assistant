@@ -121,8 +121,9 @@ describe('mergeFindings: a theme scan joins the findings already known', () => {
     expect(rec.findingReviews[second.key]).toBeUndefined()
     expect(rec.findings.find((f) => f.key === first.key)).toMatchObject({ present: false, id: 1 })
     expect(rec.findingReviews[first.key].note).toBe('my note')
-    // the new one is numbered while the vanished #2 still exists (it is dropped afterwards), so the numbering has a gap: 1, 3
-    expect(rec.findings.find((f) => f.html.includes('Autre'))!.id).toBe(3)
+    // the vanished #2 is dropped first, so the new finding reuses its number: 1, 2 (no gap)
+    expect(rec.findings.find((f) => f.html.includes('Autre'))!.id).toBe(2)
+    expect(rec.findings.filter((f) => f.theme === 2).map((f) => f.id).sort()).toEqual([1, 2])
   })
 
   it('nextFindingNumber is one more than the highest in use, per theme', () => {
