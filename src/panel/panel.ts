@@ -9,10 +9,11 @@ import { colorOf } from '../lib/theme-colors'
 import { contrastRatio, parseHex, toHex } from '../lib/contrast'
 import { MANUAL_CHECKS, MANUAL_GROUPS } from '../lib/manual-checks'
 import axeFrench from 'axe-core/locales/fr.json'
-import { applyToolResults, fromAxe, type ToolResults } from '../lib/axe-import'
+import { applyToolResults, AXE_TO_RGAA, fromAxe, type ToolResults } from '../lib/axe-import'
 import { RULES, type RuleFinding } from '../lib/rgaa-rules'
 import { packSnapshot, unpackSnapshot } from '../lib/snapshot'
 import { initPageTools, renderPageTools, resetPageTools } from './page-tools-ui'
+import { buildReportHtml } from '../lib/report'
 import { checkHtml } from '../lib/html-check'
 // --- Asqatasun-derived: begin ---
 import type { AsqExtra } from '../lib/asqatasun-rules' // a type only: the table itself stays in the page script
@@ -2522,6 +2523,22 @@ function dashboard(inputs: PageInput[]): HTMLElement {
   return h('div', {}, wrap, h('div', { class: 'results-scroll' }, themeTable), calc)
 }
 
+/** The audit report: one printable HTML page (summary, non-conformities per page, draft accessibility statement). */
+function openReport(download_: boolean): void {
+  const inputs = allPageInputs()
+  if (!inputs.length) return void say(t('Add a page to the audit first.'))
+  const html = buildReportHtml(audit, inputs, audit.pages)
+  const date = new Date().toISOString().slice(0, 10)
+  if (download_) {
+    download(html, 'text/html', `${slugOf(audit.meta.site || audit.name)}_rapport_${date}.html`)
+    say(t('Report downloaded. Open it in a browser and print it to PDF if you need one.'))
+  } else {
+    const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }))
+    window.open(url, '_blank', 'noopener')
+    setTimeout(() => URL.revokeObjectURL(url), 60000)
+  }
+}
+
 function renderAudit(): void {
   auditEl.replaceChildren()
   const inputs = allPageInputs()
@@ -2538,6 +2555,8 @@ function renderAudit(): void {
         { class: 'nav' },
         h('button', { type: 'button', onclick: () => setView('review') }, t('← Back to review')),
         h('button', { type: 'button', class: 'primary', onclick: () => void exportWorkbook(inputs, auditSheets(inputs, audit.meta), `grille-rgaa-${slugOf(audit.meta.site || audit.name)}.xlsx`) }, t('Export Excel (all pages)')),
+        h('button', { type: 'button', class: 'primary', title: t('One printable page with the summary, the non-conformities and a draft accessibility statement'), onclick: () => openReport(false) }, t('Open the report')),
+        h('button', { type: 'button', onclick: () => openReport(true) }, t('Download the report (HTML)')),
       ),
     ),
   )
@@ -2683,7 +2702,7 @@ async function scan(): Promise<void> {
       const n = rec.findings.filter((f) => f.theme === tn).length
       parts.push(tn === 2 ? t('{n} frame(s)', { n }) : tn === 6 ? t('{n} link(s)', { n }) : tn === 9 ? t('{n} heading(s) and landmark(s)', { n }) : tn === 5 ? t('{n} table(s)', { n }) : tn === 11 ? t('{n} field(s)', { n }) : `${t('{n} contrast finding(s)', { n: listedFindings(tn).length })}${added ? ` (${t('{n} new', { n: added })})` : ''}`)
     }
-    const missing = rec.findings.filter((f) => f.present && !f.shot && f.type !== 'contrast-ok' && rec.themes.includes(f.theme)).slice(0, 80)
+    const missing = rec.findings.filter((f) => f.present && !f.shot && f.type !== 'contrast-ok' && rec.themes.includes(f.theme)).slice(0, 50)
     const shots = await captureShots(missing)
     if (shots) parts.push(t('{n} preview(s)', { n: shots }))
     filter = 'all'
@@ -2993,8 +3012,9 @@ async function runAutoChecks(): Promise<void> {
   let step = 'rules'
   try {
     const own = await sendToPage(inspectedTabId(), { type: 'RGAA_RULES_RUN' })
+    await sleep(250) // let a heavy page breathe between the steps
     step = 'axe'
-    const response = await chrome.runtime.sendMessage({ type: 'RGAA_AXE', tabId: inspectedTabId(), locale: getLang() === 'fr' ? axeFrench : null })
+    const response = await chrome.runtime.sendMessage({ type: 'RGAA_AXE', tabId: inspectedTabId(), locale: getLang() === 'fr' ? axeFrench : null, rules: Object.keys(AXE_TO_RGAA) })
     if (!response || response.error) throw new Error(response?.error ?? 'no response')
     const results = fromAxe(response)
     if (results.url && rec.url && normalizeUrl(results.url) !== normalizeUrl(rec.url)) {
@@ -3006,6 +3026,7 @@ async function runAutoChecks(): Promise<void> {
     const asqReport = applyToolResults(rec, split.asq, { addThemes: true })
     const report = applyToolResults(rec, results, { addThemes: true })
     step = 'html'
+    await sleep(250)
     try {
       await captureAndCheckHtml(rec)
     } catch (err) {

@@ -20,7 +20,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === 'RGAA_AXE') {
     chrome.scripting
       .executeScript({ target: { tabId: message.tabId }, files: ['axe.min.js'] })
-      .then(() => chrome.tabs.sendMessage(message.tabId, { type: 'RGAA_AXE_RUN', locale: message.locale ?? null }))
+      .then(() => chrome.tabs.sendMessage(message.tabId, { type: 'RGAA_AXE_RUN', locale: message.locale ?? null, rules: message.rules ?? null }))
       .then(sendResponse, (err) => sendResponse({ error: String(err) }))
     return true
   }
