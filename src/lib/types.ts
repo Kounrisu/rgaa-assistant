@@ -70,6 +70,32 @@ export type ChecklistVerdict = 'c' | 'nc' | 'na'
 export interface ChecklistAnswer {
   verdict?: ChecklistVerdict
   note: string
+  /** Name of the tool that pre-filled the verdict (axe…); cleared when the auditor answers. */
+  source?: string
+}
+
+/** What an import of another tool's results did on a page. */
+export interface ImportReport {
+  tool: string
+  at: number
+  url: string
+  /** Verdicts pre-filled. */
+  set: number
+  /** Notes written on elements. */
+  noted: number
+  /** Criteria the tool failed but the auditor had marked otherwise. */
+  conflicts: string[]
+  /** Tool findings that could not be matched to a scanned element. */
+  unmatched: string[]
+  /** Tool rules / answers with no place in this audit. */
+  unmapped: string[]
+  incomplete: number
+  passes: number
+}
+
+export interface ManualCheckAnswer {
+  state: 'ok' | 'issue'
+  note: string
 }
 
 export interface PageRecord {
@@ -93,6 +119,10 @@ export interface PageRecord {
   nextFindingId: number
   /** Findings are numbered 1, 2, 3… within each theme. */
   nextFindingIds: Record<number, number>
+  /** Manual checks (keyboard, zoom, screen reader…) by check id. */
+  manualChecks?: Record<string, ManualCheckAnswer>
+  /** Imports of other tools' results made on this page. */
+  imports?: ImportReport[]
 }
 
 export interface AuditMeta {

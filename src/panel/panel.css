@@ -634,3 +634,13 @@ dialog.confirm { width: min(460px, 92vw); }
 .legend .bar.named { background: #2563eb; }
 .legend .bar.ignored { background: #94a3b8; }
 .legend-note { margin: 0; padding: 0 8px 8px; font-size: 11px; color: var(--muted); }
+
+/* Manual checks */
+.check-row { padding: 10px 0; border-top: 1px solid var(--border); }
+.check-row:first-of-type { border-top: 0; }
+.check-row[data-state='ok'] .question { color: var(--muted); }
+.check-row[data-state='issue'] { border-left: 4px solid var(--bad); padding-left: 10px; }
+.check-row textarea { width: 100%; box-sizing: border-box; min-height: 56px; margin-top: 8px; }
+.code-sample { background: var(--code-bg); color: var(--code-text); padding: 10px 12px; border-radius: 8px; overflow-x: auto; font-size: 12px; }
+.checks-body { display: grid; gap: 14px; margin-top: 14px; }
+#checks .card { margin-top: 14px; }
