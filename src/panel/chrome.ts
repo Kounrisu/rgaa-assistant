@@ -1,0 +1,424 @@
+import { type Outcome } from '../lib/results'
+import { state } from './state'
+import { pageInput, pageLabel, adoptSite, persist, nextPageLabel } from './model'
+import { t, getLang } from '../lib/i18n'
+import { h, say, dom, $, tNodes } from './dom'
+import { reviewKey, needsReview, findingNeedsReview, statusOf } from './review-state'
+import { renderFilters, renderList, select } from './images-view'
+import { syncFilterBoxes, focusFinding } from './page-bridge'
+import { findingCriterionIds } from '../lib/findings'
+import { FINDING_THEMES, THEMES, THEME_LABEL, SCANNED_THEMES } from '../lib/themes'
+import { renderThemeView } from './findings-view'
+import { rateOf, auditStats, isProvisional, countsOf } from '../lib/audit-sheet'
+import { normalizeUrl, findPage } from '../lib/audit-store'
+import type { PageRecord } from '../lib/types'
+import { colorOf } from '../lib/theme-colors'
+import { auditTitle, timeOf } from './helpers'
+import { actions } from './actions'
+
+/** Kept as the single entry point the rest of the panel calls after any answer. */
+export function renderStats(): void {
+  renderSummaries()
+}
+
+/** English labels: translate with t() where they are shown. */
+export const OUTCOME_PILLS: [Outcome, string, string][] = [
+  ['c', 'compliant', 'ok'],
+  ['nc', 'non-compliant', 'bad'],
+  ['pending', 'to review', 'warn-pill'],
+  ['na', 'not applicable', ''],
+  ['unassessed', 'not tested', ''],
+]
+
+/**
+ * The totals of a theme, in the theme's own header: criteria compliant, non-compliant, to review,
+ * not applicable, not tested. Each total jumps to the first element it stands for.
+ */
+export function renderSummaries(): void {
+  for (const host of document.querySelectorAll<HTMLElement>('.theme-summary')) {
+    const pageScope = host.dataset.scope === 'page'
+    const n = Number(host.dataset.theme)
+    host.replaceChildren()
+    if (!state.page) continue
+    const all = pageInput(state.page).themes
+    // page scope: every criterion of the chosen themes; theme scope: that theme's criteria
+    const criteria = pageScope ? all.filter((t) => t.selected).flatMap((t) => t.criteria) : (all.find((x) => x.number === n)?.criteria ?? [])
+    if (!pageScope && !all.find((x) => x.number === n)?.selected) continue
+    if (!criteria.length) continue
+    for (const [outcome, labelEn, cls] of OUTCOME_PILLS) {
+      const label = t(labelEn)
+      // compliant / not applicable only on the tests this tool can assess does not count here: see the partial pill
+      const count = criteria.filter((c) => c.outcome === outcome && !((outcome === 'c' || outcome === 'na') && c.coverage !== 'full')).length
+      host.append(
+        h(
+          'button',
+          {
+            type: 'button',
+            class: `pill ${cls} sum-${outcome}`,
+            disabled: count === 0,
+            title: count ? t('Go to the first one ({label})', { label }) : t('Nothing {label}', { label }),
+            onclick: () => (pageScope ? goToFirstOnPage(outcome) : goToFirst(n, outcome)),
+          },
+          h('strong', {}, String(count)),
+          ` ${label}`,
+        ),
+      )
+    }
+    const toConfirm = criteria.filter((c) => c.outcome === 'pending' && c.suggested).length
+    const partial = criteria.filter((c) => c.coverage === 'partial').length
+    const unconfirmedNc = criteria.filter((c) => c.unconfirmed && c.outcome === 'nc').length
+    if (toConfirm) host.append(h('span', { class: 'pill warn-pill', title: t('A tool suggests an answer for these criteria. Confirm or change each one: until then they count as to review.') }, t('{n} to confirm', { n: toConfirm })))
+    if (unconfirmedNc) host.append(h('span', { class: 'pill warn-pill', title: t('Failures found by a tool and not yet confirmed. They are counted as non-compliant, so the rate is provisional.') }, t('{n} failure(s) to confirm', { n: unconfirmedNc })))
+    if (partial) host.append(h('span', { class: 'pill warn-pill', title: t('Some tests of these criteria are not supported by this tool. The result counts, but only for the tests this tool can assess, so the rate stays provisional; a failure is always kept.') }, t('{n} partly covered', { n: partial })))
+    if (!pageScope && n === 1 && state.elements.length) {
+      const prefilled = state.elements.filter((e) => state.reviews[reviewKey(e)]?.auto).length
+      host.append(
+        h('span', { class: 'pill plain' }, t('{n} image(s)', { n: state.elements.length })),
+        ...(state.elements.some((e) => !e.present) ? [h('span', { class: 'pill plain' }, t('{n} on page now', { n: state.elements.filter((e) => e.present).length }))] : []),
+        ...(prefilled
+          ? [h('button', { type: 'button', class: 'pill plain', title: t('Show the images whose answer was pre-filled'), onclick: () => { state.filter = 'prefilled'; renderFilters(); renderList(); void syncFilterBoxes() } }, t('{n} pre-filled, to confirm', { n: prefilled }))]
+          : []),
+      )
+    }
+  }
+}
+
+/** The first chosen theme (in order) that has something to jump to for this status. */
+export function firstThemeWith(outcome: Outcome): number | null {
+  if (!state.page) return null
+  const rec = state.page
+  for (const t of pageInput(rec).themes.filter((x) => x.selected)) {
+    if (!t.criteria.some((c) => c.outcome === outcome)) continue
+    if (outcome === 'pending') {
+      // a theme that was never scanned has criteria "to review" but no element to go to
+      const perFinding = findingCriterionIds(t.number)
+      const pendingCards = t.criteria.some((c) => c.outcome === 'pending' && !perFinding.includes(c.id) && t.number !== 1)
+      const hasElement =
+        t.number === 1 ? state.elements.some((e) => needsReview(e)) : FINDING_THEMES.has(t.number) ? rec.findings.some((f) => f.theme === t.number && findingNeedsReview(f)) : false
+      if (!hasElement && !pendingCards) continue
+    }
+    return t.number
+  }
+  return null
+}
+
+/** Page-level totals (all chosen themes): open the first theme that has such an item, then go to its first element. */
+export function goToFirstOnPage(outcome: Outcome): void {
+  const n = firstThemeWith(outcome)
+  if (n === null) {
+    return void say(outcome === 'pending' ? t('Nothing to review yet: scan the page, or every element has been reviewed.') : t('Nothing to show for this total.'))
+  }
+  state.theme = n
+  state.findingFilter = 'all'
+  actions.setView('review')
+  renderThemeBar()
+  goToFirst(n, outcome)
+}
+
+/** Where a total leads: the first image / finding / criterion behind it, or its row in the grid. */
+export function goToFirst(n: number, outcome: Outcome): void {
+  if (!state.page) return
+  const rec = state.page
+  const result = pageInput(rec).themes.find((x) => x.number === n)
+  const first = result?.criteria.find((c) => c.outcome === outcome)
+  const verdictOf = (o: Outcome) => (o === 'c' ? 'c' : o === 'nc' ? 'nc' : o === 'na' ? 'na' : null)
+
+  if (n === 1) {
+    const pick =
+      outcome === 'pending' ? state.elements.find((e) => needsReview(e)) : outcome === 'c' || outcome === 'nc' ? state.elements.find((e) => statusOf(e) === outcome) : undefined
+    if (pick) {
+      state.filter = outcome === 'pending' ? 'review' : 'all'
+      renderFilters()
+      renderList()
+      select(pick.id, true)
+      void syncFilterBoxes()
+      return
+    }
+    if (outcome === 'pending') return void say(t('Nothing left to review among the images.'))
+    if (first) return openGridAt(first.id)
+    return
+  }
+
+  if (FINDING_THEMES.has(n)) {
+    const list = rec.findings.filter((f) => f.theme === n)
+    const v = verdictOf(outcome)
+    const pick =
+      outcome === 'pending'
+        ? list.find((f) => findingNeedsReview(f))
+        : v
+          ? list.find((f) => Object.values(rec.findingReviews[f.key]?.answers ?? {}).includes(v))
+          : undefined
+    if (pick) {
+      state.findingFilter = outcome === 'pending' ? 'review' : 'all'
+      state.findingSel = pick.id
+      renderThemeView()
+      void focusFinding(pick, true)
+      void syncFilterBoxes()
+      return
+    }
+  }
+
+  // checklist criteria (every theme but Images, plus 3.1 / 3.3): scroll to the card
+  if (first) {
+    const card = dom.themeEl.querySelector<HTMLElement>(`[id="crit-card-${first.id}"]`)
+    if (card) {
+      card.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      card.classList.add('flash')
+      setTimeout(() => card.classList.remove('flash'), 1800)
+      return
+    }
+    openGridAt(first.id)
+  }
+}
+
+/** Opens the page grid on a criterion's row (for totals that have no element to point at). */
+export function openGridAt(criterionId: string): void {
+  state.activeSheet = 0
+  actions.setView('page')
+  const row = dom.resultsEl.querySelector<HTMLElement>(`tr[data-crit="${criterionId}"]`)
+  row?.scrollIntoView({ block: 'center' })
+  row?.classList.add('flash')
+  setTimeout(() => row?.classList.remove('flash'), 1800)
+}
+
+export function renderPageBar(): void {
+  dom.pageSelect.replaceChildren()
+  if (!state.audit.pages.length) dom.pageSelect.append(h('option', { value: '' }, t('No page yet — add page 1 in “Audit pages sample”')))
+  for (const p of state.audit.pages) {
+    const input = pageInput(p)
+    const rate = rateOf(auditStats([input]).perPage[0].counts)
+    dom.pageSelect.append(
+      h('option', { value: p.id, selected: p.id === state.page?.id }, `${pageLabel(p)} · ${p.title || p.url} · ${t('{n} image(s)', { n: p.items.length })}${rate === null ? '' : ` · ${rate} %${isProvisional(countsOf(input)) ? ` (${t('provisional')})` : ''}`}`),
+    )
+  }
+  dom.pageSelect.disabled = !state.audit.pages.length
+  dom.pageToolsEl.hidden = !state.page
+  dom.nextBtn.disabled = !state.page
+  dom.progressEl.replaceChildren()
+  if (state.page) {
+    const c = countsOf(pageInput(state.page))
+    const total = c.C + c.NC + c.NA + c.NT || 1
+    const answered = c.C + c.NC + c.NA
+    dom.progressEl.append(
+      h('span', {}, t('{done}/{total} criteria answered', { done: answered, total })),
+      h('span', { class: 'meter', role: 'img', 'aria-label': t('Progress of {label}', { label: pageLabel(state.page) }) }, ...[['c', c.C], ['nc', c.NC], ['na', c.NA]].map(([k, n]) => h('i', { class: String(k), style: `width:${(Number(n) / total) * 100}%` }))),
+    )
+  }
+  dom.deletePageBtn.disabled = !state.page
+  dom.resetPageBtn.disabled = !state.page
+  const onLive = Boolean(state.page && state.liveUrl && normalizeUrl(state.page.url) === normalizeUrl(state.liveUrl))
+  dom.liveUrlEl.textContent = state.liveUrl ? t('Browser: {url}', { url: state.liveUrl }) : ''
+  dom.liveUrlEl.title = state.liveUrl
+  dom.liveUrlEl.className = `live-url${onLive ? ' same' : ''}`
+  dom.scanBtn.disabled = !state.page
+  dom.scanBtn.textContent = state.page ? (state.scannedThisSession.has(state.page.id) ? t('Rescan {page}', { page: pageLabel(state.page) }) : t('Scan {page}', { page: pageLabel(state.page) })) : t('Scan')
+  dom.scanBtn.title = state.page
+    ? t('Scan what the browser shows and merge the images into {page} (popins, tabs…)', { page: pageLabel(state.page) })
+    : t('Add a page to the sample first')
+}
+
+export function showNavBanner(url: string): void {
+  dom.navBannerBtn.hidden = false
+  // the current page has lost its address
+  if (state.page && !state.page.url && url) {
+    const rec = state.page
+    const owner = findPage(state.audit, url)
+    if (owner && owner !== rec) {
+      // the browser is on another page of the sample: say how to register this one, without offering a duplicate address
+      dom.navBannerText.textContent = t('{label} has no address. The browser is on {other}: open the page of {label} in the browser, then select {label} again.', { label: pageLabel(rec), other: pageLabel(owner) })
+      dom.navBannerBtn.hidden = true
+      dom.navBanner.hidden = false
+      return
+    }
+    dom.navBannerText.textContent = t('{label} has no address. The browser is on {url}.', { label: pageLabel(rec), url })
+    dom.navBannerBtn.textContent = t('Use this address for {label}', { label: pageLabel(rec) })
+    dom.navBannerBtn.onclick = () => {
+      rec.url = normalizeUrl(url)
+      adoptSite(rec.url)
+      dom.navBanner.hidden = true
+      persist()
+      actions.renderAll()
+      say(t('{label} now points to {url}.', { label: pageLabel(rec), url: rec.url }))
+    }
+    dom.navBanner.hidden = false
+    return
+  }
+  if (state.navDismissed && normalizeUrl(url) === state.navDismissed) return void (dom.navBanner.hidden = true)
+  const known = findPage(state.audit, url)
+  if (known && known === state.page) return void (dom.navBanner.hidden = true)
+  if (known) {
+    dom.navBannerText.textContent = t('The browser is now on {label} ({title}).', { label: pageLabel(known), title: known.title || known.url })
+    dom.navBannerBtn.textContent = t('Switch to {label}', { label: pageLabel(known) })
+    dom.navBannerBtn.onclick = () => {
+      dom.navBanner.hidden = true
+      actions.switchTo(known.id)
+    }
+  } else {
+    dom.navBannerText.textContent = t('This URL is not in the sample yet.')
+    dom.navBannerBtn.textContent = t('Add it as {label}', { label: nextPageLabel() })
+    dom.navBannerBtn.onclick = () => {
+      dom.navBanner.hidden = true
+      void actions.addPage(url)
+    }
+  }
+  dom.navBanner.hidden = false
+}
+
+/** Share of a theme's criteria that have an answer (criteria this tool cannot assess count as done). */
+export function themeProgress(rec: PageRecord, n: number): { done: number; total: number } {
+  const t = pageInput(rec).themes.find((x) => x.number === n)
+  const total = t?.criteria.length ?? 0
+  const pending = t?.criteria.filter((c) => c.outcome === 'pending').length ?? 0
+  return { done: total - pending, total }
+}
+
+export function setThemes(rec: PageRecord, themes: number[]): void {
+  rec.themes = [...new Set(themes)].sort((a, b) => a - b)
+  if (rec === state.page && !rec.themes.includes(state.theme)) state.theme = rec.themes[0] ?? 1
+  persist()
+  // keep the menu open while ticking several themes
+  if (state.view === 'sample') {
+    renderPageBar()
+    renderThemeBar()
+    return
+  }
+  const open = document.querySelector<HTMLDetailsElement>('.themebar .themes-menu')?.open
+  actions.renderAll()
+  if (open) document.querySelector<HTMLDetailsElement>('.themebar .themes-menu')?.setAttribute('open', '')
+}
+
+/** A drop-down with one checkbox per RGAA theme. */
+export function themesMenu(rec: PageRecord): HTMLElement {
+  const box = h('details', { class: 'themes-menu' }, h('summary', {}, t('Themes ({n})', { n: rec.themes.length })))
+  const list = h('div', { class: 'menu', role: 'group', 'aria-label': t('Themes audited on {label}', { label: pageLabel(rec) }) })
+  for (const th of THEMES) {
+    list.append(
+      h(
+        'label',
+        { class: 'menu-item' },
+        h('input', {
+          type: 'checkbox',
+          checked: rec.themes.includes(th.number),
+          onchange: (e: Event) => {
+            const on = (e.target as HTMLInputElement).checked
+            if (!on && rec.themes.length === 1) {
+              ;(e.target as HTMLInputElement).checked = true
+              return void say(t('Keep at least one theme.'))
+            }
+            setThemes(rec, on ? [...rec.themes, th.number] : rec.themes.filter((n) => n !== th.number))
+          },
+        }),
+        h('span', {}, `${th.number}. ${t(THEME_LABEL[th.number])}`),
+        h('span', { class: 'menu-kind' }, SCANNED_THEMES.has(th.number) ? t('scan + review') : t('{n} criteria', { n: th.criteria.length })),
+      ),
+    )
+  }
+  list.append(
+    h(
+      'div',
+      { class: 'menu-actions' },
+      h('button', { type: 'button', class: 'img-ref', onclick: () => setThemes(rec, THEMES.map((th) => th.number)) }, t('All 13')),
+      h('button', { type: 'button', class: 'img-ref', onclick: () => setThemes(rec, [1]) }, t('Images only')),
+    ),
+  )
+  box.append(list)
+  return box
+}
+
+export function renderThemeBar(): void {
+  document.documentElement.style.setProperty('--tc', colorOf(state.theme))
+  dom.themebarEl.replaceChildren()
+  if (!state.page) return
+  const rec = state.page
+  const selected = [...rec.themes].sort((a, b) => a - b)
+  if (!selected.includes(state.theme)) state.theme = selected[0] ?? 1
+  const tabs = h('div', { class: 'theme-tabs', role: 'tablist', 'aria-label': t('RGAA themes of this page') })
+  for (const n of selected) {
+    const { done, total } = themeProgress(rec, n)
+    tabs.append(
+      h(
+        'button',
+        {
+          type: 'button',
+          role: 'tab',
+          class: `theme-tab${done === total ? ' complete' : ''}`,
+          'aria-selected': String(n === state.theme),
+          style: `--tc:${colorOf(n)}`,
+          title: t('{n}. {name} (its boxes on the page use this colour)', { n, name: t(THEME_LABEL[n]) }),
+          onclick: () => {
+            state.theme = n
+            state.findingFilter = 'all'
+            actions.setView('review')
+            renderThemeBar()
+            renderStats()
+          },
+        },
+        h('span', { class: 'tn' }, String(n)),
+        ` ${t(THEME_LABEL[n])} `,
+        h('span', { class: 'tp' }, `${done}/${total}`),
+      ),
+    )
+  }
+  dom.themebarEl.append(
+    tabs,
+    h('button', { type: 'button', class: 'ghost-btn danger', title: t('Clear the scan and the answers of {name} on this page only', { name: t(THEME_LABEL[state.theme]) }), onclick: () => actions.resetTheme() }, t('Reset {name}', { name: t(THEME_LABEL[state.theme]) })),
+    themesMenu(rec),
+  )
+}
+
+export function renderEmpty(): void {
+  const onPage = Boolean(state.page && state.liveUrl && normalizeUrl(state.page.url) === normalizeUrl(state.liveUrl))
+  dom.emptyAddBtn.hidden = Boolean(state.page)
+  dom.emptyGoBtn.hidden = !state.page || onPage
+  if (!state.page) {
+    dom.emptyTitle.textContent = t('Start by registering the pages of your sample')
+    dom.emptyText.textContent = t('Open the first page in the browser and add it as page 1. You scan it afterwards, when you are ready.')
+    dom.emptyAddBtn.textContent = t('Add the current URL as {label}', { label: nextPageLabel() })
+  } else {
+    const label = pageLabel(state.page)
+    dom.emptyTitle.textContent = t('{label} is registered, not scanned yet', { label })
+    dom.emptyText.textContent = onPage
+      ? t('The browser is on {url}. Click “Scan {label}” to list its images.', { url: state.page.url, label })
+      : t('Open {url} in the browser, then click “Scan {label}”.', { url: state.page.url, label })
+    dom.emptyGoBtn.textContent = t('Open {label} in the browser', { label })
+  }
+  const strong = (text: string) => h('strong', {}, text)
+  $('empty-steps').replaceChildren(
+    h('li', {}, ...tNodes('Register each page in {sample} (P01, P02…), with its URL.', { sample: strong(t('Audit pages sample')) })),
+    h('li', {}, ...tNodes('Select a page in the {page} list: the browser opens it. Click {scan}.', { page: strong(t('Page')), scan: strong(t('Scan')) })),
+    h('li', {}, ...tNodes('Open a popin or a tab and click {rescan}: its images join the same page.', { rescan: strong(t('Rescan')) })),
+  )
+}
+
+/** Which audit is open, and whether it is saved (in the browser, and in a file). Always visible. */
+export function renderAuditBar(): void {
+  dom.auditNameBtn.textContent = auditTitle(state.audit)
+  dom.auditNameBtn.title = t('Rename this audit')
+  const { saveState, savedAt, blocked, lastError } = state.session
+  dom.saveStateEl.className = `pill ${saveState === 'saved' ? '' : saveState}`
+  dom.saveStateEl.textContent =
+    saveState === 'saving'
+      ? t('Saving…')
+      : saveState === 'error'
+        ? blocked
+          ? t('Not loaded! The saved audit cannot be read; nothing will be written over it.')
+          : t('Not saved! Retry, or save to a file now.')
+        : t('Saved {time}', { time: timeOf(savedAt || state.audit.updatedAt) })
+  dom.saveStateEl.title =
+    saveState === 'error'
+      ? blocked
+        ? lastError
+        : t('Not saved: browser storage full or unavailable ({error}). Retry, or save to a file now.', { error: lastError || '—' })
+      : t('Saved in the browser at {time}', { time: timeOf(savedAt || state.audit.updatedAt) })
+  dom.saveRetryBtn.hidden = saveState !== 'error'
+  dom.saveRetryBtn.textContent = blocked ? t('Retry loading') : t('Retry')
+  const never = state.audit.exportedAt === undefined
+  const changed = !never && state.audit.updatedAt > (state.audit.exportedAt ?? 0)
+  dom.backupStateEl.className = `pill ${never || changed ? (state.audit.pages.length ? 'warn' : 'muted') : 'muted'}`
+  dom.backupStateEl.textContent = never ? t('No file yet') : changed ? t('File out of date') : t('File up to date')
+  dom.backupStateEl.title = never ? t('No file saved yet') : changed ? t('Changed since the file of {time}', { time: timeOf(state.audit.exportedAt ?? 0) }) : t('File saved at {time}', { time: timeOf(state.audit.exportedAt ?? 0) })
+  dom.auditsBtn.setAttribute('aria-pressed', String(state.view === 'audits'))
+  dom.langFrBtn.setAttribute('aria-pressed', String(getLang() === 'fr'))
+  dom.langEnBtn.setAttribute('aria-pressed', String(getLang() === 'en'))
+  document.title = `${auditTitle(state.audit)} — RGAA Assistant`
+}
