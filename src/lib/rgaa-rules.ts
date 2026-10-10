@@ -26,6 +26,8 @@ export const RULES: Record<string, RuleMeta> = {
   'no-form': { criteria: theme(11, ['11.9']), status: 'na', text: 'No form field on the page.' },
   'no-button': { criteria: ['11.9'], status: 'na', text: 'No button on the page.' },
   'no-link': { criteria: theme(6), status: 'na', text: 'No link on the page.' },
+  'skip-link-missing': { criteria: ['12.7'], status: null, text: 'No skip link found among the first focusable elements of the page: press Tab at the top of the page to check that a link to the main content appears.' },
+  'skip-link-broken': { criteria: ['12.7'], status: 'nc', text: '{n} skip link(s) point to a target that does not exist on the page. Examples: {samples}' },
   'generic-title': { criteria: ['8.6'], status: null, text: 'The page title looks generic or empty ({detail}): check that it is relevant.' },
 }
 
