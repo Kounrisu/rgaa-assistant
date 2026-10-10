@@ -2,6 +2,7 @@ import { OUTCOME_LABEL, type CriterionResult, type Outcome, type Theme1Results, 
 import { CRITERION_LEVEL, THEME_LABEL, type Level } from './themes'
 import type { Thumb } from './thumbs'
 import { buildXlsx, type CellInput, type Sheet } from './xlsx'
+import { findingCriteriaOf } from './findings'
 import { tFr } from './i18n'
 import { MANUAL_CHECKS } from './manual-checks'
 import type { AuditMeta, ChecklistAnswer, Detected, FindingItem, ImageElementInfo, ImageReview, ManualCheckAnswer } from './types'
@@ -437,11 +438,11 @@ export function manualSheet(pages: PageInput[]): Sheet {
 
 export function findingsSheet(pages: PageInput[]): Sheet {
   const rows: CellInput[][] = [
-    title('Détail des éléments – cadres, couleurs et liens'),
+    title('Détail des éléments – cadres, couleurs, liens et structure'),
     [],
     head(['Page', 'Thème', 'N°', 'Aperçu', 'Type', 'Constat', 'Détails', 'Critère', 'Statut', 'Remarque']),
   ]
-  const criteriaOf = (f: FindingItem) => (f.theme === 2 ? ['2.1', '2.2'] : f.theme === 6 ? ['6.1', '6.2'] : ['3.2'])
+  const criteriaOf = (f: FindingItem) => findingCriteriaOf(f).map((c) => c.id)
   pages.forEach((page, pageIndex) => {
     for (const f of page.findings) {
       const review = page.findingReviews[f.key]

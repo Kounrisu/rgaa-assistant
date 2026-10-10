@@ -16,7 +16,7 @@ import { checkHtml } from '../lib/html-check'
 // --- Asqatasun-derived: begin ---
 import type { AsqExtra } from '../lib/asqatasun-rules' // a type only: the table itself stays in the page script
 // --- Asqatasun-derived: end ---
-import { FINDING_CRITERIA, findingCriterionIds, hintForFinding, suggestFinding, type FindingCriterion } from '../lib/findings'
+import { findingCriteriaOf, findingCriterionIds, hintForFinding, suggestFinding, type FindingCriterion } from '../lib/findings'
 import { FINDING_THEMES, SCANNED_THEMES, THEMES, THEME_LABEL, themeByNumber } from '../lib/themes'
 import type { Audit, AuditItem, AuditSummary, ChecklistAnswer, ChecklistVerdict, Detected, FindingItem, ImageElementInfo, ImageKind, ImageReview, PageRecord, RawFinding, Verdict } from '../lib/types'
 
@@ -201,6 +201,9 @@ function tDyn(text: string): string {
     [/^(.+) — cannot be computed$/, (m) => t('{what} — cannot be computed', { what: tDyn(m[1]) })],
     [/^(\d+)px( bold)?$/, (m) => `${m[1]} px${m[2] ? ` ${t('bold')}` : ''}`],
     [/^<(\w+)> without title$/, (m) => t('<{tag}> without title', { tag: m[1] })],
+    [/^(\d+) h1$/, (m) => t('{n} h1', { n: m[1] })],
+    [/^h(\d) \(empty\)$/, (m) => t('h{n} (empty)', { n: m[1] })],
+    [/^h(\d) · jump from h(\d)$/, (m) => t('h{a} · jump from h{b}', { a: m[1], b: m[2] })],
     [/^<(\w+)> without name$/, (m) => t('<{tag}> without name', { tag: m[1] })],
   ]
   for (const [re, fn] of rules) {
@@ -697,7 +700,7 @@ function boxStates(themeNo: number): Record<number, string> {
     if (f.theme !== themeNo || f.type === 'contrast-ok') continue
     const pending = findingNeedsReview(f)
     const status = findingStatus(f)
-    const failing = f.type === 'contrast-fail' || f.type === 'link-empty' || (themeNo === 2 && !f.facts.title?.trim())
+    const failing = f.type === 'contrast-fail' || f.type === 'link-empty' || f.type === 'heading-empty' || f.type === 'page-no-h1' || f.type === 'page-no-main' || (themeNo === 2 && !f.facts.title?.trim())
     out[f.id] = !pending ? (status === 'nc' ? 'nc' : 'c') : failing ? 'error' : 'review'
   }
   return out
@@ -1433,7 +1436,8 @@ function perFindingIds(): string[] {
 function autoHints(answer: ChecklistAnswer): HTMLElement[] {
   const entries = Object.entries(answer.autoResults ?? {})
   if (!entries.length) return (page?.imports?.length ?? 0) > 0 ? [h('p', { class: 'hint-line' }, t('No automatic check covers this criterion.'))] : []
-  return entries.map(([tool, r]) =>
+  const disagree = entries.some(([, r]) => r.result === 'pass') && entries.some(([, r]) => r.result === 'fail')
+  const lines = entries.map(([tool, r]) =>
     h(
       'p',
       { class: `hint ${r.result === 'pass' ? 'ok' : 'warn'}` },
@@ -1442,6 +1446,7 @@ function autoHints(answer: ChecklistAnswer): HTMLElement[] {
         : t('Automatic checks ({tool}) found a problem: {rules}.', { tool, rules: r.rules.join(', ') }),
     ),
   )
+  return disagree ? [h('p', { class: 'hint warn' }, t('The automatic tools disagree on this criterion: check it by hand.')), ...lines] : lines
 }
 
 function renderChecklist(host: HTMLElement = themeEl): void {
@@ -1638,7 +1643,7 @@ function findingReview(f: FindingItem): ImageReview {
 
 type FStatus = 'todo' | 'progress' | 'c' | 'nc'
 function findingStatus(f: FindingItem): FStatus {
-  const answers = (FINDING_CRITERIA[f.theme] ?? []).map((c) => page!.findingReviews[f.key]?.answers[c.id])
+  const answers = findingCriteriaOf(f).map((c) => page!.findingReviews[f.key]?.answers[c.id])
   if (answers.includes('nc')) return 'nc'
   if (answers.every((a) => a === undefined)) return 'todo'
   return answers.some((a) => a === undefined) ? 'progress' : 'c'
@@ -1708,7 +1713,7 @@ async function captureShots(list: FindingItem[]): Promise<number> {
 /** What the list shows: every finding, except the unnumbered “text that passes” line of Colours. */
 const listedFindings = (themeNo: number): FindingItem[] => (page?.findings ?? []).filter((f) => f.theme === themeNo && f.type !== 'contrast-ok')
 
-type FindingFilter = 'all' | 'review' | 'contrast-fail' | 'contrast-unknown' | 'link-empty' | 'link-generic'
+type FindingFilter = 'all' | 'review' | 'contrast-fail' | 'contrast-unknown' | 'link-empty' | 'link-generic' | 'headings' | 'landmarks'
 let findingFilter: FindingFilter = 'all'
 
 /**
@@ -1723,13 +1728,16 @@ function findingNeedsReview(f: FindingItem): boolean {
   }
   // a link with a usable name is pre-filled compliant and does not ask for attention; empty or generic ones do
   if (f.theme === 6 && f.type === 'link') return false
-  const ids = (FINDING_CRITERIA[f.theme] ?? []).map((c) => c.id)
+  if (f.theme === 9 && (f.type === 'heading' || f.type === 'landmark')) return false
+  const ids = findingCriteriaOf(f).map((c) => c.id)
   return ids.some((c) => r?.answers[c] === undefined) || Boolean(r?.auto)
 }
 
 function findingMatches(f: FindingItem, value: FindingFilter): boolean {
   if (value === 'all') return true
   if (value === 'review') return findingNeedsReview(f)
+  if (value === 'headings') return f.data.group === 'heading'
+  if (value === 'landmarks') return f.data.group === 'landmark'
   return f.type === value
 }
 
@@ -1768,7 +1776,7 @@ function renderFindingsView(): void {
         'div',
         {},
         h('h2', {}, `${def.number}. ${def.name}`),
-        h('p', { class: 'hint-line' }, theme === 2 ? t('Every iframe / frame of the page, with its title.') : theme === 6 ? t('Every link of the page (identical links are grouped), with its name and destination. Links with no name or a generic text are boxed on the page.') : t('Only the texts that fail or that a script cannot judge are numbered and boxed on the page. Criteria 3.1 and 3.3 need your eyes (below).')),
+        h('p', { class: 'hint-line' }, theme === 2 ? t('Every iframe / frame of the page, with its title.') : theme === 6 ? t('Every link of the page (identical links are grouped), with its name and destination. Links with no name or a generic text are boxed on the page.') : theme === 9 ? t('The outline of the page, like a headings map: headings with their level, and the landmarks, in reading order. Click one to find it on the page; skipped levels and missing areas are flagged.') : t('Only the texts that fail or that a script cannot judge are numbered and boxed on the page. Criteria 3.1 and 3.3 need your eyes (below).')),
         h('div', { class: 'theme-summary', 'data-theme': String(theme), 'aria-label': t('Totals') }),
       ),
       h('div', { class: 'nav' }, toolsEl),
@@ -1777,14 +1785,16 @@ function renderFindingsView(): void {
   if (!scanned) {
     themeEl.append(h('p', { class: 'hint-line' }, t('Not scanned yet. Open {url} in the browser and click “Scan {label}”.', { url: rec.url, label })))
   } else if (!list.length) {
-    themeEl.append(h('p', { class: 'hint-line' }, theme === 3 && passing ? t('No text with a contrast problem found: {summary}.', { summary: tDyn(passing.summary) }) : theme === 2 ? t('No frames found on the page at the last scan: criteria are not applicable.') : theme === 6 ? t('No links found on the page at the last scan: criteria are not applicable.') : t('No text colours found on the page at the last scan: criteria are not applicable.')))
+    themeEl.append(h('p', { class: 'hint-line' }, theme === 3 && passing ? t('No text with a contrast problem found: {summary}.', { summary: tDyn(passing.summary) }) : theme === 2 ? t('No frames found on the page at the last scan: criteria are not applicable.') : theme === 6 ? t('No links found on the page at the last scan: criteria are not applicable.') : theme === 9 ? t('No heading or landmark found on the page at the last scan.') : t('No text colours found on the page at the last scan: criteria are not applicable.')))
   } else {
     const options: [FindingFilter, string][] =
       theme === 3
         ? [['all', 'All'], ['review', 'To review'], ['contrast-fail', 'Fail'], ['contrast-unknown', 'Check by eye']]
         : theme === 6
           ? [['all', 'All'], ['review', 'To review'], ['link-empty', 'No name'], ['link-generic', 'Generic text']]
-          : [['all', 'All'], ['review', 'To review']]
+          : theme === 9
+            ? [['all', 'All'], ['review', 'To review'], ['headings', 'Headings'], ['landmarks', 'Landmarks']]
+            : [['all', 'All'], ['review', 'To review']]
     if (!options.some(([v]) => v === findingFilter)) findingFilter = 'all'
     const shown = list.filter((f) => findingMatches(f, findingFilter))
     if (!shown.some((f) => f.id === findingSel)) findingSel = shown[0]?.id ?? null
@@ -1814,6 +1824,7 @@ function renderFindingsView(): void {
               type: 'button',
               class: `item finding${f.present ? '' : ' absent'}`,
               'data-fid': f.id,
+              ...(f.data.group === 'heading' ? { style: `margin-left:${(Number(f.data.level) - 1) * 12}px` } : {}),
               'data-kind': f.type,
               'data-status': st,
               'aria-current': String(f.id === findingSel),
@@ -1834,7 +1845,7 @@ function renderFindingsView(): void {
     const f = list.find((x) => x.id === findingSel)
     themeEl.append(h('div', { class: 'finding-layout' }, h('nav', { class: 'finding-pane', 'aria-label': t('{name} findings', { name: def.name }) }, chips, ...(theme === 3 && passing ? [h('p', { class: 'hint-line' }, t('Not listed — {summary} pass.', { summary: tDyn(passing.summary) }))] : []), listEl2), f ? findingDetail(f) : h('p', { class: 'hint-line' }, t('Nothing in this category.'))))
   }
-  if (theme === 3) {
+  if ((themeByNumber(theme)?.criteria ?? []).some((c) => !findingCriterionIds(theme).includes(c.id))) {
     const rest = h('div', { class: 'theme-rest' })
     renderChecklist(rest)
     themeEl.append(rest)
@@ -1847,7 +1858,7 @@ function findingDetail(f: FindingItem): HTMLElement {
   for (const [k, v] of Object.entries(f.facts)) {
     facts.append(h('dt', {}, t(k)), h('dd', { class: v === null ? 'missing' : '' }, v === null ? '—' : tDyn(v)))
   }
-  const cards = FINDING_CRITERIA[f.theme].map((c) => findingCard(f, review, c))
+  const cards = findingCriteriaOf(f).map((c) => findingCard(f, review, c))
   if (f.theme === 3 && f.type !== 'contrast-ok') cards.unshift(contrastChecker(f, review))
   const evidence = h(
     'div',
@@ -2606,7 +2617,10 @@ function mergeScan(found: ImageElementInfo[]): { added: number; map: { from: num
   return { added, map }
 }
 
+let lastScanOk = false
+
 async function scan(): Promise<void> {
+  lastScanOk = false
   if (!page) return void say(t('Add a page to the audit pages sample first (button “Audit pages sample”).'))
   const scannable = page.themes.filter((n) => SCANNED_THEMES.has(n))
   if (!scannable.length) return void say(t('None of the selected themes can be scanned: they are checklists. Select Images, Frames or Colours to scan.'))
@@ -2653,7 +2667,7 @@ async function scan(): Promise<void> {
       const { map, added } = mergeFindings(tn, response?.findings ?? [])
       await sendToPage(inspectedTabId(), { type: 'RGAA_RELABEL', map, theme: tn })
       const n = rec.findings.filter((f) => f.theme === tn).length
-      parts.push(tn === 2 ? t('{n} frame(s)', { n }) : tn === 6 ? t('{n} link(s)', { n }) : `${t('{n} contrast finding(s)', { n: listedFindings(tn).length })}${added ? ` (${t('{n} new', { n: added })})` : ''}`)
+      parts.push(tn === 2 ? t('{n} frame(s)', { n }) : tn === 6 ? t('{n} link(s)', { n }) : tn === 9 ? t('{n} heading(s) and landmark(s)', { n }) : `${t('{n} contrast finding(s)', { n: listedFindings(tn).length })}${added ? ` (${t('{n} new', { n: added })})` : ''}`)
     }
     const missing = rec.findings.filter((f) => f.present && !f.shot && f.type !== 'contrast-ok' && rec.themes.includes(f.theme)).slice(0, 80)
     const shots = await captureShots(missing)
@@ -2667,6 +2681,7 @@ async function scan(): Promise<void> {
     setView('review')
     renderAll()
     persist()
+    lastScanOk = true
     say(
       first
         ? t('{label} scanned: {parts}. Open a popin or a tab, then click “Rescan {label}” to add what appears.', { label, parts: parts.join(' · ') })
@@ -2820,8 +2835,8 @@ function renderChecks(): void {
       'div',
       { class: 'card' },
       h('h3', {}, t('Automatic checks')),
-      h('p', { class: 'hint-line' }, t('Runs our own RGAA checks and the axe engine on the page you are inspecting. A failure becomes a pre-filled “non-compliant” to confirm; a theme that clearly does not apply (no table, no media, no form…) is pre-filled “not applicable”. Finding nothing never marks a criterion compliant. It covers only part of the RGAA: the manual checks below are still needed.')),
-      h('div', { class: 'nav' }, h('button', { type: 'button', class: 'primary', disabled: axeRunning, onclick: () => void runAutoChecks() }, axeRunning ? t('Running the checks…') : t('Run the automatic checks'))),
+      h('p', { class: 'hint-line' }, t('Runs every automatic test on the page you are inspecting: it scans all the themes, then runs axe, our RGAA checks, the Asqatasun-derived rules and the HTML check. A failure becomes a pre-filled “non-compliant” to confirm; a theme that clearly does not apply (no table, no media, no form…) is pre-filled “not applicable”. A criterion where nothing is found is pre-filled “compliant” to confirm. It covers only part of the RGAA: the manual checks below are still needed.')),
+      h('div', { class: 'nav' }, h('button', { type: 'button', class: 'primary', disabled: axeRunning, onclick: () => void runEverything() }, axeRunning ? t('Running the checks…') : t('Run the automatic checks'))),
     ),
     htmlCard(rec),
     ...reports.map((r) =>
@@ -2831,6 +2846,7 @@ function renderChecks(): void {
         h('h3', {}, t('Automatic checks ({tool}) — {date}', { tool: r.tool, date: dateTimeOf(r.at) })),
         h('p', { class: 'hint-line' }, t('{set} verdict(s) pre-filled, {noted} element note(s). {passes} passed rule(s) ignored, {incomplete} to check by hand.', { set: r.set, noted: r.noted, passes: r.passes, incomplete: r.incomplete })),
         ...(r.conflicts.length ? [h('p', { class: 'hint warn' }, t('The scan disagrees with your answer:')), h('ul', { class: 'checks' }, ...r.conflicts.map((x) => h('li', {}, x)))] : []),
+        ...((r.items ?? []).length ? [h('details', {}, h('summary', {}, t('Rule by rule ({n})', { n: (r.items ?? []).length })), h('table', { class: 'audit-table' }, h('tbody', {}, ...(r.items ?? []).slice(0, 300).map((i) => h('tr', {}, h('td', {}, i.criterion), h('td', {}, i.rule), h('td', {}, i.result === 'nc' ? t('problem') : i.result === 'pass' ? t('nothing found') : i.result === 'na' ? t('not applicable') : t('to check')), h('td', {}, i.text))))))] : []),
         ...(r.unmatched.length ? [h('details', {}, h('summary', {}, t('{n} finding(s) not matched to a scanned element', { n: r.unmatched.length })), h('ul', { class: 'checks' }, ...r.unmatched.slice(0, 60).map((x) => h('li', {}, x))))] : []),
         ...(r.unmapped.length ? [h('details', {}, h('summary', {}, t('{n} rule(s) with no RGAA criterion in this tool', { n: r.unmapped.length })), h('p', { class: 'hint-line' }, r.unmapped.slice(0, 80).join(' · ')))] : []),
       ),
@@ -2856,7 +2872,7 @@ async function validateSnapshot(rec: PageRecord, html: string): Promise<void> {
     const top = result.groups.slice(0, 4).map((g) => `${g.rule} ×${g.count}`).join(', ')
     answers.push({ criterion: '8.2', status: 'nc', note: t('{n} HTML error(s) in the generated code ({rules}). Details on the Checks page.', { n: result.errors, rules: top }), rule: 'html-validate' })
   } else passedChecks.push({ criterion: '8.2', rule: 'html-validate' })
-  applyToolResults(rec, { tool: 'html-validate', url: rec.snapshot?.url ?? rec.url, violations: [], answers, incomplete: 0, passes: passedChecks.length, passedChecks })
+  applyToolResults(rec, { tool: 'html-validate', url: rec.snapshot?.url ?? rec.url, violations: [], answers, incomplete: 0, passes: passedChecks.length, passedChecks }, { addThemes: true })
 }
 
 const kb = (bytes: number) => `${Math.max(1, Math.round(bytes / 1024))} KB`
@@ -2922,8 +2938,9 @@ function htmlCard(rec: PageRecord): HTMLElement {
 }
 
 /** Our own RGAA checks: the page sends what it found, the wording and the criteria come from lib/rgaa-rules.ts. */
-function rulesToResults(url: string, findings: RuleFinding[]): ToolResults {
+function rulesToResults(url: string, findings: RuleFinding[]): { own: ToolResults; asq: ToolResults } {
   const answers: ToolResults['answers'] = []
+  const asqAnswers: ToolResults['answers'] = []
   for (const f of findings) {
     const meta = RULES[f.key]
     if (!meta) continue
@@ -2935,7 +2952,7 @@ function rulesToResults(url: string, findings: RuleFinding[]): ToolResults {
   for (const f of findings as (RuleFinding & { asq?: AsqExtra })[]) {
     if (!f.asq) continue
     const note = t(f.asq.text, { n: f.count, samples: (f.samples ?? []).join(', '), criterion: f.asq.criterion })
-    answers.push({ criterion: f.asq.criterion, status: f.asq.status === 'review' ? null : f.asq.status, note, rule: f.key })
+    asqAnswers.push({ criterion: f.asq.criterion, status: f.asq.status === 'review' ? null : f.asq.status, note, rule: f.key })
   }
   // --- Asqatasun-derived: end ---
   // our checks that look for a failure and found none: shown as "checked" on their criteria
@@ -2944,7 +2961,10 @@ function rulesToResults(url: string, findings: RuleFinding[]): ToolResults {
   for (const [key, meta] of Object.entries(RULES)) {
     if (meta.status === 'nc' && !found.has(key)) for (const criterion of meta.criteria) passedChecks.push({ criterion, rule: key })
   }
-  return { tool: 'RGAA', url, violations: [], answers, incomplete: 0, passes: passedChecks.length, passedChecks }
+  // --- Asqatasun-derived: begin ---
+  const asq: ToolResults = { tool: 'Asqatasun', url, violations: [], answers: asqAnswers, incomplete: 0, passes: 0, passedChecks: [] }
+  // --- Asqatasun-derived: end ---
+  return { own: { tool: 'RGAA', url, violations: [], answers, incomplete: 0, passes: passedChecks.length, passedChecks }, asq }
 }
 
 async function runAutoChecks(): Promise<void> {
@@ -2965,8 +2985,10 @@ async function runAutoChecks(): Promise<void> {
       const ok = await askConfirm(t('The browser is on another page'), t('The browser is on {url}, but {label} is registered for {registered}. Apply them to {label} anyway?', { url: results.url, label: pageLabel(rec), registered: rec.url }), t('Apply anyway'))
       if (!ok) return void say(t('Scan cancelled.'))
     }
-    const ownReport = applyToolResults(rec, rulesToResults(own.url, own.findings ?? []))
-    const report = applyToolResults(rec, results)
+    const split = rulesToResults(own.url, own.findings ?? [])
+    const ownReport = applyToolResults(rec, split.own, { addThemes: true })
+    const asqReport = applyToolResults(rec, split.asq, { addThemes: true })
+    const report = applyToolResults(rec, results, { addThemes: true })
     step = 'html'
     try {
       await captureAndCheckHtml(rec)
@@ -2976,7 +2998,7 @@ async function runAutoChecks(): Promise<void> {
     }
     persist()
     renderAll()
-    say(t('Automatic checks on {label}: {n} rule(s) failed, {set} verdict(s) pre-filled, {noted} element note(s). Confirm them in the themes.', { label: pageLabel(rec), n: results.violations.length + (own.findings ?? []).filter((f: RuleFinding) => RULES[f.key]?.status === 'nc').length, set: report.set + ownReport.set, noted: report.noted + ownReport.noted }))
+    say(t('Automatic checks on {label}: {n} rule(s) failed, {set} verdict(s) pre-filled, {noted} element note(s). Confirm them in the themes.', { label: pageLabel(rec), n: results.violations.length + (own.findings ?? []).filter((f: RuleFinding) => RULES[f.key]?.status === 'nc').length, set: report.set + ownReport.set + asqReport.set, noted: report.noted + ownReport.noted + asqReport.noted }))
   } catch (err) {
     const reason = `${step}: ${String((err as Error)?.message ?? err).replace(/^Error: /, '')}`
     say(t('Could not run the automatic checks ({reason}). Reload the page (F5) if you just reloaded the extension, check the extension may access this site, then try again.', { reason }))
@@ -2989,10 +3011,22 @@ async function runAutoChecks(): Promise<void> {
 }
 
 checksBtn.addEventListener('click', () => setView(view === 'checks' ? 'review' : 'checks'))
-autoBtn.addEventListener('click', () => {
+/** Everything at once: scan every theme that can be scanned, then axe, our RGAA checks, the Asqatasun-derived rules and the HTML check. */
+async function runEverything(): Promise<void> {
+  if (!page || axeRunning) return
+  const rec = page
+  const scannable = [...SCANNED_THEMES].filter((n) => !rec.themes.includes(n))
+  if (scannable.length) {
+    rec.themes = [...rec.themes, ...scannable].sort((a, b) => a - b)
+    persist()
+  }
+  await scan()
+  if (!lastScanOk || page !== rec) return
   setView('checks')
-  void runAutoChecks()
-})
+  await runAutoChecks()
+}
+
+autoBtn.addEventListener('click', () => void runEverything())
 
 /* ------------------------------------------------------------------ */
 /* Audits: name, saved state, list of audits, file save / reopen         */

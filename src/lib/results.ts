@@ -176,7 +176,8 @@ export interface FindingInputs {
 /** Outcome of one criterion over the findings of a theme. Never scanned means undecided. */
 function findingOutcome(theme: number, criterion: string, input: FindingInputs): Pick<CriterionResult, 'outcome' | 'ncRefs'> {
   if (!input.scannedThemes.includes(theme)) return { outcome: 'pending' }
-  const list = input.findings.filter((f) => f.theme === theme)
+  const def = (FINDING_CRITERIA[theme] ?? []).find((c) => c.id === criterion)
+  const list = input.findings.filter((f) => f.theme === theme && (!def?.types || def.types.includes(f.type)))
   if (!list.length) return { outcome: 'na' }
   let pending = 0
   let compliant = 0

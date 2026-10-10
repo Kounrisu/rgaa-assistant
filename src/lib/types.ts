@@ -93,6 +93,8 @@ export interface ImportReport {
   unmapped: string[]
   incomplete: number
   passes: number
+  /** What each rule found, for the detail list of the report. */
+  items?: { criterion: string; rule: string; result: 'nc' | 'na' | 'note' | 'pass'; text: string }[]
 }
 
 export interface ManualCheckAnswer {

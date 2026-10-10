@@ -28,9 +28,9 @@ export const THEMES: ThemeDef[] = data.topics as ThemeDef[]
 export const themeByNumber = (n: number): ThemeDef | undefined => THEMES.find((t) => t.number === n)
 
 /** Themes that have an element-level scan and review. The others are criteria checklists. */
-export const SCANNED_THEMES = new Set([1, 2, 3, 6])
+export const SCANNED_THEMES = new Set([1, 2, 3, 6, 9])
 /** Themes reviewed finding by finding (like images, but simpler). */
-export const FINDING_THEMES = new Set([2, 3, 6])
+export const FINDING_THEMES = new Set([2, 3, 6, 9])
 export const DEFAULT_THEMES = [1]
 
 /** Short, French-free tab labels. */
