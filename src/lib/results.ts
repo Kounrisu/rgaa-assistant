@@ -1,3 +1,4 @@
+import { t as tr } from './i18n'
 import theme1 from './rgaa-theme1.json'
 import { THEMES } from './themes'
 import { FINDING_CRITERIA } from './findings'
@@ -86,12 +87,12 @@ function testOutcome(
   reviewOf: (el: ImageElementInfo) => ImageReview | undefined,
 ): Pick<TestResult, 'outcome' | 'reason' | 'imageIds' | 'nc' | 'scope'> {
   const scope = SCOPE[testId]
-  if (!Array.isArray(scope)) return { outcome: 'unassessed', reason: UNASSESSED_REASON[scope], imageIds: [], nc: [], scope: null }
+  if (!Array.isArray(scope)) return { outcome: 'unassessed', reason: tr(UNASSESSED_REASON[scope]), imageIds: [], nc: [], scope: null }
 
   const criterion = testId.split('.').slice(0, 2).join('.')
   const kind = CRITERION_KIND[criterion]
   const inScope = images.filter((el) => scope.includes(normalisedType(el)))
-  if (!inScope.length) return { outcome: 'na', reason: 'No such element on the page.', imageIds: [], nc: [], scope }
+  if (!inScope.length) return { outcome: 'na', reason: tr('No such element on the page.'), imageIds: [], nc: [], scope }
 
   const nc: number[] = []
   const answered: number[] = []
@@ -113,10 +114,10 @@ function testOutcome(
     }
   }
   const imageIds = inScope.map((e) => e.id)
-  if (nc.length) return { outcome: 'nc', reason: `${nc.length} non-compliant image(s).`, imageIds, nc, scope }
-  if (pending) return { outcome: 'pending', reason: `${pending} image(s) still to review.`, imageIds, nc, scope }
-  if (compliant) return { outcome: 'c', reason: `${compliant} image(s) checked.`, imageIds, nc, scope }
-  return { outcome: 'na', reason: 'No image of this kind concerned by the test.', imageIds, nc, scope }
+  if (nc.length) return { outcome: 'nc', reason: tr('{n} non-compliant image(s).', { n: nc.length }), imageIds, nc, scope }
+  if (pending) return { outcome: 'pending', reason: tr('{n} image(s) still to review.', { n: pending }), imageIds, nc, scope }
+  if (compliant) return { outcome: 'c', reason: tr('{n} image(s) checked.', { n: compliant }), imageIds, nc, scope }
+  return { outcome: 'na', reason: tr('No image of this kind concerned by the test.'), imageIds, nc, scope }
 }
 
 function rollUp(outcomes: Outcome[]): Outcome {

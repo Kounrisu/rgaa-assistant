@@ -564,3 +564,73 @@ button.pill:not(:disabled):hover { border-color: currentColor; }
 .contrast-checker .color-label { min-width: 84px; font-weight: 600; }
 .contrast-checker .swatch { width: 24px; height: 24px; border-radius: 4px; border: 1px solid var(--border, #cbd5e1); flex: none; }
 .contrast-checker .hex { width: 96px; font-family: ui-monospace, monospace; }
+
+/* Audit bar: which audit, saved or not */
+.auditbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 6px 12px; border-bottom: 1px solid var(--border, #d9dee7); background: var(--surface-2, #f4f6fa); }
+.auditbar-label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.auditbar .spacer { flex: 1; }
+.audit-name { font-weight: 700; font-size: 14px; max-width: 38ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: transparent; border: 1px dashed transparent; padding: 2px 8px; border-radius: 6px; }
+.audit-name:hover, .audit-name:focus-visible { border-color: var(--muted); background: var(--surface, #fff); }
+.audit-name::after { content: " ✎"; font-weight: 400; color: var(--muted); }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-size: 12px; background: var(--ok-soft); color: var(--ok); }
+.pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.pill.saving { background: var(--surface-2); color: var(--muted); }
+.pill.error { background: #fde8e8; color: #b42318; font-weight: 600; }
+.pill.muted { background: transparent; color: var(--muted); }
+.pill.muted::before { display: none; }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.warn::before { display: inline-block; }
+.lang { display: inline-flex; border: 1px solid var(--border, #cbd5e1); border-radius: 6px; overflow: hidden; }
+.lang button { border: 0; border-radius: 0; padding: 3px 9px; background: var(--surface, #fff); }
+.lang button[aria-pressed="true"] { background: var(--accent, #2563eb); color: #fff; font-weight: 700; }
+
+/* List of audits */
+.audit-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+.audit-table th, .audit-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border, #e2e8f0); vertical-align: middle; }
+.audit-table tr.current { background: var(--ok-soft); }
+.audit-table .badge { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px; font-size: 11px; background: var(--ok); color: #fff; }
+.audit-table .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.text-field-error { color: #b42318; font-size: 12px; margin: 4px 0 0; }
+
+/* Naming popin (new audit, rename, duplicate) */
+dialog.confirm { width: min(460px, 92vw); }
+#text-form { display: grid; gap: 14px; }
+#text-form h2 { margin: 0; }
+#text-form .field { margin: 0; gap: 6px; }
+#text-form .field span { font-weight: 600; color: var(--text); }
+#text-form .field input { width: 100%; box-sizing: border-box; padding: 8px 10px; }
+#text-form .confirm-actions { margin-top: 4px; }
+.confirm-actions button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+
+/* One scrollbar only: the lists of elements flow with the page, they have no scroll of their own */
+.list-pane, .finding-pane { position: static; max-height: none; overflow: visible; }
+
+/* ---------- Telling the elements apart ---------- */
+/* Bar on the left = what the page says about the element; icon on the right = where the review stands */
+.item { border-left: 5px solid var(--border); padding-left: 7px; }
+.item[data-detected='unnamed'] { border-left-color: var(--bad); }
+.item[data-detected='named'] { border-left-color: #2563eb; }
+.item[data-detected='ignored'] { border-left-color: #94a3b8; }
+.item[data-detected='ignored'] .thumb { opacity: .55; }
+.item[data-kind='contrast-fail'] { border-left-color: var(--bad); }
+.item[data-kind='contrast-unknown'] { border-left-color: var(--warn); }
+/* what still needs you stands out, what is done recedes */
+.item[data-status='todo'] .num { font-weight: 800; }
+.item[data-status='c']:not([aria-current='true']):not(:hover) { opacity: .68; }
+
+.dot { width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center; box-sizing: border-box; border: 2px solid var(--muted); background: transparent; color: #fff; font: 700 13px/1 system-ui, sans-serif; flex: none; }
+.dot.progress { border-color: var(--warn); background: conic-gradient(var(--warn) 0 50%, transparent 50% 100%); }
+.dot.c { border-color: var(--ok); background: var(--ok); }
+.dot.c::before { content: '✓'; }
+.dot.nc { border-color: var(--bad); background: var(--bad); }
+.dot.nc::before { content: '✕'; }
+.dot:not(.progress):not(.c):not(.nc) { border-style: dashed; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 4px 12px; padding: 4px 8px 8px; font-size: 11px; color: var(--muted); }
+.legend .lg { display: inline-flex; align-items: center; gap: 5px; }
+.legend .dot { width: 14px; height: 14px; border-width: 2px; font-size: 9px; }
+.legend .bar { width: 5px; height: 14px; border-radius: 2px; background: var(--border); }
+.legend .bar.unnamed { background: var(--bad); }
+.legend .bar.named { background: #2563eb; }
+.legend .bar.ignored { background: #94a3b8; }
+.legend-note { margin: 0; padding: 0 8px 8px; font-size: 11px; color: var(--muted); }
