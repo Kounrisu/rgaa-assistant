@@ -1306,6 +1306,10 @@ function runRgaaRules(): { url: string; findings: { key: string; count: number; 
 
   // 8.1 — document type
   if (!document.doctype || document.compatMode === 'BackCompat') out.push({ key: 'doctype', count: 1, detail: document.doctype ? document.doctype.name : 'no doctype' })
+  else {
+    const dt = document.doctype
+    out.push({ key: 'doctype-found', count: 0, detail: `<!DOCTYPE ${dt.name}${dt.publicId ? ` PUBLIC "${dt.publicId}"` : ''}${dt.systemId ? ` "${dt.systemId}"` : ''}> · ${document.compatMode === 'CSS1Compat' ? 'standards mode' : document.compatMode}` })
+  }
 
   // 10.1 — tags and attributes that only serve presentation
   const tags = all('basefont, big, blink, center, font, marquee, s, strike, tt')

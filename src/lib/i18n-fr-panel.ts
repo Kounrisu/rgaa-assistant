@@ -560,4 +560,6 @@ export const FR_PANEL: Record<string, string> = {
   '<{tag}> without label': '<{tag}> sans étiquette',
   'table {r}×{c}': 'tableau {r}×{c}',
   '{r} rows × {c} columns · {h} header cell(s)': '{r} lignes × {c} colonnes · {h} cellule(s) d’en-tête',
+  'Seen: {details}.': 'Constaté : {details}.',
+  'standards mode': 'mode standard',
 }
