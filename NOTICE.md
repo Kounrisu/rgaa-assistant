@@ -52,7 +52,8 @@ The Asqatasun-derived code is kept in a few places only, each marked with
 | `src/lib/asqatasun-nomenclatures.ts` | The whole file: the word lists. |
 | `scripts/check-asqatasun.mjs` | The whole file: the check against Asqatasun's fixtures. |
 | `src/content/rgaa-rules-run.ts` | The import at the top, the call `out.push(...runAsqatasunRules())` in `runRgaaRules()`, and the function `runAsqatasunRules()` (which only calls `evaluateAsqRules`). |
-| `src/panel/panel.ts` | A type-only import, and one block at the end of `rulesToResults()` (notes, "not applicable", and the criteria where every ported test passed). |
+| `src/panel/auto-checks.ts` | A type-only import, and one block at the end of `rulesToResults()` (notes, "not applicable", and the criteria where every ported test passed). |
+| `tests/panel-auto-checks.test.ts` | The test between the two markers (it tests the block of `rulesToResults()` above). |
 | `src/lib/i18n-fr-lib.ts` | The French entries between the two markers (all starting with `RGAA `). |
 | `package.json`, `package-lock.json` | The `jsdom` development dependency and the `check:asqatasun` script. |
 
@@ -80,10 +81,11 @@ rows in `RULES`) if they are still wanted.
 2. In `src/content/rgaa-rules-run.ts`, delete the three blocks between `// --- Asqatasun-derived: begin ---` and
    `// --- Asqatasun-derived: end ---` (the import near the top, the call in `runRgaaRules()`, the function
    `runAsqatasunRules()`).
-3. In `src/panel/panel.ts`, delete the blocks between the same markers (the `import type` line, the loop in
+3. In `src/panel/auto-checks.ts`, delete the blocks between the same markers (the `import type` line, the loop in
    `rulesToResults()`, the `const asq: ToolResults = …` line, and the `const asqReport = …` line in `runAutoChecks()`),
    then remove the `asq` property of the return type and value of `rulesToResults()`, the `split.asq` use, and the
-   `asqReport.set` and `asqReport.noted` terms of the message in `runAutoChecks()`.
+   `asqReport.set` and `asqReport.noted` terms of the message in `runAutoChecks()`. Delete the test between the same
+   markers in `tests/panel-auto-checks.test.ts`.
 4. In `src/lib/i18n-fr-lib.ts`, delete the block between the same markers.
 5. `npm uninstall jsdom` and delete the `check:asqatasun` script of `package.json`.
 6. Restore the own checks listed above if they are wanted (see the commit above).
