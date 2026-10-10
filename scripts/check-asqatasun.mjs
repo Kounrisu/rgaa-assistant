@@ -22,8 +22,10 @@ const option = (name, fallback) => (args.includes(name) ? args[args.indexOf(name
 const fixturesDir = resolve(option('--dir', join(tmpdir(), 'asqatasun-fixtures')))
 const onlyRule = option('--rule', null)
 
-const API = 'https://api.github.com/repos/Asqatasun/Asqatasun/git/trees/master?recursive=1'
-const RAW = 'https://raw.githubusercontent.com/Asqatasun/Asqatasun/master/'
+// Pinned revision of Asqatasun: the fixtures never change under our feet. Move it deliberately, then re-run this check.
+const REVISION = 'af9064357e881786cc7cc72e782662908bd91c5b'
+const API = `https://api.github.com/repos/Asqatasun/Asqatasun/git/trees/${REVISION}?recursive=1`
+const RAW = `https://raw.githubusercontent.com/Asqatasun/Asqatasun/${REVISION}/`
 const FIXTURE_PATH = /^rules\/rules-rgaa4\.0\/src\/test\/resources\/testcases\/rgaa40\/(Rgaa40Rule\d{4}(?:\d{2})?)\/([^/]+)\.html$/
 const TEST_CLASS_PATH = /^rules\/rules-rgaa4\.0\/src\/test\/java\/org\/asqatasun\/rules\/rgaa40\/(Rgaa40Rule\d{6})Test\.java$/
 
