@@ -3,10 +3,10 @@ import pkg from './package.json'
 
 export default defineManifest({
   manifest_version: 3,
-  name: 'RGAA Assistant — Images (Theme 1)',
+  name: 'RGAA Assistant',
   version: pkg.version,
   description:
-    "AI-assisted RGAA 4.1 auditor, Theme 1 (Images) only. Numbers the images on a page, builds the element list, and prepares the AI prompt to paste into a chat UI.",
+    'RGAA 4.1 audit assistant in the DevTools: finds and numbers the elements on a page, runs automatic and manual checks, keeps your audits, and exports an Excel grid and a report. Results are an aid: the auditor confirms every verdict.',
   background: {
     service_worker: 'src/background.ts',
     type: 'module',
