@@ -1,10 +1,14 @@
 import type { ImageElementInfo, RawFinding } from '../lib/types'
+import type { ScanCoverage } from '../lib/scan-coverage'
 // --- Asqatasun-derived: begin ---
 // Imported by this script only (no other file imports the table), so it stays inside this bundle.
 import { evaluateAsqRules, type AsqFinding } from '../lib/asqatasun-rules'
 // --- Asqatasun-derived: end ---
 // Visual aids for manual checks; imported by this script only, so it is inlined in this bundle.
 import { hiddenKind, resetTools, runTool, tabOrder, type ToolName } from './page-tools'
+// Pure helpers, imported by this script only (inlined).
+import { cloneWithTarget } from './scan-context'
+import { computeCoverage, noteCut, resetCuts } from './scan-coverage'
 
 const OVERLAY_ID = 'rgaa-assistant-overlay'
 const STYLE_ID = 'rgaa-assistant-style'
@@ -293,11 +297,7 @@ function ownHtmlFor(el: Element): string {
 
 function contextHtmlFor(el: Element): string {
   const context = el.closest('a, button, figure, picture') ?? el.parentElement ?? el
-  const clone = context.cloneNode(true) as Element
-  clone.querySelectorAll('script, style, noscript').forEach((n) => n.remove())
-  const index = Array.from(context.querySelectorAll('*')).indexOf(el)
-  const target = context === el ? clone : clone.querySelectorAll('*')[index]
-  target?.setAttribute('data-rgaa-target', '')
+  const clone = cloneWithTarget(context, el, 'script, style, noscript')
   clone.querySelectorAll('svg').forEach(trimSvg)
   const html = clone.outerHTML
   return html.length > MAX_HTML ? html.slice(0, MAX_HTML) + ' …' : html
@@ -498,6 +498,7 @@ function makeThemeBoxes(overlay: ThemeOverlay, id: number, els: Element[], badge
   if (!overlay.container.isConnected) document.body.appendChild(overlay.container)
   ensureStyle()
   const boxes: HTMLElement[] = []
+  noteCut('boxes per finding', 60, els.length)
   els.slice(0, 60).forEach((el, i) => {
     const rect = el.getBoundingClientRect()
     const fixed = isFixed(el)
@@ -597,10 +598,7 @@ function shortHtml(el: Element, max = 400): string {
 
 function boundedContext(el: Element): string {
   const parent = el.parentElement ?? el
-  const clone = parent.cloneNode(true) as Element
-  clone.querySelectorAll('script, style, noscript, svg').forEach((n) => n.remove())
-  const target = parent === el ? clone : clone.querySelectorAll('*')[Array.from(parent.querySelectorAll('*')).indexOf(el)]
-  target?.setAttribute('data-rgaa-target', '')
+  const clone = cloneWithTarget(parent, el, 'script, style, noscript, svg')
   const html = clone.outerHTML
   return html.length > 2500 ? `${html.slice(0, 2500)} …` : html
 }
@@ -753,7 +751,9 @@ function scanContrast(): { findings: RawFinding[]; els: Element[][] } {
   const seen = new Set<Element>()
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
   const skip = /^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA|OPTION)$/
-  for (let n = walker.nextNode(), i = 0; n && i < 9000; n = walker.nextNode(), i++) {
+  const MAX_NODES = 9000
+  let n = walker.nextNode()
+  for (let i = 0; n && i < MAX_NODES; n = walker.nextNode(), i++) {
     const text = (n.textContent ?? '').replace(/\s+/g, ' ').trim()
     const el = n.parentElement
     if (!text || !el || skip.test(el.tagName) || seen.has(el) || el.closest(`#${OVERLAY_ID}`) || !visible(el)) continue
@@ -777,12 +777,19 @@ function scanContrast(): { findings: RawFinding[]; els: Element[][] } {
     const kind = reason ? 'unknown' : ratio >= threshold ? 'ok' : 'fail'
     hits.push({ el, text, fg, bg: bgInfo.color, ratio, threshold, large, size, bold, kind, reason })
   }
+  if (n) {
+    // the walk stopped at the limit: count what was left unexamined
+    let left = 0
+    for (; n; n = walker.nextNode()) left++
+    noteCut('text nodes (contrast)', MAX_NODES, MAX_NODES + left)
+  }
 
   const findings: RawFinding[] = []
   const els: Element[][] = []
   const ok = hits.filter((h) => h.kind === 'ok')
   const pairs = new Set(ok.map((h) => `${hex(h.fg)}|${hex(h.bg)}|${h.large}`))
   const problems = hits.filter((h) => h.kind !== 'ok')
+  noteCut('contrast findings', MAX_LISTED, problems.length)
   findings.push({
     type: 'contrast-ok',
     id: 0,
@@ -912,6 +919,7 @@ function scanLinks(): { findings: RawFinding[]; els: Element[][] } {
   }
   const findings: RawFinding[] = []
   const els: Element[][] = []
+  noteCut('links', 400, groups.size)
   for (const g of Array.from(groups.values()).slice(0, 400)) {
     const first = g.els[0]
     const empty = !g.name
@@ -1024,7 +1032,9 @@ function scanStructure(): { findings: RawFinding[]; els: Element[][] } {
 function scanTables(): { findings: RawFinding[]; els: Element[][] } {
   const findings: RawFinding[] = []
   const els: Element[][] = []
-  for (const t of Array.from(document.querySelectorAll('table, [role="table"], [role="grid"], [role="treegrid"]')).slice(0, 200)) {
+  const allTables = Array.from(document.querySelectorAll('table, [role="table"], [role="grid"], [role="treegrid"]'))
+  noteCut('tables', 200, allTables.length)
+  for (const t of allTables.slice(0, 200)) {
     if (t.closest(`[id^="${OVERLAY_ID}"]`) || !rendered(t)) continue
     const vis = visibilityOf(t)
     const role = (t.getAttribute('role') ?? '').toLowerCase()
@@ -1076,7 +1086,9 @@ function scanFields(): { findings: RawFinding[]; els: Element[][] } {
   const findings: RawFinding[] = []
   const els: Element[][] = []
   const sel = 'input:not([type=hidden]):not([type=submit]):not([type=button]):not([type=reset]):not([type=image]), select, textarea, [role="textbox"], [role="combobox"], [role="listbox"], [role="checkbox"], [role="radio"], [role="switch"], [role="slider"], [role="spinbutton"], [role="searchbox"]'
-  for (const f of Array.from(document.querySelectorAll(sel)).slice(0, 300)) {
+  const allFields = Array.from(document.querySelectorAll(sel))
+  noteCut('fields', 300, allFields.length)
+  for (const f of allFields.slice(0, 300)) {
     if (f.closest(`[id^="${OVERLAY_ID}"]`) || !rendered(f)) continue
     const vis = visibilityOf(f)
     const tag = f.tagName.toLowerCase()
@@ -1102,6 +1114,7 @@ function scanFields(): { findings: RawFinding[]; els: Element[][] } {
 }
 
 function scanTheme(theme: number, color: string): RawFinding[] {
+  resetCuts()
   const { findings, els } = theme === 2 ? scanFrames() : theme === 6 ? scanLinks() : theme === 9 ? scanStructure() : theme === 5 ? scanTables() : theme === 11 ? scanFields() : scanContrast()
   themeOverlayFor(theme, color)
   // every element keeps its box, unless the page has so many that only the ones to look at stay (hundreds of boxes slow a page down)
@@ -1436,7 +1449,7 @@ function runAsqatasunRules(): AsqFinding[] {
 // --- Asqatasun-derived: end ---
 
 /** The generated HTML of the page (what the browser holds now, after scripts), without our own markers. */
-function takeSnapshot(): { url: string; title: string; html: string } {
+function takeSnapshot(): { url: string; title: string; html: string; coverage: ScanCoverage } {
   // no deep copy of the page (heavy on big pages): our own markers are lifted out for a moment, the page is serialized, they go back
   const lifted: { node: Element; parent: Node; next: Node | null }[] = []
   for (const node of Array.from(document.querySelectorAll(`[id^="${OVERLAY_ID}"], #${STYLE_ID}`))) {
@@ -1453,7 +1466,9 @@ function takeSnapshot(): { url: string; title: string; html: string } {
   const doctype = dt ? `<!DOCTYPE ${dt.name}${dt.publicId ? ` PUBLIC "${dt.publicId}"` : ''}${dt.systemId ? ` "${dt.systemId}"` : ''}>\n` : ''
   // a very large page is cut: the audit file and the validation stay manageable
   const MAX = 6_000_000
-  return { url: location.href, title: document.title, html: doctype + (html.length > MAX ? `${html.slice(0, MAX)}\n<!-- cut: page larger than ${MAX} characters -->` : html) }
+  resetCuts()
+  noteCut('html characters', MAX, html.length)
+  return { url: location.href, title: document.title, coverage: computeCoverage(document), html: doctype + (html.length > MAX ? `${html.slice(0, MAX)}\n<!-- cut: page larger than ${MAX} characters -->` : html) }
 }
 
 /** Runs the axe engine (injected by the background page just before) and sends back a light copy of its findings. */
@@ -1505,8 +1520,9 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true
   }
   if (message?.type === 'RGAA_RULES_RUN') {
+    resetCuts()
     const base = runRgaaRules()
-    sendResponse({ ...base, findings: [...base.findings, ...runUxRules()] })
+    sendResponse({ ...base, findings: [...base.findings, ...runUxRules()], coverage: computeCoverage(document) })
     return true
   }
   if (message?.type === 'RGAA_AXE_RUN') {
@@ -1526,7 +1542,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message.color) imageColor = message.color
     const elements = highlightImages()
     startObserving()
-    sendResponse({ elements })
+    sendResponse({ elements, coverage: computeCoverage(document) })
     return true
   }
   if (message?.type === 'RGAA_CLEAR_HIGHLIGHTS') {
@@ -1574,7 +1590,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true
   }
   if (message?.type === 'RGAA_SCAN_THEME') {
-    sendResponse({ findings: scanTheme(message.theme, message.color ?? DEFAULT_COLOR) })
+    const findings = scanTheme(message.theme, message.color ?? DEFAULT_COLOR)
+    sendResponse({ findings, coverage: computeCoverage(document) })
     return true
   }
   if (message?.type === 'RGAA_RELABEL' && message.theme && message.theme !== 1) {

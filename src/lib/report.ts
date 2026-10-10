@@ -1,6 +1,7 @@
 import { auditStats, levelStats, rateOf, type Counts, type PageInput } from './audit-sheet'
 import { getLang, t } from './i18n'
 import { MANUAL_CHECKS } from './manual-checks'
+import { coverageLines } from './scan-coverage'
 import { CRITERION_LEVEL } from './themes'
 import type { Audit, PageRecord } from './types'
 
@@ -59,6 +60,11 @@ function nonCompliances(page: PageRecord, input: PageInput): string {
   return rows.length ? `<table class="grid"><thead><tr><th>${esc(t('Criterion'))}</th><th>${esc(t('Non-compliance'))}</th></tr></thead><tbody>${rows.join('')}</tbody></table>` : `<p>${esc(t('No non-compliance recorded on this page.'))}</p>`
 }
 
+function coverageOf(page: PageRecord): string {
+  if (!page.scanCoverage) return ''
+  return `<h4>${esc(t('Scan coverage'))}</h4><ul>${coverageLines(page.scanCoverage).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`
+}
+
 function checksOf(page: PageRecord): string {
   const parts: string[] = []
   const manual = page.manualChecks ?? {}
@@ -93,7 +99,7 @@ export function buildReportHtml(audit: Audit, inputs: PageInput[], pages: PageRe
     .map((x) => `<tr><td>${x.number}. ${esc(x.name)}</td><td>${pct(x.rate)}</td><td>${bar(x.counts)}<br><small>${counts(x.counts)}</small></td></tr>`)
     .join('')
   const perPage = pages
-    .map((page, i) => `<section class="page"><h3>${esc(stats.perPage[i].label)} — ${esc(stats.perPage[i].title)}</h3><p><small>${esc(stats.perPage[i].url)}</small></p>${nonCompliances(page, inputs[i])}<h4>${esc(t('Checks'))}</h4>${checksOf(page)}</section>`)
+    .map((page, i) => `<section class="page"><h3>${esc(stats.perPage[i].label)} — ${esc(stats.perPage[i].title)}</h3><p><small>${esc(stats.perPage[i].url)}</small></p>${nonCompliances(page, inputs[i])}<h4>${esc(t('Checks'))}</h4>${checksOf(page)}${coverageOf(page)}</section>`)
     .join('')
   const failing = stats.sampleCriteria.filter((c) => c.status === 'NC')
 

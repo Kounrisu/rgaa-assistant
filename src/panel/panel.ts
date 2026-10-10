@@ -14,6 +14,7 @@ import { RULES, type RuleFinding } from '../lib/rgaa-rules'
 import { packSnapshot, unpackSnapshot } from '../lib/snapshot'
 import { initPageTools, renderPageTools, resetPageTools, setPageToolsTheme } from './page-tools-ui'
 import { buildReportHtml } from '../lib/report'
+import { coverageLines, mergeCoverage } from '../lib/scan-coverage'
 import { checkHtml } from '../lib/html-check'
 // --- Asqatasun-derived: begin ---
 import type { AsqExtra } from '../lib/asqatasun-rules' // a type only: the table itself stays in the page script
@@ -2700,6 +2701,7 @@ async function scan(): Promise<void> {
     const selectedKey = elements.find((e) => e.id === selectedId)?.key
     if (rec.themes.includes(1)) {
       const response = await sendToPage(inspectedTabId(), { type: 'RGAA_HIGHLIGHT_IMAGES', color: colorOf(1) })
+      rec.scanCoverage = mergeCoverage(rec.scanCoverage, response?.coverage)
       const { added, map } = mergeScan(response?.elements ?? [])
       await sendToPage(inspectedTabId(), { type: 'RGAA_RELABEL', map })
       if (!rec.scannedThemes.includes(1)) rec.scannedThemes.push(1)
@@ -2711,6 +2713,7 @@ async function scan(): Promise<void> {
     }
     for (const tn of rec.themes.filter((n) => FINDING_THEMES.has(n))) {
       const response = await sendToPage(inspectedTabId(), { type: 'RGAA_SCAN_THEME', theme: tn, color: colorOf(tn) })
+      rec.scanCoverage = mergeCoverage(rec.scanCoverage, response?.coverage)
       const { map, added } = mergeFindings(tn, response?.findings ?? [])
       await sendToPage(inspectedTabId(), { type: 'RGAA_RELABEL', map, theme: tn })
       const n = rec.findings.filter((f) => f.theme === tn).length
@@ -2826,6 +2829,11 @@ function manualProgress(rec: PageRecord): { done: number; issues: number; total:
   return { done: answers.length, issues: answers.filter((a) => a.state === 'issue').length, total: MANUAL_CHECKS.length }
 }
 
+/** What the scans did not look at, in plain words (frames, shadow roots, lists cut at a limit). */
+function coverageCard(cov: NonNullable<PageRecord['scanCoverage']>): HTMLElement {
+  return h('div', { class: 'card' }, h('h3', {}, t('Scan coverage')), h('p', { class: 'hint-line' }, t('What the automatic scans did NOT look at. These parts need a manual check.')), h('ul', { class: 'checks' }, ...coverageLines(cov).map((x) => h('li', {}, x))))
+}
+
 function renderChecks(): void {
   checksEl.replaceChildren()
   if (!page) return
@@ -2890,6 +2898,7 @@ function renderChecks(): void {
       h('div', { class: 'nav' }, h('button', { type: 'button', class: 'primary', disabled: axeRunning, onclick: () => void runEverything() }, axeRunning ? t('Running the checks…') : t('Run the automatic checks'))),
     ),
     htmlCard(rec),
+    ...(rec.scanCoverage ? [coverageCard(rec.scanCoverage)] : []),
     ...reports.map((r) =>
       h(
         'div',
@@ -2911,6 +2920,7 @@ async function captureAndCheckHtml(rec: PageRecord): Promise<void> {
   const snap = await sendToPage(inspectedTabId(), { type: 'RGAA_SNAPSHOT' })
   if (typeof snap.html !== 'string') throw new Error('no html')
   rec.snapshot = packSnapshot(snap.html, snap.url, snap.title)
+  rec.scanCoverage = mergeCoverage(rec.scanCoverage, snap.coverage)
   await validateSnapshot(rec, snap.html)
 }
 
@@ -3035,6 +3045,7 @@ async function runAutoChecks(): Promise<void> {
   let step = 'rules'
   try {
     const own = await sendToPage(inspectedTabId(), { type: 'RGAA_RULES_RUN' })
+    rec.scanCoverage = mergeCoverage(rec.scanCoverage, own?.coverage)
     await sleep(250) // let a heavy page breathe between the steps
     step = 'axe'
     const response = await chrome.runtime.sendMessage({ type: 'RGAA_AXE', tabId: inspectedTabId(), locale: getLang() === 'fr' ? axeFrench : null, rules: Object.keys(AXE_TO_RGAA) })
