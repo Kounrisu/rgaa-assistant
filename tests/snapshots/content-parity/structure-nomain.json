@@ -569,7 +569,7 @@
         "truncated": [],
         "notes": []
       },
-      "html": "<!DOCTYPE html>\n<html lang=\"fr\" data-rgaa-instance=\"X\"><head><meta charset=\"utf-8\"><title>Sans main</title></head>\n<body><div><h2>Seulement un h2</h2><p>Texte.</p></div>\n\n</body></html>"
+      "html": "<!DOCTYPE html>\n<html lang=\"fr\"><head><meta charset=\"utf-8\"><title>Sans main</title></head>\n<body><div><h2>Seulement un h2</h2><p>Texte.</p></div>\n\n</body></html>"
     }
   },
   "overlay after scans": [

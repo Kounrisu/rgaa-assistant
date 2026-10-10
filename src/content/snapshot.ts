@@ -13,10 +13,14 @@ export function takeSnapshot(): { url: string; title: string; html: string; cove
     if (node.parentNode) lifted.push({ node, parent: node.parentNode, next: node.nextSibling })
   }
   for (const { node } of lifted) node.remove()
+  // our own instance marker on <html> is not part of the page either
+  const instance = document.documentElement.getAttribute('data-rgaa-instance')
+  if (instance !== null) document.documentElement.removeAttribute('data-rgaa-instance')
   let html = ''
   try {
     html = document.documentElement.outerHTML
   } finally {
+    if (instance !== null) document.documentElement.setAttribute('data-rgaa-instance', instance)
     for (const { node, parent, next } of lifted.reverse()) parent.insertBefore(node, next)
   }
   const dt = document.doctype

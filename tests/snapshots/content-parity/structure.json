@@ -950,7 +950,7 @@
         "truncated": [],
         "notes": []
       },
-      "html": "<!DOCTYPE html>\n<html lang=\"fr\" data-rgaa-instance=\"X\"><head><meta charset=\"utf-8\"><title>Structure</title></head>\n<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n</body></html>"
+      "html": "<!DOCTYPE html>\n<html lang=\"fr\"><head><meta charset=\"utf-8\"><title>Structure</title></head>\n<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n</body></html>"
     }
   },
   "overlay after scans": [

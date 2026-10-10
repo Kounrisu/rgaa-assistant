@@ -849,7 +849,7 @@
         "truncated": [],
         "notes": []
       },
-      "html": "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">\n<html lang=\"en\" dir=\"ltr\" data-rgaa-instance=\"X\"><head><meta charset=\"utf-8\"><title>Accueil</title></head>\n<body>\n<font color=\"red\">Balise de présentation</font>\n<center>Centré</center>\n<p align=\"center\" style=\"color:#000\">Texte aligné</p>\n<a href=\"doc.pdf\">Document PDF</a>\n<video src=\"v.mp4\"></video>\n<img src=\"a.png\" alt=\"Alt\">\n<main><h1>Page</h1></main>\n\n\n</body></html>"
+      "html": "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">\n<html lang=\"en\" dir=\"ltr\"><head><meta charset=\"utf-8\"><title>Accueil</title></head>\n<body>\n<font color=\"red\">Balise de présentation</font>\n<center>Centré</center>\n<p align=\"center\" style=\"color:#000\">Texte aligné</p>\n<a href=\"doc.pdf\">Document PDF</a>\n<video src=\"v.mp4\"></video>\n<img src=\"a.png\" alt=\"Alt\">\n<main><h1>Page</h1></main>\n\n\n</body></html>"
     }
   },
   "overlay after scans": [

@@ -812,7 +812,7 @@
         "truncated": [],
         "notes": []
       },
-      "html": "<html data-rgaa-instance=\"X\"><head><title>untitled</title></head>\n<body>\n<h1>Sans doctype</h1>\n<img src=\"z.png\">\n<a href=\"/x\" target=\"_blank\">Lien</a>\n<input type=\"text\" name=\"email\">\n<table><tbody><tr><td>a</td></tr><tr><td>b</td></tr></tbody></table>\n\n\n</body></html>"
+      "html": "<html><head><title>untitled</title></head>\n<body>\n<h1>Sans doctype</h1>\n<img src=\"z.png\">\n<a href=\"/x\" target=\"_blank\">Lien</a>\n<input type=\"text\" name=\"email\">\n<table><tbody><tr><td>a</td></tr><tr><td>b</td></tr></tbody></table>\n\n\n</body></html>"
     }
   },
   "overlay after scans": [
