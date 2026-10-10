@@ -25,77 +25,17 @@ import type { AsqExtra } from '../lib/asqatasun-rules' // a type only: the table
 import { findingCriteriaOf, findingCriterionIds, hintForFinding, suggestFinding, type FindingCriterion } from '../lib/findings'
 import { FINDING_THEMES, SCANNED_THEMES, THEMES, THEME_LABEL, themeByNumber } from '../lib/themes'
 import type { Audit, AuditSummary, ChecklistAnswer, ChecklistVerdict, FindingItem, ImageElementInfo, ImageKind, ImageReview, PageRecord, RawFinding, Verdict } from '../lib/types'
-import type { Item, Filter, Child, Status, View, FStatus, FindingFilter } from './types'
+import type { Item, Filter, Status, View, FStatus, FindingFilter } from './types'
 import { labelOf, formatHtml, fileName, pad, hash, sleep, tDyn, slugOf, keyOf, dateTimeOf, kb, auditTitle, timeOf, hostName, auditFileName } from './helpers'
+import { $, h, keepScroll, tNodes, download, dom, say } from './dom'
+import { state } from './state'
+import { registerActions } from './actions'
 
-const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T
-
-const scanBtn = $<HTMLButtonElement>('scan-btn')
-const clearBtn = $<HTMLButtonElement>('clear-btn')
-const statusEl = $('status')
-const appEl = $('app')
-const emptyEl = $('empty')
-const listEl = $('element-list')
-const detailEl = $('detail')
-const filtersEl = $('filters')
-const resultsEl = $('results')
-const resultsBtn = $<HTMLButtonElement>('results-btn')
-const newBanner = $('new-banner')
-const newBannerText = $('new-banner-text')
-const rescanBtn = $<HTMLButtonElement>('rescan-btn')
-const boxesBtn = $<HTMLButtonElement>('boxes-btn')
-const tintBtn = $<HTMLButtonElement>('tint-btn')
-const altBtn = $<HTMLButtonElement>('alt-btn')
-let showAltOn = (() => { try { return localStorage.getItem('rgaa-show-alt') === 'on' } catch { return false } })()
-let focusTintOn = (() => { try { return localStorage.getItem('rgaa-focus-tint') !== 'off' } catch { return true } })()
-
-
-let audit: Audit = emptyAudit()
-let page: PageRecord | null = null
-let liveUrl = ''
-const scannedThisSession = new Set<string>()
-let elements: Item[] = []
-let scanCount = 0
-let selectedId: number | null = null
-let reviews: Record<string, ImageReview> = {}
-let theme = 1
-let filter: Filter = 'all'
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
 /* ------------------------------------------------------------------ */
 
-function h<K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  props: Record<string, unknown> = {},
-  ...children: Child[]
-): HTMLElementTagNameMap[K] {
-  const node = document.createElement(tag)
-  for (const [key, value] of Object.entries(props)) {
-    if (value === undefined || value === null || value === false) continue
-    if (key === 'class') node.className = String(value)
-    else if (key.startsWith('on') && typeof value === 'function') node.addEventListener(key.slice(2), value as EventListener)
-    else if (key in node && key !== 'list') (node as unknown as Record<string, unknown>)[key] = value
-    else node.setAttribute(key, String(value))
-  }
-  for (const child of children) if (child) node.append(child)
-  return node
-}
-
-function say(message: string): void {
-  statusEl.textContent = message
-}
-
-/** Like t(), but each `{name}` is replaced by a node (a <strong>, a link…) instead of text. */
-function tNodes(en: string, nodes: Record<string, Child>): Child[] {
-  return t(en)
-    .split(/(\{\w+\})/)
-    .filter(Boolean)
-    .map((part) => {
-      const key = /^\{(\w+)\}$/.exec(part)?.[1]
-      return key && key in nodes ? nodes[key] : part
-    })
-}
 
 function inspectedTabId(): number {
   return chrome.devtools.inspectedWindow.tabId
@@ -108,8 +48,8 @@ async function sendToPage<M extends ContentMessage>(tabId: number, payload: M): 
 }
 
 const focusOnPage = async (id: number, scroll: boolean, themeNo = 1) => {
-  if (scroll && boxesOn[themeNo] === false) {
-    boxesOn[themeNo] = true
+  if (scroll && state.boxesOn[themeNo] === false) {
+    state.boxesOn[themeNo] = true
     await applyBoxes()
   }
   return sendToPage(inspectedTabId(), { type: 'RGAA_FOCUS_IMAGE', id, scroll, theme: themeNo })
@@ -119,26 +59,22 @@ const focusOnPage = async (id: number, scroll: boolean, themeNo = 1) => {
     .catch(console.error)
 }
 
-/** Per theme: are its boxes on? Saved in the browser; the default is on. */
-const boxesOn: Record<number, boolean> = (() => {
-  try { return JSON.parse(localStorage.getItem('rgaa-boxes-by-theme') ?? '{}') } catch { return {} }
-})()
 
 /** Only the theme you are in shows boxes on the page, and only if its own toggle is on. */
 async function applyBoxes(): Promise<void> {
-  const on = boxesOn[theme] !== false
-  const name = t(THEME_LABEL[theme] ?? '')
-  boxesBtn.setAttribute('aria-pressed', String(on))
-  boxesBtn.textContent = on ? t('Hide {name} boxes', { name }) : t('Show {name} boxes', { name })
-  try { localStorage.setItem('rgaa-boxes-by-theme', JSON.stringify(boxesOn)) } catch { /* optional */ }
+  const on = state.boxesOn[state.theme] !== false
+  const name = t(THEME_LABEL[state.theme] ?? '')
+  dom.boxesBtn.setAttribute('aria-pressed', String(on))
+  dom.boxesBtn.textContent = on ? t('Hide {name} boxes', { name }) : t('Show {name} boxes', { name })
+  try { localStorage.setItem('rgaa-boxes-by-theme', JSON.stringify(state.boxesOn)) } catch { /* optional */ }
   const visibility: Record<number, boolean> = {}
-  for (const n of SCANNED_THEMES) visibility[n] = n === theme && boxesOn[n] !== false
-  tintBtn.setAttribute('aria-pressed', String(focusTintOn))
-  tintBtn.textContent = focusTintOn ? t('Yellow highlight: on') : t('Yellow highlight: off')
-  altBtn.setAttribute('aria-pressed', String(showAltOn))
-  altBtn.textContent = showAltOn ? t('Alt text: on') : t('Alt text: off')
-  altBtn.hidden = theme !== 1
-  await sendToPage(inspectedTabId(), { type: 'RGAA_OVERLAY', visibility, tint: focusTintOn, alt: showAltOn }).catch(() => undefined)
+  for (const n of SCANNED_THEMES) visibility[n] = n === state.theme && state.boxesOn[n] !== false
+  dom.tintBtn.setAttribute('aria-pressed', String(state.focusTintOn))
+  dom.tintBtn.textContent = state.focusTintOn ? t('Yellow highlight: on') : t('Yellow highlight: off')
+  dom.altBtn.setAttribute('aria-pressed', String(state.showAltOn))
+  dom.altBtn.textContent = state.showAltOn ? t('Alt text: on') : t('Alt text: off')
+  dom.altBtn.hidden = state.theme !== 1
+  await sendToPage(inspectedTabId(), { type: 'RGAA_OVERLAY', visibility, tint: state.focusTintOn, alt: state.showAltOn }).catch(() => undefined)
   pushStates()
   await syncFilterBoxes()
 }
@@ -146,17 +82,16 @@ async function applyBoxes(): Promise<void> {
 /** The list filter also decides which boxes are on the page (Images and Colours). */
 async function syncFilterBoxes(): Promise<void> {
   let ids: number[] | null = null
-  if (theme === 1 && filter !== 'all') ids = visibleElements().map((e) => e.id)
-  if (FINDING_THEMES.has(theme) && findingFilter !== 'all' && page) ids = page.findings.filter((f) => f.theme === theme && findingMatches(f, findingFilter)).map((f) => f.id)
-  if (theme !== 1 && !FINDING_THEMES.has(theme)) return
-  await sendToPage(inspectedTabId(), { type: 'RGAA_SHOW_ONLY', theme, ids }).catch(() => undefined)
+  if (state.theme === 1 && state.filter !== 'all') ids = visibleElements().map((e) => e.id)
+  if (FINDING_THEMES.has(state.theme) && state.findingFilter !== 'all' && state.page) ids = state.page.findings.filter((f) => f.theme === state.theme && findingMatches(f, state.findingFilter)).map((f) => f.id)
+  if (state.theme !== 1 && !FINDING_THEMES.has(state.theme)) return
+  await sendToPage(inspectedTabId(), { type: 'RGAA_SHOW_ONLY', theme: state.theme, ids }).catch(() => undefined)
 }
 
 /**
  * Asks a question inside the panel. The browser's own confirm() popup is not shown in a DevTools panel
  * (it returns "no" at once), so a reset would silently do nothing.
  */
-const confirmDialog = $<HTMLDialogElement>('confirm-dialog')
 function askConfirm(title: string, text: string, okLabel?: string): Promise<boolean> {
   return new Promise((resolve) => {
     const ok = $('confirm-ok')
@@ -167,8 +102,8 @@ function askConfirm(title: string, text: string, okLabel?: string): Promise<bool
     const finish = (answer: boolean) => {
       ok.removeEventListener('click', onOk)
       cancel.removeEventListener('click', onNo)
-      confirmDialog.removeEventListener('cancel', onNo)
-      if (confirmDialog.open) confirmDialog.close()
+      dom.confirmDialog.removeEventListener('cancel', onNo)
+      if (dom.confirmDialog.open) dom.confirmDialog.close()
       resolve(answer)
     }
     const onOk = () => finish(true)
@@ -178,8 +113,8 @@ function askConfirm(title: string, text: string, okLabel?: string): Promise<bool
     }
     ok.addEventListener('click', onOk)
     cancel.addEventListener('click', onNo)
-    confirmDialog.addEventListener('cancel', onNo)
-    confirmDialog.showModal()
+    dom.confirmDialog.addEventListener('cancel', onNo)
+    dom.confirmDialog.showModal()
   })
 }
 
@@ -193,22 +128,22 @@ const reviewKey = (el: Item) => el.key
 
 function persist(): void {
   const now = Date.now()
-  if (page) {
-    page.scanCount = scanCount
-    page.updatedAt = now
+  if (state.page) {
+    state.page.scanCount = state.scanCount
+    state.page.updatedAt = now
   }
-  audit.updatedAt = now
-  session.markDirty()
+  state.audit.updatedAt = now
+  state.session.markDirty()
   pushStates()
 }
 const saveReviews = persist
 
 function reviewOf(el: Item): ImageReview {
-  return (reviews[reviewKey(el)] ??= { answers: {}, note: '' })
+  return (state.reviews[reviewKey(el)] ??= { answers: {}, note: '' })
 }
 
 function statusOf(el: Item): Status {
-  const review = reviews[reviewKey(el)]
+  const review = state.reviews[reviewKey(el)]
   if (!review?.kind) return 'todo'
   const applicable = criteriaFor(review.kind)
   const answers = applicable.map((c) => review.answers[c.id])
@@ -252,8 +187,8 @@ function renderSummaries(): void {
     const pageScope = host.dataset.scope === 'page'
     const n = Number(host.dataset.theme)
     host.replaceChildren()
-    if (!page) continue
-    const all = pageInput(page).themes
+    if (!state.page) continue
+    const all = pageInput(state.page).themes
     // page scope: every criterion of the chosen themes; theme scope: that theme's criteria
     const criteria = pageScope ? all.filter((t) => t.selected).flatMap((t) => t.criteria) : (all.find((x) => x.number === n)?.criteria ?? [])
     if (!pageScope && !all.find((x) => x.number === n)?.selected) continue
@@ -283,13 +218,13 @@ function renderSummaries(): void {
     if (toConfirm) host.append(h('span', { class: 'pill warn-pill', title: t('A tool suggests an answer for these criteria. Confirm or change each one: until then they count as to review.') }, t('{n} to confirm', { n: toConfirm })))
     if (unconfirmedNc) host.append(h('span', { class: 'pill warn-pill', title: t('Failures found by a tool and not yet confirmed. They are counted as non-compliant, so the rate is provisional.') }, t('{n} failure(s) to confirm', { n: unconfirmedNc })))
     if (partial) host.append(h('span', { class: 'pill warn-pill', title: t('Some tests of these criteria are not supported by this tool. The result counts, but only for the tests this tool can assess, so the rate stays provisional; a failure is always kept.') }, t('{n} partly covered', { n: partial })))
-    if (!pageScope && n === 1 && elements.length) {
-      const prefilled = elements.filter((e) => reviews[reviewKey(e)]?.auto).length
+    if (!pageScope && n === 1 && state.elements.length) {
+      const prefilled = state.elements.filter((e) => state.reviews[reviewKey(e)]?.auto).length
       host.append(
-        h('span', { class: 'pill plain' }, t('{n} image(s)', { n: elements.length })),
-        ...(elements.some((e) => !e.present) ? [h('span', { class: 'pill plain' }, t('{n} on page now', { n: elements.filter((e) => e.present).length }))] : []),
+        h('span', { class: 'pill plain' }, t('{n} image(s)', { n: state.elements.length })),
+        ...(state.elements.some((e) => !e.present) ? [h('span', { class: 'pill plain' }, t('{n} on page now', { n: state.elements.filter((e) => e.present).length }))] : []),
         ...(prefilled
-          ? [h('button', { type: 'button', class: 'pill plain', title: t('Show the images whose answer was pre-filled'), onclick: () => { filter = 'prefilled'; renderFilters(); renderList(); void syncFilterBoxes() } }, t('{n} pre-filled, to confirm', { n: prefilled }))]
+          ? [h('button', { type: 'button', class: 'pill plain', title: t('Show the images whose answer was pre-filled'), onclick: () => { state.filter = 'prefilled'; renderFilters(); renderList(); void syncFilterBoxes() } }, t('{n} pre-filled, to confirm', { n: prefilled }))]
           : []),
       )
     }
@@ -298,8 +233,8 @@ function renderSummaries(): void {
 
 /** The first chosen theme (in order) that has something to jump to for this status. */
 function firstThemeWith(outcome: Outcome): number | null {
-  if (!page) return null
-  const rec = page
+  if (!state.page) return null
+  const rec = state.page
   for (const t of pageInput(rec).themes.filter((x) => x.selected)) {
     if (!t.criteria.some((c) => c.outcome === outcome)) continue
     if (outcome === 'pending') {
@@ -307,7 +242,7 @@ function firstThemeWith(outcome: Outcome): number | null {
       const perFinding = findingCriterionIds(t.number)
       const pendingCards = t.criteria.some((c) => c.outcome === 'pending' && !perFinding.includes(c.id) && t.number !== 1)
       const hasElement =
-        t.number === 1 ? elements.some((e) => needsReview(e)) : FINDING_THEMES.has(t.number) ? rec.findings.some((f) => f.theme === t.number && findingNeedsReview(f)) : false
+        t.number === 1 ? state.elements.some((e) => needsReview(e)) : FINDING_THEMES.has(t.number) ? rec.findings.some((f) => f.theme === t.number && findingNeedsReview(f)) : false
       if (!hasElement && !pendingCards) continue
     }
     return t.number
@@ -321,8 +256,8 @@ function goToFirstOnPage(outcome: Outcome): void {
   if (n === null) {
     return void say(outcome === 'pending' ? t('Nothing to review yet: scan the page, or every element has been reviewed.') : t('Nothing to show for this total.'))
   }
-  theme = n
-  findingFilter = 'all'
+  state.theme = n
+  state.findingFilter = 'all'
   setView('review')
   renderThemeBar()
   goToFirst(n, outcome)
@@ -330,17 +265,17 @@ function goToFirstOnPage(outcome: Outcome): void {
 
 /** Where a total leads: the first image / finding / criterion behind it, or its row in the grid. */
 function goToFirst(n: number, outcome: Outcome): void {
-  if (!page) return
-  const rec = page
+  if (!state.page) return
+  const rec = state.page
   const result = pageInput(rec).themes.find((x) => x.number === n)
   const first = result?.criteria.find((c) => c.outcome === outcome)
   const verdictOf = (o: Outcome) => (o === 'c' ? 'c' : o === 'nc' ? 'nc' : o === 'na' ? 'na' : null)
 
   if (n === 1) {
     const pick =
-      outcome === 'pending' ? elements.find((e) => needsReview(e)) : outcome === 'c' || outcome === 'nc' ? elements.find((e) => statusOf(e) === outcome) : undefined
+      outcome === 'pending' ? state.elements.find((e) => needsReview(e)) : outcome === 'c' || outcome === 'nc' ? state.elements.find((e) => statusOf(e) === outcome) : undefined
     if (pick) {
-      filter = outcome === 'pending' ? 'review' : 'all'
+      state.filter = outcome === 'pending' ? 'review' : 'all'
       renderFilters()
       renderList()
       select(pick.id, true)
@@ -362,8 +297,8 @@ function goToFirst(n: number, outcome: Outcome): void {
           ? list.find((f) => Object.values(rec.findingReviews[f.key]?.answers ?? {}).includes(v))
           : undefined
     if (pick) {
-      findingFilter = outcome === 'pending' ? 'review' : 'all'
-      findingSel = pick.id
+      state.findingFilter = outcome === 'pending' ? 'review' : 'all'
+      state.findingSel = pick.id
       renderThemeView()
       void focusFinding(pick, true)
       void syncFilterBoxes()
@@ -373,7 +308,7 @@ function goToFirst(n: number, outcome: Outcome): void {
 
   // checklist criteria (every theme but Images, plus 3.1 / 3.3): scroll to the card
   if (first) {
-    const card = themeEl.querySelector<HTMLElement>(`[id="crit-card-${first.id}"]`)
+    const card = dom.themeEl.querySelector<HTMLElement>(`[id="crit-card-${first.id}"]`)
     if (card) {
       card.scrollIntoView({ block: 'center', behavior: 'smooth' })
       card.classList.add('flash')
@@ -386,9 +321,9 @@ function goToFirst(n: number, outcome: Outcome): void {
 
 /** Opens the page grid on a criterion's row (for totals that have no element to point at). */
 function openGridAt(criterionId: string): void {
-  activeSheet = 0
+  state.activeSheet = 0
   setView('page')
-  const row = resultsEl.querySelector<HTMLElement>(`tr[data-crit="${criterionId}"]`)
+  const row = dom.resultsEl.querySelector<HTMLElement>(`tr[data-crit="${criterionId}"]`)
   row?.scrollIntoView({ block: 'center' })
   row?.classList.add('flash')
   setTimeout(() => row?.classList.remove('flash'), 1800)
@@ -406,7 +341,7 @@ function altLabel(el: Item): { text: string; missing: boolean } {
 }
 
 function visibleElements(): Item[] {
-  return elements.filter((el) => matches(el, filter))
+  return state.elements.filter((el) => matches(el, state.filter))
 }
 
 /** Present on the page but not fully answered: no type chosen, or a criterion still unanswered. */
@@ -420,13 +355,13 @@ function matches(el: Item, f: Filter): boolean {
   if (f === 'dialog') return el.inDialog
   if (f === 'gone') return !el.present
   if (f === 'review') return needsReview(el)
-  if (f === 'prefilled') return Boolean(reviews[reviewKey(el)]?.auto)
+  if (f === 'prefilled') return Boolean(state.reviews[reviewKey(el)]?.auto)
   return detectedOf(el) === f
 }
 
 function renderFilters(): void {
-  filtersEl.replaceChildren()
-  const count = (d: Filter) => elements.filter((e) => matches(e, d)).length
+  dom.filtersEl.replaceChildren()
+  const count = (d: Filter) => state.elements.filter((e) => matches(e, d)).length
   /** English labels: translated where the chips are drawn. */
   const chips: [Filter, string][] = [
     ['all', 'All'],
@@ -440,16 +375,16 @@ function renderFilters(): void {
   ]
   for (const [value, label] of chips) {
     if ((value === 'dialog' || value === 'gone' || value === 'prefilled') && count(value) === 0) continue
-    filtersEl.append(
+    dom.filtersEl.append(
       h(
         'button',
         {
           type: 'button',
           class: `chip ${value}`,
-          'aria-pressed': String(filter === value),
+          'aria-pressed': String(state.filter === value),
           title: value === 'all' ? t('Every image found so far') : value === 'review' ? t('Images with no type chosen or a criterion still unanswered') : value === 'dialog' ? t('Inside a dialog / popin') : value === 'gone' ? t('Seen in an earlier scan but no longer on the page') : value === 'prefilled' ? t('Answer pre-filled from the markup, still to confirm') : t(DETECTED_LABEL[value]),
           onclick: () => {
-            filter = value
+            state.filter = value
             renderFilters()
             renderList()
             void syncFilterBoxes()
@@ -463,7 +398,7 @@ function renderFilters(): void {
 }
 
 function renderList(): void {
-  listEl.replaceChildren()
+  dom.listEl.replaceChildren()
   for (const el of visibleElements()) {
     const alt = altLabel(el)
     const status = statusOf(el)
@@ -476,7 +411,7 @@ function renderList(): void {
         'data-id': el.id,
         'data-detected': detected,
         'data-status': status,
-        'aria-current': el.id === selectedId ? 'true' : 'false',
+        'aria-current': el.id === state.selectedId ? 'true' : 'false',
         onclick: () => select(el.id, true),
       },
       el.thumb
@@ -492,7 +427,7 @@ function renderList(): void {
           h('span', { class: 'type' }, el.type),
           detected === 'unnamed' ? h('span', { class: 'type error' }, el.alt === null && el.tag === 'img' ? t('no alt') : t('no name')) : null,
           el.inDialog ? h('span', { class: 'type popin' }, t('popin')) : null,
-          h('span', { class: 'type auto-tag', hidden: !reviews[reviewKey(el)]?.auto, title: t('Pre-filled from the markup — confirm it') }, t('pre-filled')),
+          h('span', { class: 'type auto-tag', hidden: !state.reviews[reviewKey(el)]?.auto, title: t('Pre-filled from the markup — confirm it') }, t('pre-filled')),
           !el.present ? h('span', { class: 'type gone' }, t('not on page')) : null,
           el.scan > 1 && el.present ? h('span', { class: 'type new' }, t('scan {n}', { n: el.scan })) : null,
         ),
@@ -500,21 +435,21 @@ function renderList(): void {
       ),
       h('span', { class: `dot ${status}`, role: 'img', 'aria-label': t(STATUS_LABEL[status]), title: t(STATUS_LABEL[status]) }),
     )
-    listEl.append(h('li', {}, btn))
+    dom.listEl.append(h('li', {}, btn))
   }
-  if (!listEl.children.length) listEl.append(h('li', { class: 'hint-line' }, t('No image in this category.')))
+  if (!dom.listEl.children.length) dom.listEl.append(h('li', { class: 'hint-line' }, t('No image in this category.')))
 }
 
 function refreshListState(): void {
-  for (const btn of listEl.querySelectorAll<HTMLButtonElement>('.item')) {
-    const el = elements.find((e) => e.id === Number(btn.dataset.id))
+  for (const btn of dom.listEl.querySelectorAll<HTMLButtonElement>('.item')) {
+    const el = state.elements.find((e) => e.id === Number(btn.dataset.id))
     if (!el) continue
-    btn.setAttribute('aria-current', el.id === selectedId ? 'true' : 'false')
+    btn.setAttribute('aria-current', el.id === state.selectedId ? 'true' : 'false')
     btn.dataset.status = statusOf(el)
     const dot = btn.querySelector('.dot') as HTMLElement
     const status = statusOf(el)
     dot.className = `dot ${status}`
-    btn.querySelector<HTMLElement>('.auto-tag')!.hidden = !reviews[reviewKey(el)]?.auto
+    btn.querySelector<HTMLElement>('.auto-tag')!.hidden = !state.reviews[reviewKey(el)]?.auto
     dot.setAttribute('aria-label', t(STATUS_LABEL[status]))
     dot.title = t(STATUS_LABEL[status])
   }
@@ -598,7 +533,7 @@ function fact(label: string, value: string | null, opts: { missingIfNull?: boole
 }
 
 function nextToReview(from: Item): Item | undefined {
-  const list = elements.filter((e) => needsReview(e) && e.id !== from.id)
+  const list = state.elements.filter((e) => needsReview(e) && e.id !== from.id)
   return list.find((e) => e.id > from.id) ?? list[0]
 }
 
@@ -610,15 +545,15 @@ function nextToReview(from: Item): Item | undefined {
 function boxStates(themeNo: number): Record<number, string> {
   const out: Record<number, string> = {}
   if (themeNo === 1) {
-    for (const el of elements) {
+    for (const el of state.elements) {
       const status = statusOf(el)
-      const pending = status === 'todo' || status === 'progress' || Boolean(reviews[reviewKey(el)]?.auto)
+      const pending = status === 'todo' || status === 'progress' || Boolean(state.reviews[reviewKey(el)]?.auto)
       const detected = detectedOf(el)
       out[el.id] = !pending ? (status === 'nc' ? 'nc' : 'c') : detected === 'unnamed' ? 'error' : detected === 'ignored' ? 'ignored' : 'review'
     }
     return out
   }
-  for (const f of page?.findings ?? []) {
+  for (const f of state.page?.findings ?? []) {
     if (f.theme !== themeNo || f.type === 'contrast-ok') continue
     const pending = findingNeedsReview(f)
     const status = findingStatus(f)
@@ -637,37 +572,22 @@ function pushStates(): void {
   }, 120)
 }
 
-/**
- * Rebuilds a part of the panel without moving what you were looking at: the panel scroll, the scroll of the list and
- * of the columns are put back, and the part keeps its height while previews load (a shorter page would scroll up).
- */
-function keepScroll(host: HTMLElement, rebuild: () => void): void {
-  const root = (document.scrollingElement ?? document.documentElement) as HTMLElement
-  const sel = '.col'
-  const y = root.scrollTop
-  const inner = [...host.querySelectorAll<HTMLElement>(sel)].map((e) => e.scrollTop)
-  host.style.minHeight = `${host.offsetHeight}px`
-  rebuild()
-  host.querySelectorAll<HTMLElement>(sel).forEach((e, i) => (e.scrollTop = inner[i] ?? 0))
-  root.scrollTop = y
-  window.setTimeout(() => (host.style.minHeight = ''), 700)
-}
 
 function renderDetail(): void {
-  keepScroll(detailEl, renderDetailNow)
+  keepScroll(dom.detailEl, renderDetailNow)
 }
 
 function renderDetailNow(): void {
-  const scrollTop = detailEl.scrollTop
-  const colScroll = [...detailEl.querySelectorAll('.col')].map((c) => c.scrollTop)
-  const el = elements.find((e) => e.id === selectedId)
-  detailEl.replaceChildren()
+  const scrollTop = dom.detailEl.scrollTop
+  const colScroll = [...dom.detailEl.querySelectorAll('.col')].map((c) => c.scrollTop)
+  const el = state.elements.find((e) => e.id === state.selectedId)
+  dom.detailEl.replaceChildren()
   if (!el) return
   const review = reviewOf(el)
-  const index = elements.indexOf(el)
+  const index = state.elements.indexOf(el)
 
-  const goto = (delta: number) => select(elements[index + delta].id, true)
-  detailEl.append(
+  const goto = (delta: number) => select(state.elements[index + delta].id, true)
+  dom.detailEl.append(
     h(
       'div',
       { class: 'detail-head' },
@@ -676,14 +596,14 @@ function renderDetailNow(): void {
         {},
         `${t('Image #{id}', { id: el.id })} `,
         h('span', { class: `result ${statusOf(el)}`, id: 'result-badge' }, t(STATUS_LABEL[statusOf(el)])),
-        h('span', { class: 'hint-line' }, `  ${index + 1} / ${elements.length}`),
+        h('span', { class: 'hint-line' }, `  ${index + 1} / ${state.elements.length}`),
       ),
       h(
         'div',
         { class: 'nav' },
         h('button', { type: 'button', onclick: () => focusOnPage(el.id, true) }, t('Locate on page')),
         h('button', { type: 'button', disabled: index === 0, onclick: () => goto(-1) }, t('← Prev')),
-        h('button', { type: 'button', disabled: index === elements.length - 1, onclick: () => goto(1) }, t('Next →')),
+        h('button', { type: 'button', disabled: index === state.elements.length - 1, onclick: () => goto(1) }, t('Next →')),
         h('button', { type: 'button', class: 'next-review', disabled: !nextToReview(el), onclick: () => { const n = nextToReview(el); if (n) select(n.id, true) } }, t('Next to review ⇥')),
       ),
     ),
@@ -752,9 +672,9 @@ function renderDetailNow(): void {
       }),
     ),
   )
-  detailEl.append(cols)
-  detailEl.scrollTop = scrollTop
-  detailEl.querySelectorAll('.col').forEach((c, i) => (c.scrollTop = colScroll[i] ?? 0))
+  dom.detailEl.append(cols)
+  dom.detailEl.scrollTop = scrollTop
+  dom.detailEl.querySelectorAll('.col').forEach((c, i) => (c.scrollTop = colScroll[i] ?? 0))
 }
 
 /** Shown on images that are neither hidden nor named: the failure depends on what the image is. */
@@ -903,7 +823,7 @@ function criterionCard(el: Item, review: ImageReview, criterion: Criterion): HTM
 
 function refreshAll(): void {
   const badge = document.getElementById('result-badge')
-  const current = elements.find((e) => e.id === selectedId)
+  const current = state.elements.find((e) => e.id === state.selectedId)
   if (badge && current) {
     badge.className = `result ${statusOf(current)}`
     badge.textContent = t(STATUS_LABEL[statusOf(current)])
@@ -914,9 +834,9 @@ function refreshAll(): void {
 }
 
 function select(id: number, scroll: boolean): void {
-  selectedId = id
-  if (filter !== 'all' && !visibleElements().some((e) => e.id === id)) {
-    filter = 'all'
+  state.selectedId = id
+  if (state.filter !== 'all' && !visibleElements().some((e) => e.id === id)) {
+    state.filter = 'all'
     renderFilters()
     renderList()
   }
@@ -930,29 +850,9 @@ function select(id: number, scroll: boolean): void {
 /* Pages of the sample (P01, P02…)                                      */
 /* ------------------------------------------------------------------ */
 
-const pageSelect = $<HTMLSelectElement>('page-select')
-const pageToolsEl = $('page-tools')
-const progressEl = $('progress')
-const nextBtn = $<HTMLButtonElement>('next-btn')
-const liveUrlEl = $('live-url')
-const deletePageBtn = $<HTMLButtonElement>('delete-page-btn')
-const resetPageBtn = $<HTMLButtonElement>('reset-page-btn')
-const navBanner = $('nav-banner')
-const navBannerText = $('nav-banner-text')
-const navBannerBtn = $<HTMLButtonElement>('nav-banner-btn')
-const auditEl = $('audit')
-const auditBtn = $<HTMLButtonElement>('audit-btn')
-const sampleEl = $('sample')
-const themeEl = $('theme-view')
-const themebarEl = $('themebar')
-const sampleBtn = $<HTMLButtonElement>('sample-btn')
-const emptyTitle = $('empty-title')
-const emptyText = $('empty-text')
-const emptyAddBtn = $<HTMLButtonElement>('empty-add-btn')
-const emptyGoBtn = $<HTMLButtonElement>('empty-go-btn')
 
 /** P01, P02… follow the order of the sample, so reordering renumbers the pages. */
-const pageLabel = (rec: PageRecord) => `P${pad(audit.pages.indexOf(rec) + 1)}`
+const pageLabel = (rec: PageRecord) => `P${pad(state.audit.pages.indexOf(rec) + 1)}`
 
 function pageInput(rec: PageRecord): PageInput {
   const reviewOfRec = (el: ImageElementInfo) => rec.reviews[(el as Item).key]
@@ -973,58 +873,58 @@ function pageInput(rec: PageRecord): PageInput {
   }
 }
 
-const allPageInputs = (): PageInput[] => audit.pages.map(pageInput)
+const allPageInputs = (): PageInput[] => state.audit.pages.map(pageInput)
 
 function loadPage(rec: PageRecord | null): void {
-  page = rec
-  elements = rec ? rec.items : []
-  reviews = rec ? rec.reviews : {}
-  scanCount = rec ? rec.scanCount : 0
-  selectedId = elements[0]?.id ?? null
-  filter = 'all'
-  audit.current = rec ? rec.id : null
+  state.page = rec
+  state.elements = rec ? rec.items : []
+  state.reviews = rec ? rec.reviews : {}
+  state.scanCount = rec ? rec.scanCount : 0
+  state.selectedId = state.elements[0]?.id ?? null
+  state.filter = 'all'
+  state.audit.current = rec ? rec.id : null
   // Images of a page that was not scanned in this session are shown as they were last seen.
-  if (rec && !scannedThisSession.has(rec.id)) for (const el of elements) el.present = true
+  if (rec && !state.scannedThisSession.has(rec.id)) for (const el of state.elements) el.present = true
 }
 
 function renderPageBar(): void {
-  pageSelect.replaceChildren()
-  if (!audit.pages.length) pageSelect.append(h('option', { value: '' }, t('No page yet — add page 1 in “Audit pages sample”')))
-  for (const p of audit.pages) {
+  dom.pageSelect.replaceChildren()
+  if (!state.audit.pages.length) dom.pageSelect.append(h('option', { value: '' }, t('No page yet — add page 1 in “Audit pages sample”')))
+  for (const p of state.audit.pages) {
     const input = pageInput(p)
     const rate = rateOf(auditStats([input]).perPage[0].counts)
-    pageSelect.append(
-      h('option', { value: p.id, selected: p.id === page?.id }, `${pageLabel(p)} · ${p.title || p.url} · ${t('{n} image(s)', { n: p.items.length })}${rate === null ? '' : ` · ${rate} %${isProvisional(countsOf(input)) ? ` (${t('provisional')})` : ''}`}`),
+    dom.pageSelect.append(
+      h('option', { value: p.id, selected: p.id === state.page?.id }, `${pageLabel(p)} · ${p.title || p.url} · ${t('{n} image(s)', { n: p.items.length })}${rate === null ? '' : ` · ${rate} %${isProvisional(countsOf(input)) ? ` (${t('provisional')})` : ''}`}`),
     )
   }
-  pageSelect.disabled = !audit.pages.length
-  pageToolsEl.hidden = !page
-  nextBtn.disabled = !page
-  progressEl.replaceChildren()
-  if (page) {
-    const c = countsOf(pageInput(page))
+  dom.pageSelect.disabled = !state.audit.pages.length
+  dom.pageToolsEl.hidden = !state.page
+  dom.nextBtn.disabled = !state.page
+  dom.progressEl.replaceChildren()
+  if (state.page) {
+    const c = countsOf(pageInput(state.page))
     const total = c.C + c.NC + c.NA + c.NT || 1
     const answered = c.C + c.NC + c.NA
-    progressEl.append(
+    dom.progressEl.append(
       h('span', {}, t('{done}/{total} criteria answered', { done: answered, total })),
-      h('span', { class: 'meter', role: 'img', 'aria-label': t('Progress of {label}', { label: pageLabel(page) }) }, ...[['c', c.C], ['nc', c.NC], ['na', c.NA]].map(([k, n]) => h('i', { class: String(k), style: `width:${(Number(n) / total) * 100}%` }))),
+      h('span', { class: 'meter', role: 'img', 'aria-label': t('Progress of {label}', { label: pageLabel(state.page) }) }, ...[['c', c.C], ['nc', c.NC], ['na', c.NA]].map(([k, n]) => h('i', { class: String(k), style: `width:${(Number(n) / total) * 100}%` }))),
     )
   }
-  deletePageBtn.disabled = !page
-  resetPageBtn.disabled = !page
-  const onLive = Boolean(page && liveUrl && normalizeUrl(page.url) === normalizeUrl(liveUrl))
-  liveUrlEl.textContent = liveUrl ? t('Browser: {url}', { url: liveUrl }) : ''
-  liveUrlEl.title = liveUrl
-  liveUrlEl.className = `live-url${onLive ? ' same' : ''}`
-  scanBtn.disabled = !page
-  scanBtn.textContent = page ? (scannedThisSession.has(page.id) ? t('Rescan {page}', { page: pageLabel(page) }) : t('Scan {page}', { page: pageLabel(page) })) : t('Scan')
-  scanBtn.title = page
-    ? t('Scan what the browser shows and merge the images into {page} (popins, tabs…)', { page: pageLabel(page) })
+  dom.deletePageBtn.disabled = !state.page
+  dom.resetPageBtn.disabled = !state.page
+  const onLive = Boolean(state.page && state.liveUrl && normalizeUrl(state.page.url) === normalizeUrl(state.liveUrl))
+  dom.liveUrlEl.textContent = state.liveUrl ? t('Browser: {url}', { url: state.liveUrl }) : ''
+  dom.liveUrlEl.title = state.liveUrl
+  dom.liveUrlEl.className = `live-url${onLive ? ' same' : ''}`
+  dom.scanBtn.disabled = !state.page
+  dom.scanBtn.textContent = state.page ? (state.scannedThisSession.has(state.page.id) ? t('Rescan {page}', { page: pageLabel(state.page) }) : t('Scan {page}', { page: pageLabel(state.page) })) : t('Scan')
+  dom.scanBtn.title = state.page
+    ? t('Scan what the browser shows and merge the images into {page} (popins, tabs…)', { page: pageLabel(state.page) })
     : t('Add a page to the sample first')
 }
 
 function nextPageLabel(): string {
-  return `P${pad(audit.pages.length + 1)}`
+  return `P${pad(state.audit.pages.length + 1)}`
 }
 
 function renderAll(): void {
@@ -1035,27 +935,27 @@ function renderAll(): void {
   renderStats()
   renderDetail()
   setScanned()
-  if (view === 'page') renderResults()
-  if (view === 'audit') renderAudit()
-  if (view === 'sample') renderSample()
+  if (state.view === 'page') renderResults()
+  if (state.view === 'audit') renderAudit()
+  if (state.view === 'sample') renderSample()
 }
 
 /** Selects a page of the sample; with `navigate`, the browser tab goes to its URL too. */
 function switchTo(id: string, navigate = false): void {
-  const rec = audit.pages.find((p) => p.id === id)
+  const rec = state.audit.pages.find((p) => p.id === id)
   if (!rec) return
-  if (rec !== page) loadPage(rec)
+  if (rec !== state.page) loadPage(rec)
   // you chose this page yourself: the “the browser is on another page” reminder no longer applies
-  navBanner.hidden = true
-  navDismissed = liveUrl && rec.url ? normalizeUrl(liveUrl) : ''
-  setView(['sample', 'audit', 'audits', 'checks'].includes(view) ? 'review' : view)
+  dom.navBanner.hidden = true
+  state.navDismissed = state.liveUrl && rec.url ? normalizeUrl(state.liveUrl) : ''
+  setView(['sample', 'audit', 'audits', 'checks'].includes(state.view) ? 'review' : state.view)
   renderAll()
   persist()
   const label = pageLabel(rec)
   if (navigate && !rec.url) {
-    showNavBanner(liveUrl)
+    showNavBanner(state.liveUrl)
     say(t('{label} has no address yet: open its page in the browser and click “Scan {label}”.', { label }))
-  } else if (navigate && (!liveUrl || normalizeUrl(rec.url) !== normalizeUrl(liveUrl))) {
+  } else if (navigate && (!state.liveUrl || normalizeUrl(rec.url) !== normalizeUrl(state.liveUrl))) {
     goTo(rec.url)
     say(t('Opening {label} in the browser. Click “Scan {label}” once it has loaded.', { label }))
   } else {
@@ -1068,69 +968,67 @@ function goTo(url: string): void {
   chrome.devtools.inspectedWindow.eval(`location.href = ${JSON.stringify(url)}`)
 }
 
-async function removePage(rec: PageRecord | null = page): Promise<void> {
+async function removePage(rec: PageRecord | null = state.page): Promise<void> {
   if (!rec) return
   const label = pageLabel(rec)
   if (!(await askConfirm(t('Remove {label}?', { label }), `${rec.title || rec.url}\n\n${t('The page and all its answers are deleted from the audit and the other pages are renumbered.')}`, t('Remove page')))) return
-  audit.pages = audit.pages.filter((p) => p !== rec)
-  scannedThisSession.delete(rec.id)
-  if (page === rec) loadPage(audit.pages[0] ?? null)
+  state.audit.pages = state.audit.pages.filter((p) => p !== rec)
+  state.scannedThisSession.delete(rec.id)
+  if (state.page === rec) loadPage(state.audit.pages[0] ?? null)
   renderAll()
   persist()
   say(t('{label} removed from the audit.', { label }))
 }
 
-pageSelect.addEventListener('change', () => switchTo(pageSelect.value, true))
-deletePageBtn.addEventListener('click', () => removePage())
+dom.pageSelect.addEventListener('change', () => switchTo(dom.pageSelect.value, true))
+dom.deletePageBtn.addEventListener('click', () => removePage())
 
-/** The address the reminder was dismissed for (you chose a page yourself while the browser was there). */
-let navDismissed = ''
 
 function showNavBanner(url: string): void {
-  navBannerBtn.hidden = false
+  dom.navBannerBtn.hidden = false
   // the current page has lost its address
-  if (page && !page.url && url) {
-    const rec = page
-    const owner = findPage(audit, url)
+  if (state.page && !state.page.url && url) {
+    const rec = state.page
+    const owner = findPage(state.audit, url)
     if (owner && owner !== rec) {
       // the browser is on another page of the sample: say how to register this one, without offering a duplicate address
-      navBannerText.textContent = t('{label} has no address. The browser is on {other}: open the page of {label} in the browser, then select {label} again.', { label: pageLabel(rec), other: pageLabel(owner) })
-      navBannerBtn.hidden = true
-      navBanner.hidden = false
+      dom.navBannerText.textContent = t('{label} has no address. The browser is on {other}: open the page of {label} in the browser, then select {label} again.', { label: pageLabel(rec), other: pageLabel(owner) })
+      dom.navBannerBtn.hidden = true
+      dom.navBanner.hidden = false
       return
     }
-    navBannerText.textContent = t('{label} has no address. The browser is on {url}.', { label: pageLabel(rec), url })
-    navBannerBtn.textContent = t('Use this address for {label}', { label: pageLabel(rec) })
-    navBannerBtn.onclick = () => {
+    dom.navBannerText.textContent = t('{label} has no address. The browser is on {url}.', { label: pageLabel(rec), url })
+    dom.navBannerBtn.textContent = t('Use this address for {label}', { label: pageLabel(rec) })
+    dom.navBannerBtn.onclick = () => {
       rec.url = normalizeUrl(url)
       adoptSite(rec.url)
-      navBanner.hidden = true
+      dom.navBanner.hidden = true
       persist()
       renderAll()
       say(t('{label} now points to {url}.', { label: pageLabel(rec), url: rec.url }))
     }
-    navBanner.hidden = false
+    dom.navBanner.hidden = false
     return
   }
-  if (navDismissed && normalizeUrl(url) === navDismissed) return void (navBanner.hidden = true)
-  const known = findPage(audit, url)
-  if (known && known === page) return void (navBanner.hidden = true)
+  if (state.navDismissed && normalizeUrl(url) === state.navDismissed) return void (dom.navBanner.hidden = true)
+  const known = findPage(state.audit, url)
+  if (known && known === state.page) return void (dom.navBanner.hidden = true)
   if (known) {
-    navBannerText.textContent = t('The browser is now on {label} ({title}).', { label: pageLabel(known), title: known.title || known.url })
-    navBannerBtn.textContent = t('Switch to {label}', { label: pageLabel(known) })
-    navBannerBtn.onclick = () => {
-      navBanner.hidden = true
+    dom.navBannerText.textContent = t('The browser is now on {label} ({title}).', { label: pageLabel(known), title: known.title || known.url })
+    dom.navBannerBtn.textContent = t('Switch to {label}', { label: pageLabel(known) })
+    dom.navBannerBtn.onclick = () => {
+      dom.navBanner.hidden = true
       switchTo(known.id)
     }
   } else {
-    navBannerText.textContent = t('This URL is not in the sample yet.')
-    navBannerBtn.textContent = t('Add it as {label}', { label: nextPageLabel() })
-    navBannerBtn.onclick = () => {
-      navBanner.hidden = true
+    dom.navBannerText.textContent = t('This URL is not in the sample yet.')
+    dom.navBannerBtn.textContent = t('Add it as {label}', { label: nextPageLabel() })
+    dom.navBannerBtn.onclick = () => {
+      dom.navBanner.hidden = true
       void addPage(url)
     }
   }
-  navBanner.hidden = false
+  dom.navBanner.hidden = false
 }
 
 /* ------------------------------------------------------------------ */
@@ -1153,16 +1051,16 @@ function resetThemeData(rec: PageRecord, n: number): void {
   }
   for (const c of themeByNumber(n)?.criteria ?? []) delete rec.checklist[c.id]
   rec.scannedThemes = rec.scannedThemes.filter((t) => t !== n)
-  scannedThisSession.delete(rec.id)
+  state.scannedThisSession.delete(rec.id)
 }
 
-async function resetTheme(n = theme): Promise<void> {
-  if (!page) return
-  const rec = page
+async function resetTheme(n = state.theme): Promise<void> {
+  if (!state.page) return
+  const rec = state.page
   const name = t(THEME_LABEL[n])
   if (!(await askConfirm(t('Reset {name} on {label}?', { name, label: pageLabel(rec) }), t('This removes what was scanned and every answer for this theme only. The other themes and the page itself are kept.'), t('Reset {name}', { name })))) return
   resetThemeData(rec, n)
-  findingSel = null
+  state.findingSel = null
   loadPage(rec)
   void clearBoxes(n)
   renderAll()
@@ -1170,7 +1068,7 @@ async function resetTheme(n = theme): Promise<void> {
   say(t('{name} reset on {label}.', { name, label: pageLabel(rec) }))
 }
 
-async function resetPage(rec: PageRecord | null = page): Promise<void> {
+async function resetPage(rec: PageRecord | null = state.page): Promise<void> {
   if (!rec) return
   const label = pageLabel(rec)
   if (!(await askConfirm(t('Reset {label}?', { label }), `${rec.title || rec.url}\n\n${t('This clears its scans and every answer, in all themes. Its URL, title and chosen themes are kept.')}`, t('Reset page')))) return
@@ -1180,8 +1078,8 @@ async function resetPage(rec: PageRecord | null = page): Promise<void> {
   rec.nextFindingId = 1
   rec.nextFindingIds = {}
   rec.updatedAt = Date.now()
-  findingSel = null
-  if (rec === page) {
+  state.findingSel = null
+  if (rec === state.page) {
     loadPage(rec)
     void clearBoxes()
   }
@@ -1191,12 +1089,12 @@ async function resetPage(rec: PageRecord | null = page): Promise<void> {
 }
 
 async function resetAudit(): Promise<void> {
-  if (!(await askConfirm(t('Reset the whole audit?'), t('This deletes all {n} page(s), their scans and answers, and the site, auditor and context fields. It cannot be undone.', { n: audit.pages.length }), t('Delete everything')))) return
-  const fresh = emptyAudit(audit.name)
-  audit = { ...fresh, id: audit.id, createdAt: audit.createdAt }
-  scannedThisSession.clear()
-  findingSel = null
-  theme = 1
+  if (!(await askConfirm(t('Reset the whole audit?'), t('This deletes all {n} page(s), their scans and answers, and the site, auditor and context fields. It cannot be undone.', { n: state.audit.pages.length }), t('Delete everything')))) return
+  const fresh = emptyAudit(state.audit.name)
+  state.audit = { ...fresh, id: state.audit.id, createdAt: state.audit.createdAt }
+  state.scannedThisSession.clear()
+  state.findingSel = null
+  state.theme = 1
   loadPage(null)
   void clearBoxes()
   setView('review')
@@ -1205,31 +1103,30 @@ async function resetAudit(): Promise<void> {
   say(t('The audit was reset. Add the first page of your sample to start again.'))
 }
 
-resetPageBtn.addEventListener('click', () => resetPage())
+dom.resetPageBtn.addEventListener('click', () => resetPage())
 
 /* ------------------------------------------------------------------ */
 /* Views: review | page results | audit overview                        */
 /* ------------------------------------------------------------------ */
 
-let view: View = 'review'
 
 function setView(next: View): void {
-  view = next
-  resultsEl.hidden = next !== 'page'
-  auditEl.hidden = next !== 'audit'
-  sampleEl.hidden = next !== 'sample'
-  auditsEl.hidden = next !== 'audits'
-  checksEl.hidden = next !== 'checks'
-  checksBtn.setAttribute('aria-pressed', String(next === 'checks'))
-  const imagesTheme = theme === 1
-  appEl.hidden = next !== 'review' || !imagesTheme || !elements.length
-  emptyEl.hidden = next !== 'review' || !imagesTheme || elements.length > 0
-  themeEl.hidden = next !== 'review' || imagesTheme
-  themebarEl.hidden = !page
+  state.view = next
+  dom.resultsEl.hidden = next !== 'page'
+  dom.auditEl.hidden = next !== 'audit'
+  dom.sampleEl.hidden = next !== 'sample'
+  dom.auditsEl.hidden = next !== 'audits'
+  dom.checksEl.hidden = next !== 'checks'
+  dom.checksBtn.setAttribute('aria-pressed', String(next === 'checks'))
+  const imagesTheme = state.theme === 1
+  dom.appEl.hidden = next !== 'review' || !imagesTheme || !state.elements.length
+  dom.emptyEl.hidden = next !== 'review' || !imagesTheme || state.elements.length > 0
+  dom.themeEl.hidden = next !== 'review' || imagesTheme
+  dom.themebarEl.hidden = !state.page
   updateTools()
-  resultsBtn.setAttribute('aria-pressed', String(next === 'page'))
-  auditBtn.setAttribute('aria-pressed', String(next === 'audit'))
-  sampleBtn.setAttribute('aria-pressed', String(next === 'sample'))
+  dom.resultsBtn.setAttribute('aria-pressed', String(next === 'page'))
+  dom.auditBtn.setAttribute('aria-pressed', String(next === 'audit'))
+  dom.sampleBtn.setAttribute('aria-pressed', String(next === 'sample'))
   if (next === 'review') {
     renderSummaries()
     renderEmpty()
@@ -1245,15 +1142,15 @@ function setView(next: View): void {
 
 
 function setScanned(): void {
-  const has = elements.length > 0
-  clearBtn.disabled = !has && !(page?.findings.length)
-  boxesBtn.disabled = !has && !(page?.findings.length)
-  resultsBtn.disabled = !has
-  auditBtn.disabled = !audit.pages.length
-  checksBtn.disabled = !page
-  autoBtn.disabled = !page || axeRunning
-  scanBtn.disabled = !page
-  setView(view === 'page' && !has ? 'review' : view)
+  const has = state.elements.length > 0
+  dom.clearBtn.disabled = !has && !(state.page?.findings.length)
+  dom.boxesBtn.disabled = !has && !(state.page?.findings.length)
+  dom.resultsBtn.disabled = !has
+  dom.auditBtn.disabled = !state.audit.pages.length
+  dom.checksBtn.disabled = !state.page
+  dom.autoBtn.disabled = !state.page || state.axeRunning
+  dom.scanBtn.disabled = !state.page
+  setView(state.view === 'page' && !has ? 'review' : state.view)
 }
 
 /* ------------------------------------------------------------------ */
@@ -1270,10 +1167,10 @@ function themeProgress(rec: PageRecord, n: number): { done: number; total: numbe
 
 function setThemes(rec: PageRecord, themes: number[]): void {
   rec.themes = [...new Set(themes)].sort((a, b) => a - b)
-  if (rec === page && !rec.themes.includes(theme)) theme = rec.themes[0] ?? 1
+  if (rec === state.page && !rec.themes.includes(state.theme)) state.theme = rec.themes[0] ?? 1
   persist()
   // keep the menu open while ticking several themes
-  if (view === 'sample') {
+  if (state.view === 'sample') {
     renderPageBar()
     renderThemeBar()
     return
@@ -1322,12 +1219,12 @@ function themesMenu(rec: PageRecord): HTMLElement {
 }
 
 function renderThemeBar(): void {
-  document.documentElement.style.setProperty('--tc', colorOf(theme))
-  themebarEl.replaceChildren()
-  if (!page) return
-  const rec = page
+  document.documentElement.style.setProperty('--tc', colorOf(state.theme))
+  dom.themebarEl.replaceChildren()
+  if (!state.page) return
+  const rec = state.page
   const selected = [...rec.themes].sort((a, b) => a - b)
-  if (!selected.includes(theme)) theme = selected[0] ?? 1
+  if (!selected.includes(state.theme)) state.theme = selected[0] ?? 1
   const tabs = h('div', { class: 'theme-tabs', role: 'tablist', 'aria-label': t('RGAA themes of this page') })
   for (const n of selected) {
     const { done, total } = themeProgress(rec, n)
@@ -1338,12 +1235,12 @@ function renderThemeBar(): void {
           type: 'button',
           role: 'tab',
           class: `theme-tab${done === total ? ' complete' : ''}`,
-          'aria-selected': String(n === theme),
+          'aria-selected': String(n === state.theme),
           style: `--tc:${colorOf(n)}`,
           title: t('{n}. {name} (its boxes on the page use this colour)', { n, name: t(THEME_LABEL[n]) }),
           onclick: () => {
-            theme = n
-            findingFilter = 'all'
+            state.theme = n
+            state.findingFilter = 'all'
             setView('review')
             renderThemeBar()
             renderStats()
@@ -1355,22 +1252,22 @@ function renderThemeBar(): void {
       ),
     )
   }
-  themebarEl.append(
+  dom.themebarEl.append(
     tabs,
-    h('button', { type: 'button', class: 'ghost-btn danger', title: t('Clear the scan and the answers of {name} on this page only', { name: t(THEME_LABEL[theme]) }), onclick: () => resetTheme() }, t('Reset {name}', { name: t(THEME_LABEL[theme]) })),
+    h('button', { type: 'button', class: 'ghost-btn danger', title: t('Clear the scan and the answers of {name} on this page only', { name: t(THEME_LABEL[state.theme]) }), onclick: () => resetTheme() }, t('Reset {name}', { name: t(THEME_LABEL[state.theme]) })),
     themesMenu(rec),
   )
 }
 
 /** Checklist themes: one card per official criterion with a verdict and a note. */
 function perFindingIds(): string[] {
-  return findingCriterionIds(theme)
+  return findingCriterionIds(state.theme)
 }
 
 /** What the automatic checks found for a criterion (or that none covers it, once they have been run on the page). */
 function autoHints(answer: ChecklistAnswer): HTMLElement[] {
   const entries = Object.entries(answer.autoResults ?? {})
-  if (!entries.length) return (page?.imports?.length ?? 0) > 0 ? [h('p', { class: 'hint-line' }, t('No automatic check covers this criterion.'))] : []
+  if (!entries.length) return (state.page?.imports?.length ?? 0) > 0 ? [h('p', { class: 'hint-line' }, t('No automatic check covers this criterion.'))] : []
   const disagree = entries.some(([, r]) => r.result === 'pass') && entries.some(([, r]) => r.result === 'fail')
   const lines = entries.map(([tool, r]) =>
     h(
@@ -1386,11 +1283,11 @@ function autoHints(answer: ChecklistAnswer): HTMLElement[] {
 
 const VERDICT_WORD: Record<ChecklistVerdict, string> = { c: 'Compliant', nc: 'Non-compliant', na: 'Not applicable' }
 
-function renderChecklist(host: HTMLElement = themeEl): void {
-  const def = themeByNumber(theme)
-  if (!page || !def) return
-  const rec = page
-  const result = pageInput(rec).themes.find((t) => t.number === theme)!
+function renderChecklist(host: HTMLElement = dom.themeEl): void {
+  const def = themeByNumber(state.theme)
+  if (!state.page || !def) return
+  const rec = state.page
+  const result = pageInput(rec).themes.find((t) => t.number === state.theme)!
   const autoLabel = { auto: t('Automatic'), semi: t('Semi-automatic'), manual: t('Manual') } as const
 
   host.append(
@@ -1400,14 +1297,14 @@ function renderChecklist(host: HTMLElement = themeEl): void {
       h(
         'div',
         {},
-        h('h2', {}, FINDING_THEMES.has(theme) ? t('Other criteria of this theme') : `${def.number}. ${def.name}`),
-        ...(FINDING_THEMES.has(theme) ? [] : [h('div', { class: 'theme-summary', 'data-theme': String(theme), 'aria-label': t('Totals') })]),
-        h('p', { class: 'hint-line' }, FINDING_THEMES.has(theme) ? t('Criteria {ids} are not detectable by a script: check them on {url}.', { ids: def.criteria.filter((x) => !perFindingIds().includes(x.id)).map((x) => x.id).join(', '), url: rec.url }) : t('{n} criteria. Check them on {url} and answer each one. Nothing to scan for this theme.', { n: def.criteria.length, url: rec.url })),
+        h('h2', {}, FINDING_THEMES.has(state.theme) ? t('Other criteria of this theme') : `${def.number}. ${def.name}`),
+        ...(FINDING_THEMES.has(state.theme) ? [] : [h('div', { class: 'theme-summary', 'data-theme': String(state.theme), 'aria-label': t('Totals') })]),
+        h('p', { class: 'hint-line' }, FINDING_THEMES.has(state.theme) ? t('Criteria {ids} are not detectable by a script: check them on {url}.', { ids: def.criteria.filter((x) => !perFindingIds().includes(x.id)).map((x) => x.id).join(', '), url: rec.url }) : t('{n} criteria. Check them on {url} and answer each one. Nothing to scan for this theme.', { n: def.criteria.length, url: rec.url })),
       ),
     ),
   )
   const list = h('div', { class: 'checklist' })
-  const perFinding = findingCriterionIds(theme)
+  const perFinding = findingCriterionIds(state.theme)
   for (const c of def.criteria.filter((x) => !perFinding.includes(x.id))) {
     const answer = (rec.checklist[c.id] ??= { note: '' })
     const outcome = result.criteria.find((x) => x.id === c.id)?.outcome
@@ -1484,20 +1381,16 @@ function renderChecklist(host: HTMLElement = themeEl): void {
 /* Frames (2) and colours (3): scanned, reviewed finding by finding      */
 /* ------------------------------------------------------------------ */
 
-let findingSel: number | null = null
-
-const toolsEl = $('tools')
-const imagesHeadEl = $('images-head')
 
 /** Buttons that act on the boxes of the current theme live in that theme's own toolbar. */
 function updateTools(): void {
-  setPageToolsTheme(theme)
+  setPageToolsTheme(state.theme)
   void applyBoxes()
-  const reviewing = Boolean(page) && view === 'review'
-  imagesHeadEl.hidden = !(reviewing && theme === 1)
+  const reviewing = Boolean(state.page) && state.view === 'review'
+  dom.imagesHeadEl.hidden = !(reviewing && state.theme === 1)
   // the toolbar belongs to the theme being shown: Images has its header, the other themes put it in theirs
-  if (theme === 1) imagesHeadEl.append(toolsEl)
-  toolsEl.hidden = !(reviewing && SCANNED_THEMES.has(theme))
+  if (state.theme === 1) dom.imagesHeadEl.append(dom.toolsEl)
+  dom.toolsEl.hidden = !(reviewing && SCANNED_THEMES.has(state.theme))
 }
 
 function keyOfFinding(theme: number, f: RawFinding): string {
@@ -1508,7 +1401,7 @@ function keyOfFinding(theme: number, f: RawFinding): string {
 
 /** Merges the scan of one theme into the current page; returns the renumbering for the boxes. */
 function mergeFindings(themeNo: number, raw: RawFinding[]): { map: { from: number; to: number }[]; added: number } {
-  const rec = page!
+  const rec = state.page!
   // Findings from the first versions (colours grouped by colour pair) are replaced by one finding per element.
   if (themeNo === 3) {
     for (const f of rec.findings.filter((x) => x.theme === 3 && x.type !== 'contrast-ok' && !x.label.startsWith('“'))) delete rec.findingReviews[f.key]
@@ -1536,7 +1429,7 @@ function mergeFindings(themeNo: number, raw: RawFinding[]): { map: { from: numbe
       Object.assign(existing, r, { id: existing.id, key, theme: themeNo, present: true, scan: existing.scan })
       map.push({ from: r.id, to: existing.id })
     } else {
-      const item: FindingItem = { ...r, id: r.type === 'contrast-ok' ? 0 : nextFindingNumber(rec, themeNo), theme: themeNo, key, present: true, scan: scanCount }
+      const item: FindingItem = { ...r, id: r.type === 'contrast-ok' ? 0 : nextFindingNumber(rec, themeNo), theme: themeNo, key, present: true, scan: state.scanCount }
       rec.findings.push(item)
       byKey.set(key, item)
       map.push({ from: r.id, to: item.id })
@@ -1571,11 +1464,11 @@ function mergeFindings(themeNo: number, raw: RawFinding[]): { map: { from: numbe
 }
 
 function removeFinding(f: FindingItem): void {
-  const rec = page
+  const rec = state.page
   if (!rec) return
   rec.findings = rec.findings.filter((x) => x !== f)
   delete rec.findingReviews[f.key]
-  findingSel = null
+  state.findingSel = null
   persist()
   renderAll()
   say(t('Finding #{id} removed from the audit.', { id: f.id }))
@@ -1588,11 +1481,11 @@ function nextFindingNumber(rec: PageRecord, themeNo: number): number {
 }
 
 function findingReview(f: FindingItem): ImageReview {
-  return (page!.findingReviews[f.key] ??= { answers: {}, note: '' })
+  return (state.page!.findingReviews[f.key] ??= { answers: {}, note: '' })
 }
 
 function findingStatus(f: FindingItem): FStatus {
-  const answers = findingCriteriaOf(f).map((c) => page!.findingReviews[f.key]?.answers[c.id])
+  const answers = findingCriteriaOf(f).map((c) => state.page!.findingReviews[f.key]?.answers[c.id])
   if (answers.includes('nc')) return 'nc'
   if (answers.every((a) => a === undefined)) return 'todo'
   return answers.some((a) => a === undefined) ? 'progress' : 'c'
@@ -1662,16 +1555,15 @@ async function captureShots(list: FindingItem[]): Promise<number> {
 }
 
 /** What the list shows: every finding, except the unnumbered “text that passes” line of Colours. */
-const listedFindings = (themeNo: number): FindingItem[] => (page?.findings ?? []).filter((f) => f.theme === themeNo && f.type !== 'contrast-ok')
+const listedFindings = (themeNo: number): FindingItem[] => (state.page?.findings ?? []).filter((f) => f.theme === themeNo && f.type !== 'contrast-ok')
 
-let findingFilter: FindingFilter = 'all'
 
 /**
  * Needs a human: colours that failed or that the script could not judge, until the verdict is confirmed
  * (a pre-filled verdict does not count as confirmed). Frames: any criterion unanswered or still pre-filled.
  */
 function findingNeedsReview(f: FindingItem): boolean {
-  const r = page?.findingReviews[f.key]
+  const r = state.page?.findingReviews[f.key]
   if (f.theme === 3) {
     if (f.type !== 'contrast-fail' && f.type !== 'contrast-unknown') return false
     return !(r && r.answers['3.2'] !== undefined && !r.auto)
@@ -1696,9 +1588,9 @@ function findingMatches(f: FindingItem, value: FindingFilter): boolean {
 }
 
 function updateFindingChips(): void {
-  if (!page) return
-  const list = listedFindings(theme)
-  for (const chip of themeEl.querySelectorAll<HTMLElement>('.finding-pane .chip[data-value]')) {
+  if (!state.page) return
+  const list = listedFindings(state.theme)
+  for (const chip of dom.themeEl.querySelectorAll<HTMLElement>('.finding-pane .chip[data-value]')) {
     const value = chip.dataset.value as FindingFilter
     const count = chip.querySelector('.count')
     if (count) count.textContent = String(list.filter((f) => findingMatches(f, value)).length)
@@ -1706,23 +1598,23 @@ function updateFindingChips(): void {
 }
 
 function renderThemeView(): void {
-  keepScroll(themeEl, () => {
-    themeEl.replaceChildren()
-    if (FINDING_THEMES.has(theme)) renderFindingsView()
+  keepScroll(dom.themeEl, () => {
+    dom.themeEl.replaceChildren()
+    if (FINDING_THEMES.has(state.theme)) renderFindingsView()
     else renderChecklist()
     renderSummaries()
   })
 }
 
 function renderFindingsView(): void {
-  const def = themeByNumber(theme)
-  if (!page || !def) return
-  const rec = page
-  const list = listedFindings(theme)
+  const def = themeByNumber(state.theme)
+  if (!state.page || !def) return
+  const rec = state.page
+  const list = listedFindings(state.theme)
   const passing = rec.findings.find((f) => f.theme === 3 && f.type === 'contrast-ok')
-  const scanned = rec.scannedThemes.includes(theme)
+  const scanned = rec.scannedThemes.includes(state.theme)
   const label = pageLabel(rec)
-  themeEl.append(
+  dom.themeEl.append(
     h(
       'div',
       { class: 'results-head' },
@@ -1730,39 +1622,39 @@ function renderFindingsView(): void {
         'div',
         {},
         h('h2', {}, `${def.number}. ${def.name}`),
-        h('p', { class: 'hint-line' }, theme === 2 ? t('Every iframe / frame of the page, with its title.') : theme === 6 ? t('Every link of the page (identical links are grouped), with its name and destination. Links with no name or a generic text are boxed on the page.') : theme === 5 ? t('Every table of the page: data tables (with their header cells and title) and layout tables. Click one to find it on the page.') : theme === 11 ? t('Every form field of the page, with the name a screen reader would give it. Fields with no label, or only a placeholder, are boxed on the page.') : theme === 9 ? t('The outline of the page, like a headings map: headings with their level, and the landmarks, in reading order. Click one to find it on the page; skipped levels and missing areas are flagged.') : t('Only the texts that fail or that a script cannot judge are numbered and boxed on the page. Criteria 3.1 and 3.3 need your eyes (below).')),
-        h('div', { class: 'theme-summary', 'data-theme': String(theme), 'aria-label': t('Totals') }),
+        h('p', { class: 'hint-line' }, state.theme === 2 ? t('Every iframe / frame of the page, with its title.') : state.theme === 6 ? t('Every link of the page (identical links are grouped), with its name and destination. Links with no name or a generic text are boxed on the page.') : state.theme === 5 ? t('Every table of the page: data tables (with their header cells and title) and layout tables. Click one to find it on the page.') : state.theme === 11 ? t('Every form field of the page, with the name a screen reader would give it. Fields with no label, or only a placeholder, are boxed on the page.') : state.theme === 9 ? t('The outline of the page, like a headings map: headings with their level, and the landmarks, in reading order. Click one to find it on the page; skipped levels and missing areas are flagged.') : t('Only the texts that fail or that a script cannot judge are numbered and boxed on the page. Criteria 3.1 and 3.3 need your eyes (below).')),
+        h('div', { class: 'theme-summary', 'data-theme': String(state.theme), 'aria-label': t('Totals') }),
       ),
-      h('div', { class: 'nav' }, toolsEl),
+      h('div', { class: 'nav' }, dom.toolsEl),
     ),
   )
   if (!scanned) {
-    themeEl.append(h('p', { class: 'hint-line' }, t('Not scanned yet. Open {url} in the browser and click “Scan {label}”.', { url: rec.url, label })))
+    dom.themeEl.append(h('p', { class: 'hint-line' }, t('Not scanned yet. Open {url} in the browser and click “Scan {label}”.', { url: rec.url, label })))
   } else if (!list.length) {
-    themeEl.append(h('p', { class: 'hint-line' }, theme === 3 && passing ? t('No text with a contrast problem found: {summary}.', { summary: tDyn(passing.summary) }) : theme === 2 ? t('No frames found on the page at the last scan: criteria are not applicable.') : theme === 6 ? t('No links found on the page at the last scan: criteria are not applicable.') : theme === 9 ? t('No heading or landmark found on the page at the last scan.') : theme === 5 ? t('No table found on the page at the last scan: criteria are not applicable.') : theme === 11 ? t('No form field found on the page at the last scan: criteria are not applicable.') : t('No text colours found on the page at the last scan: criteria are not applicable.')))
+    dom.themeEl.append(h('p', { class: 'hint-line' }, state.theme === 3 && passing ? t('No text with a contrast problem found: {summary}.', { summary: tDyn(passing.summary) }) : state.theme === 2 ? t('No frames found on the page at the last scan: criteria are not applicable.') : state.theme === 6 ? t('No links found on the page at the last scan: criteria are not applicable.') : state.theme === 9 ? t('No heading or landmark found on the page at the last scan.') : state.theme === 5 ? t('No table found on the page at the last scan: criteria are not applicable.') : state.theme === 11 ? t('No form field found on the page at the last scan: criteria are not applicable.') : t('No text colours found on the page at the last scan: criteria are not applicable.')))
   } else {
     const options: [FindingFilter, string][] =
-      theme === 3
+      state.theme === 3
         ? [['all', 'All'], ['review', 'To review'], ['contrast-fail', 'Fail'], ['contrast-unknown', 'Check by eye']]
-        : theme === 6
+        : state.theme === 6
           ? [['all', 'All'], ['review', 'To review'], ['link-empty', 'No name'], ['link-generic', 'Generic text'], ['link-skip', 'Skip links'], ['hidden', 'Hidden content']]
-          : theme === 9
+          : state.theme === 9
             ? [['all', 'All'], ['review', 'To review'], ['headings', 'Headings'], ['landmarks', 'Landmarks'], ['hidden', 'Hidden content']]
-            : theme === 11
+            : state.theme === 11
               ? [['all', 'All'], ['review', 'To review'], ['field-nolabel', 'No label'], ['field-placeholder', 'Placeholder only'], ['hidden', 'Hidden content']]
-              : theme === 5
+              : state.theme === 5
                 ? [['all', 'All'], ['review', 'To review'], ['table-nohead', 'No header cell'], ['table-layout', 'Layout tables'], ['hidden', 'Hidden content']]
                 : [['all', 'All'], ['review', 'To review']]
-    if (!options.some(([v]) => v === findingFilter)) findingFilter = 'all'
-    const shown = list.filter((f) => findingMatches(f, findingFilter))
-    if (!shown.some((f) => f.id === findingSel)) findingSel = shown[0]?.id ?? null
+    if (!options.some(([v]) => v === state.findingFilter)) state.findingFilter = 'all'
+    const shown = list.filter((f) => findingMatches(f, state.findingFilter))
+    if (!shown.some((f) => f.id === state.findingSel)) state.findingSel = shown[0]?.id ?? null
     const chips = h('div', { class: 'filters', role: 'group', 'aria-label': t('Filter findings') })
     for (const [value, text] of options) {
       const n = list.filter((f) => findingMatches(f, value)).length
       chips.append(
         h(
           'button',
-          { type: 'button', class: 'chip', 'data-value': value, 'aria-pressed': String(findingFilter === value), onclick: () => { findingFilter = value; renderThemeView(); void syncFilterBoxes() } },
+          { type: 'button', class: 'chip', 'data-value': value, 'aria-pressed': String(state.findingFilter === value), onclick: () => { state.findingFilter = value; renderThemeView(); void syncFilterBoxes() } },
           `${t(text)} `,
           h('span', { class: 'count' }, String(n)),
         ),
@@ -1785,9 +1677,9 @@ function renderFindingsView(): void {
               ...(f.data.group === 'heading' ? { style: `margin-left:${(Number(f.data.level) - 1) * 12}px` } : {}),
               'data-kind': f.type,
               'data-status': st,
-              'aria-current': String(f.id === findingSel),
+              'aria-current': String(f.id === state.findingSel),
               onclick: () => {
-                findingSel = f.id
+                state.findingSel = f.id
                 renderThemeView()
                 void focusFinding(f, true)
               },
@@ -1800,13 +1692,13 @@ function renderFindingsView(): void {
         ),
       )
     }
-    const f = list.find((x) => x.id === findingSel)
-    themeEl.append(h('div', { class: 'finding-layout' }, h('nav', { class: 'finding-pane', 'aria-label': t('{name} findings', { name: def.name }) }, chips, ...(theme === 3 && passing ? [h('p', { class: 'hint-line' }, t('Not listed — {summary} pass.', { summary: tDyn(passing.summary) }))] : []), listEl2), f ? findingDetail(f) : h('p', { class: 'hint-line' }, t('Nothing in this category.'))))
+    const f = list.find((x) => x.id === state.findingSel)
+    dom.themeEl.append(h('div', { class: 'finding-layout' }, h('nav', { class: 'finding-pane', 'aria-label': t('{name} findings', { name: def.name }) }, chips, ...(state.theme === 3 && passing ? [h('p', { class: 'hint-line' }, t('Not listed — {summary} pass.', { summary: tDyn(passing.summary) }))] : []), listEl2), f ? findingDetail(f) : h('p', { class: 'hint-line' }, t('Nothing in this category.'))))
   }
-  if ((themeByNumber(theme)?.criteria ?? []).some((c) => !findingCriterionIds(theme).includes(c.id))) {
+  if ((themeByNumber(state.theme)?.criteria ?? []).some((c) => !findingCriterionIds(state.theme).includes(c.id))) {
     const rest = h('div', { class: 'theme-rest' })
     renderChecklist(rest)
-    themeEl.append(rest)
+    dom.themeEl.append(rest)
   }
 }
 
@@ -1917,7 +1809,7 @@ function syncContrastUI(f: FindingItem, review: ImageReview): void {
   }
   const note = document.getElementById(`fnd-note-${f.id}`) as HTMLTextAreaElement | null
   if (note) note.value = review.note
-  const dot = themeEl.querySelector(`.item.finding[data-fid="${f.id}"] .dot`) as HTMLElement | null
+  const dot = dom.themeEl.querySelector(`.item.finding[data-fid="${f.id}"] .dot`) as HTMLElement | null
   if (dot) dot.className = `dot ${findingStatus(f) === 'todo' ? '' : findingStatus(f)}`
   renderThemeBar()
   renderStats()
@@ -2017,7 +1909,7 @@ function findingCard(f: FindingItem, review: ImageReview, c: FindingCriterion): 
         renderThemeBar()
         renderStats()
         renderPageBar()
-        const dot = themeEl.querySelector(`.item.finding[data-fid="${f.id}"] .dot`) as HTMLElement | null
+        const dot = dom.themeEl.querySelector(`.item.finding[data-fid="${f.id}"] .dot`) as HTMLElement | null
         if (dot) dot.className = `dot ${findingStatus(f) === 'todo' ? '' : findingStatus(f)}`
         updateFindingChips()
       },
@@ -2036,20 +1928,20 @@ function findingCard(f: FindingItem, review: ImageReview, c: FindingCriterion): 
 }
 
 function renderEmpty(): void {
-  const onPage = Boolean(page && liveUrl && normalizeUrl(page.url) === normalizeUrl(liveUrl))
-  emptyAddBtn.hidden = Boolean(page)
-  emptyGoBtn.hidden = !page || onPage
-  if (!page) {
-    emptyTitle.textContent = t('Start by registering the pages of your sample')
-    emptyText.textContent = t('Open the first page in the browser and add it as page 1. You scan it afterwards, when you are ready.')
-    emptyAddBtn.textContent = t('Add the current URL as {label}', { label: nextPageLabel() })
+  const onPage = Boolean(state.page && state.liveUrl && normalizeUrl(state.page.url) === normalizeUrl(state.liveUrl))
+  dom.emptyAddBtn.hidden = Boolean(state.page)
+  dom.emptyGoBtn.hidden = !state.page || onPage
+  if (!state.page) {
+    dom.emptyTitle.textContent = t('Start by registering the pages of your sample')
+    dom.emptyText.textContent = t('Open the first page in the browser and add it as page 1. You scan it afterwards, when you are ready.')
+    dom.emptyAddBtn.textContent = t('Add the current URL as {label}', { label: nextPageLabel() })
   } else {
-    const label = pageLabel(page)
-    emptyTitle.textContent = t('{label} is registered, not scanned yet', { label })
-    emptyText.textContent = onPage
-      ? t('The browser is on {url}. Click “Scan {label}” to list its images.', { url: page.url, label })
-      : t('Open {url} in the browser, then click “Scan {label}”.', { url: page.url, label })
-    emptyGoBtn.textContent = t('Open {label} in the browser', { label })
+    const label = pageLabel(state.page)
+    dom.emptyTitle.textContent = t('{label} is registered, not scanned yet', { label })
+    dom.emptyText.textContent = onPage
+      ? t('The browser is on {url}. Click “Scan {label}” to list its images.', { url: state.page.url, label })
+      : t('Open {url} in the browser, then click “Scan {label}”.', { url: state.page.url, label })
+    dom.emptyGoBtn.textContent = t('Open {label} in the browser', { label })
   }
   const strong = (text: string) => h('strong', {}, text)
   $('empty-steps').replaceChildren(
@@ -2059,53 +1951,53 @@ function renderEmpty(): void {
   )
 }
 
-emptyAddBtn.addEventListener('click', () => void addPage(liveUrl))
-emptyGoBtn.addEventListener('click', () => page && goTo(page.url))
-sampleBtn.addEventListener('click', () => setView(view === 'sample' ? 'review' : 'sample'))
+dom.emptyAddBtn.addEventListener('click', () => void addPage(state.liveUrl))
+dom.emptyGoBtn.addEventListener('click', () => state.page && goTo(state.page.url))
+dom.sampleBtn.addEventListener('click', () => setView(state.view === 'sample' ? 'review' : 'sample'))
 
 /** Registers a page of the sample without scanning it. */
 async function addPage(url: string, title?: string): Promise<void> {
-  const target = url || liveUrl
+  const target = url || state.liveUrl
   if (!target) return void say(t('No URL to add: open a page in the browser first.'))
-  const known = findPage(audit, target)
+  const known = findPage(state.audit, target)
   if (known) {
     say(t('{label} already uses this URL.', { label: pageLabel(known) }))
     return void switchTo(known.id)
   }
-  const rec = createPage(audit, target, title ?? ((await inspectedTitle()) || target))
+  const rec = createPage(state.audit, target, title ?? ((await inspectedTitle()) || target))
   adoptSite(rec.url)
   loadPage(rec)
   persist()
-  setView(view === 'sample' ? 'sample' : 'review')
+  setView(state.view === 'sample' ? 'sample' : 'review')
   renderAll()
   say(t('{label} registered. It is not scanned yet: open it in the browser and click “Scan {label}”.', { label: pageLabel(rec) }))
 }
 
 function movePage(rec: PageRecord, dir: -1 | 1): void {
-  const i = audit.pages.indexOf(rec)
+  const i = state.audit.pages.indexOf(rec)
   const j = i + dir
-  if (j < 0 || j >= audit.pages.length) return
-  ;[audit.pages[i], audit.pages[j]] = [audit.pages[j], audit.pages[i]]
+  if (j < 0 || j >= state.audit.pages.length) return
+  ;[state.audit.pages[i], state.audit.pages[j]] = [state.audit.pages[j], state.audit.pages[i]]
   persist()
   renderAll()
 }
 
 /** The sample: which URL is page 1, page 2… Editable, and where pages are registered before scanning. */
 function renderSample(): void {
-  sampleEl.replaceChildren()
+  dom.sampleEl.replaceChildren()
   const field = (label: string, key: keyof Audit['meta'], placeholder: string) =>
     h(
       'label',
       { class: 'field' },
       h('span', {}, label),
-      h('input', { type: 'text', value: audit.meta[key], placeholder, oninput: (e: Event) => { audit.meta[key] = (e.target as HTMLInputElement).value; persist() } }),
+      h('input', { type: 'text', value: state.audit.meta[key], placeholder, oninput: (e: Event) => { state.audit.meta[key] = (e.target as HTMLInputElement).value; persist() } }),
     )
-  sampleEl.append(
+  dom.sampleEl.append(
     h(
       'div',
       { class: 'results-head' },
       h('div', {}, h('h2', {}, t('Audit pages sample')), h('p', { class: 'hint-line' }, t('Register each page and its URL here, then scan them one by one. P01, P02… follow this order.'))),
-      h('div', { class: 'nav' }, h('button', { type: 'button', onclick: () => setView('review') }, t('← Back to review')), h('button', { type: 'button', onclick: () => setView('audit') }, t('Audit pages overview')), h('button', { type: 'button', class: 'danger-btn', disabled: !audit.pages.length && !audit.meta.site && !audit.meta.auditor, title: t('Delete every page and the audit fields'), onclick: () => resetAudit() }, t('Reset the whole audit'))),
+      h('div', { class: 'nav' }, h('button', { type: 'button', onclick: () => setView('review') }, t('← Back to review')), h('button', { type: 'button', onclick: () => setView('audit') }, t('Audit pages overview')), h('button', { type: 'button', class: 'danger-btn', disabled: !state.audit.pages.length && !state.audit.meta.site && !state.audit.meta.auditor, title: t('Delete every page and the audit fields'), onclick: () => resetAudit() }, t('Reset the whole audit'))),
     ),
     h('div', { class: 'sample-meta' }, field(t('Site'), 'site', t('Name of the site')), field(t('Auditor'), 'auditor', t('First name Last name')), field(t('Context'), 'context', t('Initial visit'))),
   )
@@ -2116,7 +2008,7 @@ function renderSample(): void {
     h('thead', {}, h('tr', {}, ...['Page', 'Title', 'URL', 'Themes', 'Images', 'Scans', 'Actions'].map((name) => h('th', { scope: 'col' }, t(name))))),
   )
   const body = h('tbody', {})
-  audit.pages.forEach((rec, i) => {
+  state.audit.pages.forEach((rec, i) => {
     const label = pageLabel(rec)
     const urlInput = h('input', {
       type: 'url',
@@ -2124,7 +2016,7 @@ function renderSample(): void {
       'aria-label': t('URL of {label}', { label }),
       onchange: (e: Event) => {
         const value = (e.target as HTMLInputElement).value.trim()
-        const clash = findPage(audit, value)
+        const clash = findPage(state.audit, value)
         if (clash && clash !== rec) {
           say(t('{label} already uses this URL.', { label: pageLabel(clash) }))
           ;(e.target as HTMLInputElement).value = rec.url
@@ -2138,7 +2030,7 @@ function renderSample(): void {
     body.append(
       h(
         'tr',
-        { class: rec === page ? 'current' : '' },
+        { class: rec === state.page ? 'current' : '' },
         h('th', { scope: 'row' }, label),
         h('td', {}, h('input', { type: 'text', value: rec.title, 'aria-label': t('Title of {label}', { label }), oninput: (e: Event) => { rec.title = (e.target as HTMLInputElement).value; persist() }, onchange: () => renderPageBar() })),
         h('td', {}, urlInput),
@@ -2149,9 +2041,9 @@ function renderSample(): void {
           'td',
           { class: 'row-actions' },
           h('button', { type: 'button', class: 'img-ref', onclick: () => switchTo(rec.id, true) }, t('Open page')),
-          h('button', { type: 'button', class: 'img-ref', title: t('Use the URL the browser is on now'), onclick: () => { if (!liveUrl) return; rec.url = normalizeUrl(liveUrl); persist(); renderSample(); renderPageBar() } }, t('Use current URL')),
+          h('button', { type: 'button', class: 'img-ref', title: t('Use the URL the browser is on now'), onclick: () => { if (!state.liveUrl) return; rec.url = normalizeUrl(state.liveUrl); persist(); renderSample(); renderPageBar() } }, t('Use current URL')),
           h('button', { type: 'button', class: 'img-ref', 'aria-label': t('Move {label} up', { label }), disabled: i === 0, onclick: () => movePage(rec, -1) }, '↑'),
-          h('button', { type: 'button', class: 'img-ref', 'aria-label': t('Move {label} down', { label }), disabled: i === audit.pages.length - 1, onclick: () => movePage(rec, 1) }, '↓'),
+          h('button', { type: 'button', class: 'img-ref', 'aria-label': t('Move {label} down', { label }), disabled: i === state.audit.pages.length - 1, onclick: () => movePage(rec, 1) }, '↓'),
           h('button', { type: 'button', class: 'img-ref', title: t('Clear its scans and answers, keep the page'), onclick: () => resetPage(rec) }, t('Reset')),
           h('button', { type: 'button', class: 'img-ref nc', onclick: () => removePage(rec) }, t('Remove')),
         ),
@@ -2159,17 +2051,17 @@ function renderSample(): void {
     )
   })
   table.append(body)
-  sampleEl.append(h('div', { class: 'results-scroll' }, table))
+  dom.sampleEl.append(h('div', { class: 'results-scroll' }, table))
 
-  const urlNew = h('input', { type: 'url', value: liveUrl, placeholder: 'https://…', 'aria-label': t('URL of the new page') })
+  const urlNew = h('input', { type: 'url', value: state.liveUrl, placeholder: 'https://…', 'aria-label': t('URL of the new page') })
   const titleNew = h('input', { type: 'text', placeholder: t('Title (optional)'), 'aria-label': t('Title of the new page') })
-  sampleEl.append(
+  dom.sampleEl.append(
     h(
       'div',
       { class: 'card add-page' },
       h('h3', {}, t('Add page {label}', { label: nextPageLabel() })),
       h('div', { class: 'add-row' }, urlNew, titleNew,
-        h('button', { type: 'button', class: 'img-ref', onclick: () => { urlNew.value = liveUrl } }, t('Use current URL')),
+        h('button', { type: 'button', class: 'img-ref', onclick: () => { urlNew.value = state.liveUrl } }, t('Use current URL')),
         h('button', { type: 'button', class: 'primary', onclick: () => void addPage(urlNew.value.trim(), titleNew.value.trim() || undefined) }, t('Add to the sample'))),
       h('p', { class: 'hint-line' }, t('Adding a page does not scan it. Select it, open it in the browser, then click Scan.')),
     ),
@@ -2180,29 +2072,28 @@ function renderSample(): void {
 /* Sheets in the browser (same content as the .xlsx)                    */
 /* ------------------------------------------------------------------ */
 
-let activeSheet = 0
 
 function tabsFor(host: HTMLElement, tabs: { name: string; render: () => HTMLElement }[]): void {
   const bar = h('div', { class: 'sheet-tabs', role: 'tablist', 'aria-label': t('Sections') })
   const panel = h('div', { class: 'results-scroll', role: 'tabpanel' })
   const show = (index: number) => {
-    activeSheet = Math.min(index, tabs.length - 1)
+    state.activeSheet = Math.min(index, tabs.length - 1)
     bar.querySelectorAll('button').forEach((b, i) => {
-      b.setAttribute('aria-selected', String(i === activeSheet))
-      b.tabIndex = i === activeSheet ? 0 : -1
+      b.setAttribute('aria-selected', String(i === state.activeSheet))
+      b.tabIndex = i === state.activeSheet ? 0 : -1
     })
-    panel.replaceChildren(tabs[activeSheet].render())
+    panel.replaceChildren(tabs[state.activeSheet].render())
   }
   tabs.forEach((t, i) => bar.append(h('button', { type: 'button', role: 'tab', onclick: () => show(i) }, t.name)))
   bar.addEventListener('keydown', (event) => {
     const dir = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0
     if (!dir) return
-    const next = (activeSheet + dir + tabs.length) % tabs.length
+    const next = (state.activeSheet + dir + tabs.length) % tabs.length
     show(next)
     ;(bar.children[next] as HTMLElement).focus()
   })
   host.append(bar, panel)
-  show(activeSheet)
+  show(state.activeSheet)
 }
 
 /** Renders one sheet exactly as it is exported to Excel. */
@@ -2238,21 +2129,13 @@ function sheetTable(sheet: Sheet): HTMLElement {
 function appendWithImageLinks(cell: HTMLElement, text: string): void {
   for (const part of text.split(/(#\d+)/g)) {
     const m = /^#(\d+)$/.exec(part)
-    if (m && view === 'page' && elements.some((e) => e.id === Number(m[1]))) {
+    if (m && state.view === 'page' && state.elements.some((e) => e.id === Number(m[1]))) {
       const id = Number(m[1])
       cell.append(h('button', { type: 'button', class: 'img-ref', onclick: () => { setView('review'); select(id, true) } }, part))
     } else if (part) cell.append(part)
   }
 }
 
-function download(bytes: BlobPart, type: string, name: string): void {
-  const url = URL.createObjectURL(new Blob([bytes], { type }))
-  const a = h('a', { href: url, download: name })
-  document.body.append(a)
-  a.click()
-  a.remove()
-  setTimeout(() => URL.revokeObjectURL(url), 5000)
-}
 
 const XLSX_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
@@ -2281,28 +2164,28 @@ const PROVISIONAL_HELP = (): string =>
   t('Provisional rate: some criteria are still to test, are only partly covered by this tool, or rest on an automatic answer you have not confirmed. A criterion judged on only part of its tests keeps its result but keeps the rate provisional; a suggested compliance counts as to review until you confirm it; a failure is always kept.')
 
 function renderResults(): void {
-  resultsEl.replaceChildren()
-  if (!page) return
-  const input = pageInput(page)
+  dom.resultsEl.replaceChildren()
+  if (!state.page) return
+  const input = pageInput(state.page)
   const stat = auditStats([input]).perPage[0]
   const pill = (cls: string, text: string) => h('span', { class: `outcome ${cls}` }, text)
-  resultsEl.append(
+  dom.resultsEl.append(
     h(
       'div',
       { class: 'results-head' },
-      h('div', {}, h('h2', {}, `${pageLabel(page)} — ${page.title || page.url}`), h('p', { class: 'hint-line' }, page.url)),
+      h('div', {}, h('h2', {}, `${pageLabel(state.page)} — ${state.page.title || state.page.url}`), h('p', { class: 'hint-line' }, state.page.url)),
       h(
         'div',
         { class: 'nav' },
         h('button', { type: 'button', onclick: () => setView('review') }, t('← Back to review')),
         h('button', { type: 'button', onclick: () => setView('audit') }, t('Audit pages overview')),
-        h('button', { type: 'button', class: 'primary', onclick: () => void exportWorkbook([input], auditSheets([input], audit.meta), `grille-rgaa-${slugOf(audit.meta.site || audit.name)}-${pageLabel(page!)}.xlsx`) }, t('Export this page (.xlsx)')),
+        h('button', { type: 'button', class: 'primary', onclick: () => void exportWorkbook([input], auditSheets([input], state.audit.meta), `grille-rgaa-${slugOf(state.audit.meta.site || state.audit.name)}-${pageLabel(state.page!)}.xlsx`) }, t('Export this page (.xlsx)')),
       ),
     ),
     h(
       'div',
       { class: 'results-summary' },
-      h('div', { class: 'rate' }, h('strong', {}, stat.rate === null ? '—' : `${stat.rate}%`), ...(stat.rate !== null && isProvisional(stat.counts) ? [h('span', { class: 'pill warn-pill', title: PROVISIONAL_HELP() }, t('provisional'))] : []), h('span', {}, t('accessibility rate of {label} (C ÷ (C + NC), themes {themes})', { label: pageLabel(page), themes: stat.themes.join(', ') }))),
+      h('div', { class: 'rate' }, h('strong', {}, stat.rate === null ? '—' : `${stat.rate}%`), ...(stat.rate !== null && isProvisional(stat.counts) ? [h('span', { class: 'pill warn-pill', title: PROVISIONAL_HELP() }, t('provisional'))] : []), h('span', {}, t('accessibility rate of {label} (C ÷ (C + NC), themes {themes})', { label: pageLabel(state.page), themes: stat.themes.join(', ') }))),
       pill('c', t('{n} compliant', { n: stat.counts.C })),
       pill('nc', t('{n} non-compliant', { n: stat.counts.NC })),
       pill('na', t('{n} not applicable', { n: stat.counts.NA })),
@@ -2313,7 +2196,7 @@ function renderResults(): void {
     ...(isProvisional(stat.counts) ? [h('p', { class: 'hint warn' }, PROVISIONAL_HELP())] : []),
   )
   const sheets = pageSheets(input)
-  tabsFor(resultsEl, sheets.map((sheet) => ({ name: sheet.name === pageLabel(page!) ? t('Grid ({label})', { label: pageLabel(page!) }) : sheet.name, render: () => sheetTable(sheet) })))
+  tabsFor(dom.resultsEl, sheets.map((sheet) => ({ name: sheet.name === pageLabel(state.page!) ? t('Grid ({label})', { label: pageLabel(state.page!) }) : sheet.name, render: () => sheetTable(sheet) })))
 }
 
 /* ------------------------------------------------------------------ */
@@ -2424,7 +2307,7 @@ function dashboard(inputs: PageInput[]): HTMLElement {
           'tbody',
           {},
           ...lv.pages.map((p) => {
-            const rec = audit.pages.find((x) => pageLabel(x) === p.label)
+            const rec = state.audit.pages.find((x) => pageLabel(x) === p.label)
             return h(
               'tr',
               {},
@@ -2479,10 +2362,10 @@ function dashboard(inputs: PageInput[]): HTMLElement {
 function openReport(download_: boolean): void {
   const inputs = allPageInputs()
   if (!inputs.length) return void say(t('Add a page to the audit first.'))
-  const html = buildReportHtml(audit, inputs, audit.pages)
+  const html = buildReportHtml(state.audit, inputs, state.audit.pages)
   const date = new Date().toISOString().slice(0, 10)
   if (download_) {
-    download(html, 'text/html', `${slugOf(audit.meta.site || audit.name)}_rapport_${date}.html`)
+    download(html, 'text/html', `${slugOf(state.audit.meta.site || state.audit.name)}_rapport_${date}.html`)
     say(t('Report downloaded. Open it in a browser and print it to PDF if you need one.'))
   } else {
     const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }))
@@ -2492,12 +2375,12 @@ function openReport(download_: boolean): void {
 }
 
 function renderAudit(): void {
-  auditEl.replaceChildren()
+  dom.auditEl.replaceChildren()
   const inputs = allPageInputs()
-  if (!inputs.length) return void auditEl.append(h('p', { class: 'hint-line' }, t('Scan a page to start the audit.')))
-  const sheets = auditSheets(inputs, audit.meta)
+  if (!inputs.length) return void dom.auditEl.append(h('p', { class: 'hint-line' }, t('Scan a page to start the audit.')))
+  const sheets = auditSheets(inputs, state.audit.meta)
   const named = (name: string) => sheets.find((s) => s.name === name)!
-  auditEl.append(
+  dom.auditEl.append(
     h(
       'div',
       { class: 'results-head' },
@@ -2506,13 +2389,13 @@ function renderAudit(): void {
         'div',
         { class: 'nav' },
         h('button', { type: 'button', onclick: () => setView('review') }, t('← Back to review')),
-        h('button', { type: 'button', class: 'primary', onclick: () => void exportWorkbook(inputs, auditSheets(inputs, audit.meta), `grille-rgaa-${slugOf(audit.meta.site || audit.name)}.xlsx`) }, t('Export Excel (all pages)')),
+        h('button', { type: 'button', class: 'primary', onclick: () => void exportWorkbook(inputs, auditSheets(inputs, state.audit.meta), `grille-rgaa-${slugOf(state.audit.meta.site || state.audit.name)}.xlsx`) }, t('Export Excel (all pages)')),
         h('button', { type: 'button', class: 'primary', title: t('One printable page with the summary, the non-conformities and a draft accessibility statement'), onclick: () => openReport(false) }, t('Open the report')),
         h('button', { type: 'button', onclick: () => openReport(true) }, t('Download the report (HTML)')),
       ),
     ),
   )
-  tabsFor(auditEl, [
+  tabsFor(dom.auditEl, [
     { name: t('Dashboard'), render: () => dashboard(inputs) },
     { name: t('Summary'), render: () => sheetTable(named('Synthèse')) },
     { name: t('Sample'), render: () => h('div', {}, h('p', { class: 'hint-line' }, t('Pages and fields are edited in “Audit pages sample”. ')), h('button', { type: 'button', class: 'img-ref', onclick: () => setView('sample') }, t('Edit the sample')), sheetTable(named('Échantillon'))) },
@@ -2571,9 +2454,9 @@ function prefill(el: Item): void {
 
 /** Merges a scan into the current page. Returns the new count and the renumbering for the page's boxes. */
 function mergeScan(found: ImageElementInfo[]): { added: number; map: { from: number; to: number }[] } {
-  const rec = page!
-  scanCount++
-  const byKey = new Map(elements.map((el) => [el.key, el]))
+  const rec = state.page!
+  state.scanCount++
+  const byKey = new Map(state.elements.map((el) => [el.key, el]))
   const seen = new Set<string>()
   const occurrences = new Map<string, number>()
   const map: { from: number; to: number }[] = []
@@ -2589,38 +2472,37 @@ function mergeScan(found: ImageElementInfo[]): { added: number; map: { from: num
       Object.assign(existing, info, { id: existing.id, key, present: true, scan: existing.scan })
       map.push({ from: info.id, to: existing.id })
     } else {
-      const item: Item = { ...info, id: rec.nextId++, key, present: true, scan: scanCount }
-      elements.push(item)
+      const item: Item = { ...info, id: rec.nextId++, key, present: true, scan: state.scanCount }
+      state.elements.push(item)
       byKey.set(key, item)
       map.push({ from: info.id, to: item.id })
       added++
     }
   }
-  for (const el of elements) if (!seen.has(el.key)) el.present = false
-  for (const el of elements) if (el.present) prefill(el)
-  elements.sort((a, b) => a.scan - b.scan || a.id - b.id)
+  for (const el of state.elements) if (!seen.has(el.key)) el.present = false
+  for (const el of state.elements) if (el.present) prefill(el)
+  state.elements.sort((a, b) => a.scan - b.scan || a.id - b.id)
   return { added, map }
 }
 
-let lastScanOk = false
 
 async function scan(): Promise<void> {
-  lastScanOk = false
-  if (!page) return void say(t('Add a page to the audit pages sample first (button “Audit pages sample”).'))
-  const scannable = page.themes.filter((n) => SCANNED_THEMES.has(n))
+  state.lastScanOk = false
+  if (!state.page) return void say(t('Add a page to the audit pages sample first (button “Audit pages sample”).'))
+  const scannable = state.page.themes.filter((n) => SCANNED_THEMES.has(n))
   if (!scannable.length) return void say(t('None of the selected themes can be scanned: they are checklists. Select Images, Frames or Colours to scan.'))
   say(t('Scanning…'))
   try {
     const [url, title] = await Promise.all([inspectedUrl(), inspectedTitle()])
-    liveUrl = url
-    const rec = page
+    state.liveUrl = url
+    const rec = state.page
     const label = pageLabel(rec)
     if (url && !rec.url) {
       rec.url = normalizeUrl(url)
       adoptSite(rec.url)
     }
     else if (url && normalizeUrl(url) !== normalizeUrl(rec.url)) {
-      const other = findPage(audit, url)
+      const other = findPage(state.audit, url)
       const question = other
         ? `${t('The browser is on {other} ({url}), not on {label}.', { other: pageLabel(other), url, label })}\n\n${t('OK: scan into {other} instead.', { other: pageLabel(other) })}\n${t('Cancel: stop.')}`
         : `${t('The browser is on {url}, but {label} is registered for {registered}.', { url, label, registered: rec.url })}\n\n${t('OK: scan into {label} and update its URL.', { label })}\n${t('Cancel: stop.')}`
@@ -2634,19 +2516,19 @@ async function scan(): Promise<void> {
     if (!rec.title && title) rec.title = title
 
     const parts: string[] = []
-    const first = scanCount === 0
-    const selectedKey = elements.find((e) => e.id === selectedId)?.key
+    const first = state.scanCount === 0
+    const selectedKey = state.elements.find((e) => e.id === state.selectedId)?.key
     if (rec.themes.includes(1)) {
       const response = await sendToPage(inspectedTabId(), { type: 'RGAA_HIGHLIGHT_IMAGES', color: colorOf(1) })
       rec.scanCoverage = mergeCoverage(rec.scanCoverage, response?.coverage)
       const { added, map } = mergeScan(response?.elements ?? [])
       await sendToPage(inspectedTabId(), { type: 'RGAA_RELABEL', map })
       if (!rec.scannedThemes.includes(1)) rec.scannedThemes.push(1)
-      selectedId = elements.find((e) => e.key === selectedKey)?.id ?? elements[0]?.id ?? null
-      const gone = elements.filter((e) => !e.present).length
-      parts.push([t('{n} image(s)', { n: elements.length }), ...(first ? [] : [t('{n} new', { n: added })]), ...(gone ? [t('{n} gone', { n: gone })] : [])].join(', '))
+      state.selectedId = state.elements.find((e) => e.key === selectedKey)?.id ?? state.elements[0]?.id ?? null
+      const gone = state.elements.filter((e) => !e.present).length
+      parts.push([t('{n} image(s)', { n: state.elements.length }), ...(first ? [] : [t('{n} new', { n: added })]), ...(gone ? [t('{n} gone', { n: gone })] : [])].join(', '))
     } else {
-      scanCount++
+      state.scanCount++
     }
     for (const tn of rec.themes.filter((n) => FINDING_THEMES.has(n))) {
       const response = await sendToPage(inspectedTabId(), { type: 'RGAA_SCAN_THEME', theme: tn, color: colorOf(tn) })
@@ -2659,20 +2541,20 @@ async function scan(): Promise<void> {
     const missing = rec.findings.filter((f) => f.present && !f.shot && f.type !== 'contrast-ok' && rec.themes.includes(f.theme)).slice(0, 50)
     const shots = await captureShots(missing)
     if (shots) parts.push(t('{n} preview(s)', { n: shots }))
-    filter = 'all'
-    findingFilter = 'all'
+    state.filter = 'all'
+    state.findingFilter = 'all'
     await applyBoxes()
-    scannedThisSession.add(rec.id)
-    newBanner.hidden = true
-    navBanner.hidden = true
+    state.scannedThisSession.add(rec.id)
+    dom.newBanner.hidden = true
+    dom.navBanner.hidden = true
     setView('review')
     renderAll()
     persist()
-    lastScanOk = true
+    state.lastScanOk = true
     say(
       first
         ? t('{label} scanned: {parts}. Open a popin or a tab, then click “Rescan {label}” to add what appears.', { label, parts: parts.join(' · ') })
-        : t('Rescan {n} of {label}: {parts}.', { n: scanCount, label, parts: parts.join(' · ') }),
+        : t('Rescan {n} of {label}: {parts}.', { n: state.scanCount, label, parts: parts.join(' · ') }),
     )
   } catch (err) {
     say(t('Could not reach the page. Reload the tab, check site access in about:addons, and try again.'))
@@ -2680,35 +2562,35 @@ async function scan(): Promise<void> {
   }
 }
 
-scanBtn.addEventListener('click', scan)
-rescanBtn.addEventListener('click', scan)
+dom.scanBtn.addEventListener('click', scan)
+dom.rescanBtn.addEventListener('click', scan)
 
 chrome.runtime.onMessage.addListener((message) => {
-  if (message?.type !== 'RGAA_NEW_IMAGES' || !scanCount) return
-  newBannerText.textContent = t('{n} new image(s) appeared on the page (popin, tab, lazy content…).', { n: message.count })
-  newBanner.hidden = false
+  if (message?.type !== 'RGAA_NEW_IMAGES' || !state.scanCount) return
+  dom.newBannerText.textContent = t('{n} new image(s) appeared on the page (popin, tab, lazy content…).', { n: message.count })
+  dom.newBanner.hidden = false
 })
 
 chrome.devtools.network.onNavigated.addListener((url: string) => {
-  liveUrl = url
+  state.liveUrl = url
   // The boxes are gone with the old document: what was seen is shown as last seen until the next scan.
-  scannedThisSession.clear()
+  state.scannedThisSession.clear()
   resetPageTools()
-  for (const p of audit.pages) for (const el of p.items) el.present = true
-  newBanner.hidden = true
+  for (const p of state.audit.pages) for (const el of p.items) el.present = true
+  dom.newBanner.hidden = true
   renderPageBar()
   renderList()
   renderStats()
-  if (view === 'review') renderEmpty()
-  if (normalizeUrl(url) !== navDismissed) navDismissed = ''
+  if (state.view === 'review') renderEmpty()
+  if (normalizeUrl(url) !== state.navDismissed) state.navDismissed = ''
   showNavBanner(url)
 })
 
-clearBtn.addEventListener('click', async () => {
+dom.clearBtn.addEventListener('click', async () => {
   try {
     await sendToPage(inspectedTabId(), { type: 'RGAA_CLEAR_HIGHLIGHTS' })
-    for (const el of elements) el.present = false
-    for (const f of page?.findings ?? []) f.present = false
+    for (const el of state.elements) el.present = false
+    for (const f of state.page?.findings ?? []) f.present = false
     renderList()
     renderStats()
     say(t('Boxes removed from the page. The images and your answers stay in the audit; “Rescan” draws them again.'))
@@ -2718,35 +2600,35 @@ clearBtn.addEventListener('click', async () => {
   }
 })
 
-altBtn.addEventListener('click', () => {
-  showAltOn = !showAltOn
-  try { localStorage.setItem('rgaa-show-alt', showAltOn ? 'on' : 'off') } catch { /* optional */ }
+dom.altBtn.addEventListener('click', () => {
+  state.showAltOn = !state.showAltOn
+  try { localStorage.setItem('rgaa-show-alt', state.showAltOn ? 'on' : 'off') } catch { /* optional */ }
   void applyBoxes()
 })
 
-tintBtn.addEventListener('click', () => {
-  focusTintOn = !focusTintOn
-  try { localStorage.setItem('rgaa-focus-tint', focusTintOn ? 'on' : 'off') } catch { /* optional */ }
+dom.tintBtn.addEventListener('click', () => {
+  state.focusTintOn = !state.focusTintOn
+  try { localStorage.setItem('rgaa-focus-tint', state.focusTintOn ? 'on' : 'off') } catch { /* optional */ }
   void applyBoxes()
 })
 
-boxesBtn.addEventListener('click', () => {
-  boxesOn[theme] = boxesOn[theme] === false
+dom.boxesBtn.addEventListener('click', () => {
+  state.boxesOn[state.theme] = state.boxesOn[state.theme] === false
   void applyBoxes()
 })
-resultsBtn.addEventListener('click', () => setView(view === 'page' ? 'review' : 'page'))
-auditBtn.addEventListener('click', () => setView(view === 'audit' ? 'review' : 'audit'))
+dom.resultsBtn.addEventListener('click', () => setView(state.view === 'page' ? 'review' : 'page'))
+dom.auditBtn.addEventListener('click', () => setView(state.view === 'audit' ? 'review' : 'audit'))
 
 /* Keyboard: j / k move between images (outside text fields). */
-nextBtn.addEventListener('click', () => goToFirstOnPage('pending'))
+dom.nextBtn.addEventListener('click', () => goToFirstOnPage('pending'))
 
 document.addEventListener('keydown', (event) => {
   const target = event.target as HTMLElement
-  if (event.key === 'n' && !event.ctrlKey && !event.metaKey && !['TEXTAREA', 'INPUT', 'SELECT'].includes(target.tagName) && page && view === 'review') return void goToFirstOnPage('pending')
-  if (['TEXTAREA', 'INPUT', 'SELECT'].includes(target.tagName) || view !== 'review' || theme !== 1 || !elements.length || selectedId === null) return
-  const index = elements.findIndex((e) => e.id === selectedId)
+  if (event.key === 'n' && !event.ctrlKey && !event.metaKey && !['TEXTAREA', 'INPUT', 'SELECT'].includes(target.tagName) && state.page && state.view === 'review') return void goToFirstOnPage('pending')
+  if (['TEXTAREA', 'INPUT', 'SELECT'].includes(target.tagName) || state.view !== 'review' || state.theme !== 1 || !state.elements.length || state.selectedId === null) return
+  const index = state.elements.findIndex((e) => e.id === state.selectedId)
   const next = event.key === 'j' ? index + 1 : event.key === 'k' ? index - 1 : -1
-  if (next >= 0 && next < elements.length) select(elements[next].id, true)
+  if (next >= 0 && next < state.elements.length) select(state.elements[next].id, true)
 })
 
 window.addEventListener('error', (event) => say(t('Panel error: {message}', { message: event.message })))
@@ -2756,10 +2638,6 @@ window.addEventListener('unhandledrejection', (event) => say(t('Panel error: {me
 /* Manual checks and import of other tools' results (per page)           */
 /* ------------------------------------------------------------------ */
 
-const checksEl = $('checks')
-const checksBtn = $<HTMLButtonElement>('checks-btn')
-const autoBtn = $<HTMLButtonElement>('auto-btn')
-let axeRunning = false
 
 function manualProgress(rec: PageRecord): { done: number; issues: number; total: number } {
   const answers = Object.values(rec.manualChecks ?? {})
@@ -2772,9 +2650,9 @@ function coverageCard(cov: NonNullable<PageRecord['scanCoverage']>): HTMLElement
 }
 
 function renderChecks(): void {
-  checksEl.replaceChildren()
-  if (!page) return
-  const rec = page
+  dom.checksEl.replaceChildren()
+  if (!state.page) return
+  const rec = state.page
   rec.manualChecks ??= {}
   const progress = manualProgress(rec)
   const body = h('div', { class: 'checks-body' })
@@ -2787,7 +2665,7 @@ function renderChecks(): void {
         if (state === 'todo') delete rec.manualChecks![c.id]
         else rec.manualChecks![c.id] = { state, note: answer?.note ?? '' }
         persist()
-        keepScroll(checksEl, renderChecks)
+        keepScroll(dom.checksEl, renderChecks)
       }
       const radio = (value: 'todo' | 'ok' | 'issue', label: string) => [
         h('input', { type: 'radio', name: `mc-${c.id}`, id: `mc-${c.id}-${value}`, checked: (answer?.state ?? 'todo') === value, onclick: () => set(value) }),
@@ -2815,7 +2693,7 @@ function renderChecks(): void {
   }
 
   const reports = (rec.imports ?? []).slice().reverse()
-  checksEl.append(
+  dom.checksEl.append(
     h(
       'div',
       { class: 'results-head' },
@@ -2832,7 +2710,7 @@ function renderChecks(): void {
       { class: 'card' },
       h('h3', {}, t('Automatic checks')),
       h('p', { class: 'hint-line' }, t('Runs every automatic test on the page you are inspecting: it scans all the themes, then runs axe, our RGAA checks, the Asqatasun-derived rules and the HTML check. A failure becomes a pre-filled “non-compliant” to confirm; a theme that clearly does not apply (no table, no media, no form…) is pre-filled “not applicable”. A criterion where nothing is found is pre-filled “compliant” to confirm. It covers only part of the RGAA: the manual checks below are still needed.')),
-      h('div', { class: 'nav' }, h('button', { type: 'button', class: 'primary', disabled: axeRunning, onclick: () => void runEverything() }, axeRunning ? t('Running the checks…') : t('Run the automatic checks'))),
+      h('div', { class: 'nav' }, h('button', { type: 'button', class: 'primary', disabled: state.axeRunning, onclick: () => void runEverything() }, state.axeRunning ? t('Running the checks…') : t('Run the automatic checks'))),
     ),
     htmlCard(rec),
     ...(rec.scanCoverage ? [coverageCard(rec.scanCoverage)] : []),
@@ -2877,7 +2755,7 @@ async function validateSnapshot(rec: PageRecord, html: string): Promise<void> {
 function downloadSnapshot(rec: PageRecord): void {
   if (!rec.snapshot) return
   const date = new Date(rec.snapshot.at).toISOString().slice(0, 10)
-  download(unpackSnapshot(rec.snapshot), 'text/html', `${slugOf(audit.meta.site || audit.name)}_${pageLabel(rec)}_${date}.html`)
+  download(unpackSnapshot(rec.snapshot), 'text/html', `${slugOf(state.audit.meta.site || state.audit.name)}_${pageLabel(rec)}_${date}.html`)
 }
 
 let htmlBusy = false
@@ -2887,7 +2765,7 @@ function htmlCard(rec: PageRecord): HTMLElement {
   const run = async (fn: () => Promise<void>) => {
     if (htmlBusy) return
     htmlBusy = true
-    keepScroll(checksEl, renderChecks)
+    keepScroll(dom.checksEl, renderChecks)
     try {
       await fn()
       persist()
@@ -2896,7 +2774,7 @@ function htmlCard(rec: PageRecord): HTMLElement {
       say(t('Could not capture or check the HTML ({reason}).', { reason: String((err as Error)?.message ?? err) }))
     } finally {
       htmlBusy = false
-      if (view === 'checks') keepScroll(checksEl, renderChecks)
+      if (state.view === 'checks') keepScroll(dom.checksEl, renderChecks)
     }
   }
   return h(
@@ -2972,11 +2850,11 @@ function rulesToResults(url: string, findings: RuleFinding[]): { own: ToolResult
 }
 
 async function runAutoChecks(): Promise<void> {
-  if (!page || axeRunning) return
-  const rec = page
-  axeRunning = true
-  autoBtn.disabled = true
-  keepScroll(checksEl, renderChecks)
+  if (!state.page || state.axeRunning) return
+  const rec = state.page
+  state.axeRunning = true
+  dom.autoBtn.disabled = true
+  keepScroll(dom.checksEl, renderChecks)
   say(t('Running the automatic checks on the page…'))
   let step = 'rules'
   try {
@@ -3013,79 +2891,66 @@ async function runAutoChecks(): Promise<void> {
     say(t('Could not run the automatic checks ({reason}). Reload the page (F5) if you just reloaded the extension, check the extension may access this site, then try again.', { reason }))
     console.error(err)
   } finally {
-    axeRunning = false
-    autoBtn.disabled = !page
-    if (view === 'checks') keepScroll(checksEl, renderChecks)
+    state.axeRunning = false
+    dom.autoBtn.disabled = !state.page
+    if (state.view === 'checks') keepScroll(dom.checksEl, renderChecks)
   }
 }
 
-checksBtn.addEventListener('click', () => setView(view === 'checks' ? 'review' : 'checks'))
+dom.checksBtn.addEventListener('click', () => setView(state.view === 'checks' ? 'review' : 'checks'))
 /** Everything at once: scan every theme that can be scanned, then axe, our RGAA checks, the Asqatasun-derived rules and the HTML check. */
 async function runEverything(): Promise<void> {
-  if (!page || axeRunning) return
-  const rec = page
+  if (!state.page || state.axeRunning) return
+  const rec = state.page
   const scannable = [...SCANNED_THEMES].filter((n) => !rec.themes.includes(n))
   if (scannable.length) {
     rec.themes = [...rec.themes, ...scannable].sort((a, b) => a - b)
     persist()
   }
   await scan()
-  if (!lastScanOk || page !== rec) return
+  if (!state.lastScanOk || state.page !== rec) return
   setView('checks')
   await runAutoChecks()
 }
 
-autoBtn.addEventListener('click', () => void runEverything())
+dom.autoBtn.addEventListener('click', () => void runEverything())
 
 /* ------------------------------------------------------------------ */
 /* Audits: name, saved state, list of audits, file save / reopen         */
 /* ------------------------------------------------------------------ */
 
-const auditNameBtn = $<HTMLButtonElement>('audit-name-btn')
-const saveStateEl = $('save-state')
-const saveRetryBtn = $<HTMLButtonElement>('save-retry-btn')
-const backupStateEl = $('backup-state')
-const auditsBtn = $<HTMLButtonElement>('audits-btn')
-const saveFileBtn = $<HTMLButtonElement>('save-file-btn')
-const openFileBtn = $<HTMLButtonElement>('open-file-btn')
-const auditsEl = $('audits')
-const importInput = $<HTMLInputElement>('import-file')
-const langFrBtn = $<HTMLButtonElement>('lang-fr')
-const langEnBtn = $<HTMLButtonElement>('lang-en')
-const textDialog = $<HTMLDialogElement>('text-dialog')
-
 
 /** Which audit is open, and whether it is saved (in the browser, and in a file). Always visible. */
 function renderAuditBar(): void {
-  auditNameBtn.textContent = auditTitle(audit)
-  auditNameBtn.title = t('Rename this audit')
-  const { saveState, savedAt, blocked, lastError } = session
-  saveStateEl.className = `pill ${saveState === 'saved' ? '' : saveState}`
-  saveStateEl.textContent =
+  dom.auditNameBtn.textContent = auditTitle(state.audit)
+  dom.auditNameBtn.title = t('Rename this audit')
+  const { saveState, savedAt, blocked, lastError } = state.session
+  dom.saveStateEl.className = `pill ${saveState === 'saved' ? '' : saveState}`
+  dom.saveStateEl.textContent =
     saveState === 'saving'
       ? t('Saving…')
       : saveState === 'error'
         ? blocked
           ? t('Not loaded! The saved audit cannot be read; nothing will be written over it.')
           : t('Not saved! Retry, or save to a file now.')
-        : t('Saved {time}', { time: timeOf(savedAt || audit.updatedAt) })
-  saveStateEl.title =
+        : t('Saved {time}', { time: timeOf(savedAt || state.audit.updatedAt) })
+  dom.saveStateEl.title =
     saveState === 'error'
       ? blocked
         ? lastError
         : t('Not saved: browser storage full or unavailable ({error}). Retry, or save to a file now.', { error: lastError || '—' })
-      : t('Saved in the browser at {time}', { time: timeOf(savedAt || audit.updatedAt) })
-  saveRetryBtn.hidden = saveState !== 'error'
-  saveRetryBtn.textContent = blocked ? t('Retry loading') : t('Retry')
-  const never = audit.exportedAt === undefined
-  const changed = !never && audit.updatedAt > (audit.exportedAt ?? 0)
-  backupStateEl.className = `pill ${never || changed ? (audit.pages.length ? 'warn' : 'muted') : 'muted'}`
-  backupStateEl.textContent = never ? t('No file yet') : changed ? t('File out of date') : t('File up to date')
-  backupStateEl.title = never ? t('No file saved yet') : changed ? t('Changed since the file of {time}', { time: timeOf(audit.exportedAt ?? 0) }) : t('File saved at {time}', { time: timeOf(audit.exportedAt ?? 0) })
-  auditsBtn.setAttribute('aria-pressed', String(view === 'audits'))
-  langFrBtn.setAttribute('aria-pressed', String(getLang() === 'fr'))
-  langEnBtn.setAttribute('aria-pressed', String(getLang() === 'en'))
-  document.title = `${auditTitle(audit)} — RGAA Assistant`
+      : t('Saved in the browser at {time}', { time: timeOf(savedAt || state.audit.updatedAt) })
+  dom.saveRetryBtn.hidden = saveState !== 'error'
+  dom.saveRetryBtn.textContent = blocked ? t('Retry loading') : t('Retry')
+  const never = state.audit.exportedAt === undefined
+  const changed = !never && state.audit.updatedAt > (state.audit.exportedAt ?? 0)
+  dom.backupStateEl.className = `pill ${never || changed ? (state.audit.pages.length ? 'warn' : 'muted') : 'muted'}`
+  dom.backupStateEl.textContent = never ? t('No file yet') : changed ? t('File out of date') : t('File up to date')
+  dom.backupStateEl.title = never ? t('No file saved yet') : changed ? t('Changed since the file of {time}', { time: timeOf(state.audit.exportedAt ?? 0) }) : t('File saved at {time}', { time: timeOf(state.audit.exportedAt ?? 0) })
+  dom.auditsBtn.setAttribute('aria-pressed', String(state.view === 'audits'))
+  dom.langFrBtn.setAttribute('aria-pressed', String(getLang() === 'fr'))
+  dom.langEnBtn.setAttribute('aria-pressed', String(getLang() === 'en'))
+  document.title = `${auditTitle(state.audit)} — RGAA Assistant`
 }
 
 /** A text question inside the panel (the browser's prompt() is not shown in a DevTools panel). */
@@ -3101,10 +2966,10 @@ function askText(title: string, label: string, initial = '', okLabel = t('OK')):
     const finish = (value: string | null) => {
       if (done) return
       done = true
-      textDialog.removeEventListener('cancel', onCancel)
+      dom.textDialog.removeEventListener('cancel', onCancel)
       form.removeEventListener('submit', onSubmit)
       cancel.removeEventListener('click', onCancelClick)
-      textDialog.close()
+      dom.textDialog.close()
       resolve(value)
     }
     const form = $<HTMLFormElement>('text-form')
@@ -3122,8 +2987,8 @@ function askText(title: string, label: string, initial = '', okLabel = t('OK')):
     const onCancelClick = () => finish(null)
     form.addEventListener('submit', onSubmit)
     cancel.addEventListener('click', onCancelClick)
-    textDialog.addEventListener('cancel', onCancel)
-    textDialog.showModal()
+    dom.textDialog.addEventListener('cancel', onCancel)
+    dom.textDialog.showModal()
     input.select()
   })
 }
@@ -3133,11 +2998,10 @@ function askText(title: string, label: string, initial = '', okLabel = t('OK')):
 function adoptSite(url: string): void {
   const host = hostName(url)
   if (!host) return
-  if (!audit.meta.site.trim()) audit.meta.site = host
-  if (!audit.name.trim() || audit.name === 'Untitled audit' || audit.name === 'Audit sans titre') audit.name = audit.meta.site
+  if (!state.audit.meta.site.trim()) state.audit.meta.site = host
+  if (!state.audit.name.trim() || state.audit.name === 'Untitled audit' || state.audit.name === 'Audit sans titre') state.audit.name = state.audit.meta.site
 }
 
-const choiceDialog = $<HTMLDialogElement>('choice-dialog')
 
 /** A question with several answers (buttons); null when it is dismissed. */
 function askChoice(title: string, text: string, choices: Choice[]): Promise<string | null> {
@@ -3147,8 +3011,8 @@ function askChoice(title: string, text: string, choices: Choice[]): Promise<stri
     const box = $('choice-actions')
     box.replaceChildren()
     const finish = (id: string | null) => {
-      choiceDialog.removeEventListener('cancel', onCancel)
-      if (choiceDialog.open) choiceDialog.close()
+      dom.choiceDialog.removeEventListener('cancel', onCancel)
+      if (dom.choiceDialog.open) dom.choiceDialog.close()
       resolve(id)
     }
     const onCancel = (event: Event) => {
@@ -3156,26 +3020,26 @@ function askChoice(title: string, text: string, choices: Choice[]): Promise<stri
       finish(null)
     }
     for (const c of choices) box.append(h('button', { type: 'button', class: c.primary ? 'primary' : '', onclick: () => finish(c.id) }, c.label))
-    choiceDialog.addEventListener('cancel', onCancel)
-    choiceDialog.showModal()
+    dom.choiceDialog.addEventListener('cancel', onCancel)
+    dom.choiceDialog.showModal()
   })
 }
 
 /** The open audit and everything that stores it: see audit-session.ts. */
-const session = createAuditSession({
-  getAudit: () => audit,
-  setAudit: (next) => { audit = next },
+state.session = createAuditSession({
+  getAudit: () => state.audit,
+  setAudit: (next) => { state.audit = next },
   onActivated: () => {
-    scannedThisSession.clear()
-    findingSel = null
-    theme = 1
+    state.scannedThisSession.clear()
+    state.findingSel = null
+    state.theme = 1
     void clearBoxes()
-    loadPage((liveUrl ? findPage(audit, liveUrl) : undefined) ?? audit.pages.find((p) => p.id === audit.current) ?? audit.pages[0] ?? null)
+    loadPage((state.liveUrl ? findPage(state.audit, state.liveUrl) : undefined) ?? state.audit.pages.find((p) => p.id === state.audit.current) ?? state.audit.pages[0] ?? null)
     setView('review')
     renderAll()
   },
   onState: () => renderAuditBar(),
-  onListChanged: () => { if (view === 'audits') void renderAuditsView() },
+  onListChanged: () => { if (state.view === 'audits') void renderAuditsView() },
   say,
   askText,
   askConfirm,
@@ -3184,33 +3048,33 @@ const session = createAuditSession({
   fileNameOf: auditFileName,
 })
 
-const renameAudit = (): Promise<unknown> => session.renameAuditById(audit.id).then(() => { renderAuditBar(); if (view === 'audits') void renderAuditsView() })
-const newAudit = (): Promise<boolean> => session.newAudit()
-const openAuditById = (id: string): Promise<boolean> => session.openAuditById(id).then((ok) => { if (ok) setView('review'); return ok })
-const duplicateAuditById = (id: string): Promise<void> => session.duplicateAuditById(id)
-const renameAuditById = (id: string): Promise<unknown> => session.renameAuditById(id)
-const saveAuditToFile = (id?: string): Promise<void> => session.saveAuditToFile(id)
-const importAuditFile = (file: File): Promise<boolean> => session.importAuditFile(file)
+const renameAudit = (): Promise<unknown> => state.session.renameAuditById(state.audit.id).then(() => { renderAuditBar(); if (state.view === 'audits') void renderAuditsView() })
+const newAudit = (): Promise<boolean> => state.session.newAudit()
+const openAuditById = (id: string): Promise<boolean> => state.session.openAuditById(id).then((ok) => { if (ok) setView('review'); return ok })
+const duplicateAuditById = (id: string): Promise<void> => state.session.duplicateAuditById(id)
+const renameAuditById = (id: string): Promise<unknown> => state.session.renameAuditById(id)
+const saveAuditToFile = (id?: string): Promise<void> => state.session.saveAuditToFile(id)
+const importAuditFile = (file: File): Promise<boolean> => state.session.importAuditFile(file)
 async function deleteAuditFlow(id: string): Promise<void> {
-  const wasOpen = id === audit.id
-  if ((await session.deleteAuditFlow(id)) && wasOpen) setView('audits')
+  const wasOpen = id === state.audit.id
+  if ((await state.session.deleteAuditFlow(id)) && wasOpen) setView('audits')
 }
 
 async function renderAuditsView(): Promise<void> {
-  await session.flush()
+  await state.session.flush()
   let list: AuditSummary[]
   try {
     list = (await listAudits()).sort((a, b) => b.updatedAt - a.updatedAt)
   } catch (err) {
     return void say(describeAuditError(err))
   }
-  if (view !== 'audits') return
-  auditsEl.replaceChildren(
+  if (state.view !== 'audits') return
+  dom.auditsEl.replaceChildren(
     h(
       'div',
       { class: 'results-head' },
       h('div', {}, h('h2', {}, t('My audits')), h('p', { class: 'hint-line' }, t('Each audit has its own pages, scans and answers. Everything is saved in the browser as you work; save to a file to keep a copy or move it.'))),
-      h('div', { class: 'nav' }, h('button', { type: 'button', onclick: () => setView('review') }, t('← Back to review')), h('button', { type: 'button', onclick: () => importInput.click() }, t('Open from a file')), h('button', { type: 'button', class: 'primary', onclick: () => void newAudit() }, t('New audit'))),
+      h('div', { class: 'nav' }, h('button', { type: 'button', onclick: () => setView('review') }, t('← Back to review')), h('button', { type: 'button', onclick: () => dom.importInput.click() }, t('Open from a file')), h('button', { type: 'button', class: 'primary', onclick: () => void newAudit() }, t('New audit'))),
     ),
     h(
       'table',
@@ -3222,8 +3086,8 @@ async function renderAuditsView(): Promise<void> {
         ...list.map((a) =>
           h(
             'tr',
-            { class: a.id === audit.id ? 'current' : '' },
-            h('td', {}, h('strong', {}, auditTitle(a)), a.id === audit.id ? h('span', { class: 'badge' }, t('Current')) : null),
+            { class: a.id === state.audit.id ? 'current' : '' },
+            h('td', {}, h('strong', {}, auditTitle(a)), a.id === state.audit.id ? h('span', { class: 'badge' }, t('Current')) : null),
             h('td', {}, a.site || '—'),
             h('td', {}, String(a.pages)),
             h('td', {}, dateTimeOf(a.updatedAt)),
@@ -3234,7 +3098,7 @@ async function renderAuditsView(): Promise<void> {
               h(
                 'div',
                 { class: 'row-actions' },
-                a.id === audit.id ? null : h('button', { type: 'button', class: 'primary', onclick: () => void openAuditById(a.id) }, t('Open')),
+                a.id === state.audit.id ? null : h('button', { type: 'button', class: 'primary', onclick: () => void openAuditById(a.id) }, t('Open')),
                 h('button', { type: 'button', onclick: () => void renameAuditById(a.id) }, t('Rename')),
                 h('button', { type: 'button', onclick: () => void duplicateAuditById(a.id) }, t('Duplicate')),
                 h('button', { type: 'button', onclick: () => void saveAuditToFile(a.id) }, t('Save to file')),
@@ -3251,7 +3115,7 @@ async function renderAuditsView(): Promise<void> {
 /** Changes the language of the whole panel, now. */
 function applyLanguage(lang: Lang): void {
   setLang(lang)
-  statusEl.textContent = '' // an old message would stay in the previous language
+  dom.statusEl.textContent = '' // an old message would stay in the previous language
   translateStatic()
   renderAll()
   renderAuditBar()
@@ -3259,37 +3123,46 @@ function applyLanguage(lang: Lang): void {
   void applyBoxes()
 }
 
-auditNameBtn.addEventListener('click', () => void renameAudit())
-auditsBtn.addEventListener('click', () => setView(view === 'audits' ? 'review' : 'audits'))
-saveFileBtn.addEventListener('click', () => void saveAuditToFile())
-openFileBtn.addEventListener('click', () => importInput.click())
-langFrBtn.addEventListener('click', () => applyLanguage('fr'))
-langEnBtn.addEventListener('click', () => applyLanguage('en'))
-importInput.addEventListener('change', () => {
-  const file = importInput.files?.[0]
-  importInput.value = ''
+dom.auditNameBtn.addEventListener('click', () => void renameAudit())
+dom.auditsBtn.addEventListener('click', () => setView(state.view === 'audits' ? 'review' : 'audits'))
+dom.saveFileBtn.addEventListener('click', () => void saveAuditToFile())
+dom.openFileBtn.addEventListener('click', () => dom.importInput.click())
+dom.langFrBtn.addEventListener('click', () => applyLanguage('fr'))
+dom.langEnBtn.addEventListener('click', () => applyLanguage('en'))
+dom.importInput.addEventListener('change', () => {
+  const file = dom.importInput.files?.[0]
+  dom.importInput.value = ''
   if (file) void importAuditFile(file)
 })
 // the last edits are written when the panel is hidden or closed
-window.addEventListener('pagehide', () => { if (session.hasPending()) void session.saveNow() })
-document.addEventListener('visibilitychange', () => { if (document.hidden && session.hasPending()) void session.saveNow() })
-saveRetryBtn.addEventListener('click', () => void session.retry())
+window.addEventListener('pagehide', () => { if (state.session.hasPending()) void state.session.saveNow() })
+document.addEventListener('visibilitychange', () => { if (document.hidden && state.session.hasPending()) void state.session.saveNow() })
+dom.saveRetryBtn.addEventListener('click', () => void state.session.retry())
 
 async function init(): Promise<void> {
   setLang(getLang())
   translateStatic()
-  initPageTools(pageToolsEl, { send: (payload) => sendToPage(inspectedTabId(), payload as Extract<ContentMessage, { type: 'RGAA_TOOL' }>), say })
-  const loaded = await session.loadInitial()
-  const firstUrl = audit.pages.find((p) => p.url)?.url
-  if (loaded && !audit.meta.site.trim() && firstUrl) {
+  initPageTools(dom.pageToolsEl, { send: (payload) => sendToPage(inspectedTabId(), payload as Extract<ContentMessage, { type: 'RGAA_TOOL' }>), say })
+  const loaded = await state.session.loadInitial()
+  const firstUrl = state.audit.pages.find((p) => p.url)?.url
+  if (loaded && !state.audit.meta.site.trim() && firstUrl) {
     adoptSite(firstUrl)
     persist()
   }
-  liveUrl = await inspectedUrl()
-  loadPage((liveUrl ? findPage(audit, liveUrl) : undefined) ?? audit.pages.find((p) => p.id === audit.current) ?? audit.pages[0] ?? null)
+  state.liveUrl = await inspectedUrl()
+  loadPage((state.liveUrl ? findPage(state.audit, state.liveUrl) : undefined) ?? state.audit.pages.find((p) => p.id === state.audit.current) ?? state.audit.pages[0] ?? null)
   renderAll()
   renderAuditBar()
-  if (liveUrl) showNavBanner(liveUrl)
-  if (loaded) say(t('Audit “{name}” opened: {n} page(s).', { name: auditTitle(audit), n: audit.pages.length }))
+  if (state.liveUrl) showNavBanner(state.liveUrl)
+  if (loaded) say(t('Audit “{name}” opened: {n} page(s).', { name: auditTitle(state.audit), n: state.audit.pages.length }))
 }
+
+/**
+ * The functions the extracted modules call upwards (see actions.ts). Filled in by the tool when a module needs one.
+ */
+const registry = {
+}
+export type Registry = typeof registry
+registerActions(registry)
+
 void init()
