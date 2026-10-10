@@ -11,6 +11,7 @@ export default defineConfig({
   retries: 0,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : [['list']],
   outputDir: 'test-results',
+  snapshotPathTemplate: '{testDir}/__snapshots__/{testFileName}/{arg}{ext}',
   use: { trace: 'retain-on-failure', screenshot: 'only-on-failure', acceptDownloads: true, viewport: { width: 1280, height: 900 } },
   projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
   webServer: { command: 'node e2e/server.mjs', url: 'http://127.0.0.1:4173/manifest.json', reuseExistingServer: !process.env.CI, timeout: 20_000 },
