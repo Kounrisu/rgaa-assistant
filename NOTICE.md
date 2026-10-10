@@ -51,7 +51,7 @@ The Asqatasun-derived code is kept in a few places only, each marked with
 | `src/lib/asqatasun-rules.ts` | The whole file: the tests, their selectors and verdicts, their English wording, and the evaluation `evaluateAsqRules()`. |
 | `src/lib/asqatasun-nomenclatures.ts` | The whole file: the word lists. |
 | `scripts/check-asqatasun.mjs` | The whole file: the check against Asqatasun's fixtures. |
-| `src/content/inject.ts` | The import at the top, the call `out.push(...runAsqatasunRules())` in `runRgaaRules()`, and the function `runAsqatasunRules()` (which only calls `evaluateAsqRules`). |
+| `src/content/rgaa-rules-run.ts` | The import at the top, the call `out.push(...runAsqatasunRules())` in `runRgaaRules()`, and the function `runAsqatasunRules()` (which only calls `evaluateAsqRules`). |
 | `src/panel/panel.ts` | A type-only import, and one block at the end of `rulesToResults()` (notes, "not applicable", and the criteria where every ported test passed). |
 | `src/lib/i18n-fr-lib.ts` | The French entries between the two markers (all starting with `RGAA `). |
 | `package.json`, `package-lock.json` | The `jsdom` development dependency and the `check:asqatasun` script. |
@@ -59,7 +59,7 @@ The Asqatasun-derived code is kept in a few places only, each marked with
 ### Our own checks that Asqatasun's replaced
 
 Where Asqatasun has the same test, its version replaced ours, because it has been tested upstream and agrees with its
-fixtures. The checks removed from `runRgaaRules()` (`src/content/inject.ts`) and `RULES` (`src/lib/rgaa-rules.ts`):
+fixtures. The checks removed from `runRgaaRules()` (`src/content/rgaa-rules-run.ts`) and `RULES` (`src/lib/rgaa-rules.ts`):
 
 | Our former check | Replaced by | Difference |
 | --- | --- | --- |
@@ -77,7 +77,7 @@ rows in `RULES`) if they are still wanted.
 ## How to remove it
 
 1. Delete `src/lib/asqatasun-rules.ts`, `src/lib/asqatasun-nomenclatures.ts` and `scripts/check-asqatasun.mjs`.
-2. In `src/content/inject.ts`, delete the three blocks between `// --- Asqatasun-derived: begin ---` and
+2. In `src/content/rgaa-rules-run.ts`, delete the three blocks between `// --- Asqatasun-derived: begin ---` and
    `// --- Asqatasun-derived: end ---` (the import near the top, the call in `runRgaaRules()`, the function
    `runAsqatasunRules()`).
 3. In `src/panel/panel.ts`, delete the blocks between the same markers (the `import type` line, the loop in

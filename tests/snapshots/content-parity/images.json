@@ -1,0 +1,1738 @@
+{
+  "highlight images": {
+    "returned": true,
+    "response": {
+      "elements": [
+        {
+          "id": 1,
+          "tag": "img",
+          "type": "img",
+          "src": "https://example.test/a.png",
+          "thumb": "https://example.test/a.png",
+          "alt": "Un chat noir",
+          "ariaLabel": null,
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": "Un chat noir",
+          "ignoredBy": null,
+          "role": null,
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": "Images\n  \n  \n  \n  \n  \n  \n  \n  \n  Légende liée\n  Une légende\n   Texte du lien\n  Titre SVG",
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 0,
+          "naturalHeight": 0,
+          "html": "<img src=\"https://example.test/a.png\" alt=\"Un chat noir\">",
+          "contextHtml": "<main>\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\" data-rgaa-target=\"\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  <svg width=\"40\" height=\"40\" role=\"img\" aria-label=\"Icône\"><title>Titre SVG</title><!-- … 2 more element(s) --></svg>\n  <svg width=\"10\" height=\"10\" aria-hidden=\"true\"><!-- … 1 more element(s) --></svg>\n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>",
+          "deterministic": {
+            "altMissing": false,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        },
+        {
+          "id": 2,
+          "tag": "img",
+          "type": "img",
+          "src": "https://example.test/b.png",
+          "thumb": "https://example.test/b.png",
+          "alt": null,
+          "ariaLabel": null,
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": null,
+          "ignoredBy": null,
+          "role": null,
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": "Images\n  \n  \n  \n  \n  \n  \n  \n  \n  Légende liée\n  Une légende\n   Texte du lien\n  Titre SVG",
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 0,
+          "naturalHeight": 0,
+          "html": "<img src=\"https://example.test/b.png\">",
+          "contextHtml": "<main>\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\" data-rgaa-target=\"\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  <svg width=\"40\" height=\"40\" role=\"img\" aria-label=\"Icône\"><title>Titre SVG</title><!-- … 2 more element(s) --></svg>\n  <svg width=\"10\" height=\"10\" aria-hidden=\"true\"><!-- … 1 more element(s) --></svg>\n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>",
+          "deterministic": {
+            "altMissing": true,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        },
+        {
+          "id": 3,
+          "tag": "img",
+          "type": "img",
+          "src": "https://example.test/c.png",
+          "thumb": "https://example.test/c.png",
+          "alt": "",
+          "ariaLabel": null,
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": null,
+          "ignoredBy": "alt=\"\"",
+          "role": null,
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": "Images\n  \n  \n  \n  \n  \n  \n  \n  \n  Légende liée\n  Une légende\n   Texte du lien\n  Titre SVG",
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 0,
+          "naturalHeight": 0,
+          "html": "<img src=\"https://example.test/c.png\" alt=\"\">",
+          "contextHtml": "<main>\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\" data-rgaa-target=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  <svg width=\"40\" height=\"40\" role=\"img\" aria-label=\"Icône\"><title>Titre SVG</title><!-- … 2 more element(s) --></svg>\n  <svg width=\"10\" height=\"10\" aria-hidden=\"true\"><!-- … 1 more element(s) --></svg>\n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>",
+          "deterministic": {
+            "altMissing": false,
+            "altEmpty": true,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        },
+        {
+          "id": 4,
+          "tag": "img",
+          "type": "img",
+          "src": "https://example.test/photo-123.jpg",
+          "thumb": "https://example.test/photo-123.jpg",
+          "alt": "photo-123.jpg",
+          "ariaLabel": null,
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": "photo-123.jpg",
+          "ignoredBy": null,
+          "role": null,
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": "Images\n  \n  \n  \n  \n  \n  \n  \n  \n  Légende liée\n  Une légende\n   Texte du lien\n  Titre SVG",
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 0,
+          "naturalHeight": 0,
+          "html": "<img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">",
+          "contextHtml": "<main>\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\" data-rgaa-target=\"\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  <svg width=\"40\" height=\"40\" role=\"img\" aria-label=\"Icône\"><title>Titre SVG</title><!-- … 2 more element(s) --></svg>\n  <svg width=\"10\" height=\"10\" aria-hidden=\"true\"><!-- … 1 more element(s) --></svg>\n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>",
+          "deterministic": {
+            "altMissing": false,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": true,
+            "ariaHidden": false
+          }
+        },
+        {
+          "id": 5,
+          "tag": "img",
+          "type": "img",
+          "src": "https://example.test/d.png",
+          "thumb": "https://example.test/d.png",
+          "alt": "",
+          "ariaLabel": null,
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": null,
+          "ignoredBy": "aria-hidden=\"true\"",
+          "role": null,
+          "ariaHidden": true,
+          "inDialog": false,
+          "nearbyText": "Images\n  \n  \n  \n  \n  \n  \n  \n  \n  Légende liée\n  Une légende\n   Texte du lien\n  Titre SVG",
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 0,
+          "naturalHeight": 0,
+          "html": "<img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">",
+          "contextHtml": "<main>\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\" data-rgaa-target=\"\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  <svg width=\"40\" height=\"40\" role=\"img\" aria-label=\"Icône\"><title>Titre SVG</title><!-- … 2 more element(s) --></svg>\n  <svg width=\"10\" height=\"10\" aria-hidden=\"true\"><!-- … 1 more element(s) --></svg>\n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>",
+          "deterministic": {
+            "altMissing": false,
+            "altEmpty": true,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": true
+          }
+        },
+        {
+          "id": 6,
+          "tag": "img",
+          "type": "img",
+          "src": "https://example.test/e.png",
+          "thumb": "https://example.test/e.png",
+          "alt": "",
+          "ariaLabel": null,
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": null,
+          "ignoredBy": "role=\"presentation\"",
+          "role": "presentation",
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": "Images\n  \n  \n  \n  \n  \n  \n  \n  \n  Légende liée\n  Une légende\n   Texte du lien\n  Titre SVG",
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 0,
+          "naturalHeight": 0,
+          "html": "<img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">",
+          "contextHtml": "<main>\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\" data-rgaa-target=\"\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  <svg width=\"40\" height=\"40\" role=\"img\" aria-label=\"Icône\"><title>Titre SVG</title><!-- … 2 more element(s) --></svg>\n  <svg width=\"10\" height=\"10\" aria-hidden=\"true\"><!-- … 1 more element(s) --></svg>\n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>",
+          "deterministic": {
+            "altMissing": false,
+            "altEmpty": true,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        },
+        {
+          "id": 7,
+          "tag": "img",
+          "type": "img",
+          "src": "https://example.test/f.png",
+          "thumb": "https://example.test/f.png",
+          "alt": null,
+          "ariaLabel": "Libellé ARIA",
+          "labelledByText": null,
+          "title": "Titre",
+          "svgTitle": null,
+          "accessibleName": "Libellé ARIA",
+          "ignoredBy": null,
+          "role": null,
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": "Images\n  \n  \n  \n  \n  \n  \n  \n  \n  Légende liée\n  Une légende\n   Texte du lien\n  Titre SVG",
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 0,
+          "naturalHeight": 0,
+          "html": "<img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">",
+          "contextHtml": "<main>\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\" data-rgaa-target=\"\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  <svg width=\"40\" height=\"40\" role=\"img\" aria-label=\"Icône\"><title>Titre SVG</title><!-- … 2 more element(s) --></svg>\n  <svg width=\"10\" height=\"10\" aria-hidden=\"true\"><!-- … 1 more element(s) --></svg>\n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>",
+          "deterministic": {
+            "altMissing": true,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        },
+        {
+          "id": 8,
+          "tag": "img",
+          "type": "img",
+          "src": "https://example.test/g.png",
+          "thumb": "https://example.test/g.png",
+          "alt": null,
+          "ariaLabel": null,
+          "labelledByText": "Légende liée",
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": "Légende liée",
+          "ignoredBy": null,
+          "role": null,
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": "Images\n  \n  \n  \n  \n  \n  \n  \n  \n  Légende liée\n  Une légende\n   Texte du lien\n  Titre SVG",
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 0,
+          "naturalHeight": 0,
+          "html": "<img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">",
+          "contextHtml": "<main>\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\" data-rgaa-target=\"\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  <svg width=\"40\" height=\"40\" role=\"img\" aria-label=\"Icône\"><title>Titre SVG</title><!-- … 2 more element(s) --></svg>\n  <svg width=\"10\" height=\"10\" aria-hidden=\"true\"><!-- … 1 more element(s) --></svg>\n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>",
+          "deterministic": {
+            "altMissing": true,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        },
+        {
+          "id": 9,
+          "tag": "img",
+          "type": "img",
+          "src": "https://example.test/h.png",
+          "thumb": "https://example.test/h.png",
+          "alt": "Dans une figure",
+          "ariaLabel": null,
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": "Dans une figure",
+          "ignoredBy": null,
+          "role": null,
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": "Une légende",
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": "Une légende",
+          "naturalWidth": 0,
+          "naturalHeight": 0,
+          "html": "<img src=\"https://example.test/h.png\" alt=\"Dans une figure\">",
+          "contextHtml": "<figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\" data-rgaa-target=\"\"><figcaption>Une légende</figcaption></figure>",
+          "deterministic": {
+            "altMissing": false,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        },
+        {
+          "id": 10,
+          "tag": "img",
+          "type": "img",
+          "src": "https://example.test/i.png",
+          "thumb": "https://example.test/i.png",
+          "alt": "Accueil",
+          "ariaLabel": null,
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": "Accueil",
+          "ignoredBy": null,
+          "role": null,
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": "Texte du lien",
+          "isInsideLink": true,
+          "linkHref": "/lien",
+          "linkText": "Texte du lien",
+          "figcaption": null,
+          "naturalWidth": 0,
+          "naturalHeight": 0,
+          "html": "<img src=\"https://example.test/i.png\" alt=\"Accueil\">",
+          "contextHtml": "<a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\" data-rgaa-target=\"\"> Texte du lien</a>",
+          "deterministic": {
+            "altMissing": false,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        },
+        {
+          "id": 11,
+          "tag": "svg",
+          "type": "role-img (svg)",
+          "src": null,
+          "thumb": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%2220%22%20role%3D%22img%22%20aria-label%3D%22Ic%C3%B4ne%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20style%3D%22color%3A%20rgb(0%2C%200%2C%200)%3B%22%3E%3Ctitle%3ETitre%20SVG%3C%2Ftitle%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2220%22%20r%3D%2210%22%2F%3E%3Crect%20width%3D%225%22%20height%3D%225%22%2F%3E%3C%2Fsvg%3E",
+          "alt": null,
+          "ariaLabel": "Icône",
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": "Titre SVG",
+          "accessibleName": "Icône",
+          "ignoredBy": null,
+          "role": "img",
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": "Images\n  \n  \n  \n  \n  \n  \n  \n  \n  Légende liée\n  Une légende\n   Texte du lien\n  Titre SVG",
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 100,
+          "naturalHeight": 20,
+          "html": "<svg width=\"40\" height=\"40\" role=\"img\" aria-label=\"Icône\"><title>Titre SVG</title><!-- … 2 more element(s) --></svg>",
+          "contextHtml": "<main>\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  <svg width=\"40\" height=\"40\" role=\"img\" aria-label=\"Icône\" data-rgaa-target=\"\"><title>Titre SVG</title><!-- … 2 more element(s) --></svg>\n  <svg width=\"10\" height=\"10\" aria-hidden=\"true\"><!-- … 1 more element(s) --></svg>\n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>",
+          "deterministic": {
+            "altMissing": false,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        },
+        {
+          "id": 12,
+          "tag": "svg",
+          "type": "svg",
+          "src": null,
+          "thumb": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%2220%22%20aria-hidden%3D%22true%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20style%3D%22color%3A%20rgb(0%2C%200%2C%200)%3B%22%3E%3Ccircle%20cx%3D%225%22%20cy%3D%225%22%20r%3D%224%22%2F%3E%3C%2Fsvg%3E",
+          "alt": null,
+          "ariaLabel": null,
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": null,
+          "ignoredBy": "aria-hidden=\"true\"",
+          "role": null,
+          "ariaHidden": true,
+          "inDialog": false,
+          "nearbyText": "Images\n  \n  \n  \n  \n  \n  \n  \n  \n  Légende liée\n  Une légende\n   Texte du lien\n  Titre SVG",
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 100,
+          "naturalHeight": 20,
+          "html": "<svg width=\"10\" height=\"10\" aria-hidden=\"true\"><!-- … 1 more element(s) --></svg>",
+          "contextHtml": "<main>\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  <svg width=\"40\" height=\"40\" role=\"img\" aria-label=\"Icône\"><title>Titre SVG</title><!-- … 2 more element(s) --></svg>\n  <svg width=\"10\" height=\"10\" aria-hidden=\"true\" data-rgaa-target=\"\"><!-- … 1 more element(s) --></svg>\n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>",
+          "deterministic": {
+            "altMissing": false,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": true
+          }
+        },
+        {
+          "id": 13,
+          "tag": "div",
+          "type": "role-img (div)",
+          "src": null,
+          "thumb": null,
+          "alt": null,
+          "ariaLabel": "Div image",
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": "Div image",
+          "ignoredBy": null,
+          "role": "img",
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": "Images\n  \n  \n  \n  \n  \n  \n  \n  \n  Légende liée\n  Une légende\n   Texte du lien\n  Titre SVG",
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 100,
+          "naturalHeight": 20,
+          "html": "<div role=\"img\" aria-label=\"Div image\"></div>",
+          "contextHtml": "<main>\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  <svg width=\"40\" height=\"40\" role=\"img\" aria-label=\"Icône\"><title>Titre SVG</title><!-- … 2 more element(s) --></svg>\n  <svg width=\"10\" height=\"10\" aria-hidden=\"true\"><!-- … 1 more element(s) --></svg>\n  <div role=\"img\" aria-label=\"Div image\" data-rgaa-target=\"\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>",
+          "deterministic": {
+            "altMissing": false,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        },
+        {
+          "id": 14,
+          "tag": "input",
+          "type": "input-image",
+          "src": "https://example.test/btn.png",
+          "thumb": "https://example.test/btn.png",
+          "alt": "Envoyer",
+          "ariaLabel": null,
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": "Envoyer",
+          "ignoredBy": null,
+          "role": null,
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": "Images\n  \n  \n  \n  \n  \n  \n  \n  \n  Légende liée\n  Une légende\n   Texte du lien\n  Titre SVG",
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 100,
+          "naturalHeight": 20,
+          "html": "<input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">",
+          "contextHtml": "<main>\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  <svg width=\"40\" height=\"40\" role=\"img\" aria-label=\"Icône\"><title>Titre SVG</title><!-- … 2 more element(s) --></svg>\n  <svg width=\"10\" height=\"10\" aria-hidden=\"true\"><!-- … 1 more element(s) --></svg>\n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\" data-rgaa-target=\"\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>",
+          "deterministic": {
+            "altMissing": false,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        },
+        {
+          "id": 15,
+          "tag": "area",
+          "type": "area",
+          "src": null,
+          "thumb": null,
+          "alt": "Zone 1",
+          "ariaLabel": null,
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": "Zone 1",
+          "ignoredBy": null,
+          "role": null,
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": null,
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 100,
+          "naturalHeight": 20,
+          "html": "<area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\">",
+          "contextHtml": "<map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\" data-rgaa-target=\"\"></map>",
+          "deterministic": {
+            "altMissing": false,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        },
+        {
+          "id": 16,
+          "tag": "img",
+          "type": "img",
+          "src": "https://example.test/map.png",
+          "thumb": "https://example.test/map.png",
+          "alt": "Carte",
+          "ariaLabel": null,
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": "Carte",
+          "ignoredBy": null,
+          "role": null,
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": "Images\n  \n  \n  \n  \n  \n  \n  \n  \n  Légende liée\n  Une légende\n   Texte du lien\n  Titre SVG",
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 0,
+          "naturalHeight": 0,
+          "html": "<img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">",
+          "contextHtml": "<main>\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  <svg width=\"40\" height=\"40\" role=\"img\" aria-label=\"Icône\"><title>Titre SVG</title><!-- … 2 more element(s) --></svg>\n  <svg width=\"10\" height=\"10\" aria-hidden=\"true\"><!-- … 1 more element(s) --></svg>\n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\" data-rgaa-target=\"\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>",
+          "deterministic": {
+            "altMissing": false,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        },
+        {
+          "id": 17,
+          "tag": "canvas",
+          "type": "canvas",
+          "src": null,
+          "thumb": null,
+          "alt": null,
+          "ariaLabel": null,
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": null,
+          "ignoredBy": null,
+          "role": null,
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": "Images\n  \n  \n  \n  \n  \n  \n  \n  \n  Légende liée\n  Une légende\n   Texte du lien\n  Titre SVG",
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 100,
+          "naturalHeight": 20,
+          "html": "<canvas width=\"50\" height=\"50\"></canvas>",
+          "contextHtml": "<main>\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  <svg width=\"40\" height=\"40\" role=\"img\" aria-label=\"Icône\"><title>Titre SVG</title><!-- … 2 more element(s) --></svg>\n  <svg width=\"10\" height=\"10\" aria-hidden=\"true\"><!-- … 1 more element(s) --></svg>\n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\" data-rgaa-target=\"\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>",
+          "deterministic": {
+            "altMissing": false,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        },
+        {
+          "id": 18,
+          "tag": "object",
+          "type": "object",
+          "src": "https://example.test/o.png",
+          "thumb": "https://example.test/o.png",
+          "alt": null,
+          "ariaLabel": null,
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": null,
+          "ignoredBy": null,
+          "role": null,
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": "Images\n  \n  \n  \n  \n  \n  \n  \n  \n  Légende liée\n  Une légende\n   Texte du lien\n  Titre SVG",
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 100,
+          "naturalHeight": 20,
+          "html": "<object type=\"image/png\" data=\"https://example.test/o.png\"></object>",
+          "contextHtml": "<main>\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  <svg width=\"40\" height=\"40\" role=\"img\" aria-label=\"Icône\"><title>Titre SVG</title><!-- … 2 more element(s) --></svg>\n  <svg width=\"10\" height=\"10\" aria-hidden=\"true\"><!-- … 1 more element(s) --></svg>\n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\" data-rgaa-target=\"\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>",
+          "deterministic": {
+            "altMissing": false,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        },
+        {
+          "id": 19,
+          "tag": "img",
+          "type": "img",
+          "src": "https://example.test/dlg.png",
+          "thumb": "https://example.test/dlg.png",
+          "alt": "Dans un dialogue",
+          "ariaLabel": null,
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": "Dans un dialogue",
+          "ignoredBy": null,
+          "role": null,
+          "ariaHidden": false,
+          "inDialog": true,
+          "nearbyText": null,
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 0,
+          "naturalHeight": 0,
+          "html": "<img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\">",
+          "contextHtml": "<dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\" data-rgaa-target=\"\"></dialog>",
+          "deterministic": {
+            "altMissing": false,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 2": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 3": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "contrast-ok",
+          "id": 0,
+          "label": "Text with sufficient contrast",
+          "summary": "4 text element(s) · 2 colour pair(s)",
+          "facts": {
+            "Text elements checked": "4",
+            "Sufficient contrast": "4",
+            "To review (listed below)": "0",
+            "Not listed (limit)": null
+          },
+          "html": "",
+          "contextHtml": "",
+          "count": 4,
+          "data": {
+            "humanNeeded": false,
+            "checked": 4,
+            "okCount": 4
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 5": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 6": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "link",
+          "id": 1,
+          "label": "“Texte du lien”",
+          "summary": "/lien",
+          "facts": {
+            "Text": "Texte du lien",
+            "Accessible name": "Texte du lien",
+            "href": "/lien",
+            "target": null,
+            "title": null,
+            "aria-label": null,
+            "Occurrences": null,
+            "Skip link": null,
+            "Visibility": null,
+            "Element": "<a>"
+          },
+          "html": "<a href=\"/lien\">Texte du lien</a>",
+          "contextHtml": "<main>\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\" data-rgaa-target=\"\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  \n  \n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "reason": "",
+            "hidden": null
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 9": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "landmark",
+          "id": 1,
+          "label": "main",
+          "summary": "<main>",
+          "facts": {
+            "Role": "main",
+            "Name": null,
+            "Element": "<main>"
+          },
+          "html": "<main>Images Légende liée Une légende Texte du lien Titre SVG</main>",
+          "contextHtml": "<body>\n<main data-rgaa-target=\"\">\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  \n  \n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 218px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"1\" data-alt=\"alt “Un chat noir”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">1</span></div><div style=\"position: absolute; left: 8px; top: 248px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"2\" data-alt=\"no alternative\" data-state=\"\" data-focused=\"false\"><span  …",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "landmark",
+            "level": 1,
+            "badge": "main"
+          }
+        },
+        {
+          "type": "heading",
+          "id": 2,
+          "label": "“Images”",
+          "summary": "h1",
+          "facts": {
+            "Level": "h1",
+            "Text": "Images",
+            "Previous level": null,
+            "Visibility": null,
+            "Element": "<h1>"
+          },
+          "html": "<h1>Images</h1>",
+          "contextHtml": "<main>\n  <h1 data-rgaa-target=\"\">Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  \n  \n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "heading",
+            "level": 1,
+            "badge": "h1",
+            "hidden": null
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 11": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "rules run": {
+    "returned": true,
+    "response": {
+      "url": "https://page.test/start",
+      "findings": [
+        {
+          "key": "no-table",
+          "count": 0
+        },
+        {
+          "key": "no-form",
+          "count": 0
+        },
+        {
+          "key": "asq:3.1.5",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "3.1",
+            "test": "3.1.5",
+            "status": "review",
+            "text": "RGAA 3.1.5: {n} time-based media found: check that no information is given by colour alone. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:3.1.6",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "3.1",
+            "test": "3.1.6",
+            "status": "review",
+            "text": "RGAA 3.1.6: {n} non time-based media found (svg, canvas, object, embed): check that no information is given by colour alone. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.1.1",
+          "count": 1,
+          "samples": [
+            "object"
+          ],
+          "asq": {
+            "criterion": "4.1",
+            "test": "4.1.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} element(s) that may be audio (audio, bgsound, object, embed, links to audio files): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.1.2",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.1",
+            "test": "4.1.2",
+            "status": "review",
+            "text": "RGAA {test}: {n} element(s) that may be video (video, svg, canvas, object, embed, links to video files, video players): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.1.3",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.1",
+            "test": "4.1.3",
+            "status": "review",
+            "text": "RGAA {test}: {n} time-based media found (audio, video, svg, canvas, object, embed, links to media files, video players): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.2.1",
+          "count": 1,
+          "samples": [
+            "object"
+          ],
+          "asq": {
+            "criterion": "4.2",
+            "test": "4.2.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} element(s) that may be audio (audio, bgsound, object, embed, links to audio files): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.2.2",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.2",
+            "test": "4.2.2",
+            "status": "review",
+            "text": "RGAA {test}: {n} element(s) that may be video (video, svg, canvas, object, embed, links to video files, video players): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.2.3",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.2",
+            "test": "4.2.3",
+            "status": "review",
+            "text": "RGAA {test}: {n} time-based media found (audio, video, svg, canvas, object, embed, links to media files, video players): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.3.1",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.3",
+            "test": "4.3.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} time-based media found (audio, video, svg, canvas, object, embed, links to media files, video players): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.3.2",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.3",
+            "test": "4.3.2",
+            "status": "review",
+            "text": "RGAA {test}: {n} time-based media found (audio, video, svg, canvas, object, embed, links to media files, video players): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.4.1",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.4",
+            "test": "4.4.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} time-based media found (audio, video, svg, canvas, object, embed, links to media files, video players): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.5.1",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.5",
+            "test": "4.5.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} element(s) that may be video (video, svg, canvas, object, embed, links to video files, video players): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.5.2",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.5",
+            "test": "4.5.2",
+            "status": "review",
+            "text": "RGAA {test}: {n} time-based media found (audio, video, svg, canvas, object, embed, links to media files, video players): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.6.1",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.6",
+            "test": "4.6.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} element(s) that may be video (video, svg, canvas, object, embed, links to video files, video players): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.6.2",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.6",
+            "test": "4.6.2",
+            "status": "review",
+            "text": "RGAA {test}: {n} time-based media found (audio, video, svg, canvas, object, embed, links to media files, video players): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.7.1",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.7",
+            "test": "4.7.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} time-based media found (audio, video, svg, canvas, object, embed, links to media files, video players): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.8.1",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.8",
+            "test": "4.8.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} non time-based media found (svg, canvas, object, embed): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.8.2",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.8",
+            "test": "4.8.2",
+            "status": "review",
+            "text": "RGAA {test}: {n} non time-based media found (svg, canvas, object, embed): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.9.1",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.9",
+            "test": "4.9.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} non time-based media found (svg, canvas, object, embed): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.11.1",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.11",
+            "test": "4.11.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} time-based media found (audio, video, svg, canvas, object, embed, links to media files, video players): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.11.2",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.11",
+            "test": "4.11.2",
+            "status": "review",
+            "text": "RGAA {test}: {n} time-based media found (audio, video, svg, canvas, object, embed, links to media files, video players): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.11.3",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.11",
+            "test": "4.11.3",
+            "status": "review",
+            "text": "RGAA {test}: {n} time-based media found (audio, video, svg, canvas, object, embed, links to media files, video players): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.12.1",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.12",
+            "test": "4.12.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} non time-based media found (svg, canvas, object, embed): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.12.2",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.12",
+            "test": "4.12.2",
+            "status": "review",
+            "text": "RGAA {test}: {n} non time-based media found (svg, canvas, object, embed): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.13.1",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.13",
+            "test": "4.13.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} media found of any kind (time-based or not): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:4.13.2",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "4.13",
+            "test": "4.13.2",
+            "status": "review",
+            "text": "RGAA {test}: {n} media found of any kind (time-based or not): check them against this test. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:10.9.2",
+          "count": 13,
+          "samples": [
+            "img",
+            "img",
+            "img"
+          ],
+          "asq": {
+            "criterion": "10.9",
+            "test": "10.9.2",
+            "status": "review",
+            "text": "RGAA 10.9.2: {n} image(s) found: check that no information is given by shape, size or position alone. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:10.9.3",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "10.9",
+            "test": "10.9.3",
+            "status": "review",
+            "text": "RGAA 10.9.3: {n} time-based media found: check that no information is given by shape, size or position alone. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:10.9.4",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "10.9",
+            "test": "10.9.4",
+            "status": "review",
+            "text": "RGAA 10.9.4: {n} non time-based media found (svg, canvas, object, embed): check that no information is given by shape, size or position alone. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:10.10.2",
+          "count": 13,
+          "samples": [
+            "img",
+            "img",
+            "img"
+          ],
+          "asq": {
+            "criterion": "10.10",
+            "test": "10.10.2",
+            "status": "review",
+            "text": "RGAA 10.10.2: {n} image(s) found: check that the way shape, size or position convey information is relevant. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:10.10.3",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "10.10",
+            "test": "10.10.3",
+            "status": "review",
+            "text": "RGAA 10.10.3: {n} time-based media found: check that the way shape, size or position convey information is relevant. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:10.10.4",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "10.10",
+            "test": "10.10.4",
+            "status": "review",
+            "text": "RGAA 10.10.4: {n} non time-based media found (svg, canvas, object, embed): check that the way shape, size or position convey information is relevant. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:13.1.1",
+          "count": 4,
+          "samples": [
+            "svg",
+            "svg",
+            "canvas"
+          ],
+          "asq": {
+            "criterion": "13.1",
+            "test": "13.1.1",
+            "status": "review",
+            "text": "RGAA 13.1.1: {n} element(s) that may refresh the page (svg, canvas, object, embed, meta refresh): check that the user controls the time limit. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:13.7.1",
+          "count": 17,
+          "samples": [
+            "img",
+            "img",
+            "img"
+          ],
+          "asq": {
+            "criterion": "13.7",
+            "test": "13.7.1",
+            "status": "review",
+            "text": "RGAA 13.7.1: {n} image(s) or media element(s) found: check that none flashes or changes brightness abruptly. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:8.4.1-relevance",
+          "count": 1,
+          "detail": "fr",
+          "asq": {
+            "criterion": "8.4",
+            "test": "8.4.1",
+            "status": "review",
+            "text": "RGAA 8.4.1: the language code is valid ({detail}): check that it is the language of the page."
+          }
+        },
+        {
+          "key": "asq:8.6.1",
+          "count": 1,
+          "detail": "Images",
+          "asq": {
+            "criterion": "8.6",
+            "test": "8.6.1",
+            "status": "review",
+            "text": "RGAA 8.6.1: check that the page title ({detail}) is relevant."
+          }
+        },
+        {
+          "key": "asq:9.1.2",
+          "count": 1,
+          "samples": [
+            "h1"
+          ],
+          "asq": {
+            "criterion": "9.1",
+            "test": "9.1.2",
+            "status": "review",
+            "text": "RGAA 9.1.2: {n} heading(s): check that each one is relevant. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:9.2.1-header",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no <header> element outside <article> and <section>."
+          }
+        },
+        {
+          "key": "asq:9.2.1-footer",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no <footer> element outside <article> and <section>."
+          }
+        },
+        {
+          "key": "asq:9.2.1-nav",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no <nav> element."
+          }
+        },
+        {
+          "key": "asq:13.3.1-noext",
+          "count": 1,
+          "samples": [
+            "a"
+          ],
+          "asq": {
+            "criterion": "13.3",
+            "test": "13.3.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} link(s) whose address has no recognised file name: check that none gives access to an office document. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:13.4.1-noext",
+          "count": 1,
+          "samples": [
+            "a"
+          ],
+          "asq": {
+            "criterion": "13.4",
+            "test": "13.4.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} link(s) whose address has no recognised file name: check that none gives access to an office document. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:na:2.1",
+          "count": 0,
+          "asq": {
+            "criterion": "2.1",
+            "test": "2.1.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:2.2",
+          "count": 0,
+          "asq": {
+            "criterion": "2.2",
+            "test": "2.2.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:11.11",
+          "count": 0,
+          "asq": {
+            "criterion": "11.11",
+            "test": "11.11.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:11.12",
+          "count": 0,
+          "asq": {
+            "criterion": "11.12",
+            "test": "11.12.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:11.13",
+          "count": 0,
+          "asq": {
+            "criterion": "11.13",
+            "test": "11.13.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:pass:8.1",
+          "count": 0,
+          "detail": "<!DOCTYPE html>",
+          "asq": {
+            "criterion": "8.1",
+            "test": "8.1.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:8.3",
+          "count": 0,
+          "asq": {
+            "criterion": "8.3",
+            "test": "8.3.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:8.5",
+          "count": 0,
+          "asq": {
+            "criterion": "8.5",
+            "test": "8.5.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:10.1",
+          "count": 0,
+          "asq": {
+            "criterion": "10.1",
+            "test": "10.1.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "skip-link-missing",
+          "count": 1
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "snapshot": {
+    "returned": true,
+    "response": {
+      "url": "https://page.test/start",
+      "title": "Images",
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      },
+      "html": "<!DOCTYPE html>\n<html lang=\"fr\" data-rgaa-instance=\"X\"><head><meta charset=\"utf-8\"><title>Images</title></head>\n<body>\n<main>\n  <h1>Images</h1>\n  <img src=\"https://example.test/a.png\" alt=\"Un chat noir\">\n  <img src=\"https://example.test/b.png\">\n  <img src=\"https://example.test/c.png\" alt=\"\">\n  <img src=\"https://example.test/photo-123.jpg\" alt=\"photo-123.jpg\">\n  <img src=\"https://example.test/d.png\" alt=\"\" aria-hidden=\"true\">\n  <img src=\"https://example.test/e.png\" alt=\"\" role=\"presentation\">\n  <img src=\"https://example.test/f.png\" aria-label=\"Libellé ARIA\" title=\"Titre\">\n  <img src=\"https://example.test/g.png\" aria-labelledby=\"cap1\">\n  <p id=\"cap1\">Légende liée</p>\n  <figure><img src=\"https://example.test/h.png\" alt=\"Dans une figure\"><figcaption>Une légende</figcaption></figure>\n  <a href=\"/lien\"><img src=\"https://example.test/i.png\" alt=\"Accueil\"> Texte du lien</a>\n  <svg width=\"40\" height=\"40\" role=\"img\" aria-label=\"Icône\"><title>Titre SVG</title><circle cx=\"20\" cy=\"20\" r=\"10\"></circle><rect width=\"5\" height=\"5\"></rect></svg>\n  <svg width=\"10\" height=\"10\" aria-hidden=\"true\"><circle cx=\"5\" cy=\"5\" r=\"4\"></circle></svg>\n  <div role=\"img\" aria-label=\"Div image\"></div>\n  <input type=\"image\" src=\"https://example.test/btn.png\" alt=\"Envoyer\">\n  <map name=\"m1\"><area shape=\"rect\" coords=\"0,0,10,10\" href=\"/zone\" alt=\"Zone 1\"></map>\n  <img src=\"https://example.test/map.png\" usemap=\"#m1\" alt=\"Carte\">\n  <canvas width=\"50\" height=\"50\"></canvas>\n  <object type=\"image/png\" data=\"https://example.test/o.png\"></object>\n  <div style=\"display:none\"><img src=\"https://example.test/hidden.png\" alt=\"Caché\"></div>\n  <dialog open=\"\"><img src=\"https://example.test/dlg.png\" alt=\"Dans un dialogue\"></dialog>\n</main>\n\n\n</body></html>"
+    }
+  },
+  "overlay after scans": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 218px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"1\" data-alt=\"alt “Un chat noir”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">1</span></div><div style=\"position: absolute; left: 8px; top: 248px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"2\" data-alt=\"no alternative\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">2</span></div><div style=\"position: absolute; left: 8px; top: 278px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"3\" data-alt=\"alt=&quot;&quot;\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">3</span></div><div style=\"position: absolute; left: 8px; top: 308px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"4\" data-alt=\"alt “photo-123.jpg”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">4</span></div><div style=\"position: absolute; left: 8px; top: 338px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"5\" data-alt=\"alt=&quot;&quot;\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">5</span></div><div style=\"position: absolute; left: 8px; top: 368px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"6\" data-alt=\"alt=&quot;&quot;\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">6</span></div><div style=\"position: absolute; left: 8px; top: 398px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"7\" data-alt=\"aria-label “Libellé ARIA”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">7</span></div><div style=\"position: absolute; left: 8px; top: 428px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"8\" data-alt=\"aria-labelledby “Légende liée”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">8</span></div><div style=\"position: absolute; left: 8px; top: 518px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"9\" data-alt=\"alt “Dans une figure”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">9</span></div><div style=\"position: absolute; left: 8px; top: 608px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"10\" data-alt=\"alt “Accueil”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">10</span></div><div style=\"position: absolute; left: 8px; top: 638px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"11\" data-alt=\"aria-label “Icône”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">11</span></div><div style=\"position: absolute; left: 8px; top: 758px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"12\" data-alt=\"aria-hidden\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">12</span></div><div style=\"position: absolute; left: 8px; top: 818px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"13\" data-alt=\"aria-label “Div image”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">13</span></div><div style=\"position: absolute; left: 8px; top: 848px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"14\" data-alt=\"alt “Envoyer”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">14</span></div><div style=\"position: absolute; left: 8px; top: 938px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"15\" data-alt=\"alt “Zone 1”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">15</span></div><div style=\"position: absolute; left: 8px; top: 938px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"16\" data-alt=\"alt “Carte”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">16</span></div><div style=\"position: absolute; left: 8px; top: 968px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"17\" data-alt=\"no alternative\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">17</span></div><div style=\"position: absolute; left: 8px; top: 998px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"18\" data-alt=\"no alternative\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">18</span></div><div style=\"position: absolute; left: 8px; top: 1118px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"19\" data-alt=\"alt “Dans un dialogue”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">19</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t6\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 578px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"1\" data-badge=\"main\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">1 · main</span></div><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · h1</span></div></div>"
+  ],
+  "states theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "states theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay options": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "focus image 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "focus link 2": {
+    "returned": true,
+    "response": {
+      "ok": false
+    }
+  },
+  "focus unknown": {
+    "returned": true,
+    "response": {
+      "ok": false
+    }
+  },
+  "show only theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "show only theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "locate": {
+    "returned": true,
+    "response": {
+      "rect": {
+        "x": 8,
+        "y": 578,
+        "w": 100,
+        "h": 20
+      },
+      "vw": 1024,
+      "vh": 768
+    }
+  },
+  "locate unknown": {
+    "returned": true,
+    "response": {
+      "rect": null
+    }
+  },
+  "scroll restore": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "unfocus": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "relabel theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "relabel theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay options 2": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "tool reveal on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 0
+    }
+  },
+  "tool tables on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 0
+    }
+  },
+  "tool taborder on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 2
+    }
+  },
+  "overlay after interactions": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 218px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"11\" data-alt=\"alt “Un chat noir”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">11</span></div><div style=\"position: absolute; left: 8px; top: 248px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"12\" data-alt=\"no alternative\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">12</span></div><div style=\"position: absolute; left: 8px; top: 278px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px dashed rgb(255, 23, 68); background: rgba(255, 23, 68, 0.16); box-shadow: 0 0 0 1px #fff, 0 0 10px 2px rgba(255, 23, 68, 0.75); animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"3\" data-alt=\"alt=&quot;&quot;\" data-state=\"review\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(255, 23, 68); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">? 3 · alt=\"\"</span></div><div style=\"position: absolute; left: 8px; top: 308px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"4\" data-alt=\"alt “photo-123.jpg”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">4 · alt “photo-123.jpg”</span></div><div style=\"position: absolute; left: 8px; top: 338px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"5\" data-alt=\"alt=&quot;&quot;\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">5 · alt=\"\"</span></div><div style=\"position: absolute; left: 8px; top: 368px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"6\" data-alt=\"alt=&quot;&quot;\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">6 · alt=\"\"</span></div><div style=\"position: absolute; left: 8px; top: 398px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"7\" data-alt=\"aria-label “Libellé ARIA”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">7 · aria-label “Libellé ARIA”</span></div><div style=\"position: absolute; left: 8px; top: 428px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"8\" data-alt=\"aria-labelledby “Légende liée”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">8 · aria-labelledby “Légende liée”</span></div><div style=\"position: absolute; left: 8px; top: 518px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"9\" data-alt=\"alt “Dans une figure”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">9 · alt “Dans une figure”</span></div><div style=\"position: absolute; left: 8px; top: 608px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"10\" data-alt=\"alt “Accueil”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">10 · alt “Accueil”</span></div><div style=\"position: absolute; left: 8px; top: 638px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"11\" data-alt=\"aria-label “Icône”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">11 · aria-label “Icône”</span></div><div style=\"position: absolute; left: 8px; top: 758px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"12\" data-alt=\"aria-hidden\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">12 · aria-hidden</span></div><div style=\"position: absolute; left: 8px; top: 818px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"13\" data-alt=\"aria-label “Div image”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">13 · aria-label “Div image”</span></div><div style=\"position: absolute; left: 8px; top: 848px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"14\" data-alt=\"alt “Envoyer”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">14 · alt “Envoyer”</span></div><div style=\"position: absolute; left: 8px; top: 938px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"15\" data-alt=\"alt “Zone 1”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">15 · alt “Zone 1”</span></div><div style=\"position: absolute; left: 8px; top: 938px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"16\" data-alt=\"alt “Carte”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">16 · alt “Carte”</span></div><div style=\"position: absolute; left: 8px; top: 968px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"17\" data-alt=\"no alternative\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">17 · no alternative</span></div><div style=\"position: absolute; left: 8px; top: 998px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"18\" data-alt=\"no alternative\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">18 · no alternative</span></div><div style=\"position: absolute; left: 8px; top: 1118px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0; display: none;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"19\" data-alt=\"alt “Dans un dialogue”\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">19 · alt “Dans un dialogue”</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t6\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 578px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 4px solid rgb(255, 23, 68); background: rgba(255, 23, 68, 0.16); box-shadow: 0 0 0 1px #fff, 0 0 10px 2px rgba(255, 23, 68, 0.75); animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"21\" data-state=\"error\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(255, 23, 68); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">! 21</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"1\" data-badge=\"main\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">1 · main</span></div><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · h1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-tools\" style=\"position: absolute; top: 0px; left: 0px; width: 0px; height: 0px; z-index: 2147483645; pointer-events: none;\"><div data-tool=\"tables\"></div><div data-tool=\"taborder\"><svg width=\"0\" height=\"0\" style=\"position: absolute; left: 0px; top: 0px; pointer-events: none;\"><polyline points=\"14,584 14,854\" fill=\"none\" stroke=\"#0369a1\" stroke-width=\"1.5\" stroke-opacity=\"0.55\"></polyline></svg><div title=\"a\" style=\"position: absolute; left: 4px; top: 574px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">1</div><div title=\"input\" style=\"position: absolute; left: 4px; top: 844px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">2</div></div></div>"
+  ],
+  "tools reset": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "pick cancel": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "unknown message": {},
+  "clear theme 3": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "clear theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay after clear themes": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay-t6\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 578px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 4px solid rgb(255, 23, 68); background: rgba(255, 23, 68, 0.16); box-shadow: 0 0 0 1px #fff, 0 0 10px 2px rgba(255, 23, 68, 0.75); animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"21\" data-state=\"error\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(255, 23, 68); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">! 21</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"1\" data-badge=\"main\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">1 · main</span></div><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · h1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-tools\" style=\"position: absolute; top: 0px; left: 0px; width: 0px; height: 0px; z-index: 2147483645; pointer-events: none;\"></div>"
+  ],
+  "clear highlights": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay after clear all": []
+}

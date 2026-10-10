@@ -1,0 +1,1012 @@
+{
+  "highlight images": {
+    "returned": true,
+    "response": {
+      "elements": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 2,
+          "sameOrigin": 0,
+          "crossOrigin": 2
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": [
+          "The scanners look at the main document only; the axe run is made with iframes: false."
+        ]
+      }
+    }
+  },
+  "scan theme 2": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "iframe",
+          "id": 1,
+          "label": "“Cadre externe”",
+          "summary": "https://other.test/frame",
+          "facts": {
+            "title": "Cadre externe",
+            "name": null,
+            "src": "https://other.test/frame",
+            "aria-label": null,
+            "aria-labelledby": null,
+            "aria-hidden": null,
+            "role": null,
+            "Size": "100 × 20px"
+          },
+          "html": "<iframe src=\"https://other.test/frame\" title=\"Cadre externe\"></iframe>",
+          "contextHtml": "<main>\n<h1>Masqué</h1>\n<h2 class=\"sr\">Titre pour lecteurs d'écran</h2>\n<a class=\"sr\" href=\"#x\">Lien lecteur</a>\n<p aria-hidden=\"true\">Texte aria-hidden <a href=\"/ah\">lien</a></p>\n<p style=\"visibility:hidden\">Invisible</p>\n<p hidden=\"\">Attribut hidden</p>\n<p class=\"clip\">Clip</p>\n<p style=\"color:#777;background:#fff\">Texte gris sur blanc</p>\n<p style=\"color:#000;background:#fff\">Texte noir sur blanc</p>\n<p style=\"color:#fff;background:#fff\">Blanc sur blanc</p>\n<p style=\"color:#888;background:url(x.png)\">Sur image</p>\n<p style=\"font-size:30px;color:#999;background:#fff\">Grand texte</p>\n<iframe src=\"https://other.test/frame\" title=\"Cadre externe\" data-rgaa-target=\"\"></iframe>\n<iframe src=\"/same-origin\"></iframe>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "hasTitle": true,
+            "titleEmpty": false,
+            "size": 2000
+          }
+        },
+        {
+          "type": "iframe",
+          "id": 2,
+          "label": "<iframe> without title",
+          "summary": "/same-origin",
+          "facts": {
+            "title": null,
+            "name": null,
+            "src": "/same-origin",
+            "aria-label": null,
+            "aria-labelledby": null,
+            "aria-hidden": null,
+            "role": null,
+            "Size": "100 × 20px"
+          },
+          "html": "<iframe src=\"/same-origin\"></iframe>",
+          "contextHtml": "<main>\n<h1>Masqué</h1>\n<h2 class=\"sr\">Titre pour lecteurs d'écran</h2>\n<a class=\"sr\" href=\"#x\">Lien lecteur</a>\n<p aria-hidden=\"true\">Texte aria-hidden <a href=\"/ah\">lien</a></p>\n<p style=\"visibility:hidden\">Invisible</p>\n<p hidden=\"\">Attribut hidden</p>\n<p class=\"clip\">Clip</p>\n<p style=\"color:#777;background:#fff\">Texte gris sur blanc</p>\n<p style=\"color:#000;background:#fff\">Texte noir sur blanc</p>\n<p style=\"color:#fff;background:#fff\">Blanc sur blanc</p>\n<p style=\"color:#888;background:url(x.png)\">Sur image</p>\n<p style=\"font-size:30px;color:#999;background:#fff\">Grand texte</p>\n<iframe src=\"https://other.test/frame\" title=\"Cadre externe\"></iframe>\n<iframe src=\"/same-origin\" data-rgaa-target=\"\"></iframe>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "hasTitle": false,
+            "titleEmpty": false,
+            "size": 2000
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 2,
+          "sameOrigin": 0,
+          "crossOrigin": 2
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": [
+          "The scanners look at the main document only; the axe run is made with iframes: false."
+        ]
+      }
+    }
+  },
+  "scan theme 3": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "contrast-ok",
+          "id": 0,
+          "label": "Text with sufficient contrast",
+          "summary": "4 text element(s) · 2 colour pair(s)",
+          "facts": {
+            "Text elements checked": "8",
+            "Sufficient contrast": "4",
+            "To review (listed below)": "4",
+            "Not listed (limit)": null
+          },
+          "html": "",
+          "contextHtml": "",
+          "count": 4,
+          "data": {
+            "humanNeeded": false,
+            "checked": 8,
+            "okCount": 4
+          }
+        },
+        {
+          "type": "contrast-fail",
+          "id": 1,
+          "label": "“Texte gris sur blanc”",
+          "summary": "#777777 on #FFFFFF · 4.48:1 (needs 4.5:1)",
+          "facts": {
+            "Text": "Texte gris sur blanc",
+            "Text colour": "#777777",
+            "Background": "#FFFFFF",
+            "Ratio": "4.48:1",
+            "Required": "4.5:1 (normal text)",
+            "Font size": "NaNpx",
+            "Same colours on": null,
+            "Element": "<p>"
+          },
+          "html": "<p style=\"color:#777;background:#fff\">Texte gris sur blanc</p>",
+          "contextHtml": "<main>\n<h1>Masqué</h1>\n<h2 class=\"sr\">Titre pour lecteurs d'écran</h2>\n<a class=\"sr\" href=\"#x\">Lien lecteur</a>\n<p aria-hidden=\"true\">Texte aria-hidden <a href=\"/ah\">lien</a></p>\n<p style=\"visibility:hidden\">Invisible</p>\n<p hidden=\"\">Attribut hidden</p>\n<p class=\"clip\">Clip</p>\n<p style=\"color:#777;background:#fff\" data-rgaa-target=\"\">Texte gris sur blanc</p>\n<p style=\"color:#000;background:#fff\">Texte noir sur blanc</p>\n<p style=\"color:#fff;background:#fff\">Blanc sur blanc</p>\n<p style=\"color:#888;background:url(x.png)\">Sur image</p>\n<p style=\"font-size:30px;color:#999;background:#fff\">Grand texte</p>\n<iframe src=\"https://other.test/frame\" title=\"Cadre externe\"></iframe>\n<iframe src=\"/same-origin\"></iframe>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "reason": "",
+            "fg": "#777777",
+            "bg": "#FFFFFF",
+            "large": false,
+            "ratio": 4.48,
+            "threshold": 4.5
+          }
+        },
+        {
+          "type": "contrast-fail",
+          "id": 2,
+          "label": "“Blanc sur blanc”",
+          "summary": "#FFFFFF on #FFFFFF · 1.00:1 (needs 4.5:1)",
+          "facts": {
+            "Text": "Blanc sur blanc",
+            "Text colour": "#FFFFFF",
+            "Background": "#FFFFFF",
+            "Ratio": "1.00:1",
+            "Required": "4.5:1 (normal text)",
+            "Font size": "NaNpx",
+            "Same colours on": null,
+            "Element": "<p>"
+          },
+          "html": "<p style=\"color:#fff;background:#fff\">Blanc sur blanc</p>",
+          "contextHtml": "<main>\n<h1>Masqué</h1>\n<h2 class=\"sr\">Titre pour lecteurs d'écran</h2>\n<a class=\"sr\" href=\"#x\">Lien lecteur</a>\n<p aria-hidden=\"true\">Texte aria-hidden <a href=\"/ah\">lien</a></p>\n<p style=\"visibility:hidden\">Invisible</p>\n<p hidden=\"\">Attribut hidden</p>\n<p class=\"clip\">Clip</p>\n<p style=\"color:#777;background:#fff\">Texte gris sur blanc</p>\n<p style=\"color:#000;background:#fff\">Texte noir sur blanc</p>\n<p style=\"color:#fff;background:#fff\" data-rgaa-target=\"\">Blanc sur blanc</p>\n<p style=\"color:#888;background:url(x.png)\">Sur image</p>\n<p style=\"font-size:30px;color:#999;background:#fff\">Grand texte</p>\n<iframe src=\"https://other.test/frame\" title=\"Cadre externe\"></iframe>\n<iframe src=\"/same-origin\"></iframe>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "reason": "",
+            "fg": "#FFFFFF",
+            "bg": "#FFFFFF",
+            "large": false,
+            "ratio": 1,
+            "threshold": 4.5
+          }
+        },
+        {
+          "type": "contrast-unknown",
+          "id": 3,
+          "label": "“Sur image”",
+          "summary": "#888888 on a background image or gradient · ratio cannot be computed",
+          "facts": {
+            "Text": "Sur image",
+            "Text colour": "#888888",
+            "Background": "a background image or gradient — cannot be computed",
+            "Ratio": "cannot be computed",
+            "Required": "4.5:1 (normal text)",
+            "Font size": "NaNpx",
+            "Same colours on": null,
+            "Element": "<p>"
+          },
+          "html": "<p style=\"color:#888;background:url(x.png)\">Sur image</p>",
+          "contextHtml": "<main>\n<h1>Masqué</h1>\n<h2 class=\"sr\">Titre pour lecteurs d'écran</h2>\n<a class=\"sr\" href=\"#x\">Lien lecteur</a>\n<p aria-hidden=\"true\">Texte aria-hidden <a href=\"/ah\">lien</a></p>\n<p style=\"visibility:hidden\">Invisible</p>\n<p hidden=\"\">Attribut hidden</p>\n<p class=\"clip\">Clip</p>\n<p style=\"color:#777;background:#fff\">Texte gris sur blanc</p>\n<p style=\"color:#000;background:#fff\">Texte noir sur blanc</p>\n<p style=\"color:#fff;background:#fff\">Blanc sur blanc</p>\n<p style=\"color:#888;background:url(x.png)\" data-rgaa-target=\"\">Sur image</p>\n<p style=\"font-size:30px;color:#999;background:#fff\">Grand texte</p>\n<iframe src=\"https://other.test/frame\" title=\"Cadre externe\"></iframe>\n<iframe src=\"/same-origin\"></iframe>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "reason": "image",
+            "fg": "#888888",
+            "bg": null,
+            "large": false,
+            "ratio": 3.54,
+            "threshold": 4.5
+          }
+        },
+        {
+          "type": "contrast-fail",
+          "id": 4,
+          "label": "“Grand texte”",
+          "summary": "#999999 on #FFFFFF · 2.85:1 (needs 3:1)",
+          "facts": {
+            "Text": "Grand texte",
+            "Text colour": "#999999",
+            "Background": "#FFFFFF",
+            "Ratio": "2.85:1",
+            "Required": "3:1 (large text)",
+            "Font size": "30px",
+            "Same colours on": null,
+            "Element": "<p>"
+          },
+          "html": "<p style=\"font-size:30px;color:#999;background:#fff\">Grand texte</p>",
+          "contextHtml": "<main>\n<h1>Masqué</h1>\n<h2 class=\"sr\">Titre pour lecteurs d'écran</h2>\n<a class=\"sr\" href=\"#x\">Lien lecteur</a>\n<p aria-hidden=\"true\">Texte aria-hidden <a href=\"/ah\">lien</a></p>\n<p style=\"visibility:hidden\">Invisible</p>\n<p hidden=\"\">Attribut hidden</p>\n<p class=\"clip\">Clip</p>\n<p style=\"color:#777;background:#fff\">Texte gris sur blanc</p>\n<p style=\"color:#000;background:#fff\">Texte noir sur blanc</p>\n<p style=\"color:#fff;background:#fff\">Blanc sur blanc</p>\n<p style=\"color:#888;background:url(x.png)\">Sur image</p>\n<p style=\"font-size:30px;color:#999;background:#fff\" data-rgaa-target=\"\">Grand texte</p>\n<iframe src=\"https://other.test/frame\" title=\"Cadre externe\"></iframe>\n<iframe src=\"/same-origin\"></iframe>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "reason": "",
+            "fg": "#999999",
+            "bg": "#FFFFFF",
+            "large": true,
+            "ratio": 2.85,
+            "threshold": 3
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 2,
+          "sameOrigin": 0,
+          "crossOrigin": 2
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": [
+          "The scanners look at the main document only; the axe run is made with iframes: false."
+        ]
+      }
+    }
+  },
+  "scan theme 5": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 2,
+          "sameOrigin": 0,
+          "crossOrigin": 2
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": [
+          "The scanners look at the main document only; the axe run is made with iframes: false."
+        ]
+      }
+    }
+  },
+  "scan theme 6": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "link-skip-broken",
+          "id": 1,
+          "label": "“Lien lecteur”",
+          "summary": "#x",
+          "facts": {
+            "Text": "Lien lecteur",
+            "Accessible name": "Lien lecteur",
+            "href": "#x",
+            "target": null,
+            "title": null,
+            "aria-label": null,
+            "Occurrences": null,
+            "Skip link": "yes, TARGET NOT FOUND",
+            "Visibility": "visually hidden (read by screen readers only)",
+            "Element": "<a>"
+          },
+          "html": "<a class=\"sr\" href=\"#x\">Lien lecteur</a>",
+          "contextHtml": "<main>\n<h1>Masqué</h1>\n<h2 class=\"sr\">Titre pour lecteurs d'écran</h2>\n<a class=\"sr\" href=\"#x\" data-rgaa-target=\"\">Lien lecteur</a>\n<p aria-hidden=\"true\">Texte aria-hidden <a href=\"/ah\">lien</a></p>\n<p style=\"visibility:hidden\">Invisible</p>\n<p hidden=\"\">Attribut hidden</p>\n<p class=\"clip\">Clip</p>\n<p style=\"color:#777;background:#fff\">Texte gris sur blanc</p>\n<p style=\"color:#000;background:#fff\">Texte noir sur blanc</p>\n<p style=\"color:#fff;background:#fff\">Blanc sur blanc</p>\n<p style=\"color:#888;background:url(x.png)\">Sur image</p>\n<p style=\"font-size:30px;color:#999;background:#fff\">Grand texte</p>\n<iframe src=\"https://other.test/frame\" title=\"Cadre externe\"></iframe>\n<iframe src=\"/same-origin\"></iframe>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "reason": "",
+            "hidden": "visually-hidden"
+          }
+        },
+        {
+          "type": "link-generic",
+          "id": 2,
+          "label": "“lien”",
+          "summary": "/ah",
+          "facts": {
+            "Text": "lien",
+            "Accessible name": "lien",
+            "href": "/ah",
+            "target": null,
+            "title": null,
+            "aria-label": null,
+            "Occurrences": null,
+            "Skip link": null,
+            "Visibility": "hidden from assistive technologies (aria-hidden)",
+            "Element": "<a>"
+          },
+          "html": "<a href=\"/ah\">lien</a>",
+          "contextHtml": "<p aria-hidden=\"true\">Texte aria-hidden <a href=\"/ah\" data-rgaa-target=\"\">lien</a></p>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "reason": "generic",
+            "hidden": "aria-hidden"
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 2,
+          "sameOrigin": 0,
+          "crossOrigin": 2
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": [
+          "The scanners look at the main document only; the axe run is made with iframes: false."
+        ]
+      }
+    }
+  },
+  "scan theme 9": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "landmark",
+          "id": 1,
+          "label": "main",
+          "summary": "<main>",
+          "facts": {
+            "Role": "main",
+            "Name": null,
+            "Element": "<main>"
+          },
+          "html": "<main>Masqué Titre pour lecteurs d'écran Lien lecteur Texte aria-hidden lien Invisible</main>",
+          "contextHtml": "<body><main data-rgaa-target=\"\">\n<h1>Masqué</h1>\n<h2 class=\"sr\">Titre pour lecteurs d'écran</h2>\n<a class=\"sr\" href=\"#x\">Lien lecteur</a>\n<p aria-hidden=\"true\">Texte aria-hidden <a href=\"/ah\">lien</a></p>\n<p style=\"visibility:hidden\">Invisible</p>\n<p hidden=\"\">Attribut hidden</p>\n<p class=\"clip\">Clip</p>\n<p style=\"color:#777;background:#fff\">Texte gris sur blanc</p>\n<p style=\"color:#000;background:#fff\">Texte noir sur blanc</p>\n<p style=\"color:#fff;background:#fff\">Blanc sur blanc</p>\n<p style=\"color:#888;background:url(x.png)\">Sur image</p>\n<p style=\"font-size:30px;color:#999;background:#fff\">Grand texte</p>\n<iframe src=\"https://other.test/frame\" title=\"Cadre externe\"></iframe>\n<iframe src=\"/same-origin\"></iframe>\n</main>\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div><div id=\"rgaa-assistant-overlay-t2\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 608px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 2); background: rgba(0, 0, 2, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000002\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 2);\">1</span></div><div style=\"position: absolute; left: 8px; top: 638px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 2); background: rgba(0, 0, 2, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000002\" data-id=\"2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 2);\">2</span></div></div><div id=\"rgaa-assistant-overlay-t3\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 458px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 3); background: rgba(0, 0, 3, 0.1); box-shadow: 0 0 0 1px #fff; anim …",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "landmark",
+            "level": 1,
+            "badge": "main"
+          }
+        },
+        {
+          "type": "heading",
+          "id": 2,
+          "label": "“Masqué”",
+          "summary": "h1",
+          "facts": {
+            "Level": "h1",
+            "Text": "Masqué",
+            "Previous level": null,
+            "Visibility": null,
+            "Element": "<h1>"
+          },
+          "html": "<h1>Masqué</h1>",
+          "contextHtml": "<main>\n<h1 data-rgaa-target=\"\">Masqué</h1>\n<h2 class=\"sr\">Titre pour lecteurs d'écran</h2>\n<a class=\"sr\" href=\"#x\">Lien lecteur</a>\n<p aria-hidden=\"true\">Texte aria-hidden <a href=\"/ah\">lien</a></p>\n<p style=\"visibility:hidden\">Invisible</p>\n<p hidden=\"\">Attribut hidden</p>\n<p class=\"clip\">Clip</p>\n<p style=\"color:#777;background:#fff\">Texte gris sur blanc</p>\n<p style=\"color:#000;background:#fff\">Texte noir sur blanc</p>\n<p style=\"color:#fff;background:#fff\">Blanc sur blanc</p>\n<p style=\"color:#888;background:url(x.png)\">Sur image</p>\n<p style=\"font-size:30px;color:#999;background:#fff\">Grand texte</p>\n<iframe src=\"https://other.test/frame\" title=\"Cadre externe\"></iframe>\n<iframe src=\"/same-origin\"></iframe>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "heading",
+            "level": 1,
+            "badge": "h1",
+            "hidden": null
+          }
+        },
+        {
+          "type": "heading",
+          "id": 3,
+          "label": "“Titre pour lecteurs d'écran”",
+          "summary": "h2",
+          "facts": {
+            "Level": "h2",
+            "Text": "Titre pour lecteurs d'écran",
+            "Previous level": "h1",
+            "Visibility": "visually hidden (read by screen readers only)",
+            "Element": "<h2>"
+          },
+          "html": "<h2 class=\"sr\">Titre pour lecteurs d'écran</h2>",
+          "contextHtml": "<main>\n<h1>Masqué</h1>\n<h2 class=\"sr\" data-rgaa-target=\"\">Titre pour lecteurs d'écran</h2>\n<a class=\"sr\" href=\"#x\">Lien lecteur</a>\n<p aria-hidden=\"true\">Texte aria-hidden <a href=\"/ah\">lien</a></p>\n<p style=\"visibility:hidden\">Invisible</p>\n<p hidden=\"\">Attribut hidden</p>\n<p class=\"clip\">Clip</p>\n<p style=\"color:#777;background:#fff\">Texte gris sur blanc</p>\n<p style=\"color:#000;background:#fff\">Texte noir sur blanc</p>\n<p style=\"color:#fff;background:#fff\">Blanc sur blanc</p>\n<p style=\"color:#888;background:url(x.png)\">Sur image</p>\n<p style=\"font-size:30px;color:#999;background:#fff\">Grand texte</p>\n<iframe src=\"https://other.test/frame\" title=\"Cadre externe\"></iframe>\n<iframe src=\"/same-origin\"></iframe>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "heading",
+            "level": 2,
+            "badge": "h2",
+            "hidden": "visually-hidden"
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 2,
+          "sameOrigin": 0,
+          "crossOrigin": 2
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": [
+          "The scanners look at the main document only; the axe run is made with iframes: false."
+        ]
+      }
+    }
+  },
+  "scan theme 11": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 2,
+          "sameOrigin": 0,
+          "crossOrigin": 2
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": [
+          "The scanners look at the main document only; the axe run is made with iframes: false."
+        ]
+      }
+    }
+  },
+  "rules run": {
+    "returned": true,
+    "response": {
+      "url": "https://page.test/start",
+      "findings": [
+        {
+          "key": "no-media",
+          "count": 0
+        },
+        {
+          "key": "no-table",
+          "count": 0
+        },
+        {
+          "key": "no-form",
+          "count": 0
+        },
+        {
+          "key": "no-button",
+          "count": 0
+        },
+        {
+          "key": "asq:2.1.1",
+          "count": 1,
+          "samples": [
+            "iframe"
+          ],
+          "asq": {
+            "criterion": "2.1",
+            "test": "2.1.1",
+            "status": "nc",
+            "text": "RGAA 2.1.1: {n} frame(s) without a title attribute. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:2.2.1",
+          "count": 1,
+          "samples": [
+            "iframe"
+          ],
+          "asq": {
+            "criterion": "2.2",
+            "test": "2.2.1",
+            "status": "review",
+            "text": "RGAA 2.2.1: {n} frame(s) with a title: check that each title is relevant. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:6.1.1",
+          "count": 2,
+          "samples": [
+            "a.sr",
+            "a"
+          ],
+          "asq": {
+            "criterion": "6.1",
+            "test": "6.1.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} link(s): check that the link text, alone or with its context, tells where the link goes. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:8.4.1-relevance",
+          "count": 1,
+          "detail": "fr",
+          "asq": {
+            "criterion": "8.4",
+            "test": "8.4.1",
+            "status": "review",
+            "text": "RGAA 8.4.1: the language code is valid ({detail}): check that it is the language of the page."
+          }
+        },
+        {
+          "key": "asq:8.6.1",
+          "count": 1,
+          "detail": "Contenu masqué",
+          "asq": {
+            "criterion": "8.6",
+            "test": "8.6.1",
+            "status": "review",
+            "text": "RGAA 8.6.1: check that the page title ({detail}) is relevant."
+          }
+        },
+        {
+          "key": "asq:9.1.2",
+          "count": 2,
+          "samples": [
+            "h1",
+            "h2.sr"
+          ],
+          "asq": {
+            "criterion": "9.1",
+            "test": "9.1.2",
+            "status": "review",
+            "text": "RGAA 9.1.2: {n} heading(s): check that each one is relevant. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:9.2.1-header",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no <header> element outside <article> and <section>."
+          }
+        },
+        {
+          "key": "asq:9.2.1-footer",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no <footer> element outside <article> and <section>."
+          }
+        },
+        {
+          "key": "asq:9.2.1-nav",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no <nav> element."
+          }
+        },
+        {
+          "key": "asq:13.3.1-noext",
+          "count": 2,
+          "samples": [
+            "a.sr",
+            "a"
+          ],
+          "asq": {
+            "criterion": "13.3",
+            "test": "13.3.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} link(s) whose address has no recognised file name: check that none gives access to an office document. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:13.4.1-noext",
+          "count": 2,
+          "samples": [
+            "a.sr",
+            "a"
+          ],
+          "asq": {
+            "criterion": "13.4",
+            "test": "13.4.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} link(s) whose address has no recognised file name: check that none gives access to an office document. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:na:4.1",
+          "count": 0,
+          "asq": {
+            "criterion": "4.1",
+            "test": "4.1.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.2",
+          "count": 0,
+          "asq": {
+            "criterion": "4.2",
+            "test": "4.2.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.3",
+          "count": 0,
+          "asq": {
+            "criterion": "4.3",
+            "test": "4.3.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.4",
+          "count": 0,
+          "asq": {
+            "criterion": "4.4",
+            "test": "4.4.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.5",
+          "count": 0,
+          "asq": {
+            "criterion": "4.5",
+            "test": "4.5.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.6",
+          "count": 0,
+          "asq": {
+            "criterion": "4.6",
+            "test": "4.6.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.7",
+          "count": 0,
+          "asq": {
+            "criterion": "4.7",
+            "test": "4.7.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.8",
+          "count": 0,
+          "asq": {
+            "criterion": "4.8",
+            "test": "4.8.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.9",
+          "count": 0,
+          "asq": {
+            "criterion": "4.9",
+            "test": "4.9.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.11",
+          "count": 0,
+          "asq": {
+            "criterion": "4.11",
+            "test": "4.11.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.12",
+          "count": 0,
+          "asq": {
+            "criterion": "4.12",
+            "test": "4.12.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.13",
+          "count": 0,
+          "asq": {
+            "criterion": "4.13",
+            "test": "4.13.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:11.11",
+          "count": 0,
+          "asq": {
+            "criterion": "11.11",
+            "test": "11.11.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:11.12",
+          "count": 0,
+          "asq": {
+            "criterion": "11.12",
+            "test": "11.12.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:11.13",
+          "count": 0,
+          "asq": {
+            "criterion": "11.13",
+            "test": "11.13.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:pass:8.1",
+          "count": 0,
+          "detail": "<!DOCTYPE html>",
+          "asq": {
+            "criterion": "8.1",
+            "test": "8.1.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:8.3",
+          "count": 0,
+          "asq": {
+            "criterion": "8.3",
+            "test": "8.3.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:8.5",
+          "count": 0,
+          "asq": {
+            "criterion": "8.5",
+            "test": "8.5.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:10.1",
+          "count": 0,
+          "asq": {
+            "criterion": "10.1",
+            "test": "10.1.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "skip-link-broken",
+          "count": 1,
+          "samples": [
+            "#x"
+          ]
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 2,
+          "sameOrigin": 0,
+          "crossOrigin": 2
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": [
+          "The scanners look at the main document only; the axe run is made with iframes: false."
+        ]
+      }
+    }
+  },
+  "snapshot": {
+    "returned": true,
+    "response": {
+      "url": "https://page.test/start",
+      "title": "Contenu masqué",
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 2,
+          "sameOrigin": 0,
+          "crossOrigin": 2
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": [
+          "The scanners look at the main document only; the axe run is made with iframes: false."
+        ]
+      },
+      "html": "<!DOCTYPE html>\n<html lang=\"fr\" data-rgaa-instance=\"X\"><head><meta charset=\"utf-8\"><title>Contenu masqué</title>\n<style>.sr{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}.clip{clip:rect(0,0,0,0);position:absolute}</style></head>\n<body><main>\n<h1>Masqué</h1>\n<h2 class=\"sr\">Titre pour lecteurs d'écran</h2>\n<a class=\"sr\" href=\"#x\">Lien lecteur</a>\n<p aria-hidden=\"true\">Texte aria-hidden <a href=\"/ah\">lien</a></p>\n<p style=\"visibility:hidden\">Invisible</p>\n<p hidden=\"\">Attribut hidden</p>\n<p class=\"clip\">Clip</p>\n<p style=\"color:#777;background:#fff\">Texte gris sur blanc</p>\n<p style=\"color:#000;background:#fff\">Texte noir sur blanc</p>\n<p style=\"color:#fff;background:#fff\">Blanc sur blanc</p>\n<p style=\"color:#888;background:url(x.png)\">Sur image</p>\n<p style=\"font-size:30px;color:#999;background:#fff\">Grand texte</p>\n<iframe src=\"https://other.test/frame\" title=\"Cadre externe\"></iframe>\n<iframe src=\"/same-origin\"></iframe>\n</main>\n\n</body></html>"
+    }
+  },
+  "overlay after scans": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div>",
+    "<div id=\"rgaa-assistant-overlay-t2\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 608px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 2); background: rgba(0, 0, 2, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000002\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 2);\">1</span></div><div style=\"position: absolute; left: 8px; top: 638px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 2); background: rgba(0, 0, 2, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000002\" data-id=\"2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 2);\">2</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t3\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 458px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 3); background: rgba(0, 0, 3, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000003\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 3);\">1</span></div><div style=\"position: absolute; left: 8px; top: 518px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 3); background: rgba(0, 0, 3, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000003\" data-id=\"2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 3);\">2</span></div><div style=\"position: absolute; left: 8px; top: 548px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 3); background: rgba(0, 0, 3, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000003\" data-id=\"3\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 3);\">3</span></div><div style=\"position: absolute; left: 8px; top: 578px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 3); background: rgba(0, 0, 3, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000003\" data-id=\"4\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 3);\">4</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t6\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: -9999px; top: 0px; width: 2px; height: 2px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">1</span></div><div style=\"position: absolute; left: 8px; top: 338px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">2</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"1\" data-badge=\"main\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">1 · main</span></div><div style=\"position: absolute; left: 8px; top: 218px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · h1</span></div><div style=\"position: absolute; left: -9999px; top: 0px; width: 2px; height: 2px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"3\" data-badge=\"h2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">3 · h2</span></div></div>"
+  ],
+  "states theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "states theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay options": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "focus image 1": {
+    "returned": true,
+    "response": {
+      "ok": false
+    }
+  },
+  "focus link 2": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "focus unknown": {
+    "returned": true,
+    "response": {
+      "ok": false
+    }
+  },
+  "show only theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "show only theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "locate": {
+    "returned": true,
+    "response": {
+      "rect": {
+        "x": -9999,
+        "y": 0,
+        "w": 1,
+        "h": 1
+      },
+      "vw": 1024,
+      "vh": 768
+    }
+  },
+  "locate unknown": {
+    "returned": true,
+    "response": {
+      "rect": null
+    }
+  },
+  "scroll restore": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "unfocus": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "relabel theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "relabel theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay options 2": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "tool reveal on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 3
+    }
+  },
+  "tool tables on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 0
+    }
+  },
+  "tool taborder on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 4
+    }
+  },
+  "overlay after interactions": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div>",
+    "<div id=\"rgaa-assistant-overlay-t2\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 608px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 2); background: rgba(0, 0, 2, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000002\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 2);\">1</span></div><div style=\"position: absolute; left: 8px; top: 638px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 2); background: rgba(0, 0, 2, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000002\" data-id=\"2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 2);\">2</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t3\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 458px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 3); background: rgba(0, 0, 3, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000003\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 3);\">1</span></div><div style=\"position: absolute; left: 8px; top: 518px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 3); background: rgba(0, 0, 3, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000003\" data-id=\"2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 3);\">2</span></div><div style=\"position: absolute; left: 8px; top: 548px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 3); background: rgba(0, 0, 3, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000003\" data-id=\"3\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 3);\">3</span></div><div style=\"position: absolute; left: 8px; top: 578px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 3); background: rgba(0, 0, 3, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000003\" data-id=\"4\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 3);\">4</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t6\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 278px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 4px solid rgb(255, 23, 68); background: rgba(255, 23, 68, 0.16); box-shadow: 0 0 0 1px #fff, 0 0 10px 2px rgba(255, 23, 68, 0.75); animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"21\" data-state=\"error\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(255, 23, 68); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">! 21</span></div><div style=\"position: absolute; left: 8px; top: 338px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 4px solid rgb(250, 204, 21); background: rgba(250, 204, 21, 0.25); box-shadow: 0 0 0 3px #000006, 0 0 0 5px #000; animation: rgaa-assistant-pulse 0.9s ease-in-out 3; z-index: 1;\" data-color=\"#000006\" data-id=\"2\" data-state=\"ignored\" data-focused=\"true\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(0, 0, 0); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(250, 204, 21);\">2</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"1\" data-badge=\"main\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">1 · main</span></div><div style=\"position: absolute; left: 8px; top: 218px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · h1</span></div><div style=\"position: absolute; left: 8px; top: 248px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"3\" data-badge=\"h2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">3 · h2</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-tools\" style=\"position: absolute; top: 0px; left: 0px; width: 0px; height: 0px; z-index: 2147483645; pointer-events: none;\"><div data-tool=\"tables\"></div><div data-tool=\"taborder\"><svg width=\"0\" height=\"0\" style=\"position: absolute; left: 0px; top: 0px; pointer-events: none;\"><polyline points=\"14,284 14,344 14,614 14,644\" fill=\"none\" stroke=\"#0369a1\" stroke-width=\"1.5\" stroke-opacity=\"0.55\"></polyline></svg><div title=\"a\" style=\"position: absolute; left: 4px; top: 274px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">1</div><div title=\"a\" style=\"position: absolute; left: 4px; top: 334px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">2</div><div title=\"iframe\" style=\"position: absolute; left: 4px; top: 604px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">3</div><div title=\"iframe\" style=\"position: absolute; left: 4px; top: 634px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">4</div></div></div>"
+  ],
+  "tools reset": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "pick cancel": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "unknown message": {},
+  "clear theme 3": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "clear theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay after clear themes": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay-t2\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 608px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 2); background: rgba(0, 0, 2, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000002\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 2);\">1</span></div><div style=\"position: absolute; left: 8px; top: 638px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 2); background: rgba(0, 0, 2, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000002\" data-id=\"2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 2);\">2</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t6\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: -9999px; top: 0px; width: 2px; height: 2px; box-sizing: border-box; pointer-events: none; border: 4px solid rgb(255, 23, 68); background: rgba(255, 23, 68, 0.16); box-shadow: 0 0 0 1px #fff, 0 0 10px 2px rgba(255, 23, 68, 0.75); animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"21\" data-state=\"error\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(255, 23, 68); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">! 21</span></div><div style=\"position: absolute; left: 8px; top: 338px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 4px solid rgb(250, 204, 21); background: rgba(250, 204, 21, 0.25); box-shadow: 0 0 0 3px #000006, 0 0 0 5px #000; animation: rgaa-assistant-pulse 0.9s ease-in-out 3; z-index: 1;\" data-color=\"#000006\" data-id=\"2\" data-state=\"ignored\" data-focused=\"true\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(0, 0, 0); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(250, 204, 21);\">2</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"1\" data-badge=\"main\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">1 · main</span></div><div style=\"position: absolute; left: 8px; top: 218px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · h1</span></div><div style=\"position: absolute; left: -9999px; top: 0px; width: 2px; height: 2px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"3\" data-badge=\"h2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">3 · h2</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-tools\" style=\"position: absolute; top: 0px; left: 0px; width: 0px; height: 0px; z-index: 2147483645; pointer-events: none;\"></div>"
+  ],
+  "clear highlights": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay after clear all": []
+}
