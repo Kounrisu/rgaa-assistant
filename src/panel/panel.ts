@@ -3,7 +3,7 @@ import { auditSheets, auditStats, buildWorkbook, countsOf, isProvisional, levelS
 import { confirm as confirmVerdict, evidenceConflicts as evidenceConflictsOf } from '../lib/evidence'
 import { createPage, emptyAudit, FILE_EXTENSION, findPage, listAudits, normalizeUrl } from '../lib/audit-store'
 import { createAuditSession, describeAuditError, type Choice } from './audit-session'
-import type { CaptureResponse, TabInfoResponse } from '../lib/messages'
+import type { CaptureResponse, ContentMessage, ContentResponse, TabInfoResponse } from '../lib/messages'
 import { getLang, setLang, t, translateStatic, type Lang } from '../lib/i18n'
 import type { Sheet } from '../lib/xlsx'
 import { makeThumbs } from '../lib/thumbs'
@@ -111,7 +111,7 @@ function inspectedTabId(): number {
   return chrome.devtools.inspectedWindow.tabId
 }
 
-async function sendToPage(tabId: number, payload: unknown) {
+async function sendToPage<M extends ContentMessage>(tabId: number, payload: M): Promise<ContentResponse<M>> {
   const response = await chrome.runtime.sendMessage({ type: 'RGAA_RELAY', tabId, payload })
   if (!response || response.error) throw new Error(response?.error ?? 'No response from page')
   return response
@@ -1212,7 +1212,7 @@ function showNavBanner(url: string): void {
 /* ------------------------------------------------------------------ */
 
 async function clearBoxes(themeNo?: number): Promise<void> {
-  const payload = themeNo ? { type: 'RGAA_CLEAR_THEME', theme: themeNo } : { type: 'RGAA_CLEAR_HIGHLIGHTS' }
+  const payload: ContentMessage = themeNo ? { type: 'RGAA_CLEAR_THEME', theme: themeNo } : { type: 'RGAA_CLEAR_HIGHLIGHTS' }
   await sendToPage(inspectedTabId(), payload).catch(() => undefined)
 }
 
@@ -3372,7 +3372,7 @@ saveRetryBtn.addEventListener('click', () => void session.retry())
 async function init(): Promise<void> {
   setLang(getLang())
   translateStatic()
-  initPageTools(pageToolsEl, { send: (payload) => sendToPage(inspectedTabId(), payload), say })
+  initPageTools(pageToolsEl, { send: (payload) => sendToPage(inspectedTabId(), payload as Extract<ContentMessage, { type: 'RGAA_TOOL' }>), say })
   const loaded = await session.loadInitial()
   const firstUrl = audit.pages.find((p) => p.url)?.url
   if (loaded && !audit.meta.site.trim() && firstUrl) {
