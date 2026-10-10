@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import { crx } from '@crxjs/vite-plugin'
 import manifest from './manifest.config'
 import { copyFileSync, readFileSync, writeFileSync } from 'node:fs'
+import { patchedAxe } from './scripts/patch-axe.mjs'
 
 // crxjs emits the Chrome-only `use_dynamic_url`, which makes Firefox warn.
 const stripChromeOnlyManifestKeys = () => ({
@@ -14,7 +15,8 @@ const stripChromeOnlyManifestKeys = () => ({
     for (const entry of json.web_accessible_resources ?? []) delete entry.use_dynamic_url
     writeFileSync(path, JSON.stringify(json, null, 2))
     // the axe engine (MPL-2.0) is injected into the page on demand, not bundled in every page
-    copyFileSync('node_modules/axe-core/axe.min.js', 'dist/axe.min.js')
+    // patched copy: no Function()/eval, so it also runs under a strict page CSP (Firefox applies it to content scripts)
+    writeFileSync('dist/axe.min.js', patchedAxe())
     copyFileSync('node_modules/axe-core/LICENSE', 'dist/axe.LICENSE')
   },
 })

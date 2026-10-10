@@ -21,7 +21,7 @@ Extension de navigateur (Chrome, Firefox) qui aide un auditeur ou une auditrice 
 - Aucun code distant n'est chargé : le moteur axe-core est une copie locale incluse dans l'extension.
 
 ## 4. Licences des composants
-- **axe-core** (Deque) : MPL-2.0, utilisé sans modification.
+- **axe-core** (Deque) : MPL-2.0, avec un correctif minimal appliqué à la compilation (suppression des appels `Function()`/`eval`, pour fonctionner sur les sites à politique CSP stricte) ; le correctif est public dans le dépôt (`scripts/patch-axe.mjs`).
 - **fflate** : MIT (compression de l'export Excel).
 - **Asqatasun / Tanaguru** : AGPL-3.0. Des sélecteurs et définitions de règles RGAA en sont adaptés, **isolés dans un seul fichier** pour pouvoir être retirés. Tant qu'ils sont présents, le projet est diffusé sous **AGPL-3.0** : qui reçoit l'extension peut obtenir son code source. Pour un usage interne sans diffusion à des tiers, les obligations sont limitées (à valider par le juridique).
 - Données RGAA officielles : DINUM (conditions de réutilisation à vérifier).
