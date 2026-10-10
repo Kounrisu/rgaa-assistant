@@ -1,3 +1,6 @@
+/**
+ * Every listener of the panel (buttons, keyboard, navigation of the page, messages of the extension), and the language switch.
+ */
 import { type Lang, setLang, translateStatic, t } from '../lib/i18n'
 import { dom, say } from './dom'
 import { renderAll, switchTo, removePage, resetPage, setView } from './router'

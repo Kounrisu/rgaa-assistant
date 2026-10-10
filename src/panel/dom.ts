@@ -1,3 +1,6 @@
+/**
+ * The panel page: its elements, looked up once (`dom`), and the small DOM helpers every view uses (`h`, `$`, `say`, `tNodes`, `keepScroll`, `download`).
+ */
 import type { Child } from './types'
 import { t } from '../lib/i18n'
 

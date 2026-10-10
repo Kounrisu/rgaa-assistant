@@ -1,3 +1,6 @@
+/**
+ * The checklist themes: one card per official criterion, with a verdict, the tools' hints and a note.
+ */
 import { findingCriterionIds } from '../lib/findings'
 import { state } from './state'
 import type { ChecklistAnswer, ChecklistVerdict } from '../lib/types'

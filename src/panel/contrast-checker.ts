@@ -1,3 +1,6 @@
+/**
+ * The colours of a contrast finding: the ratio and the verdict it implies, and the checker card with its colour picker.
+ */
 import { say, dom, h } from './dom'
 import { t } from '../lib/i18n'
 import { sendToPage, inspectedTabId } from './page-bridge'

@@ -1,3 +1,6 @@
+/**
+ * Which view is shown, which page is selected, and the resets (a theme, a page, the whole audit). renderAll() redraws everything.
+ */
 import { renderPageBar, renderThemeBar, renderStats, showNavBanner, renderSummaries, renderEmpty, renderAuditBar } from './chrome'
 import { renderFilters, renderList, renderDetail } from './images-view'
 import { state } from './state'

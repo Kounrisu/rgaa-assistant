@@ -76,11 +76,43 @@ npm run check:asqatasun   # run the ported rules on Asqatasun's own test pages (
 
 The smoke test (`e2e/`) opens the **built** panel and the **built** content script in two Chromium pages, with a
 fixture site and a thin stub of the extension API in between, and runs scan, review, save, reload and export. First
-run: `npx playwright install chromium`. It does not touch the network, and it does not replace a manual check in a real
+run: `npx playwright install chromium`. It does not touch the network (`e2e/parity.spec.ts` also walks through every screen and compares a hash of each with `e2e/__snapshots__`), and it does not replace a manual check in a real
 DevTools panel or in Firefox.
 
 Load `dist/` as an unpacked extension (`chrome://extensions` with Developer mode, or `about:debugging` in
 Firefox), then reload the page you inspect after reloading the extension.
+
+## Code layout
+
+`src/lib/` holds what has no DOM (audit model, rules, results, import of other tools, report, Excel, French texts).
+`src/content/` is the script injected in the inspected page (scans, overlay, picker). `src/panel/` is the DevTools panel;
+`panel.ts` only starts things up, the rest is split by what it draws or does:
+
+| Module | What lives there |
+| --- | --- |
+| `panel.ts` | Entry point: fills the `actions` registry, wires the events, creates the audit session, loads the audit. |
+| `state.ts` | The one `state` object every module shares (audit, page, theme, view, filters, selection...). Data only. |
+| `dom.ts` | The elements of `panel.html` looked up once (`dom.scanBtn`...), and `h()`, `$()`, `say()`, `keepScroll()`, `download()`. |
+| `actions.ts` | The registry of upward calls: a module calls `actions.renderAll()` instead of importing a module above it (which would make a cycle). `panel.ts` lists the functions in `registry`. |
+| `types.ts`, `helpers.ts` | Shared types; pure helpers (fingerprints, file names, slugs, `tDyn`, `formatHtml`). |
+| `dialogs.ts` | In-panel confirm, text and choice questions (the browser popups are not shown in a DevTools panel). |
+| `review-state.ts` | Status of an image or finding, list filters, colour code of the boxes (`boxStates`). |
+| `page-bridge.ts` | Everything that talks to the inspected tab: typed `sendToPage`, boxes on the page, URL and title, previews. |
+| `model.ts` | Page label, `pageInput` (input of the results), `loadPage`, `persist`. |
+| `scan-merge.ts` | How a scan joins the known images (`mergeScan`) and findings (`mergeFindings`). |
+| `images-view.ts` | Theme 1: list, filters, detail, kind and criteria cards. |
+| `findings-view.ts`, `contrast-checker.ts`, `code-view.ts` | Themes 2, 3, 5, 6, 9, 11: list, chips, detail, cards; the contrast maths and checker card; highlighted code blocks. |
+| `checklist-view.ts` | The checklist themes: one card per criterion. |
+| `checks-view.ts`, `auto-checks.ts` | The Checks view; the automatic run (axe, RGAA rules, the Asqatasun-derived rules, HTML check). |
+| `results-view.ts`, `audit-overview.ts`, `sample-view.ts`, `audits-view.ts`, `exports.ts` | Page results and sheet tables; audit dashboard; the sample of pages; the list of audits; Excel and HTML report. |
+| `chrome.ts` | Totals and their jumps, page bar, theme bar, address reminder, audit bar, empty screen. |
+| `router.ts` | `setView`, `renderAll`, `switchTo`, `removePage` and the resets. |
+| `scan-flow.ts`, `events.ts` | The scan of the inspected page; every listener and the language switch. |
+| `audit-session.ts`, `page-tools-ui.ts` | Saving and the audit lifecycle; the page tools toolbar. |
+
+The panel modules have no import cycle: a module never imports one that depends on it, and calls it through `actions` instead. `tests/panel-*.test.ts`
+cover the pure parts, and `e2e/parity.spec.ts` snapshots every screen of a seeded audit so a refactoring can prove the
+panel did not change.
 
 ## License
 

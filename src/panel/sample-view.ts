@@ -1,3 +1,6 @@
+/**
+ * The sample: the pages to audit (P01, P02...), their URLs, and the audit fields.
+ */
 import { state } from './state'
 import { say, dom, h } from './dom'
 import { t } from '../lib/i18n'

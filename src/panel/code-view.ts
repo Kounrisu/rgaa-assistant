@@ -1,3 +1,6 @@
+/**
+ * The highlighted, copyable code blocks of the detail panes.
+ */
 import { h } from './dom'
 import { formatHtml } from './helpers'
 import { t } from '../lib/i18n'

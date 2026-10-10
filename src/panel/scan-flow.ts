@@ -1,3 +1,6 @@
+/**
+ * Scanning the inspected page: the images and every other scanned theme, then the previews.
+ */
 import { state } from './state'
 import { say, dom } from './dom'
 import { t } from '../lib/i18n'

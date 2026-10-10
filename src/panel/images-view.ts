@@ -1,3 +1,6 @@
+/**
+ * The Images theme: the list with its filters, the detail of an image, the kind and criteria cards.
+ */
 import { dom, h, keepScroll, tNodes, $ } from './dom'
 import type { Filter, Item } from './types'
 import { state } from './state'

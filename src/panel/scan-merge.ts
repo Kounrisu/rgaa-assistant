@@ -1,3 +1,7 @@
+/**
+ * How a scan joins what the page already holds: images (mergeScan) and findings (mergeFindings).
+ * Ids, answers and the verdicts pre-filled from the markup are kept or set here.
+ */
 import type { RawFinding, FindingItem, PageRecord, ImageElementInfo } from '../lib/types'
 import { hash, keyOf } from './helpers'
 import { state } from './state'
