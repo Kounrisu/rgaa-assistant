@@ -1,5 +1,6 @@
 import { DETECTED_LABEL, criteriaFor, criterionUrl, detectedOf, hintFor, suggestedKind, type Criterion } from '../lib/rgaa'
-import { auditSheets, auditStats, buildWorkbook, countsOf, levelStats, pageSheets, pct2, rateExact, rateOf, thumbKey, type Counts, type PageInput } from '../lib/audit-sheet'
+import { auditSheets, auditStats, buildWorkbook, countsOf, isProvisional, levelStats, pageSheets, pct2, rateExact, rateOf, thumbKey, type Counts, type PageInput } from '../lib/audit-sheet'
+import { confirm as confirmVerdict, evidenceConflicts as evidenceConflictsOf } from '../lib/evidence'
 import { auditFromFile, auditToFile, copyOf, createPage, deleteAuditById, emptyAudit, FILE_EXTENSION, findPage, listAudits, loadActiveAudit, loadAuditById, normalizeUrl, saveAudit, setActiveId } from '../lib/audit-store'
 import { getLang, setLang, t, translateStatic, type Lang } from '../lib/i18n'
 import type { Sheet } from '../lib/xlsx'
@@ -328,7 +329,8 @@ function renderSummaries(): void {
     if (!criteria.length) continue
     for (const [outcome, labelEn, cls] of OUTCOME_PILLS) {
       const label = t(labelEn)
-      const count = criteria.filter((c) => c.outcome === outcome).length
+      // compliant / not applicable only on the tests this tool can assess does not count here: see the partial pill
+      const count = criteria.filter((c) => c.outcome === outcome && !((outcome === 'c' || outcome === 'na') && c.coverage !== 'full')).length
       host.append(
         h(
           'button',
@@ -344,6 +346,12 @@ function renderSummaries(): void {
         ),
       )
     }
+    const toConfirm = criteria.filter((c) => c.outcome === 'pending' && c.suggested).length
+    const partial = criteria.filter((c) => c.coverage === 'partial').length
+    const unconfirmedNc = criteria.filter((c) => c.unconfirmed && c.outcome === 'nc').length
+    if (toConfirm) host.append(h('span', { class: 'pill warn-pill', title: t('A tool suggests an answer for these criteria. Confirm or change each one: until then they count as to review.') }, t('{n} to confirm', { n: toConfirm })))
+    if (unconfirmedNc) host.append(h('span', { class: 'pill warn-pill', title: t('Failures found by a tool and not yet confirmed. They are counted as non-compliant, so the rate is provisional.') }, t('{n} failure(s) to confirm', { n: unconfirmedNc })))
+    if (partial) host.append(h('span', { class: 'pill warn-pill', title: t('Some tests of these criteria are not supported by this tool. A compliant result on the other tests is counted as not tested; a failure is kept.') }, t('{n} partly covered', { n: partial })))
     if (!pageScope && n === 1 && elements.length) {
       const prefilled = elements.filter((e) => reviews[reviewKey(e)]?.auto).length
       host.append(
@@ -1078,7 +1086,7 @@ function renderPageBar(): void {
     const input = pageInput(p)
     const rate = rateOf(auditStats([input]).perPage[0].counts)
     pageSelect.append(
-      h('option', { value: p.id, selected: p.id === page?.id }, `${pageLabel(p)} · ${p.title || p.url} · ${t('{n} image(s)', { n: p.items.length })}${rate === null ? '' : ` · ${rate} %`}`),
+      h('option', { value: p.id, selected: p.id === page?.id }, `${pageLabel(p)} · ${p.title || p.url} · ${t('{n} image(s)', { n: p.items.length })}${rate === null ? '' : ` · ${rate} %${isProvisional(countsOf(input)) ? ` (${t('provisional')})` : ''}`}`),
     )
   }
   pageSelect.disabled = !audit.pages.length
@@ -1469,6 +1477,8 @@ function autoHints(answer: ChecklistAnswer): HTMLElement[] {
   return disagree ? [h('p', { class: 'hint warn' }, t('The automatic tools disagree on this criterion: check it by hand.')), ...lines] : lines
 }
 
+const VERDICT_WORD: Record<ChecklistVerdict, string> = { c: 'Compliant', nc: 'Non-compliant', na: 'Not applicable' }
+
 function renderChecklist(host: HTMLElement = themeEl): void {
   const def = themeByNumber(theme)
   if (!page || !def) return
@@ -1503,8 +1513,7 @@ function renderChecklist(host: HTMLElement = themeEl): void {
         value,
         checked: answer.verdict === value,
         onclick: () => {
-          answer.verdict = value
-          delete answer.source
+          confirmVerdict(answer, value) // the auditor's answer replaces any tool suggestion
           card.querySelector('.source-note')?.remove()
           card.dataset.state = value
           persist()
@@ -1526,7 +1535,20 @@ function renderChecklist(host: HTMLElement = themeEl): void {
       h('p', { class: 'question' }, c.title.replace(/`/g, '')),
       h('p', { class: 'hint info' }, c.note),
       ...autoHints(answer),
-      ...(answer.source ? [h('p', { class: 'hint info source-note' }, t('Pre-filled from {tool}: confirm it or change it.', { tool: answer.source }))] : []),
+      ...(!answer.verdict && answer.suggested
+        ? [
+            h(
+              'p',
+              { class: 'hint info source-note' },
+              h('strong', {}, t('Suggested: {verdict} (from {tool}).', { verdict: t(VERDICT_WORD[answer.suggested]).toLowerCase(), tool: answer.source ?? '—' })),
+              ` ${t('Not counted as confirmed until you confirm it.')} `,
+              h('button', { type: 'button', class: 'ghost-btn', onclick: () => { confirmVerdict(answer, answer.suggested!); persist(); renderAll() } }, t('Confirm')),
+              ' ',
+              h('button', { type: 'button', class: 'ghost-btn', onclick: () => card.querySelector<HTMLInputElement>(`input[name="chk-${c.id}"]`)?.focus() }, t('Change')),
+            ),
+          ]
+        : []),
+      ...(evidenceConflictsOf(answer).map((x) => h('p', { class: 'hint warn' }, t('Conflicting evidence: {x}.', { x })))),
       h(
         'details',
         { class: 'tests-detail' },
@@ -2347,6 +2369,10 @@ async function exportWorkbook(pages: PageInput[], sheets: Sheet[], fileName: str
 /* Page results                                                         */
 /* ------------------------------------------------------------------ */
 
+/** Why a rate is marked provisional, and how criteria with unconfirmed or partial results are counted. */
+const PROVISIONAL_HELP = (): string =>
+  t('Provisional rate: some criteria are still to test, are only partly covered by this tool, or rest on an automatic answer you have not confirmed. A compliant result on only part of a criterion counts as not tested; a suggested compliance counts as to review until you confirm it; a failure is always kept.')
+
 function renderResults(): void {
   resultsEl.replaceChildren()
   if (!page) return
@@ -2369,12 +2395,15 @@ function renderResults(): void {
     h(
       'div',
       { class: 'results-summary' },
-      h('div', { class: 'rate' }, h('strong', {}, stat.rate === null ? '—' : `${stat.rate}%`), h('span', {}, t('accessibility rate of {label} (C ÷ (C + NC), themes {themes})', { label: pageLabel(page), themes: stat.themes.join(', ') }))),
+      h('div', { class: 'rate' }, h('strong', {}, stat.rate === null ? '—' : `${stat.rate}%`), ...(stat.rate !== null && isProvisional(stat.counts) ? [h('span', { class: 'pill warn-pill', title: PROVISIONAL_HELP() }, t('provisional'))] : []), h('span', {}, t('accessibility rate of {label} (C ÷ (C + NC), themes {themes})', { label: pageLabel(page), themes: stat.themes.join(', ') }))),
       pill('c', t('{n} compliant', { n: stat.counts.C })),
       pill('nc', t('{n} non-compliant', { n: stat.counts.NC })),
       pill('na', t('{n} not applicable', { n: stat.counts.NA })),
       pill('pending', t('{n} not tested', { n: stat.counts.NT })),
+      ...(stat.counts.suggested ? [pill('pending', t('{n} to confirm', { n: stat.counts.suggested }))] : []),
+      ...(stat.counts.partial ? [pill('pending', t('{n} partly covered', { n: stat.counts.partial }))] : []),
     ),
+    ...(isProvisional(stat.counts) ? [h('p', { class: 'hint warn' }, PROVISIONAL_HELP())] : []),
   )
   const sheets = pageSheets(input)
   tabsFor(resultsEl, sheets.map((sheet) => ({ name: sheet.name === pageLabel(page!) ? t('Grid ({label})', { label: pageLabel(page!) }) : sheet.name, render: () => sheetTable(sheet) })))
@@ -2464,6 +2493,7 @@ function dashboard(inputs: PageInput[]): HTMLElement {
       'section',
       { class: 'dash-col' },
       miniTable(t('RGAA 4 compliance'), ['', 'C', 'NC'], [['A', cOf(lv.perLevel.A), nOf(lv.perLevel.A)], [t('AA (legal)'), cOf(lv.legal), nOf(lv.legal)], ['AAA', cOf(lv.perLevel.AAA), nOf(lv.perLevel.AAA)]], 'level-table'),
+      ...(isProvisional(lv.legal) ? [h('p', { class: 'hint warn' }, `${t('provisional')} — ${PROVISIONAL_HELP()}`)] : []),
       h('p', { class: 'dash-note' }, t('These figures are the overall compliance level to report in the conformity statement. The reference is the legal level AA (A + AA): a site is declared compliant at 100 %. Other figures are indicative.')),
       miniTable(t('Compliance for each level'), ['', 'C', 'NC'], [['A', cOf(lv.perLevel.A), nOf(lv.perLevel.A)], ['AA', cOf(lv.perLevel.AA), nOf(lv.perLevel.AA)], ['AAA', cOf(lv.perLevel.AAA), nOf(lv.perLevel.AAA)]], 'level-table'),
       miniTable(t('Results by level'), ['', 'C', 'NC'], [['A', lv.perLevel.A.C, lv.perLevel.A.NC], ['AA', lv.perLevel.AA.C, lv.perLevel.AA.NC], ['AAA', lv.perLevel.AAA.C, lv.perLevel.AAA.NC], [t('Total'), lv.perLevel.A.C + lv.perLevel.AA.C + lv.perLevel.AAA.C, lv.perLevel.A.NC + lv.perLevel.AA.NC + lv.perLevel.AAA.NC]]),
@@ -2472,7 +2502,7 @@ function dashboard(inputs: PageInput[]): HTMLElement {
       'section',
       { class: 'dash-col charts' },
       levelBars(lv.perLevel),
-      donut(t('Compliance RGAA 4 (legal level AA)'), rateExact(lv.legal), t('C ÷ (C + NC) over the sample, levels A and AA')),
+      donut(t('Compliance RGAA 4 (legal level AA)'), rateExact(lv.legal), t('C ÷ (C + NC) over the sample, levels A and AA') + (isProvisional(lv.legal) ? ` (${t('provisional')})` : '')),
       donut(t('Average per page'), lv.average, t('Average of the page rates')),
     ),
     h(
@@ -2496,7 +2526,7 @@ function dashboard(inputs: PageInput[]): HTMLElement {
               h('td', { class: 's-C' }, String(p.counts.C)),
               h('td', { class: 's-NC' }, String(p.counts.NC)),
               h('td', { class: 's-NA' }, String(p.counts.NA)),
-              h('td', { class: `rate-cell ${tone(p.rate)}` }, pct2(p.rate)),
+              h('td', { class: `rate-cell ${tone(p.rate)}`, title: isProvisional(p.counts) ? PROVISIONAL_HELP() : '' }, pct2(p.rate) + (p.rate !== null && isProvisional(p.counts) ? '*' : '')),
             )
           }),
         ),
@@ -2522,7 +2552,7 @@ function dashboard(inputs: PageInput[]): HTMLElement {
         h('td', { class: 's-NC' }, String(th.counts.NC)),
         h('td', { class: 's-NA' }, String(th.counts.NA)),
         h('td', { class: 's-NT' }, String(th.counts.NT)),
-        h('td', {}, h('div', { class: 'meter', role: 'img', 'aria-label': t('{rate}% respected', { rate: th.rate ?? 0 }) }, h('i', { style: `width:${th.rate ?? 0}%` })), h('span', { class: 'meter-num' }, th.rate === null ? '—' : `${th.rate}%`)),
+        h('td', {}, h('div', { class: 'meter', role: 'img', 'aria-label': t('{rate}% respected', { rate: th.rate ?? 0 }) }, h('i', { style: `width:${th.rate ?? 0}%` })), h('span', { class: 'meter-num', title: th.rate !== null && isProvisional(th.counts) ? PROVISIONAL_HELP() : '' }, th.rate === null ? '—' : `${th.rate}%${isProvisional(th.counts) ? '*' : ''}`)),
       ),
     )
   }
@@ -2532,6 +2562,7 @@ function dashboard(inputs: PageInput[]): HTMLElement {
     { class: 'calc' },
     h('h3', {}, t('How compliance is calculated')),
     h('p', {}, t('Overall compliance is C ÷ (C + NC), where C is the number of compliant criteria and NC the number of non-compliant ones. Criteria that are not applicable (NA) or not tested (NT) are left out. This is the legal reference: it is the compliance rate of the sample.')),
+    h('p', {}, t('Rates marked provisional (or with an asterisk) come from an incomplete audit. A criterion compliant on only part of its tests counts as not tested, a suggestion from a tool counts as to review until you confirm it, and a known failure is always kept.')),
     h('p', {}, t('Levels A / AA / AAA are derived from the WCAG success criteria each RGAA criterion references. The accessibility rate used elsewhere in this panel is the average of the page rates.')),
   )
   return h('div', {}, wrap, h('div', { class: 'results-scroll' }, themeTable), calc)
