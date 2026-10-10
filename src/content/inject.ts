@@ -1056,6 +1056,100 @@ async function startPick(respond: (r: Record<string, unknown>) => void): Promise
   window.addEventListener('keydown', onPickKey, true)
 }
 
+/* ------------------------------------------------------------------ */
+/* Our own RGAA checks (what a script can see; the wording is in lib/rgaa-rules.ts) */
+/* ------------------------------------------------------------------ */
+
+function shortSelector(el: Element): string {
+  const id = el.id ? `#${CSS.escape(el.id)}` : ''
+  const cls = !id && typeof el.className === 'string' && el.className.trim() ? `.${CSS.escape(el.className.trim().split(/\s+/)[0])}` : ''
+  return `${el.tagName.toLowerCase()}${id}${cls}`
+}
+
+function runRgaaRules(): { url: string; findings: { key: string; count: number; detail?: string; samples?: string[] }[] } {
+  const out: { key: string; count: number; detail?: string; samples?: string[] }[] = []
+  const mine = (el: Element) => !el.closest(`[id^="${OVERLAY_ID}"]`)
+  const all = (selector: string): Element[] => Array.from(document.querySelectorAll(selector)).filter(mine)
+  const samples = (els: Element[], n = 3) => els.slice(0, n).map(shortSelector)
+  const push = (key: string, els: Element[], detail?: string) => {
+    if (els.length) out.push({ key, count: els.length, detail, samples: samples(els) })
+  }
+
+  // 8.1 — document type
+  if (!document.doctype || document.compatMode === 'BackCompat') out.push({ key: 'doctype', count: 1, detail: document.doctype ? document.doctype.name : 'no doctype' })
+
+  // 10.1 — tags and attributes that only serve presentation
+  const tags = all('basefont, big, blink, center, font, marquee, s, strike, tt')
+  if (tags.length) {
+    const names = [...new Set(tags.map((e) => e.tagName.toLowerCase()))]
+    push('presentation-tags', tags, names.join(', '))
+  }
+  const ATTRS = ['align', 'alink', 'background', 'bgcolor', 'border', 'cellpadding', 'cellspacing', 'clear', 'color', 'compact', 'face', 'frameborder', 'hspace', 'link', 'marginheight', 'marginwidth', 'noshade', 'nowrap', 'scrolling', 'text', 'valign', 'vlink', 'vspace']
+  const withAttrs = all(ATTRS.map((a) => `[${a}]`).join(',')).filter((e) => !e.closest('svg') && ATTRS.some((a) => e.hasAttribute(a) && !(['link', 'text', 'alink', 'vlink'].includes(a) && e.tagName !== 'BODY')))
+  if (withAttrs.length) {
+    const names = [...new Set(withAttrs.flatMap((e) => ATTRS.filter((a) => e.hasAttribute(a))))]
+    push('presentation-attrs', withAttrs, names.slice(0, 8).join(', '))
+  }
+
+  // 8.10 — reading direction
+  push('dir-invalid', all('[dir]').filter((e) => !/^(ltr|rtl|auto)$/i.test(e.getAttribute('dir') ?? '')))
+
+  // 13.2 — links that open a new window without saying so
+  const INFORMS = /(nouvelle\s+(fen[eê]tre|onglet)|nouvel\s+onglet|new\s+(window|tab)|external)/i
+  push(
+    'target-blank',
+    all('a[target="_blank"]').filter((a) => {
+      const hints = [a.textContent, a.getAttribute('title'), a.getAttribute('aria-label'), ...Array.from(a.querySelectorAll('img[alt], svg title')).map((n) => n.getAttribute('alt') ?? n.textContent)]
+      return visible(a) && !hints.some((h) => INFORMS.test(h ?? ''))
+    }),
+  )
+
+  // 11.13 — fields about the user without autocomplete
+  const PERSONAL = /(e-?mail|mail|t[eé]l|phone|pr[eé]nom|firstname|first-name|lastname|last-name|nom\b|name|adresse|address|postal|zip|ville|city|naissance|birth|username|login|identifiant|password|mot de passe)/i
+  const fields = all('input:not([type=hidden]):not([type=submit]):not([type=button]):not([type=reset]):not([type=image]):not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]):not([type=color]):not([type=search])').filter(visible)
+  push(
+    'autocomplete',
+    fields.filter((f) => {
+      const type = (f.getAttribute('type') ?? 'text').toLowerCase()
+      const personal = ['email', 'tel', 'password'].includes(type) || PERSONAL.test([f.getAttribute('name'), f.id, f.getAttribute('aria-label'), f.getAttribute('placeholder')].join(' '))
+      const ac = (f.getAttribute('autocomplete') ?? '').trim().toLowerCase()
+      return personal && (!ac || ac === 'off')
+    }),
+  )
+
+  // 13.3 / 13.4 — office documents
+  const DOC = /\.(pdf|docx?|odt|xlsx?|ods|pptx?|odp|rtf)(?:[?#]|$)/i
+  const docs = all('a[href]').filter((a) => DOC.test(a.getAttribute('href') ?? ''))
+  if (docs.length) push('downloads', docs, [...new Set(docs.map((a) => (/\.(\w+)(?:[?#]|$)/.exec(a.getAttribute('href') ?? '')?.[1] ?? '').toLowerCase()))].join(', '))
+
+  // 4 — multimedia: present (to check) or absent (not applicable)
+  const media = all('video, audio, object, embed, bgsound, iframe[src*="youtube"], iframe[src*="youtu.be"], iframe[src*="vimeo"], iframe[src*="dailymotion"]')
+  if (media.length) push('media-found', media, [...new Set(media.map((e) => e.tagName.toLowerCase()))].join(', '))
+  else out.push({ key: 'no-media', count: 0 })
+
+  // 5 — tables
+  const tables = all('table, [role="table"], [role="grid"], [role="treegrid"]')
+  if (!tables.length) out.push({ key: 'no-table', count: 0 })
+  else {
+    const noHeaders = tables.filter((t) => t.tagName === 'TABLE' && !/^(presentation|none)$/.test(t.getAttribute('role') ?? '') && t.querySelectorAll('tr').length > 1 && !t.querySelector('th, [role="columnheader"], [role="rowheader"]'))
+    push('table-no-th', noHeaders)
+  }
+
+  // 11 — forms, buttons
+  const anyField = all('input:not([type=hidden]):not([type=submit]):not([type=button]):not([type=reset]):not([type=image]), select, textarea, [role="textbox"], [role="combobox"], [role="listbox"], [role="checkbox"], [role="radio"], [role="switch"], [role="slider"], [role="spinbutton"], [role="searchbox"]')
+  if (!anyField.length) out.push({ key: 'no-form', count: 0 })
+  if (!all('button, input[type=submit], input[type=button], input[type=reset], input[type=image], [role="button"]').length) out.push({ key: 'no-button', count: 0 })
+
+  // 6 — links
+  if (!all('a[href], [role="link"]').length) out.push({ key: 'no-link', count: 0 })
+
+  // 8.6 — a title that says nothing
+  const title = document.title.trim()
+  if (!title || /^(sans titre|untitled( document)?|document|home|accueil|index|new page|nouvelle page)$/i.test(title) || title === location.href) out.push({ key: 'generic-title', count: 1, detail: title || 'empty' })
+
+  return { url: location.href, findings: out }
+}
+
 /** Runs the axe engine (injected by the background page just before) and sends back a light copy of its findings. */
 async function runAxe(locale: unknown): Promise<Record<string, unknown>> {
   const axe = (globalThis as unknown as { axe?: { run: (ctx: Document, opts: object) => Promise<Record<string, unknown>>; configure: (c: object) => void } }).axe
@@ -1085,6 +1179,10 @@ async function runAxe(locale: unknown): Promise<Record<string, unknown>> {
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (!isCurrent()) return undefined
+  if (message?.type === 'RGAA_RULES_RUN') {
+    sendResponse(runRgaaRules())
+    return true
+  }
   if (message?.type === 'RGAA_AXE_RUN') {
     void runAxe(message.locale).then(sendResponse)
     return true
