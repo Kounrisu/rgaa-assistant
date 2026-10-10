@@ -816,8 +816,70 @@ function scanContrast(): { findings: RawFinding[]; els: Element[][] } {
   return { findings, els }
 }
 
+
+/** Links (RGAA theme 6): one finding per distinct link (same name and destination), with every occurrence boxed. */
+const GENERIC_LINK = /^(cliquez ici|clic ici|ici|en savoir plus|savoir plus|lire la suite|lire plus|voir plus|voir|plus|suite|d[eé]couvrir|d[eé]tails?|click here|here|read more|learn more|more|details?|link|lien)\s*[.…>»›]*$/i
+
+function linkNameOf(a: Element): string {
+  const labelled = labelledByTextFor(a)
+  if (labelled) return labelled
+  const aria = a.getAttribute('aria-label')?.trim()
+  if (aria) return aria
+  const text = (a.textContent ?? '').replace(/\s+/g, ' ').trim()
+  if (text) return text
+  const img = a.querySelector('img[alt]:not([alt=""]), [role="img"][aria-label]')
+  const imgName = img?.getAttribute('alt')?.trim() || img?.getAttribute('aria-label')?.trim()
+  if (imgName) return imgName
+  const svgTitle = a.querySelector('svg title')?.textContent?.trim()
+  if (svgTitle) return svgTitle
+  return a.getAttribute('title')?.trim() ?? ''
+}
+
+function scanLinks(): { findings: RawFinding[]; els: Element[][] } {
+  const groups = new Map<string, { els: Element[]; name: string; href: string }>()
+  for (const a of Array.from(document.querySelectorAll('a[href], area[href], [role="link"]'))) {
+    if (a.closest(`[id^="${OVERLAY_ID}"]`) || (a.tagName !== 'AREA' && !visible(a))) continue
+    const name = linkNameOf(a)
+    const href = a.getAttribute('href') ?? ''
+    const key = `${name}|${href}`
+    const g = groups.get(key) ?? { els: [], name, href }
+    g.els.push(a)
+    groups.set(key, g)
+  }
+  const findings: RawFinding[] = []
+  const els: Element[][] = []
+  for (const g of Array.from(groups.values()).slice(0, 400)) {
+    const first = g.els[0]
+    const empty = !g.name
+    const generic = !empty && GENERIC_LINK.test(g.name)
+    const short = g.name.length > 48 ? `${g.name.slice(0, 47)}…` : g.name
+    findings.push({
+      type: empty ? 'link-empty' : generic ? 'link-generic' : 'link',
+      id: findings.length + 1,
+      label: empty ? `<${first.tagName.toLowerCase()}> without name` : `“${short}”`,
+      summary: g.href || '(no href)',
+      facts: {
+        Text: (first.textContent ?? '').replace(/\s+/g, ' ').trim().slice(0, 120) || null,
+        'Accessible name': g.name || null,
+        href: g.href || null,
+        target: first.getAttribute('target'),
+        title: first.getAttribute('title'),
+        'aria-label': first.getAttribute('aria-label'),
+        Occurrences: g.els.length > 1 ? String(g.els.length) : null,
+        Element: `<${first.tagName.toLowerCase()}>`,
+      },
+      html: shortHtml(first),
+      contextHtml: boundedContext(first),
+      count: g.els.length,
+      data: { humanNeeded: empty || generic, reason: empty ? 'no-name' : generic ? 'generic' : '' },
+    })
+    els.push(g.els)
+  }
+  return { findings, els }
+}
+
 function scanTheme(theme: number, color: string): RawFinding[] {
-  const { findings, els } = theme === 2 ? scanFrames() : scanContrast()
+  const { findings, els } = theme === 2 ? scanFrames() : theme === 6 ? scanLinks() : scanContrast()
   themeOverlayFor(theme, color)
   findings.forEach((f, i) => drawThemeBoxes(theme, f.id, els[i], theme === 3 ? f.type !== 'contrast-ok' : f.data.humanNeeded === true))
   return findings

@@ -88,6 +88,7 @@ function firstData(v: Record<string, unknown>): Record<string, unknown> | undefi
 }
 
 const srcOf = (html: string): string => /\bsrc=["']([^"']+)["']/i.exec(html)?.[1] ?? ''
+const hrefOf = (html: string): string => /\bhref=["']([^"']+)["']/i.exec(html)?.[1] ?? ''
 const textOf = (html: string): string => clean(html.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' '))
 const sameSrc = (a: string | null | undefined, b: string): boolean => {
   if (!a || !b) return false
@@ -156,11 +157,13 @@ export function applyToolResults(rec: PageRecord, res: ToolResults): ImportRepor
       continue
     }
 
-    if (criterion === '2.1' || criterion === '3.2') {
+    if (criterion === '2.1' || criterion === '3.2' || criterion === '6.2') {
       const fs = rec.findings.filter((f) => f.theme === theme && f.type !== 'contrast-ok')
       for (const node of v.nodes) {
         const f =
-          theme === 2
+          theme === 6
+            ? fs.find((x) => Boolean(x.facts.href) && (x.facts.href === hrefOf(node.html) || sameSrc(x.facts.href, hrefOf(node.html))) && (x.type === 'link-empty' || !x.facts['Accessible name']))
+            : theme === 2
             ? fs.find((x) => sameSrc(x.facts.src, srcOf(node.html)) || (!srcOf(node.html) && clean(x.html).slice(0, 60) === clean(node.html).slice(0, 60)))
             : fs.find((x) => {
                 const txt = textOf(node.html)
@@ -175,6 +178,11 @@ export function applyToolResults(rec: PageRecord, res: ToolResults): ImportRepor
         const ratio = theme === 3 && typeof v.data?.contrastRatio === 'number' ? ` (${v.data.contrastRatio}:1)` : ''
         review.note = addLine(review.note, `${mark} ${v.rule}${ratio}: ${v.help}`)
         // the script could not judge this text: the tool did, so its answer is offered as the pre-fill
+        if (f.type === 'link-empty' && review.answers['6.2'] === undefined) {
+          review.answers['6.2'] = 'nc'
+          review.auto = true
+          report.set++
+        }
         if (f.type === 'contrast-unknown' && review.answers['3.2'] === undefined) {
           review.answers['3.2'] = 'nc'
           review.auto = true

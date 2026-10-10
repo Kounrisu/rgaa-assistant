@@ -527,4 +527,9 @@ export const FR_PANEL: Record<string, string> = {
   'No HTML error found in the generated code.': 'Aucune erreur HTML trouvée dans le code généré.',
   '{n} HTML error(s) found, in {k} kind(s).': '{n} erreur(s) HTML trouvée(s), de {k} sorte(s).',
   'line {line}': 'ligne {line}',
+  'Every link of the page (identical links are grouped), with its name and destination. Links with no name or a generic text are boxed on the page.': 'Tous les liens de la page (les liens identiques sont regroupés), avec leur nom et leur destination. Les liens sans nom ou à l’intitulé générique sont encadrés sur la page.',
+  'No name': 'Sans nom',
+  'Generic text': 'Intitulé générique',
+  '{n} link(s)': '{n} lien(s)',
+  'No links found on the page at the last scan: criteria are not applicable.': 'Aucun lien trouvé sur la page lors de la dernière analyse : les critères ne sont pas applicables.',
 }

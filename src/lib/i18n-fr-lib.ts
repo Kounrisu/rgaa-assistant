@@ -269,4 +269,19 @@ export const FR_LIB: Record<string, string> = {
   'RGAA 13.7.1: {n} image(s) or media element(s) found: check that none flashes or changes brightness abruptly. Examples: {samples}':
     'RGAA 13.7.1 : {n} image(s) ou élément(s) multimédia détecté(s) : vérifier qu’aucun ne provoque de flash ou de changement brusque de luminosité. Exemples : {samples}',
   // --- Asqatasun-derived: end ---
+  'Is this link explicit: does its text (or its context) say where it goes or what it does?': 'Ce lien est-il explicite : son texte (ou son contexte) dit-il où il mène ou ce qu’il fait ?',
+  'The link text, read alone or with its sentence, list item, cell or heading, tells the destination or the action (test 6.1.1).': 'L’intitulé du lien, lu seul ou avec sa phrase, son élément de liste, sa cellule ou son titre, indique la destination ou l’action (test 6.1.1).',
+  'Not “click here”, “read more”, “more” or a bare URL, unless the context makes it clear.': 'Pas « cliquez ici », « en savoir plus », « plus » ni une simple URL, sauf si le contexte le rend clair.',
+  'Does this link have a name (an accessible label)?': 'Ce lien a-t-il un intitulé (un nom accessible) ?',
+  'The link has text, or an image with an alt, or an aria-label / aria-labelledby, or a title that gives it a name (test 6.2.1).': 'Le lien a un texte, ou une image avec un alt, ou un aria-label / aria-labelledby, ou un title qui lui donne un nom (test 6.2.1).',
+  'An empty link, or an icon without a name, is non-compliant.': 'Un lien vide, ou une icône sans nom, n’est pas conforme.',
+  'No name: 6.2 fails first.': 'Pas d’intitulé : le 6.2 échoue d’abord.',
+  '“{text}” says nothing about the destination alone: check that its context (sentence, heading, aria-describedby) makes it explicit.': '« {text} » ne dit rien de la destination seul : vérifiez que son contexte (phrase, titre, aria-describedby) le rend explicite.',
+  'Read the link text with its context: does it say where it goes or what it does?': 'Lisez l’intitulé du lien avec son contexte : dit-il où il mène ou ce qu’il fait ?',
+  'This link has no accessible name: no text, alt, aria-label, aria-labelledby or title.': 'Ce lien n’a pas de nom accessible : ni texte, ni alt, ni aria-label, aria-labelledby ou title.',
+  'Name found: “{name}”.': 'Nom trouvé : « {name} ».',
+  'Text': 'Texte',
+  'Accessible name': 'Nom accessible',
+  'Occurrences': 'Occurrences',
+  '<{tag}> without name': '<{tag}> sans nom',
 }
