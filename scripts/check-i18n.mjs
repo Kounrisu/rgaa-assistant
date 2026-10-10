@@ -21,7 +21,7 @@ for (const f of files) {
 
 const src = files.length ? '' : ''
 const dict = new Set()
-for (const f of ['src/lib/i18n-fr-panel.ts', 'src/lib/i18n-fr-lib.ts']) {
+for (const f of readdirSync('src/lib').filter((n) => /^i18n-fr-.+\.ts$/.test(n)).map((n) => join('src/lib', n))) {
   const text = readFileSync(f, 'utf8')
   for (const m of text.matchAll(/^\s*(?:'((?:\\.|[^'\\])*)'|"((?:\\.|[^"\\])*)"|([A-Za-z_][\w]*))\s*:/gm)) dict.add(unescape(m[1] ?? m[2] ?? m[3]))
 }

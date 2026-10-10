@@ -1,5 +1,5 @@
 import { DETECTED_LABEL, criteriaFor, criterionUrl, detectedOf, hintFor, suggestedKind, type Criterion } from '../lib/rgaa'
-import { auditSheets, auditStats, buildWorkbook, levelStats, pageSheets, pct2, rateExact, rateOf, thumbKey, type Counts, type PageInput } from '../lib/audit-sheet'
+import { auditSheets, auditStats, buildWorkbook, countsOf, levelStats, pageSheets, pct2, rateExact, rateOf, thumbKey, type Counts, type PageInput } from '../lib/audit-sheet'
 import { auditFromFile, auditToFile, copyOf, createPage, deleteAuditById, emptyAudit, FILE_EXTENSION, findPage, listAudits, loadActiveAudit, loadAuditById, normalizeUrl, saveAudit, setActiveId } from '../lib/audit-store'
 import { getLang, setLang, t, translateStatic, type Lang } from '../lib/i18n'
 import type { Sheet } from '../lib/xlsx'
@@ -9,9 +9,11 @@ import { colorOf } from '../lib/theme-colors'
 import { contrastRatio, parseHex, toHex } from '../lib/contrast'
 import { MANUAL_CHECKS, MANUAL_GROUPS } from '../lib/manual-checks'
 import axeFrench from 'axe-core/locales/fr.json'
-import { applyToolResults, fromAxe, type ToolResults } from '../lib/axe-import'
+import { applyToolResults, AXE_TO_RGAA, fromAxe, type ToolResults } from '../lib/axe-import'
 import { RULES, type RuleFinding } from '../lib/rgaa-rules'
 import { packSnapshot, unpackSnapshot } from '../lib/snapshot'
+import { initPageTools, renderPageTools, resetPageTools } from './page-tools-ui'
+import { buildReportHtml } from '../lib/report'
 import { checkHtml } from '../lib/html-check'
 // --- Asqatasun-derived: begin ---
 import type { AsqExtra } from '../lib/asqatasun-rules' // a type only: the table itself stays in the page script
@@ -1012,6 +1014,9 @@ function select(id: number, scroll: boolean): void {
 /* ------------------------------------------------------------------ */
 
 const pageSelect = $<HTMLSelectElement>('page-select')
+const pageToolsEl = $('page-tools')
+const progressEl = $('progress')
+const nextBtn = $<HTMLButtonElement>('next-btn')
 const liveUrlEl = $('live-url')
 const deletePageBtn = $<HTMLButtonElement>('delete-page-btn')
 const resetPageBtn = $<HTMLButtonElement>('reset-page-btn')
@@ -1077,6 +1082,18 @@ function renderPageBar(): void {
     )
   }
   pageSelect.disabled = !audit.pages.length
+  pageToolsEl.hidden = !page
+  nextBtn.disabled = !page
+  progressEl.replaceChildren()
+  if (page) {
+    const c = countsOf(pageInput(page))
+    const total = c.C + c.NC + c.NA + c.NT || 1
+    const answered = c.C + c.NC + c.NA
+    progressEl.append(
+      h('span', {}, t('{done}/{total} criteria answered', { done: answered, total })),
+      h('span', { class: 'meter', role: 'img', 'aria-label': t('Progress of {label}', { label: pageLabel(page) }) }, ...[['c', c.C], ['nc', c.NC], ['na', c.NA]].map(([k, n]) => h('i', { class: String(k), style: `width:${(Number(n) / total) * 100}%` }))),
+    )
+  }
   deletePageBtn.disabled = !page
   resetPageBtn.disabled = !page
   const onLive = Boolean(page && liveUrl && normalizeUrl(page.url) === normalizeUrl(liveUrl))
@@ -1716,7 +1733,7 @@ async function captureShots(list: FindingItem[]): Promise<number> {
 /** What the list shows: every finding, except the unnumbered “text that passes” line of Colours. */
 const listedFindings = (themeNo: number): FindingItem[] => (page?.findings ?? []).filter((f) => f.theme === themeNo && f.type !== 'contrast-ok')
 
-type FindingFilter = 'all' | 'field-nolabel' | 'field-placeholder' | 'table-nohead' | 'table-layout' | 'review' | 'contrast-fail' | 'contrast-unknown' | 'link-empty' | 'link-generic' | 'headings' | 'landmarks'
+type FindingFilter = 'all' | 'hidden' | 'link-skip' | 'field-nolabel' | 'field-placeholder' | 'table-nohead' | 'table-layout' | 'review' | 'contrast-fail' | 'contrast-unknown' | 'link-empty' | 'link-generic' | 'headings' | 'landmarks'
 let findingFilter: FindingFilter = 'all'
 
 /**
@@ -1730,7 +1747,7 @@ function findingNeedsReview(f: FindingItem): boolean {
     return !(r && r.answers['3.2'] !== undefined && !r.auto)
   }
   // a link with a usable name is pre-filled compliant and does not ask for attention; empty or generic ones do
-  if (f.theme === 6 && f.type === 'link') return false
+  if (f.theme === 6 && (f.type === 'link' || f.type === 'link-skip')) return false
   if (f.theme === 9 && (f.type === 'heading' || f.type === 'landmark')) return false
   if (f.theme === 11 && f.type === 'field') return false
   if (f.theme === 5 && (f.type === 'table-layout' || (f.type === 'table-data' && !f.facts.Title))) return false
@@ -1741,6 +1758,8 @@ function findingNeedsReview(f: FindingItem): boolean {
 function findingMatches(f: FindingItem, value: FindingFilter): boolean {
   if (value === 'all') return true
   if (value === 'review') return findingNeedsReview(f)
+  if (value === 'hidden') return Boolean(f.data.hidden)
+  if (value === 'link-skip') return f.type === 'link-skip' || f.type === 'link-skip-broken'
   if (value === 'headings') return f.data.group === 'heading'
   if (value === 'landmarks') return f.data.group === 'landmark'
   return f.type === value
@@ -1796,13 +1815,13 @@ function renderFindingsView(): void {
       theme === 3
         ? [['all', 'All'], ['review', 'To review'], ['contrast-fail', 'Fail'], ['contrast-unknown', 'Check by eye']]
         : theme === 6
-          ? [['all', 'All'], ['review', 'To review'], ['link-empty', 'No name'], ['link-generic', 'Generic text']]
+          ? [['all', 'All'], ['review', 'To review'], ['link-empty', 'No name'], ['link-generic', 'Generic text'], ['link-skip', 'Skip links'], ['hidden', 'Hidden content']]
           : theme === 9
-            ? [['all', 'All'], ['review', 'To review'], ['headings', 'Headings'], ['landmarks', 'Landmarks']]
+            ? [['all', 'All'], ['review', 'To review'], ['headings', 'Headings'], ['landmarks', 'Landmarks'], ['hidden', 'Hidden content']]
             : theme === 11
-              ? [['all', 'All'], ['review', 'To review'], ['field-nolabel', 'No label'], ['field-placeholder', 'Placeholder only']]
+              ? [['all', 'All'], ['review', 'To review'], ['field-nolabel', 'No label'], ['field-placeholder', 'Placeholder only'], ['hidden', 'Hidden content']]
               : theme === 5
-                ? [['all', 'All'], ['review', 'To review'], ['table-nohead', 'No header cell'], ['table-layout', 'Layout tables']]
+                ? [['all', 'All'], ['review', 'To review'], ['table-nohead', 'No header cell'], ['table-layout', 'Layout tables'], ['hidden', 'Hidden content']]
                 : [['all', 'All'], ['review', 'To review']]
     if (!options.some(([v]) => v === findingFilter)) findingFilter = 'all'
     const shown = list.filter((f) => findingMatches(f, findingFilter))
@@ -1845,7 +1864,7 @@ function renderFindingsView(): void {
             },
             f.shot ? h('img', { class: 'shot', src: f.shot, alt: '' }) : null,
             h('span', { class: 'num' }, `#${f.id}`),
-            h('span', { class: 'main' }, h('span', { class: `alt${bad ? ' missing' : ''}` }, tDyn(f.label), f.data.humanNeeded ? h('span', { class: 'type error' }, t('check by eye')) : null), h('span', { class: 'alt' }, tDyn(f.summary))),
+            h('span', { class: 'main' }, h('span', { class: `alt${bad ? ' missing' : ''}` }, tDyn(f.label), f.data.humanNeeded ? h('span', { class: 'type error' }, t('check by eye')) : null, f.data.hidden === 'visually-hidden' ? h('span', { class: 'type popin', title: t('Visually hidden: read by screen readers only') }, t('hidden')) : f.data.hidden === 'aria-hidden' ? h('span', { class: 'type popin', title: t('Hidden from assistive technologies (aria-hidden)') }, 'aria-hidden') : null, f.type === 'link-skip' || f.type === 'link-skip-broken' ? h('span', { class: 'type new' }, t('skip link')) : null), h('span', { class: 'alt' }, tDyn(f.summary))),
             h('span', { class: `dot ${st === 'todo' ? '' : st}`, role: 'img', 'aria-label': t(STATUS_LABEL[st]), title: t(STATUS_LABEL[st]) }),
           ),
         ),
@@ -2517,6 +2536,22 @@ function dashboard(inputs: PageInput[]): HTMLElement {
   return h('div', {}, wrap, h('div', { class: 'results-scroll' }, themeTable), calc)
 }
 
+/** The audit report: one printable HTML page (summary, non-conformities per page, draft accessibility statement). */
+function openReport(download_: boolean): void {
+  const inputs = allPageInputs()
+  if (!inputs.length) return void say(t('Add a page to the audit first.'))
+  const html = buildReportHtml(audit, inputs, audit.pages)
+  const date = new Date().toISOString().slice(0, 10)
+  if (download_) {
+    download(html, 'text/html', `${slugOf(audit.meta.site || audit.name)}_rapport_${date}.html`)
+    say(t('Report downloaded. Open it in a browser and print it to PDF if you need one.'))
+  } else {
+    const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }))
+    window.open(url, '_blank', 'noopener')
+    setTimeout(() => URL.revokeObjectURL(url), 60000)
+  }
+}
+
 function renderAudit(): void {
   auditEl.replaceChildren()
   const inputs = allPageInputs()
@@ -2533,6 +2568,8 @@ function renderAudit(): void {
         { class: 'nav' },
         h('button', { type: 'button', onclick: () => setView('review') }, t('← Back to review')),
         h('button', { type: 'button', class: 'primary', onclick: () => void exportWorkbook(inputs, auditSheets(inputs, audit.meta), `grille-rgaa-${slugOf(audit.meta.site || audit.name)}.xlsx`) }, t('Export Excel (all pages)')),
+        h('button', { type: 'button', class: 'primary', title: t('One printable page with the summary, the non-conformities and a draft accessibility statement'), onclick: () => openReport(false) }, t('Open the report')),
+        h('button', { type: 'button', onclick: () => openReport(true) }, t('Download the report (HTML)')),
       ),
     ),
   )
@@ -2678,7 +2715,7 @@ async function scan(): Promise<void> {
       const n = rec.findings.filter((f) => f.theme === tn).length
       parts.push(tn === 2 ? t('{n} frame(s)', { n }) : tn === 6 ? t('{n} link(s)', { n }) : tn === 9 ? t('{n} heading(s) and landmark(s)', { n }) : tn === 5 ? t('{n} table(s)', { n }) : tn === 11 ? t('{n} field(s)', { n }) : `${t('{n} contrast finding(s)', { n: listedFindings(tn).length })}${added ? ` (${t('{n} new', { n: added })})` : ''}`)
     }
-    const missing = rec.findings.filter((f) => f.present && !f.shot && f.type !== 'contrast-ok' && rec.themes.includes(f.theme)).slice(0, 80)
+    const missing = rec.findings.filter((f) => f.present && !f.shot && f.type !== 'contrast-ok' && rec.themes.includes(f.theme)).slice(0, 50)
     const shots = await captureShots(missing)
     if (shots) parts.push(t('{n} preview(s)', { n: shots }))
     filter = 'all'
@@ -2715,6 +2752,7 @@ chrome.devtools.network.onNavigated.addListener((url: string) => {
   liveUrl = url
   // The boxes are gone with the old document: what was seen is shown as last seen until the next scan.
   scannedThisSession.clear()
+  resetPageTools()
   for (const p of audit.pages) for (const el of p.items) el.present = true
   newBanner.hidden = true
   renderPageBar()
@@ -2759,8 +2797,11 @@ resultsBtn.addEventListener('click', () => setView(view === 'page' ? 'review' : 
 auditBtn.addEventListener('click', () => setView(view === 'audit' ? 'review' : 'audit'))
 
 /* Keyboard: j / k move between images (outside text fields). */
+nextBtn.addEventListener('click', () => goToFirstOnPage('pending'))
+
 document.addEventListener('keydown', (event) => {
   const target = event.target as HTMLElement
+  if (event.key === 'n' && !event.ctrlKey && !event.metaKey && !['TEXTAREA', 'INPUT', 'SELECT'].includes(target.tagName) && page && view === 'review') return void goToFirstOnPage('pending')
   if (['TEXTAREA', 'INPUT', 'SELECT'].includes(target.tagName) || view !== 'review' || theme !== 1 || !elements.length || selectedId === null) return
   const index = elements.findIndex((e) => e.id === selectedId)
   const next = event.key === 'j' ? index + 1 : event.key === 'k' ? index - 1 : -1
@@ -2993,8 +3034,9 @@ async function runAutoChecks(): Promise<void> {
   let step = 'rules'
   try {
     const own = await sendToPage(inspectedTabId(), { type: 'RGAA_RULES_RUN' })
+    await sleep(250) // let a heavy page breathe between the steps
     step = 'axe'
-    const response = await chrome.runtime.sendMessage({ type: 'RGAA_AXE', tabId: inspectedTabId(), locale: getLang() === 'fr' ? axeFrench : null })
+    const response = await chrome.runtime.sendMessage({ type: 'RGAA_AXE', tabId: inspectedTabId(), locale: getLang() === 'fr' ? axeFrench : null, rules: Object.keys(AXE_TO_RGAA) })
     if (!response || response.error) throw new Error(response?.error ?? 'no response')
     const results = fromAxe(response)
     if (results.url && rec.url && normalizeUrl(results.url) !== normalizeUrl(rec.url)) {
@@ -3008,6 +3050,7 @@ async function runAutoChecks(): Promise<void> {
     // --- Asqatasun-derived: end ---
     const report = applyToolResults(rec, results, { addThemes: true })
     step = 'html'
+    await sleep(250)
     try {
       await captureAndCheckHtml(rec)
     } catch (err) {
@@ -3338,6 +3381,7 @@ function applyLanguage(lang: Lang): void {
   translateStatic()
   renderAll()
   renderAuditBar()
+  renderPageTools()
   void applyBoxes()
 }
 
@@ -3359,6 +3403,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden && sav
 async function init(): Promise<void> {
   setLang(getLang())
   translateStatic()
+  initPageTools(pageToolsEl, { send: (payload) => sendToPage(inspectedTabId(), payload), say })
   audit = await loadActiveAudit(t('Untitled audit'))
   saveState = 'saved'
   savedAt = audit.updatedAt

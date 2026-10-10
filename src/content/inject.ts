@@ -3,6 +3,8 @@ import type { ImageElementInfo, RawFinding } from '../lib/types'
 // Imported by this script only (no other file imports the table), so it stays inside this bundle.
 import { evaluateAsqRules, type AsqFinding } from '../lib/asqatasun-rules'
 // --- Asqatasun-derived: end ---
+// Visual aids for manual checks; imported by this script only, so it is inlined in this bundle.
+import { hiddenKind, resetTools, runTool, tabOrder, type ToolName } from './page-tools'
 
 const OVERLAY_ID = 'rgaa-assistant-overlay'
 const STYLE_ID = 'rgaa-assistant-style'
@@ -34,6 +36,26 @@ function tint(hex: string, alpha: number): string {
 }
 
 const boxes = new Map<number, { img: Element; box: HTMLElement }>()
+/** The page element each box stands for, so the boxes can be moved when the layout changes (hidden content revealed…). */
+const boxTarget = new WeakMap<HTMLElement, Element>()
+
+function placeBox(box: HTMLElement, el: Element): void {
+  const rect = el.getBoundingClientRect()
+  const fixed = isFixed(el)
+  box.style.position = fixed ? 'fixed' : 'absolute'
+  box.style.left = `${rect.left + (fixed ? 0 : window.scrollX)}px`
+  box.style.top = `${rect.top + (fixed ? 0 : window.scrollY)}px`
+  box.style.width = `${Math.max(rect.width, 2)}px`
+  box.style.height = `${Math.max(rect.height, 2)}px`
+}
+
+function repositionBoxes(): void {
+  for (const { img, box } of boxes.values()) placeBox(box, img)
+  for (const overlay of themeOverlays.values()) for (const item of overlay.items.values()) for (const b of item.boxes) {
+    const el = boxTarget.get(b)
+    if (el) placeBox(b, el)
+  }
+}
 let focusedId: number | null = null
 
 // Ids stay stable across rescans so answers survive popins opening and closing.
@@ -83,7 +105,7 @@ function setFocused(id: number | null): void {
 const STATE_STYLE: Record<string, { color: string; dash: string; width: number; glyph: string; glow: boolean }> = {
   error: { color: '#ff1744', dash: 'solid', width: 4, glyph: '!', glow: true },
   review: { color: '#ff1744', dash: 'dashed', width: 3, glyph: '?', glow: true },
-  ignored: { color: '#7f1d1d', dash: 'dashed', width: 2, glyph: '', glow: false },
+  ignored: { color: '#f9a8b8', dash: 'dashed', width: 2, glyph: '', glow: false },
   c: { color: '#16a34a', dash: 'solid', width: 3, glyph: '✓', glow: false },
   nc: { color: '#ff1744', dash: 'solid', width: 4, glyph: '✕', glow: true },
 }
@@ -347,6 +369,7 @@ function drawBox(container: HTMLElement, id: number, img: Element, rect: DOMRect
   box.dataset.alt = alt
   box.dataset.state = imageStates[id] ?? ''
   container.appendChild(box)
+  boxTarget.set(box, img)
   refreshLabel(box)
   styleBox(box, false)
   boxes.set(id, { img, box })
@@ -477,10 +500,10 @@ function makeThemeBoxes(overlay: ThemeOverlay, id: number, els: Element[], badge
   const boxes: HTMLElement[] = []
   els.slice(0, 60).forEach((el, i) => {
     const rect = el.getBoundingClientRect()
-    if (!rect.width || !rect.height) return
     const fixed = isFixed(el)
     const box = document.createElement('div')
-    box.style.cssText = `position:${fixed ? 'fixed' : 'absolute'};left:${rect.left + (fixed ? 0 : window.scrollX)}px;top:${rect.top + (fixed ? 0 : window.scrollY)}px;width:${rect.width}px;height:${rect.height}px;box-sizing:border-box;pointer-events:none;`
+    box.style.cssText = `position:${fixed ? 'fixed' : 'absolute'};left:${rect.left + (fixed ? 0 : window.scrollX)}px;top:${rect.top + (fixed ? 0 : window.scrollY)}px;width:${Math.max(rect.width, 2)}px;height:${Math.max(rect.height, 2)}px;box-sizing:border-box;pointer-events:none;`
+    boxTarget.set(box, el)
     const label = document.createElement('span')
     label.textContent = String(id)
     label.style.cssText = 'position:absolute;top:-1px;left:-1px;transform:translateY(-100%);color:#fff;font:bold 12px/1.4 sans-serif;padding:1px 5px;border-radius:2px 2px 0 0;'
@@ -826,6 +849,36 @@ function rendered(el: Element): boolean {
   return cs.display !== 'none' && cs.visibility !== 'hidden'
 }
 
+
+/** What the page says about whether the element can be seen, for the lists. */
+function visibilityOf(el: Element): { Visibility: string | null; hidden: string | null } {
+  const kind = hiddenKind(el)
+  return { Visibility: kind === 'visually-hidden' ? 'visually hidden (read by screen readers only)' : kind === 'aria-hidden' ? 'hidden from assistive technologies (aria-hidden)' : null, hidden: kind }
+}
+
+const SKIP_TEXT = /(aller au contenu|contenu principal|acc[eè]s direct|passer au|aller [àa] la navigation|[ée]vitement|skip to|skip navigation|jump to|main content)/i
+
+/** Is this link a skip link: an in-page link among the first focusable elements, or one whose text says so? */
+function skipTarget(a: Element, early: Set<Element>): { skip: boolean; found: boolean } {
+  const href = a.getAttribute('href') ?? ''
+  if (!href.startsWith('#') || href.length < 2) return { skip: false, found: false }
+  const name = linkNameOf(a)
+  if (!early.has(a) && !SKIP_TEXT.test(name)) return { skip: false, found: false }
+  const id = decodeURIComponent(href.slice(1))
+  return { skip: true, found: Boolean(document.getElementById(id) || document.getElementsByName(id).length) }
+}
+
+/** Checks of our own that do not belong to the RGAA/Asqatasun tables: skip links. */
+function runUxRules(): { key: string; count: number; detail?: string; samples?: string[] }[] {
+  const out: { key: string; count: number; detail?: string; samples?: string[] }[] = []
+  const early = new Set(tabOrder().slice(0, 8))
+  const skips = Array.from(early).filter((a) => a.tagName === 'A' && skipTarget(a, early).skip)
+  if (!skips.length) out.push({ key: 'skip-link-missing', count: 1 })
+  const broken = skips.filter((a) => !skipTarget(a, early).found)
+  if (broken.length) out.push({ key: 'skip-link-broken', count: broken.length, samples: broken.map((a) => a.getAttribute('href') ?? '').slice(0, 3) })
+  return out
+}
+
 /** Links (RGAA theme 6): one finding per distinct link (same name and destination), with every occurrence boxed. */
 const GENERIC_LINK = /^(cliquez ici|clic ici|ici|en savoir plus|savoir plus|lire la suite|lire plus|voir plus|voir|plus|suite|d[eé]couvrir|d[eé]tails?|click here|here|read more|learn more|more|details?|link|lien)\s*[.…>»›]*$/i
 
@@ -845,13 +898,15 @@ function linkNameOf(a: Element): string {
 }
 
 function scanLinks(): { findings: RawFinding[]; els: Element[][] } {
-  const groups = new Map<string, { els: Element[]; name: string; href: string }>()
+  const groups = new Map<string, { els: Element[]; name: string; href: string; skip: boolean; found: boolean }>()
+  const early = new Set(tabOrder().slice(0, 8))
   for (const a of Array.from(document.querySelectorAll('a[href], area[href], [role="link"]'))) {
     if (a.closest(`[id^="${OVERLAY_ID}"]`) || !rendered(a)) continue
     const name = linkNameOf(a)
     const href = a.getAttribute('href') ?? ''
+    const sk = skipTarget(a, early)
     const key = `${name}|${href}`
-    const g = groups.get(key) ?? { els: [], name, href }
+    const g = groups.get(key) ?? { els: [], name, href, skip: sk.skip, found: sk.found }
     g.els.push(a)
     groups.set(key, g)
   }
@@ -862,8 +917,9 @@ function scanLinks(): { findings: RawFinding[]; els: Element[][] } {
     const empty = !g.name
     const generic = !empty && GENERIC_LINK.test(g.name)
     const short = g.name.length > 48 ? `${g.name.slice(0, 47)}…` : g.name
+    const vis = visibilityOf(first)
     findings.push({
-      type: empty ? 'link-empty' : generic ? 'link-generic' : 'link',
+      type: empty ? 'link-empty' : g.skip ? (g.found ? 'link-skip' : 'link-skip-broken') : generic ? 'link-generic' : 'link',
       id: findings.length + 1,
       label: empty ? `<${first.tagName.toLowerCase()}> without name` : `“${short}”`,
       summary: g.href || '(no href)',
@@ -875,12 +931,14 @@ function scanLinks(): { findings: RawFinding[]; els: Element[][] } {
         title: first.getAttribute('title'),
         'aria-label': first.getAttribute('aria-label'),
         Occurrences: g.els.length > 1 ? String(g.els.length) : null,
+        'Skip link': g.skip ? (g.found ? 'yes, target found' : 'yes, TARGET NOT FOUND') : null,
+        Visibility: vis.Visibility,
         Element: `<${first.tagName.toLowerCase()}>`,
       },
       html: shortHtml(first),
       contextHtml: boundedContext(first),
       count: g.els.length,
-      data: { humanNeeded: empty || generic, reason: empty ? 'no-name' : generic ? 'generic' : '' },
+      data: { humanNeeded: empty || generic || (g.skip && !g.found), reason: empty ? 'no-name' : generic ? 'generic' : '', hidden: vis.hidden },
     })
     els.push(g.els)
   }
@@ -924,11 +982,11 @@ function scanStructure(): { findings: RawFinding[]; els: Element[][] } {
         id: findings.length + 1,
         label: empty ? `h${level} (empty)` : `“${text.length > 56 ? `${text.slice(0, 55)}…` : text}”`,
         summary: `h${level}${jump ? ` · jump from h${previous}` : ''}`,
-        facts: { Level: `h${level}`, Text: text || null, 'Previous level': previous ? `h${previous}` : null, Element: `<${tag}>` },
+        facts: { Level: `h${level}`, Text: text || null, 'Previous level': previous ? `h${previous}` : null, Visibility: visibilityOf(el).Visibility, Element: `<${tag}>` },
         html: shortHtml(el),
         contextHtml: boundedContext(el),
         count: 1,
-        data: { humanNeeded: empty || jump, group: 'heading', level, badge: `h${level}` },
+        data: { humanNeeded: empty || jump, group: 'heading', level, badge: `h${level}`, hidden: visibilityOf(el).hidden },
       })
       els.push([el])
       previous = level
@@ -967,7 +1025,8 @@ function scanTables(): { findings: RawFinding[]; els: Element[][] } {
   const findings: RawFinding[] = []
   const els: Element[][] = []
   for (const t of Array.from(document.querySelectorAll('table, [role="table"], [role="grid"], [role="treegrid"]')).slice(0, 200)) {
-    if (t.closest(`[id^="${OVERLAY_ID}"]`) || !visible(t)) continue
+    if (t.closest(`[id^="${OVERLAY_ID}"]`) || !rendered(t)) continue
+    const vis = visibilityOf(t)
     const role = (t.getAttribute('role') ?? '').toLowerCase()
     const layoutRole = role === 'presentation' || role === 'none'
     const th = t.querySelectorAll('th, [role="columnheader"], [role="rowheader"]').length
@@ -982,11 +1041,11 @@ function scanTables(): { findings: RawFinding[]; els: Element[][] } {
       id: findings.length + 1,
       label: caption ? `“${caption.length > 56 ? `${caption.slice(0, 55)}…` : caption}”` : `table ${rows}×${cols}`,
       summary: `${rows} rows × ${cols} columns · ${th} header cell(s)`,
-      facts: { Rows: String(rows), Columns: String(cols), 'Header cells (th)': String(th), Title: caption || null, Summary: summary, role: role || null, Element: `<${t.tagName.toLowerCase()}>` },
+      facts: { Rows: String(rows), Columns: String(cols), 'Header cells (th)': String(th), Title: caption || null, Summary: summary, role: role || null, Visibility: vis.Visibility, Element: `<${t.tagName.toLowerCase()}>` },
       html: shortHtml(t),
       contextHtml: boundedContext(t),
       count: 1,
-      data: { humanNeeded: type !== 'table-data' || Boolean(caption), hasTitle: Boolean(caption), hasHeaders: th > 0, layout: layoutRole },
+      data: { humanNeeded: type !== 'table-data' || Boolean(caption), hasTitle: Boolean(caption), hasHeaders: th > 0, layout: layoutRole, hidden: vis.hidden },
     })
     els.push([t])
   }
@@ -1018,7 +1077,8 @@ function scanFields(): { findings: RawFinding[]; els: Element[][] } {
   const els: Element[][] = []
   const sel = 'input:not([type=hidden]):not([type=submit]):not([type=button]):not([type=reset]):not([type=image]), select, textarea, [role="textbox"], [role="combobox"], [role="listbox"], [role="checkbox"], [role="radio"], [role="switch"], [role="slider"], [role="spinbutton"], [role="searchbox"]'
   for (const f of Array.from(document.querySelectorAll(sel)).slice(0, 300)) {
-    if (f.closest(`[id^="${OVERLAY_ID}"]`) || !visible(f)) continue
+    if (f.closest(`[id^="${OVERLAY_ID}"]`) || !rendered(f)) continue
+    const vis = visibilityOf(f)
     const tag = f.tagName.toLowerCase()
     const type = (f.getAttribute('type') ?? (tag === 'input' ? 'text' : tag)).toLowerCase()
     const { name, source } = fieldNameOf(f)
@@ -1030,11 +1090,11 @@ function scanFields(): { findings: RawFinding[]; els: Element[][] } {
       id: findings.length + 1,
       label: name ? `“${name.length > 48 ? `${name.slice(0, 47)}…` : name}”` : `<${tag}> without label`,
       summary: `${type}${source ? ` · ${source}` : ''}`,
-      facts: { Type: type, 'Accessible name': name || null, 'Name comes from': source || null, Autocomplete: ac || null, Required: f.hasAttribute('required') || f.getAttribute('aria-required') === 'true' ? 'yes' : null, name: f.getAttribute('name'), Element: `<${tag}>` },
+      facts: { Type: type, 'Accessible name': name || null, 'Name comes from': source || null, Autocomplete: ac || null, Required: f.hasAttribute('required') || f.getAttribute('aria-required') === 'true' ? 'yes' : null, name: f.getAttribute('name'), Visibility: vis.Visibility, Element: `<${tag}>` },
       html: shortHtml(f),
       contextHtml: boundedContext(f),
       count: 1,
-      data: { humanNeeded: kind !== 'field', personal, hasAutocomplete: Boolean(ac) && ac !== 'off' },
+      data: { humanNeeded: kind !== 'field', personal, hasAutocomplete: Boolean(ac) && ac !== 'off', hidden: vis.hidden },
     })
     els.push([f])
   }
@@ -1044,7 +1104,9 @@ function scanFields(): { findings: RawFinding[]; els: Element[][] } {
 function scanTheme(theme: number, color: string): RawFinding[] {
   const { findings, els } = theme === 2 ? scanFrames() : theme === 6 ? scanLinks() : theme === 9 ? scanStructure() : theme === 5 ? scanTables() : theme === 11 ? scanFields() : scanContrast()
   themeOverlayFor(theme, color)
-  findings.forEach((f, i) => drawThemeBoxes(theme, f.id, els[i], theme === 3 ? f.type !== 'contrast-ok' : theme === 9 ? els[i].length > 0 : f.data.humanNeeded === true, typeof f.data.badge === 'string' ? f.data.badge : ''))
+  // every element keeps its box, unless the page has so many that only the ones to look at stay (hundreds of boxes slow a page down)
+  const many = findings.length > 350
+  findings.forEach((f, i) => drawThemeBoxes(theme, f.id, els[i], theme === 3 ? f.type !== 'contrast-ok' : [2, 5, 6, 9, 11].includes(theme) && !many ? els[i].length > 0 : f.data.humanNeeded === true, typeof f.data.badge === 'string' ? f.data.badge : ''))
   return findings
 }
 
@@ -1375,21 +1437,35 @@ function runAsqatasunRules(): AsqFinding[] {
 
 /** The generated HTML of the page (what the browser holds now, after scripts), without our own markers. */
 function takeSnapshot(): { url: string; title: string; html: string } {
-  const clone = document.documentElement.cloneNode(true) as HTMLElement
-  clone.querySelectorAll(`[id^="${OVERLAY_ID}"], #${STYLE_ID}`).forEach((el) => el.remove())
+  // no deep copy of the page (heavy on big pages): our own markers are lifted out for a moment, the page is serialized, they go back
+  const lifted: { node: Element; parent: Node; next: Node | null }[] = []
+  for (const node of Array.from(document.querySelectorAll(`[id^="${OVERLAY_ID}"], #${STYLE_ID}`))) {
+    if (node.parentNode) lifted.push({ node, parent: node.parentNode, next: node.nextSibling })
+  }
+  for (const { node } of lifted) node.remove()
+  let html = ''
+  try {
+    html = document.documentElement.outerHTML
+  } finally {
+    for (const { node, parent, next } of lifted.reverse()) parent.insertBefore(node, next)
+  }
   const dt = document.doctype
   const doctype = dt ? `<!DOCTYPE ${dt.name}${dt.publicId ? ` PUBLIC "${dt.publicId}"` : ''}${dt.systemId ? ` "${dt.systemId}"` : ''}>\n` : ''
-  return { url: location.href, title: document.title, html: doctype + clone.outerHTML }
+  // a very large page is cut: the audit file and the validation stay manageable
+  const MAX = 6_000_000
+  return { url: location.href, title: document.title, html: doctype + (html.length > MAX ? `${html.slice(0, MAX)}\n<!-- cut: page larger than ${MAX} characters -->` : html) }
 }
 
 /** Runs the axe engine (injected by the background page just before) and sends back a light copy of its findings. */
-async function runAxe(locale: unknown): Promise<Record<string, unknown>> {
+async function runAxe(locale: unknown, rules: unknown): Promise<Record<string, unknown>> {
   type AxeApi = { run: (ctx: Document, opts: object) => Promise<Record<string, unknown>>; configure: (c: object) => void }
   const axe = ((globalThis as unknown as { axe?: AxeApi }).axe ?? (window as unknown as { axe?: AxeApi }).axe) as AxeApi | undefined
   if (!axe) return { error: 'axe-not-loaded' }
   try {
     if (locale) axe.configure({ locale })
-    const r = (await axe.run(document, { resultTypes: ['violations', 'incomplete'] })) as {
+    // only the rules that map to an RGAA criterion, in this frame (waiting for other frames can hang a page for a minute)
+    const only = Array.isArray(rules) && rules.length ? { runOnly: { type: 'rule', values: rules.map(String) } } : {}
+    const r = (await axe.run(document, { resultTypes: ['violations', 'incomplete'], iframes: false, elementRef: false, ...only })) as {
       violations: { id: string; impact: string | null; help: string; nodes: { html: string; target: unknown[]; any?: { data?: unknown }[] }[] }[]
       incomplete: unknown[]
       passes: { id: string }[]
@@ -1419,12 +1495,22 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     sendResponse(takeSnapshot())
     return true
   }
+  if (message?.type === 'RGAA_TOOL') {
+    sendResponse(runTool(message.tool as ToolName, Boolean(message.on), repositionBoxes))
+    return true
+  }
+  if (message?.type === 'RGAA_TOOLS_RESET') {
+    resetTools(repositionBoxes)
+    sendResponse({ ok: true })
+    return true
+  }
   if (message?.type === 'RGAA_RULES_RUN') {
-    sendResponse(runRgaaRules())
+    const base = runRgaaRules()
+    sendResponse({ ...base, findings: [...base.findings, ...runUxRules()] })
     return true
   }
   if (message?.type === 'RGAA_AXE_RUN') {
-    void runAxe(message.locale).then(sendResponse)
+    void runAxe(message.locale, message.rules).then(sendResponse)
     return true
   }
   if (message?.type === 'RGAA_PICK_START') {

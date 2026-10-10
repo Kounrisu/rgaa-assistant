@@ -454,7 +454,7 @@ export const FR_PANEL: Record<string, string> = {
   'Alt text: on': 'Texte alternatif : affiché',
   'Alt text: off': 'Texte alternatif : masqué',
   'Write the alternative text (or its absence) next to each image on the page': 'Écrire le texte alternatif (ou son absence) à côté de chaque image de la page',
-  'On the page: solid red = error, dashed red = to review, dark red = ignored, green = reviewed and compliant.': 'Sur la page : rouge plein = erreur, rouge en pointillés = à relire, rouge foncé = ignoré, vert = relu et conforme.',
+  'On the page: solid red = error, dashed red = to review, light red = ignored, green = reviewed and compliant.': 'Sur la page : rouge plein = erreur, rouge en pointillés = à relire, rouge clair = ignoré, vert = relu et conforme.',
   'Manual checks': 'Contrôles manuels',
   'Pre-filled from {tool}: confirm it or change it.': 'Pré-rempli depuis {tool} : confirmez-le ou modifiez-le.',
   'Feeds RGAA': 'Alimente les critères RGAA',

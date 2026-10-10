@@ -194,6 +194,8 @@ export function hintForFinding(f: FindingItem, criterionId: string): Hint | null
       return { tone: 'info', text: t('Check that this area is the right kind of landmark, and named if several of the same kind exist.') }
     case '6.1': {
       if (f.type === 'link-empty') return { tone: 'warn', text: t('No name: 6.2 fails first.') }
+      if (f.type === 'link-skip') return { tone: 'info', text: t('This is a skip link (RGAA 12.7): its target exists. Check that it becomes visible when it takes the focus, and that it really moves you to the content.') }
+      if (f.type === 'link-skip-broken') return { tone: 'warn', text: t('This looks like a skip link (RGAA 12.7) but its target was not found on the page.') }
       if (f.type === 'link-generic') return { tone: 'warn', text: t('“{text}” says nothing about the destination alone: check that its context (sentence, heading, aria-describedby) makes it explicit.', { text: f.facts.Text ?? '' }) }
       return { tone: 'info', text: t('Read the link text with its context: does it say where it goes or what it does?') }
     }
@@ -222,6 +224,8 @@ export function suggestFinding(f: FindingItem): Record<string, Verdict> {
   if (f.type === 'landmark') return { '9.2': 'c' }
   if (f.type === 'page-no-main') return { '9.2': 'nc' }
   if (f.type === 'link-empty') return { '6.2': 'nc' }
+  if (f.type === 'link-skip') return { '6.1': 'c', '6.2': 'c' }
+  if (f.type === 'link-skip-broken') return { '6.2': 'c' }
   if (f.type === 'link-generic') return { '6.2': 'c' }
   if (f.type === 'link') return { '6.1': 'c', '6.2': 'c' }
   if (f.type === 'contrast-ok') return { '3.2': 'c' }
