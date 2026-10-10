@@ -462,7 +462,7 @@ export const FR_PANEL: Record<string, string> = {
   'Checked, OK': 'Vérifié, OK',
   'Problem found': 'Problème constaté',
   'What is wrong, and where': 'Ce qui ne va pas, et où',
-  'Manual checks — {label}': 'Contrôles manuels — {label}',
+  'Checks — {label}': 'Contrôles — {label}',
   'What a script cannot judge: do each check on the page, then tick it. {done}/{total} done, {issues} problem(s).': 'Ce qu’un script ne sait pas juger : faites chaque contrôle sur la page, puis cochez-le. {done}/{total} faits, {issues} problème(s).',
   '{set} verdict(s) pre-filled, {noted} element note(s). {passes} passed rule(s) ignored, {incomplete} to check by hand.': '{set} verdict(s) pré-rempli(s), {noted} note(s) sur des éléments. {passes} règle(s) réussie(s) ignorée(s), {incomplete} à vérifier à la main.',
   '{n} finding(s) not matched to a scanned element': '{n} constat(s) sans élément analysé correspondant',
@@ -503,4 +503,7 @@ export const FR_PANEL: Record<string, string> = {
   'File up to date': 'Fichier à jour',
   'Open file': 'Ouvrir',
   'Save file': 'Enregistrer',
+  'Run the automatic RGAA checks (axe and Asqatasun-derived rules) on the page in the browser': 'Lancer les contrôles RGAA automatiques (axe et règles dérivées d’Asqatasun) sur la page du navigateur',
+  'Checks': 'Contrôles',
+  '{label} has no address yet: open its page in the browser and click “Scan {label}”.': '{label} n’a pas encore d’adresse : ouvrez sa page dans le navigateur et cliquez sur « Analyser {label} ».',
 }
