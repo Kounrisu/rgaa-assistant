@@ -1,0 +1,192 @@
+// @vitest-environment jsdom
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { createPage, emptyAudit } from '../src/lib/audit-store'
+import { setLang } from '../src/lib/i18n'
+import type { FindingItem, ImageElementInfo, ImageReview, PageRecord, RawFinding } from '../src/lib/types'
+import { applyContrastVerdict, contrastOutcome } from '../src/panel/contrast-checker'
+import { keyOf } from '../src/panel/helpers'
+import { keyOfFinding, mergeFindings, mergeScan, nextFindingNumber, prefill } from '../src/panel/scan-merge'
+import { state } from '../src/panel/state'
+import type { Item } from '../src/panel/types'
+
+const info = (id: number, over: Partial<ImageElementInfo> = {}): ImageElementInfo =>
+  ({ id, tag: 'img', type: 'img', src: `https://x.test/${id}.png`, thumb: null, alt: 'x', ariaLabel: null, labelledByText: null, title: null, svgTitle: null, accessibleName: 'x', ignoredBy: null, role: null, ariaHidden: false, inDialog: false, nearbyText: null, isInsideLink: false, linkHref: null, linkText: null, figcaption: null, naturalWidth: 1, naturalHeight: 1, html: `<img id="${id}">`, contextHtml: `<p><img id="${id}"></p>`, ...over }) as ImageElementInfo
+
+const raw = (over: Partial<RawFinding> = {}): RawFinding => ({ type: 'iframe', id: 1, label: 'iframe', summary: 's', facts: {}, html: '<iframe>', contextHtml: '<div><iframe></div>', count: 1, data: {}, ...over })
+
+let rec: PageRecord
+function seed(): void {
+  const audit = emptyAudit('t')
+  rec = createPage(audit, 'https://x.test/', 'X')
+  state.audit = audit
+  state.page = rec
+  state.elements = rec.items
+  state.reviews = rec.reviews
+  state.scanCount = 0
+}
+
+beforeEach(() => {
+  setLang('en')
+  seed()
+})
+afterEach(() => setLang('fr'))
+
+describe('mergeScan: a scan joins the images already known', () => {
+  it('numbers new images from the page counter and returns the renumbering for the boxes', () => {
+    const { added, map } = mergeScan([info(7), info(8)])
+    expect(added).toBe(2)
+    expect(map).toEqual([{ from: 7, to: 1 }, { from: 8, to: 2 }])
+    expect(state.scanCount).toBe(1)
+    expect(state.elements.map((e) => [e.id, e.scan, e.present, e.key])).toEqual([
+      [1, 1, true, keyOf(info(7))],
+      [2, 1, true, keyOf(info(8))],
+    ])
+    expect(rec.nextId).toBe(3)
+  })
+
+  it('a second scan keeps ids, marks the missing image as gone and adds the new one with its scan number', () => {
+    mergeScan([info(1), info(2)])
+    const { added, map } = mergeScan([info(2, { alt: 'changed' }), info(3)])
+    expect(added).toBe(1)
+    expect(map).toEqual([{ from: 2, to: 2 }, { from: 3, to: 3 }])
+    const byId = Object.fromEntries(state.elements.map((e) => [e.id, e]))
+    expect(byId[1].present).toBe(false)
+    expect(byId[2]).toMatchObject({ present: true, scan: 1, alt: 'changed' })
+    expect(byId[3]).toMatchObject({ present: true, scan: 2 })
+    expect(state.scanCount).toBe(2)
+    // sorted by the scan they first appeared in, then by id
+    expect(state.elements.map((e) => e.id)).toEqual([1, 2, 3])
+  })
+
+  it('identical elements get their own key (~1, ~2...) and keep it from scan to scan', () => {
+    const twin = (id: number) => info(id, { src: 'https://x.test/same.png', html: '<img>', contextHtml: '<p><img></p>' })
+    mergeScan([twin(1), twin(2), twin(3)])
+    expect(state.elements.map((e) => e.key.split('~')[1] ?? '')).toEqual(['', '1', '2'])
+    const { added } = mergeScan([twin(1), twin(2), twin(3)])
+    expect(added).toBe(0)
+    expect(state.elements).toHaveLength(3)
+  })
+
+  it('pre-fills as decorative (1.2 compliant) an image hidden from assistive tech with no name, and only that', () => {
+    mergeScan([
+      info(1, { alt: '', accessibleName: null, ignoredBy: 'aria-hidden="true"' }),
+      info(2, { alt: 'Logo' }),
+      info(3, { accessibleName: null, alt: null, ignoredBy: null }),
+    ])
+    const [a, b, c] = state.elements
+    expect(state.reviews[a.key]).toEqual({ kind: 'decorative', answers: { '1.2': 'c' }, note: '', auto: true })
+    // the others only get the empty review that reviewOf creates on the way
+    expect(state.reviews[b.key]).toEqual({ answers: {}, note: '' })
+    expect(state.reviews[c.key]).toEqual({ answers: {}, note: '' })
+  })
+
+  it('prefill never overwrites an answer the auditor gave', () => {
+    const el = { ...info(1, { alt: '', accessibleName: null, ignoredBy: 'aria-hidden="true"' }), key: 'k', present: true, scan: 1 } as Item
+    state.reviews.k = { kind: 'informative', answers: {}, note: '' }
+    prefill(el)
+    expect(state.reviews.k).toEqual({ kind: 'informative', answers: {}, note: '' })
+    state.reviews.k = { kind: 'decorative', answers: { '1.2': 'nc' }, note: '' }
+    prefill(el)
+    expect(state.reviews.k.answers['1.2']).toBe('nc')
+    state.reviews.k = { kind: 'decorative', answers: {}, note: '' } // decorative, no verdict yet: filled
+    prefill(el)
+    expect(state.reviews.k).toMatchObject({ answers: { '1.2': 'c' }, auto: true })
+  })
+})
+
+describe('mergeFindings: a theme scan joins the findings already known', () => {
+  const frames = [raw({ id: 1, type: 'iframe', facts: { title: 'Carte' }, html: '<iframe title="Carte">' }), raw({ id: 2, type: 'iframe', facts: { title: null }, html: '<iframe>' })]
+
+  it('keys findings per theme, pre-fills the verdicts from the markup and records the theme as scanned', () => {
+    expect(keyOfFinding(2, frames[0])).toMatch(/^2\|iframe\|\|/)
+    const { added, map } = mergeFindings(2, frames)
+    expect(added).toBe(2)
+    expect(map).toEqual([{ from: 1, to: 1 }, { from: 2, to: 2 }])
+    expect(rec.scannedThemes).toContain(2)
+    expect(rec.findings.map((f) => [f.id, f.theme, f.present])).toEqual([[1, 2, true], [2, 2, true]])
+    const [ok, bad] = rec.findings
+    expect(rec.findingReviews[ok.key]).toMatchObject({ answers: { '2.1': 'c' }, auto: true })
+    expect(rec.findingReviews[bad.key]).toMatchObject({ answers: { '2.1': 'nc' }, auto: true })
+  })
+
+  it('a rescan keeps ids and answers; a finding that went away is dropped unless a human worked on it', () => {
+    mergeFindings(2, frames)
+    const [first, second] = [...rec.findings]
+    rec.findingReviews[first.key].auto = false
+    rec.findingReviews[first.key].note = 'my note'
+    const { added } = mergeFindings(2, [raw({ id: 1, type: 'iframe', facts: { title: 'Autre' }, html: '<iframe title="Autre">', contextHtml: '<section><iframe title="Autre"></section>' })])
+    expect(added).toBe(1)
+    // the second one (never touched by a human) is gone from the audit, the first one stays but is no longer present
+    expect(rec.findings.find((f) => f.key === second.key)).toBeUndefined()
+    expect(rec.findingReviews[second.key]).toBeUndefined()
+    expect(rec.findings.find((f) => f.key === first.key)).toMatchObject({ present: false, id: 1 })
+    expect(rec.findingReviews[first.key].note).toBe('my note')
+    // the new one is numbered while the vanished #2 still exists (it is dropped afterwards), so the numbering has a gap: 1, 3
+    expect(rec.findings.find((f) => f.html.includes('Autre'))!.id).toBe(3)
+  })
+
+  it('nextFindingNumber is one more than the highest in use, per theme', () => {
+    mergeFindings(2, frames)
+    expect(nextFindingNumber(rec, 2)).toBe(3)
+    expect(nextFindingNumber(rec, 6)).toBe(1)
+  })
+
+  it('Colours: the passing line is unnumbered (0), problems run 1, 2, 3 and get their contrast note', () => {
+    const failing = raw({ type: 'contrast-fail', id: 5, label: '“Texte pâle”', summary: 'x', data: { fg: '#bbbbbb', bg: '#ffffff', large: false } })
+    const passing = raw({ type: 'contrast-ok', id: 9, label: 'ok', summary: '4 text element(s) · 2 colour pair(s)' })
+    mergeFindings(3, [passing, failing])
+    expect(rec.findings.map((f) => [f.type, f.id])).toEqual([['contrast-ok', 0], ['contrast-fail', 1]])
+    const fail = rec.findings.find((f) => f.type === 'contrast-fail') as FindingItem
+    const review = rec.findingReviews[fail.key]
+    expect(review.answers['3.2']).toBe('nc')
+    expect(review.note).toMatch(/Contrast too low: text #BBBBBB on #FFFFFF = 1\.9\d:1, normal text needs 4\.5:1/)
+    expect(review.autoNote).toBe(review.note)
+  })
+})
+
+describe('contrast checker maths', () => {
+  const f = (data: FindingItem['data']): FindingItem => ({ ...raw({ type: 'contrast-fail', data }), theme: 3, key: 'k', present: true, scan: 1 })
+
+  it('contrastOutcome reads the colours of the script, the hand-set ones win, and a bad hex gives nothing', () => {
+    const out = contrastOutcome(f({ fg: '#000000', bg: '#ffffff' }), { answers: {}, note: '' })!
+    expect(out.ratio).toBeCloseTo(21, 5)
+    expect(out).toMatchObject({ threshold: 4.5, ok: true, fg: '#000000', bg: '#FFFFFF', large: false })
+    const byHand = contrastOutcome(f({ fg: '#000000', bg: '#ffffff' }), { answers: {}, note: '', fg: '#cccccc' })!
+    expect(byHand.ok).toBe(false)
+    expect(contrastOutcome(f({ fg: 'nope', bg: '#ffffff' }), { answers: {}, note: '' })).toBeNull()
+    expect(contrastOutcome(f({}), { answers: {}, note: '' })).toBeNull()
+  })
+
+  it('large text needs 3:1 and an explicit threshold wins', () => {
+    expect(contrastOutcome(f({ fg: '#777777', bg: '#ffffff', large: true }), { answers: {}, note: '' })).toMatchObject({ threshold: 3, ok: true, large: true })
+    expect(contrastOutcome(f({ fg: '#777777', bg: '#ffffff', large: true, threshold: 7 }), { answers: {}, note: '' })).toMatchObject({ threshold: 7, ok: false })
+  })
+
+  it('applyContrastVerdict writes the verdict and a note, replacing only a note the checker wrote itself', () => {
+    const finding = f({ fg: '#bbbbbb', bg: '#ffffff' })
+    const review: ImageReview = { answers: {}, note: '', auto: true }
+    applyContrastVerdict(finding, review, true)
+    expect(review.answers['3.2']).toBe('nc')
+    expect(review.auto).toBe(false)
+    expect(review.note).toMatch(/^Contrast too low/)
+    expect(review.autoNote).toBe(review.note)
+    // the auditor edits the note: the checker leaves it alone
+    review.note = 'my words'
+    review.fg = '#000000'
+    applyContrastVerdict(finding, review, true)
+    expect(review.answers['3.2']).toBe('c')
+    expect(review.note).toBe('my words')
+    // the note is the checker's own again: a passing ratio clears it
+    review.note = review.autoNote!
+    applyContrastVerdict(finding, review, true)
+    expect(review.note).toBe('')
+    expect(review.autoNote).toBeUndefined()
+  })
+
+  it('applyContrastVerdict without setVerdict only touches the note', () => {
+    const review: ImageReview = { answers: {}, note: '' }
+    applyContrastVerdict(f({ fg: '#bbbbbb', bg: '#ffffff' }), review, false)
+    expect(review.answers).toEqual({})
+    expect(review.note).toMatch(/^Contrast too low/)
+  })
+})
