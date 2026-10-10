@@ -2840,8 +2840,10 @@ async function runAutoChecks(): Promise<void> {
   autoBtn.disabled = true
   keepScroll(checksEl, renderChecks)
   say(t('Running the automatic checks on the page…'))
+  let step = 'rules'
   try {
     const own = await sendToPage(inspectedTabId(), { type: 'RGAA_RULES_RUN' })
+    step = 'axe'
     const response = await chrome.runtime.sendMessage({ type: 'RGAA_AXE', tabId: inspectedTabId(), locale: getLang() === 'fr' ? axeFrench : null })
     if (!response || response.error) throw new Error(response?.error ?? 'no response')
     const results = fromAxe(response)
@@ -2855,7 +2857,8 @@ async function runAutoChecks(): Promise<void> {
     renderAll()
     say(t('Automatic checks on {label}: {n} rule(s) failed, {set} verdict(s) pre-filled, {noted} element note(s). Confirm them in the themes.', { label: pageLabel(rec), n: results.violations.length + (own.findings ?? []).filter((f: RuleFinding) => RULES[f.key]?.status === 'nc').length, set: report.set + ownReport.set, noted: report.noted + ownReport.noted }))
   } catch (err) {
-    say(t('Could not run the automatic checks. Reload the tab, check the extension may access this site, and try again.'))
+    const reason = `${step}: ${String((err as Error)?.message ?? err).replace(/^Error: /, '')}`
+    say(t('Could not run the automatic checks ({reason}). Reload the page (F5) if you just reloaded the extension, check the extension may access this site, then try again.', { reason }))
     console.error(err)
   } finally {
     axeRunning = false

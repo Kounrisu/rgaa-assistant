@@ -1243,7 +1243,8 @@ function runAsqatasunRules(): { key: string; count: number; samples?: string[]; 
 
 /** Runs the axe engine (injected by the background page just before) and sends back a light copy of its findings. */
 async function runAxe(locale: unknown): Promise<Record<string, unknown>> {
-  const axe = (globalThis as unknown as { axe?: { run: (ctx: Document, opts: object) => Promise<Record<string, unknown>>; configure: (c: object) => void } }).axe
+  type AxeApi = { run: (ctx: Document, opts: object) => Promise<Record<string, unknown>>; configure: (c: object) => void }
+  const axe = ((globalThis as unknown as { axe?: AxeApi }).axe ?? (window as unknown as { axe?: AxeApi }).axe) as AxeApi | undefined
   if (!axe) return { error: 'axe-not-loaded' }
   try {
     if (locale) axe.configure({ locale })
