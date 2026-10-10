@@ -103,6 +103,8 @@ export interface ManualCheckAnswer {
 }
 
 export interface PageRecord {
+  /** What the last scans did not look at (frames, shadow roots) and where they cut a list. */
+  scanCoverage?: import('./scan-coverage').ScanCoverage
   id: string
   url: string
   title: string
