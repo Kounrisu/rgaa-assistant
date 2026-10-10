@@ -2,7 +2,9 @@ import { OUTCOME_LABEL, type CriterionResult, type Outcome, type Theme1Results, 
 import { CRITERION_LEVEL, THEME_LABEL, type Level } from './themes'
 import type { Thumb } from './thumbs'
 import { buildXlsx, type CellInput, type Sheet } from './xlsx'
-import type { AuditMeta, ChecklistAnswer, Detected, FindingItem, ImageElementInfo, ImageReview } from './types'
+import { tFr } from './i18n'
+import { MANUAL_CHECKS } from './manual-checks'
+import type { AuditMeta, ChecklistAnswer, Detected, FindingItem, ImageElementInfo, ImageReview, ManualCheckAnswer } from './types'
 
 type Status = 'C' | 'NC' | 'NA' | 'NT'
 const STATUS: Record<Outcome, Status> = { c: 'C', nc: 'NC', na: 'NA', pending: 'NT', unassessed: 'NT' }
@@ -29,6 +31,7 @@ export interface PageInput {
   detectedOf: (el: ImageElementInfo) => Detected
   pageUrl: string
   pageTitle: string
+  manualChecks?: Record<string, ManualCheckAnswer>
 }
 
 const head = (labels: string[]): CellInput[] => labels.map((v) => ({ v, s: 'head' as const }))
@@ -414,6 +417,24 @@ export function imagesSheet(pages: PageInput[]): Sheet {
   return { name: 'Détail par image', widths: [7, 6, 13, 14, 40, 30, 30, 50, 22, 7, 7, 7, 7, 7, 7, 7, 45], rows, freezeRow: 3 }
 }
 
+export function manualSheet(pages: PageInput[]): Sheet {
+  const rows: CellInput[][] = [title('Contrôles manuels (clavier, zoom, lecteur d’écran…)'), [], head(['Page', 'Groupe', 'Contrôle', 'Critères RGAA concernés', 'Résultat', 'Remarque'])]
+  for (const page of pages) {
+    for (const c of MANUAL_CHECKS) {
+      const a = page.manualChecks?.[c.id]
+      rows.push([
+        { v: page.label, s: 'crit' },
+        { v: tFr(c.group), s: 'wrap' },
+        { v: tFr(c.text), s: 'wrap' },
+        c.criteria.join(', '),
+        a ? (a.state === 'ok' ? { v: 'OK', s: 'C' as const } : { v: 'Problème', s: 'NC' as const }) : { v: 'À faire', s: 'default' as const },
+        { v: a?.note ?? '', s: 'wrap' },
+      ])
+    }
+  }
+  return { name: 'Contrôles manuels', widths: [7, 18, 70, 18, 11, 50], rows, freezeRow: 3 }
+}
+
 export function findingsSheet(pages: PageInput[]): Sheet {
   const rows: CellInput[][] = [
     title('Détail des éléments – cadres et couleurs'),
@@ -446,7 +467,7 @@ export function findingsSheet(pages: PageInput[]): Sheet {
 }
 
 /** The sheets of one page: what the "Page results" view shows. */
-export const pageSheets = (page: PageInput): Sheet[] => [gridSheet(page), summarySheet([page]), testsSheet([page]), imagesSheet([page]), ...(page.findings.length ? [findingsSheet([page])] : [])]
+export const pageSheets = (page: PageInput): Sheet[] => [gridSheet(page), summarySheet([page]), testsSheet([page]), imagesSheet([page]), ...(page.findings.length ? [findingsSheet([page])] : []), ...(page.manualChecks && Object.keys(page.manualChecks).length ? [manualSheet([page])] : [])]
 
 /** The sheets of the whole audit: what the "Audit" view shows and the .xlsx contains. */
 export const auditSheets = (pages: PageInput[], meta: AuditMeta): Sheet[] => [
@@ -458,6 +479,7 @@ export const auditSheets = (pages: PageInput[], meta: AuditMeta): Sheet[] => [
   testsSheet(pages),
   imagesSheet(pages),
   ...(pages.some((p) => p.findings.length) ? [findingsSheet(pages)] : []),
+  ...(pages.some((p) => p.manualChecks && Object.keys(p.manualChecks).length) ? [manualSheet(pages)] : []),
 ]
 
 /** Embeds the image previews (when available) and writes the .xlsx. */

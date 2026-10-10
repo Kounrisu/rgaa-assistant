@@ -36,6 +36,9 @@ export function t(en: string, params?: Record<string, string | number>): string 
   return params ? text.replace(/\{(\w+)\}/g, (_, k: string) => (k in params ? String(params[k]) : `{${k}}`)) : text
 }
 
+/** The French text whatever the language chosen: the Excel grid is always in French. */
+export const tFr = (en: string): string => FR[en] ?? en
+
 /** Plural by count: `plural(n, 'image', 'images')` is language-independent in form, `n` is added by the caller. */
 export const plural = (n: number, one: string, many: string): string => t(n === 1 ? one : many)
 

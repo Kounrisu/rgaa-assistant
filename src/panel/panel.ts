@@ -7,6 +7,8 @@ import { makeThumbs } from '../lib/thumbs'
 import { computeThemes, testIdFor, type Outcome } from '../lib/results'
 import { colorOf } from '../lib/theme-colors'
 import { contrastRatio, parseHex, toHex } from '../lib/contrast'
+import { MANUAL_CHECKS, MANUAL_GROUPS } from '../lib/manual-checks'
+import { applyToolResults, parseToolFile } from '../lib/axe-import'
 import { FINDING_CRITERIA, findingCriterionIds, hintForFinding, suggestFinding, type FindingCriterion } from '../lib/findings'
 import { FINDING_THEMES, SCANNED_THEMES, THEMES, THEME_LABEL, themeByNumber } from '../lib/themes'
 import type { Audit, AuditItem, AuditSummary, ChecklistVerdict, Detected, FindingItem, ImageElementInfo, ImageKind, ImageReview, PageRecord, RawFinding, Verdict } from '../lib/types'
@@ -1032,6 +1034,7 @@ function pageInput(rec: PageRecord): PageInput {
     detectedOf,
     pageUrl: rec.url,
     pageTitle: rec.title || rec.url,
+    manualChecks: rec.manualChecks,
   }
 }
 
@@ -1095,7 +1098,7 @@ function switchTo(id: string, navigate = false): void {
   const rec = audit.pages.find((p) => p.id === id)
   if (!rec) return
   if (rec !== page) loadPage(rec)
-  setView(view === 'sample' || view === 'audit' || view === 'audits' ? 'review' : view)
+  setView(['sample', 'audit', 'audits', 'checks'].includes(view) ? 'review' : view)
   renderAll()
   persist()
   const label = pageLabel(rec)
@@ -1225,7 +1228,7 @@ resetPageBtn.addEventListener('click', () => resetPage())
 /* Views: review | page results | audit overview                        */
 /* ------------------------------------------------------------------ */
 
-type View = 'review' | 'page' | 'audit' | 'sample' | 'audits'
+type View = 'review' | 'page' | 'audit' | 'sample' | 'audits' | 'checks'
 let view: View = 'review'
 
 function setView(next: View): void {
@@ -1234,6 +1237,8 @@ function setView(next: View): void {
   auditEl.hidden = next !== 'audit'
   sampleEl.hidden = next !== 'sample'
   auditsEl.hidden = next !== 'audits'
+  checksEl.hidden = next !== 'checks'
+  checksBtn.setAttribute('aria-pressed', String(next === 'checks'))
   const imagesTheme = theme === 1
   appEl.hidden = next !== 'review' || !imagesTheme || !elements.length
   emptyEl.hidden = next !== 'review' || !imagesTheme || elements.length > 0
@@ -1252,6 +1257,7 @@ function setView(next: View): void {
   if (next === 'audit') renderAudit()
   if (next === 'sample') renderSample()
   if (next === 'audits') void renderAuditsView()
+  if (next === 'checks') renderChecks()
   renderAuditBar()
 }
 
@@ -1262,6 +1268,7 @@ function setScanned(): void {
   boxesBtn.disabled = !has && !(page?.findings.length)
   resultsBtn.disabled = !has
   auditBtn.disabled = !audit.pages.length
+  checksBtn.disabled = !page
   scanBtn.disabled = !page
   setView(view === 'page' && !has ? 'review' : view)
 }
@@ -1412,6 +1419,8 @@ function renderChecklist(host: HTMLElement = themeEl): void {
         checked: answer.verdict === value,
         onclick: () => {
           answer.verdict = value
+          delete answer.source
+          card.querySelector('.source-note')?.remove()
           card.dataset.state = value
           persist()
           renderThemeBar()
@@ -1431,6 +1440,7 @@ function renderChecklist(host: HTMLElement = themeEl): void {
       ),
       h('p', { class: 'question' }, c.title.replace(/`/g, '')),
       h('p', { class: 'hint info' }, c.note),
+      ...(answer.source ? [h('p', { class: 'hint info source-note' }, t('Pre-filled from {tool}: confirm it or change it.', { tool: answer.source }))] : []),
       h(
         'details',
         { class: 'tests-detail' },
@@ -2667,6 +2677,126 @@ document.addEventListener('keydown', (event) => {
 
 window.addEventListener('error', (event) => say(t('Panel error: {message}', { message: event.message })))
 window.addEventListener('unhandledrejection', (event) => say(t('Panel error: {message}', { message: String(event.reason) })))
+
+/* ------------------------------------------------------------------ */
+/* Manual checks and import of other tools' results (per page)           */
+/* ------------------------------------------------------------------ */
+
+const checksEl = $('checks')
+const checksBtn = $<HTMLButtonElement>('checks-btn')
+const toolInput = $<HTMLInputElement>('tool-file')
+
+function manualProgress(rec: PageRecord): { done: number; issues: number; total: number } {
+  const answers = Object.values(rec.manualChecks ?? {})
+  return { done: answers.length, issues: answers.filter((a) => a.state === 'issue').length, total: MANUAL_CHECKS.length }
+}
+
+function renderChecks(): void {
+  checksEl.replaceChildren()
+  if (!page) return
+  const rec = page
+  rec.manualChecks ??= {}
+  const progress = manualProgress(rec)
+  const sample = '{\n  "tool": "Asqatasun",\n  "url": "https://example.org/page",\n  "results": [\n    { "criterion": "6.1", "status": "nc", "note": "Lien « en savoir plus » ambigu" },\n    { "criterion": "8.5", "status": "c" }\n  ]\n}'
+  const body = h('div', { class: 'checks-body' })
+
+  for (const group of MANUAL_GROUPS) {
+    const card = h('div', { class: 'card' }, h('h3', {}, t(group)))
+    for (const c of MANUAL_CHECKS.filter((x) => x.group === group)) {
+      const answer = rec.manualChecks![c.id]
+      const set = (state: 'todo' | 'ok' | 'issue') => {
+        if (state === 'todo') delete rec.manualChecks![c.id]
+        else rec.manualChecks![c.id] = { state, note: answer?.note ?? '' }
+        persist()
+        keepScroll(checksEl, renderChecks)
+      }
+      const radio = (value: 'todo' | 'ok' | 'issue', label: string) => [
+        h('input', { type: 'radio', name: `mc-${c.id}`, id: `mc-${c.id}-${value}`, checked: (answer?.state ?? 'todo') === value, onclick: () => set(value) }),
+        h('label', { for: `mc-${c.id}-${value}` }, label),
+      ]
+      card.append(
+        h(
+          'div',
+          { class: 'check-row', 'data-state': answer?.state ?? '' },
+          h('p', { class: 'question' }, t(c.text)),
+          h('p', { class: 'hint-line' }, t('Feeds RGAA'), ' ', ...c.criteria.flatMap((id, i) => [i ? ', ' : '', h('a', { href: criterionUrl(id), target: '_blank', rel: 'noreferrer' }, id)])),
+          h('div', { class: 'verdicts' }, ...radio('todo', t('To do')), ...radio('ok', t('Checked, OK')), ...radio('issue', t('Problem found'))),
+          answer?.state === 'issue'
+            ? h('textarea', {
+                'aria-label': t('What is wrong, and where'),
+                placeholder: t('What is wrong, and where'),
+                value: answer.note,
+                oninput: (e: Event) => { answer.note = (e.target as HTMLTextAreaElement).value; persist() },
+              })
+            : null,
+        ),
+      )
+    }
+    body.append(card)
+  }
+
+  const reports = (rec.imports ?? []).slice().reverse()
+  checksEl.append(
+    h(
+      'div',
+      { class: 'results-head' },
+      h(
+        'div',
+        {},
+        h('h2', {}, t('Manual checks — {label}', { label: pageLabel(rec) })),
+        h('p', { class: 'hint-line' }, t('What a script cannot judge: do each check on the page, then tick it. {done}/{total} done, {issues} problem(s).', { done: progress.done, total: progress.total, issues: progress.issues })),
+      ),
+      h('div', { class: 'nav' }, h('button', { type: 'button', onclick: () => setView('review') }, t('← Back to review'))),
+    ),
+    h(
+      'div',
+      { class: 'card' },
+      h('h3', {}, t('Import the results of another tool')),
+      h('p', { class: 'hint-line' }, t('axe results (JSON) or a simple RGAA file. What the tool found becomes a pre-filled “non-compliant” to confirm; a tool that finds nothing never marks a criterion compliant.')),
+      h('div', { class: 'nav' }, h('button', { type: 'button', class: 'primary', onclick: () => toolInput.click() }, t('Import results (.json)'))),
+      h('details', {}, h('summary', {}, t('Accepted files')), h('p', { class: 'hint-line' }, t('axe: the JSON saved by axe DevTools (Export), or the object returned by axe.run(). Other tools (Asqatasun…): convert their result to this format, one line per criterion or test:')), h('pre', { class: 'code-sample' }, sample)),
+    ),
+    ...reports.map((r) =>
+      h(
+        'div',
+        { class: 'card' },
+        h('h3', {}, t('Import {tool} — {date}', { tool: r.tool, date: dateTimeOf(r.at) })),
+        h('p', { class: 'hint-line' }, t('{set} verdict(s) pre-filled, {noted} element note(s). {passes} passed rule(s) ignored, {incomplete} to check by hand.', { set: r.set, noted: r.noted, passes: r.passes, incomplete: r.incomplete })),
+        ...(r.conflicts.length ? [h('p', { class: 'hint warn' }, t('The tool disagrees with your answer:')), h('ul', { class: 'checks' }, ...r.conflicts.map((x) => h('li', {}, x)))] : []),
+        ...(r.unmatched.length ? [h('details', {}, h('summary', {}, t('{n} finding(s) not matched to a scanned element', { n: r.unmatched.length })), h('ul', { class: 'checks' }, ...r.unmatched.slice(0, 60).map((x) => h('li', {}, x))))] : []),
+        ...(r.unmapped.length ? [h('details', {}, h('summary', {}, t('{n} rule(s) with no RGAA criterion in this tool', { n: r.unmapped.length })), h('p', { class: 'hint-line' }, r.unmapped.slice(0, 80).join(' · ')))] : []),
+      ),
+    ),
+    body,
+  )
+}
+
+async function importToolFile(file: File): Promise<void> {
+  if (!page) return void say(t('Add a page first, then import its results.'))
+  let results
+  try {
+    results = parseToolFile(await file.text())
+  } catch (err) {
+    return void say((err as Error).message === 'not-json' ? t('This file is not valid JSON.') : t('This file is not axe results nor the simple RGAA format.'))
+  }
+  const rec = page
+  if (results.url && normalizeUrl(results.url) !== normalizeUrl(rec.url)) {
+    const ok = await askConfirm(t('These results are for another page'), t('The file says {url}, but {label} is registered for {registered}. Apply them to {label} anyway?', { url: results.url, label: pageLabel(rec), registered: rec.url }), t('Apply anyway'))
+    if (!ok) return void say(t('Import cancelled.'))
+  }
+  const report = applyToolResults(rec, results)
+  persist()
+  renderAll()
+  setView('checks')
+  say(t('{tool} results imported on {label}: {set} verdict(s) pre-filled, {noted} element note(s). Confirm them in the themes.', { tool: report.tool, label: pageLabel(rec), set: report.set, noted: report.noted }))
+}
+
+checksBtn.addEventListener('click', () => setView(view === 'checks' ? 'review' : 'checks'))
+toolInput.addEventListener('change', () => {
+  const file = toolInput.files?.[0]
+  toolInput.value = ''
+  if (file) void importToolFile(file)
+})
 
 /* ------------------------------------------------------------------ */
 /* Audits: name, saved state, list of audits, file save / reopen         */
