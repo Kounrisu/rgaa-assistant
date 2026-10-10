@@ -1,0 +1,734 @@
+{
+  "highlight images": {
+    "returned": true,
+    "response": {
+      "elements": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 2": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 3": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "contrast-ok",
+          "id": 0,
+          "label": "Text with sufficient contrast",
+          "summary": "2 text element(s) · 1 colour pair(s)",
+          "facts": {
+            "Text elements checked": "2",
+            "Sufficient contrast": "2",
+            "To review (listed below)": "0",
+            "Not listed (limit)": null
+          },
+          "html": "",
+          "contextHtml": "",
+          "count": 2,
+          "data": {
+            "humanNeeded": false,
+            "checked": 2,
+            "okCount": 2
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 5": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 6": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 9": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "page-no-h1",
+          "id": 1,
+          "label": "No h1",
+          "summary": "",
+          "facts": {},
+          "html": "",
+          "contextHtml": "",
+          "count": 0,
+          "data": {
+            "humanNeeded": true,
+            "group": "page",
+            "level": 0,
+            "badge": ""
+          }
+        },
+        {
+          "type": "page-no-main",
+          "id": 2,
+          "label": "No main landmark",
+          "summary": "",
+          "facts": {},
+          "html": "",
+          "contextHtml": "",
+          "count": 0,
+          "data": {
+            "humanNeeded": true,
+            "group": "page",
+            "level": 0,
+            "badge": ""
+          }
+        },
+        {
+          "type": "heading",
+          "id": 3,
+          "label": "“Seulement un h2”",
+          "summary": "h2",
+          "facts": {
+            "Level": "h2",
+            "Text": "Seulement un h2",
+            "Previous level": null,
+            "Visibility": null,
+            "Element": "<h2>"
+          },
+          "html": "<h2>Seulement un h2</h2>",
+          "contextHtml": "<div><h2 data-rgaa-target=\"\">Seulement un h2</h2><p>Texte.</p></div>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "heading",
+            "level": 2,
+            "badge": "h2",
+            "hidden": null
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 11": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "rules run": {
+    "returned": true,
+    "response": {
+      "url": "https://page.test/start",
+      "findings": [
+        {
+          "key": "no-media",
+          "count": 0
+        },
+        {
+          "key": "no-table",
+          "count": 0
+        },
+        {
+          "key": "no-form",
+          "count": 0
+        },
+        {
+          "key": "no-button",
+          "count": 0
+        },
+        {
+          "key": "no-link",
+          "count": 0
+        },
+        {
+          "key": "asq:8.4.1-relevance",
+          "count": 1,
+          "detail": "fr",
+          "asq": {
+            "criterion": "8.4",
+            "test": "8.4.1",
+            "status": "review",
+            "text": "RGAA 8.4.1: the language code is valid ({detail}): check that it is the language of the page."
+          }
+        },
+        {
+          "key": "asq:8.6.1",
+          "count": 1,
+          "detail": "Sans main",
+          "asq": {
+            "criterion": "8.6",
+            "test": "8.6.1",
+            "status": "review",
+            "text": "RGAA 8.6.1: check that the page title ({detail}) is relevant."
+          }
+        },
+        {
+          "key": "asq:9.1.2",
+          "count": 1,
+          "samples": [
+            "h2"
+          ],
+          "asq": {
+            "criterion": "9.1",
+            "test": "9.1.2",
+            "status": "review",
+            "text": "RGAA 9.1.2: {n} heading(s): check that each one is relevant. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:9.2.1-main",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no visible <main> element."
+          }
+        },
+        {
+          "key": "asq:9.2.1-header",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no <header> element outside <article> and <section>."
+          }
+        },
+        {
+          "key": "asq:9.2.1-footer",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no <footer> element outside <article> and <section>."
+          }
+        },
+        {
+          "key": "asq:9.2.1-nav",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no <nav> element."
+          }
+        },
+        {
+          "key": "asq:na:2.1",
+          "count": 0,
+          "asq": {
+            "criterion": "2.1",
+            "test": "2.1.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:2.2",
+          "count": 0,
+          "asq": {
+            "criterion": "2.2",
+            "test": "2.2.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.1",
+          "count": 0,
+          "asq": {
+            "criterion": "4.1",
+            "test": "4.1.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.2",
+          "count": 0,
+          "asq": {
+            "criterion": "4.2",
+            "test": "4.2.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.3",
+          "count": 0,
+          "asq": {
+            "criterion": "4.3",
+            "test": "4.3.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.4",
+          "count": 0,
+          "asq": {
+            "criterion": "4.4",
+            "test": "4.4.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.5",
+          "count": 0,
+          "asq": {
+            "criterion": "4.5",
+            "test": "4.5.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.6",
+          "count": 0,
+          "asq": {
+            "criterion": "4.6",
+            "test": "4.6.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.7",
+          "count": 0,
+          "asq": {
+            "criterion": "4.7",
+            "test": "4.7.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.8",
+          "count": 0,
+          "asq": {
+            "criterion": "4.8",
+            "test": "4.8.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.9",
+          "count": 0,
+          "asq": {
+            "criterion": "4.9",
+            "test": "4.9.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.11",
+          "count": 0,
+          "asq": {
+            "criterion": "4.11",
+            "test": "4.11.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.12",
+          "count": 0,
+          "asq": {
+            "criterion": "4.12",
+            "test": "4.12.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.13",
+          "count": 0,
+          "asq": {
+            "criterion": "4.13",
+            "test": "4.13.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:11.11",
+          "count": 0,
+          "asq": {
+            "criterion": "11.11",
+            "test": "11.11.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:11.12",
+          "count": 0,
+          "asq": {
+            "criterion": "11.12",
+            "test": "11.12.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:11.13",
+          "count": 0,
+          "asq": {
+            "criterion": "11.13",
+            "test": "11.13.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:13.3",
+          "count": 0,
+          "asq": {
+            "criterion": "13.3",
+            "test": "13.3.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:13.4",
+          "count": 0,
+          "asq": {
+            "criterion": "13.4",
+            "test": "13.4.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:pass:8.1",
+          "count": 0,
+          "detail": "<!DOCTYPE html>",
+          "asq": {
+            "criterion": "8.1",
+            "test": "8.1.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:8.3",
+          "count": 0,
+          "asq": {
+            "criterion": "8.3",
+            "test": "8.3.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:8.5",
+          "count": 0,
+          "asq": {
+            "criterion": "8.5",
+            "test": "8.5.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:10.1",
+          "count": 0,
+          "asq": {
+            "criterion": "10.1",
+            "test": "10.1.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "skip-link-missing",
+          "count": 1
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "snapshot": {
+    "returned": true,
+    "response": {
+      "url": "https://page.test/start",
+      "title": "Sans main",
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      },
+      "html": "<!DOCTYPE html>\n<html lang=\"fr\" data-rgaa-instance=\"X\"><head><meta charset=\"utf-8\"><title>Sans main</title></head>\n<body><div><h2>Seulement un h2</h2><p>Texte.</p></div>\n\n</body></html>"
+    }
+  },
+  "overlay after scans": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"3\" data-badge=\"h2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">3 · h2</span></div></div>"
+  ],
+  "states theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "states theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay options": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "focus image 1": {
+    "returned": true,
+    "response": {
+      "ok": false
+    }
+  },
+  "focus link 2": {
+    "returned": true,
+    "response": {
+      "ok": false
+    }
+  },
+  "focus unknown": {
+    "returned": true,
+    "response": {
+      "ok": false
+    }
+  },
+  "show only theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "show only theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "locate": {
+    "returned": true,
+    "response": {
+      "rect": null
+    }
+  },
+  "locate unknown": {
+    "returned": true,
+    "response": {
+      "rect": null
+    }
+  },
+  "scroll restore": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "unfocus": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "relabel theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "relabel theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay options 2": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "tool reveal on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 0
+    }
+  },
+  "tool tables on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 0
+    }
+  },
+  "tool taborder on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 0
+    }
+  },
+  "overlay after interactions": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"3\" data-badge=\"h2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">3 · h2</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-tools\" style=\"position: absolute; top: 0px; left: 0px; width: 0px; height: 0px; z-index: 2147483645; pointer-events: none;\"><div data-tool=\"tables\"></div><div data-tool=\"taborder\"></div></div>"
+  ],
+  "tools reset": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "pick cancel": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "unknown message": {},
+  "clear theme 3": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "clear theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay after clear themes": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"3\" data-badge=\"h2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">3 · h2</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-tools\" style=\"position: absolute; top: 0px; left: 0px; width: 0px; height: 0px; z-index: 2147483645; pointer-events: none;\"></div>"
+  ],
+  "clear highlights": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay after clear all": []
+}

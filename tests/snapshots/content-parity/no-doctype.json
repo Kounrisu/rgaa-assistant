@@ -1,0 +1,993 @@
+{
+  "highlight images": {
+    "returned": true,
+    "response": {
+      "elements": [
+        {
+          "id": 1,
+          "tag": "img",
+          "type": "img",
+          "src": "https://page.test/z.png",
+          "thumb": "https://page.test/z.png",
+          "alt": null,
+          "ariaLabel": null,
+          "labelledByText": null,
+          "title": null,
+          "svgTitle": null,
+          "accessibleName": null,
+          "ignoredBy": null,
+          "role": null,
+          "ariaHidden": false,
+          "inDialog": false,
+          "nearbyText": "Sans doctype\n\nLien\n\nab\n\n\n1",
+          "isInsideLink": false,
+          "linkHref": null,
+          "linkText": null,
+          "figcaption": null,
+          "naturalWidth": 0,
+          "naturalHeight": 0,
+          "html": "<img src=\"z.png\">",
+          "contextHtml": "<body>\n<h1>Sans doctype</h1>\n<img src=\"z.png\" data-rgaa-target=\"\">\n<a href=\"/x\" target=\"_blank\">Lien</a>\n<input type=\"text\" name=\"email\">\n<table><tbody><tr><td>a</td></tr><tr><td>b</td></tr></tbody></table>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"1\" data-alt=\"no alternative\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">1</span></div></div></body>",
+          "deterministic": {
+            "altMissing": true,
+            "altEmpty": false,
+            "altMatchesFilenamePattern": false,
+            "ariaHidden": false
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 2": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 3": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "contrast-ok",
+          "id": 0,
+          "label": "Text with sufficient contrast",
+          "summary": "4 text element(s) · 2 colour pair(s)",
+          "facts": {
+            "Text elements checked": "4",
+            "Sufficient contrast": "4",
+            "To review (listed below)": "0",
+            "Not listed (limit)": null
+          },
+          "html": "",
+          "contextHtml": "",
+          "count": 4,
+          "data": {
+            "humanNeeded": false,
+            "checked": 4,
+            "okCount": 4
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 5": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "table-nohead",
+          "id": 1,
+          "label": "table 2×1",
+          "summary": "2 rows × 1 columns · 0 header cell(s)",
+          "facts": {
+            "Rows": "2",
+            "Columns": "1",
+            "Header cells (th)": "0",
+            "Title": null,
+            "Summary": null,
+            "role": null,
+            "Visibility": null,
+            "Element": "<table>"
+          },
+          "html": "<table>ab</table>",
+          "contextHtml": "<body>\n<h1>Sans doctype</h1>\n<img src=\"z.png\">\n<a href=\"/x\" target=\"_blank\">Lien</a>\n<input type=\"text\" name=\"email\">\n<table data-rgaa-target=\"\"><tbody><tr><td>a</td></tr><tr><td>b</td></tr></tbody></table>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"1\" data-alt=\"no alternative\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">1</span></div></div></body>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "hasTitle": false,
+            "hasHeaders": false,
+            "layout": false,
+            "hidden": null
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 6": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "link-generic",
+          "id": 1,
+          "label": "“Lien”",
+          "summary": "/x",
+          "facts": {
+            "Text": "Lien",
+            "Accessible name": "Lien",
+            "href": "/x",
+            "target": "_blank",
+            "title": null,
+            "aria-label": null,
+            "Occurrences": null,
+            "Skip link": null,
+            "Visibility": null,
+            "Element": "<a>"
+          },
+          "html": "<a href=\"/x\" target=\"_blank\">Lien</a>",
+          "contextHtml": "<body>\n<h1>Sans doctype</h1>\n<img src=\"z.png\">\n<a href=\"/x\" target=\"_blank\" data-rgaa-target=\"\">Lien</a>\n<input type=\"text\" name=\"email\">\n<table><tbody><tr><td>a</td></tr><tr><td>b</td></tr></tbody></table>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"1\" data-alt=\"no alternative\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">1</span></div></div><div id=\"rgaa-assistant-overlay-t5\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 248px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">1</span></div></div></body>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "reason": "generic",
+            "hidden": null
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 9": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "page-no-main",
+          "id": 1,
+          "label": "No main landmark",
+          "summary": "",
+          "facts": {},
+          "html": "",
+          "contextHtml": "",
+          "count": 0,
+          "data": {
+            "humanNeeded": true,
+            "group": "page",
+            "level": 0,
+            "badge": ""
+          }
+        },
+        {
+          "type": "heading",
+          "id": 2,
+          "label": "“Sans doctype”",
+          "summary": "h1",
+          "facts": {
+            "Level": "h1",
+            "Text": "Sans doctype",
+            "Previous level": null,
+            "Visibility": null,
+            "Element": "<h1>"
+          },
+          "html": "<h1>Sans doctype</h1>",
+          "contextHtml": "<body>\n<h1 data-rgaa-target=\"\">Sans doctype</h1>\n<img src=\"z.png\">\n<a href=\"/x\" target=\"_blank\">Lien</a>\n<input type=\"text\" name=\"email\">\n<table><tbody><tr><td>a</td></tr><tr><td>b</td></tr></tbody></table>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"1\" data-alt=\"no alternative\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">1</span></div></div><div id=\"rgaa-assistant-overlay-t5\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 248px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">1</span></div></div><div id=\"rgaa-assistant-overlay-t6\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">1</span></div></div></body>",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "heading",
+            "level": 1,
+            "badge": "h1",
+            "hidden": null
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 11": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "field-nolabel",
+          "id": 1,
+          "label": "<input> without label",
+          "summary": "text",
+          "facts": {
+            "Type": "text",
+            "Accessible name": null,
+            "Name comes from": null,
+            "Autocomplete": null,
+            "Required": null,
+            "name": "email",
+            "Visibility": null,
+            "Element": "<input>"
+          },
+          "html": "<input type=\"text\" name=\"email\">",
+          "contextHtml": "<body>\n<h1>Sans doctype</h1>\n<img src=\"z.png\">\n<a href=\"/x\" target=\"_blank\">Lien</a>\n<input type=\"text\" name=\"email\" data-rgaa-target=\"\">\n<table><tbody><tr><td>a</td></tr><tr><td>b</td></tr></tbody></table>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"1\" data-alt=\"no alternative\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">1</span></div></div><div id=\"rgaa-assistant-overlay-t5\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 248px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">1</span></div></div><div id=\"rgaa-assistant-overlay-t6\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">1</span></div></div><div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events …",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "personal": true,
+            "hasAutocomplete": false,
+            "hidden": null
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "rules run": {
+    "returned": true,
+    "response": {
+      "url": "https://page.test/start",
+      "findings": [
+        {
+          "key": "target-blank",
+          "count": 1,
+          "samples": [
+            "a"
+          ]
+        },
+        {
+          "key": "autocomplete",
+          "count": 1,
+          "samples": [
+            "input"
+          ]
+        },
+        {
+          "key": "no-media",
+          "count": 0
+        },
+        {
+          "key": "table-no-th",
+          "count": 1,
+          "samples": [
+            "table"
+          ]
+        },
+        {
+          "key": "no-button",
+          "count": 0
+        },
+        {
+          "key": "generic-title",
+          "count": 1,
+          "detail": "untitled"
+        },
+        {
+          "key": "asq:10.9.2",
+          "count": 1,
+          "samples": [
+            "img"
+          ],
+          "asq": {
+            "criterion": "10.9",
+            "test": "10.9.2",
+            "status": "review",
+            "text": "RGAA 10.9.2: {n} image(s) found: check that no information is given by shape, size or position alone. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:10.10.2",
+          "count": 1,
+          "samples": [
+            "img"
+          ],
+          "asq": {
+            "criterion": "10.10",
+            "test": "10.10.2",
+            "status": "review",
+            "text": "RGAA 10.10.2: {n} image(s) found: check that the way shape, size or position convey information is relevant. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:11.10.5",
+          "count": 1,
+          "samples": [
+            "input"
+          ],
+          "asq": {
+            "criterion": "11.10",
+            "test": "11.10.5",
+            "status": "review",
+            "text": "RGAA 11.10.5: {n} form(s) or field(s): check that the instructions about the expected data type and format are visible and tied to the field. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:11.10.6",
+          "count": 1,
+          "samples": [
+            "input"
+          ],
+          "asq": {
+            "criterion": "11.10",
+            "test": "11.10.6",
+            "status": "review",
+            "text": "RGAA 11.10.6: {n} form(s) or field(s): check that error messages give the expected data type and format and name the field. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:11.10.7",
+          "count": 1,
+          "samples": [
+            "input"
+          ],
+          "asq": {
+            "criterion": "11.10",
+            "test": "11.10.7",
+            "status": "review",
+            "text": "RGAA 11.10.7: {n} form(s) or field(s): check that fields with aria-invalid=\"true\" give the expected data type and format in their label or associated text. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:11.11.1",
+          "count": 1,
+          "samples": [
+            "input"
+          ],
+          "asq": {
+            "criterion": "11.11",
+            "test": "11.11.1",
+            "status": "review",
+            "text": "RGAA 11.11.1: {n} form(s) or field(s): check that, after an input error, the data types and formats are suggested where needed. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:11.11.2",
+          "count": 1,
+          "samples": [
+            "input"
+          ],
+          "asq": {
+            "criterion": "11.11",
+            "test": "11.11.2",
+            "status": "review",
+            "text": "RGAA 11.11.2: {n} form(s) or field(s): check that, after an input error, examples of expected values are suggested where needed. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:11.12.1",
+          "count": 1,
+          "samples": [
+            "input"
+          ],
+          "asq": {
+            "criterion": "11.12",
+            "test": "11.12.1",
+            "status": "review",
+            "text": "RGAA 11.12.1: {n} form(s) or field(s): for forms that change or delete data, check that the user can undo, review or confirm. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:11.12.2",
+          "count": 1,
+          "samples": [
+            "input"
+          ],
+          "asq": {
+            "criterion": "11.12",
+            "test": "11.12.2",
+            "status": "review",
+            "text": "RGAA 11.12.2: {n} form(s) or field(s): for forms that change or delete financial, legal or personal data, check that deleted data can be recovered or that an explicit confirmation is asked. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:11.13.1",
+          "count": 1,
+          "samples": [
+            "input"
+          ],
+          "asq": {
+            "criterion": "11.13",
+            "test": "11.13.1",
+            "status": "review",
+            "text": "RGAA 11.13.1: {n} form(s) or field(s): check that the purpose of each field about the user can be deduced (autocomplete attribute). Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:13.7.1",
+          "count": 1,
+          "samples": [
+            "img"
+          ],
+          "asq": {
+            "criterion": "13.7",
+            "test": "13.7.1",
+            "status": "review",
+            "text": "RGAA 13.7.1: {n} image(s) or media element(s) found: check that none flashes or changes brightness abruptly. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:6.1.1",
+          "count": 1,
+          "samples": [
+            "a"
+          ],
+          "asq": {
+            "criterion": "6.1",
+            "test": "6.1.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} link(s): check that the link text, alone or with its context, tells where the link goes. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:8.1.1",
+          "count": 1,
+          "asq": {
+            "criterion": "8.1",
+            "test": "8.1.1",
+            "status": "nc",
+            "text": "RGAA 8.1.1: the page has no document type declaration (doctype)."
+          }
+        },
+        {
+          "key": "asq:8.3.1",
+          "count": 1,
+          "asq": {
+            "criterion": "8.3",
+            "test": "8.3.1",
+            "status": "nc",
+            "text": "RGAA 8.3.1: the default language of the page is not declared (no lang attribute on <html>, nor on any element)."
+          }
+        },
+        {
+          "key": "asq:8.6.1-fail",
+          "count": 1,
+          "samples": [
+            "title"
+          ],
+          "asq": {
+            "criterion": "8.6",
+            "test": "8.6.1",
+            "status": "nc",
+            "text": "RGAA 8.6.1: the page title is empty, has no letter, or is a generic one (for example \"home\", \"untitled\"). Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:9.1.2",
+          "count": 1,
+          "samples": [
+            "h1"
+          ],
+          "asq": {
+            "criterion": "9.1",
+            "test": "9.1.2",
+            "status": "review",
+            "text": "RGAA 9.1.2: {n} heading(s): check that each one is relevant. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:9.2.1-main",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no visible <main> element."
+          }
+        },
+        {
+          "key": "asq:9.2.1-header",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no <header> element outside <article> and <section>."
+          }
+        },
+        {
+          "key": "asq:9.2.1-footer",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no <footer> element outside <article> and <section>."
+          }
+        },
+        {
+          "key": "asq:9.2.1-nav",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no <nav> element."
+          }
+        },
+        {
+          "key": "asq:13.3.1-noext",
+          "count": 1,
+          "samples": [
+            "a"
+          ],
+          "asq": {
+            "criterion": "13.3",
+            "test": "13.3.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} link(s) whose address has no recognised file name: check that none gives access to an office document. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:13.4.1-noext",
+          "count": 1,
+          "samples": [
+            "a"
+          ],
+          "asq": {
+            "criterion": "13.4",
+            "test": "13.4.1",
+            "status": "review",
+            "text": "RGAA {test}: {n} link(s) whose address has no recognised file name: check that none gives access to an office document. Examples: {samples}"
+          }
+        },
+        {
+          "key": "asq:na:2.1",
+          "count": 0,
+          "asq": {
+            "criterion": "2.1",
+            "test": "2.1.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:2.2",
+          "count": 0,
+          "asq": {
+            "criterion": "2.2",
+            "test": "2.2.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.1",
+          "count": 0,
+          "asq": {
+            "criterion": "4.1",
+            "test": "4.1.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.2",
+          "count": 0,
+          "asq": {
+            "criterion": "4.2",
+            "test": "4.2.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.3",
+          "count": 0,
+          "asq": {
+            "criterion": "4.3",
+            "test": "4.3.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.4",
+          "count": 0,
+          "asq": {
+            "criterion": "4.4",
+            "test": "4.4.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.5",
+          "count": 0,
+          "asq": {
+            "criterion": "4.5",
+            "test": "4.5.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.6",
+          "count": 0,
+          "asq": {
+            "criterion": "4.6",
+            "test": "4.6.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.7",
+          "count": 0,
+          "asq": {
+            "criterion": "4.7",
+            "test": "4.7.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.8",
+          "count": 0,
+          "asq": {
+            "criterion": "4.8",
+            "test": "4.8.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.9",
+          "count": 0,
+          "asq": {
+            "criterion": "4.9",
+            "test": "4.9.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.11",
+          "count": 0,
+          "asq": {
+            "criterion": "4.11",
+            "test": "4.11.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.12",
+          "count": 0,
+          "asq": {
+            "criterion": "4.12",
+            "test": "4.12.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.13",
+          "count": 0,
+          "asq": {
+            "criterion": "4.13",
+            "test": "4.13.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:8.4",
+          "count": 0,
+          "asq": {
+            "criterion": "8.4",
+            "test": "8.4.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:pass:8.5",
+          "count": 0,
+          "asq": {
+            "criterion": "8.5",
+            "test": "8.5.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:10.1",
+          "count": 0,
+          "asq": {
+            "criterion": "10.1",
+            "test": "10.1.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "skip-link-missing",
+          "count": 1
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "snapshot": {
+    "returned": true,
+    "response": {
+      "url": "https://page.test/start",
+      "title": "untitled",
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      },
+      "html": "<html data-rgaa-instance=\"X\"><head><title>untitled</title></head>\n<body>\n<h1>Sans doctype</h1>\n<img src=\"z.png\">\n<a href=\"/x\" target=\"_blank\">Lien</a>\n<input type=\"text\" name=\"email\">\n<table><tbody><tr><td>a</td></tr><tr><td>b</td></tr></tbody></table>\n\n\n</body></html>"
+    }
+  },
+  "overlay after scans": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"1\" data-alt=\"no alternative\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t5\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 248px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t6\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 6); background: rgba(0, 0, 6, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 6);\">1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 128px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · h1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t11\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 218px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 11); background: rgba(0, 0, 11, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#00000b\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 11);\">1</span></div></div>"
+  ],
+  "states theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "states theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay options": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "focus image 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "focus link 2": {
+    "returned": true,
+    "response": {
+      "ok": false
+    }
+  },
+  "focus unknown": {
+    "returned": true,
+    "response": {
+      "ok": false
+    }
+  },
+  "show only theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "show only theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "locate": {
+    "returned": true,
+    "response": {
+      "rect": {
+        "x": 8,
+        "y": 188,
+        "w": 100,
+        "h": 20
+      },
+      "vw": 1024,
+      "vh": 768
+    }
+  },
+  "locate unknown": {
+    "returned": true,
+    "response": {
+      "rect": null
+    }
+  },
+  "scroll restore": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "unfocus": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "relabel theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "relabel theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay options 2": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "tool reveal on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 0
+    }
+  },
+  "tool tables on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 1
+    }
+  },
+  "tool taborder on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 2
+    }
+  },
+  "overlay after interactions": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(225, 29, 72); background: rgba(225, 29, 72, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#e11d48\" data-dim=\"1\" data-id=\"11\" data-alt=\"no alternative\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(225, 29, 72);\">11</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t5\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 248px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t6\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 4px solid rgb(255, 23, 68); background: rgba(255, 23, 68, 0.16); box-shadow: 0 0 0 1px #fff, 0 0 10px 2px rgba(255, 23, 68, 0.75); animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"21\" data-state=\"error\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(255, 23, 68); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">! 21</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 128px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · h1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t11\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 218px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 11); background: rgba(0, 0, 11, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#00000b\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 11);\">1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-tools\" style=\"position: absolute; top: 0px; left: 0px; width: 0px; height: 0px; z-index: 2147483645; pointer-events: none;\"><div data-tool=\"tables\"><div style=\"position: absolute; left: 8px; top: 248px; width: 100px; height: 20px; box-sizing: border-box; outline: 2px solid #b45309; outline-offset: -1px; background: rgba(180, 83, 9, 0.133);\"><span style=\"position: absolute; left: 0px; top: 0px; transform: translateY(-100%); background: rgb(180, 83, 9); color: rgb(255, 255, 255); font: 600 11px / 1.3 system-ui, sans-serif; padding: 0px 4px; border-radius: 3px 3px 0 0; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis;\">table: NO caption / title</span></div></div><div data-tool=\"taborder\"><svg width=\"0\" height=\"0\" style=\"position: absolute; left: 0px; top: 0px; pointer-events: none;\"><polyline points=\"14,194 14,224\" fill=\"none\" stroke=\"#0369a1\" stroke-width=\"1.5\" stroke-opacity=\"0.55\"></polyline></svg><div title=\"a\" style=\"position: absolute; left: 4px; top: 184px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">1</div><div title=\"input\" style=\"position: absolute; left: 4px; top: 214px; min-width: 18px; height: 18px; border-radius: 9px; background: rgb(3, 105, 161); color: rgb(255, 255, 255); font: 700 11px / 18px system-ui, sans-serif; text-align: center; padding: 0px 3px; box-sizing: border-box; box-shadow: 0 0 0 2px #fff;\">2</div></div></div>"
+  ],
+  "tools reset": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "pick cancel": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "unknown message": {},
+  "clear theme 3": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "clear theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay after clear themes": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay-t5\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 248px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t6\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 4px solid rgb(255, 23, 68); background: rgba(255, 23, 68, 0.16); box-shadow: 0 0 0 1px #fff, 0 0 10px 2px rgba(255, 23, 68, 0.75); animation: none; z-index: 0;\" data-color=\"#000006\" data-id=\"21\" data-state=\"error\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(255, 23, 68); max-width: 360px; overflow: hidden; text-overflow: ellipsis;\">! 21</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 128px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"h1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · h1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t11\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 218px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 11); background: rgba(0, 0, 11, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#00000b\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 11);\">1</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-tools\" style=\"position: absolute; top: 0px; left: 0px; width: 0px; height: 0px; z-index: 2147483645; pointer-events: none;\"></div>"
+  ],
+  "clear highlights": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay after clear all": []
+}

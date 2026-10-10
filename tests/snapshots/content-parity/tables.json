@@ -1,0 +1,829 @@
+{
+  "highlight images": {
+    "returned": true,
+    "response": {
+      "elements": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 2": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 3": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "contrast-ok",
+          "id": 0,
+          "label": "Text with sufficient contrast",
+          "summary": "16 text element(s) · 1 colour pair(s)",
+          "facts": {
+            "Text elements checked": "16",
+            "Sufficient contrast": "16",
+            "To review (listed below)": "0",
+            "Not listed (limit)": null
+          },
+          "html": "",
+          "contextHtml": "",
+          "count": 16,
+          "data": {
+            "humanNeeded": false,
+            "checked": 16,
+            "okCount": 16
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 5": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "table-data",
+          "id": 1,
+          "label": "“Données”",
+          "summary": "3 rows × 2 columns · 2 header cell(s)",
+          "facts": {
+            "Rows": "3",
+            "Columns": "2",
+            "Header cells (th)": "2",
+            "Title": "Données",
+            "Summary": null,
+            "role": null,
+            "Visibility": null,
+            "Element": "<table>"
+          },
+          "html": "<table>DonnéesAB1234</table>",
+          "contextHtml": "<main>\n<table data-rgaa-target=\"\"><caption>Données</caption><thead><tr><th scope=\"col\">A</th><th scope=\"col\">B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></tbody></table>\n<table><tbody><tr><td>Nom</td><td>Valeur</td></tr><tr><td>x</td><td>y</td></tr></tbody></table>\n<table role=\"presentation\"><tbody><tr><td>Mise en page</td><td>Autre</td></tr></tbody></table>\n<table role=\"none\" summary=\"résumé\"><tbody><tr><td>Mise en page sémantique</td></tr></tbody></table>\n<div role=\"grid\" aria-label=\"Grille\"><div role=\"row\"><div role=\"columnheader\">H</div></div><div role=\"row\"><div role=\"gridcell\">c</div></div></div>\n<table style=\"display:none\"><tbody><tr><td>caché</td></tr></tbody></table>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "hasTitle": true,
+            "hasHeaders": true,
+            "layout": false,
+            "hidden": null
+          }
+        },
+        {
+          "type": "table-nohead",
+          "id": 2,
+          "label": "table 2×2",
+          "summary": "2 rows × 2 columns · 0 header cell(s)",
+          "facts": {
+            "Rows": "2",
+            "Columns": "2",
+            "Header cells (th)": "0",
+            "Title": null,
+            "Summary": null,
+            "role": null,
+            "Visibility": null,
+            "Element": "<table>"
+          },
+          "html": "<table>NomValeurxy</table>",
+          "contextHtml": "<main>\n<table><caption>Données</caption><thead><tr><th scope=\"col\">A</th><th scope=\"col\">B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></tbody></table>\n<table data-rgaa-target=\"\"><tbody><tr><td>Nom</td><td>Valeur</td></tr><tr><td>x</td><td>y</td></tr></tbody></table>\n<table role=\"presentation\"><tbody><tr><td>Mise en page</td><td>Autre</td></tr></tbody></table>\n<table role=\"none\" summary=\"résumé\"><tbody><tr><td>Mise en page sémantique</td></tr></tbody></table>\n<div role=\"grid\" aria-label=\"Grille\"><div role=\"row\"><div role=\"columnheader\">H</div></div><div role=\"row\"><div role=\"gridcell\">c</div></div></div>\n<table style=\"display:none\"><tbody><tr><td>caché</td></tr></tbody></table>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "hasTitle": false,
+            "hasHeaders": false,
+            "layout": false,
+            "hidden": null
+          }
+        },
+        {
+          "type": "table-layout",
+          "id": 3,
+          "label": "table 1×2",
+          "summary": "1 rows × 2 columns · 0 header cell(s)",
+          "facts": {
+            "Rows": "1",
+            "Columns": "2",
+            "Header cells (th)": "0",
+            "Title": null,
+            "Summary": null,
+            "role": "presentation",
+            "Visibility": null,
+            "Element": "<table>"
+          },
+          "html": "<table role=\"presentation\">Mise en pageAutre</table>",
+          "contextHtml": "<main>\n<table><caption>Données</caption><thead><tr><th scope=\"col\">A</th><th scope=\"col\">B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></tbody></table>\n<table><tbody><tr><td>Nom</td><td>Valeur</td></tr><tr><td>x</td><td>y</td></tr></tbody></table>\n<table role=\"presentation\" data-rgaa-target=\"\"><tbody><tr><td>Mise en page</td><td>Autre</td></tr></tbody></table>\n<table role=\"none\" summary=\"résumé\"><tbody><tr><td>Mise en page sémantique</td></tr></tbody></table>\n<div role=\"grid\" aria-label=\"Grille\"><div role=\"row\"><div role=\"columnheader\">H</div></div><div role=\"row\"><div role=\"gridcell\">c</div></div></div>\n<table style=\"display:none\"><tbody><tr><td>caché</td></tr></tbody></table>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "hasTitle": false,
+            "hasHeaders": false,
+            "layout": true,
+            "hidden": null
+          }
+        },
+        {
+          "type": "table-layout-semantic",
+          "id": 4,
+          "label": "table 1×1",
+          "summary": "1 rows × 1 columns · 0 header cell(s)",
+          "facts": {
+            "Rows": "1",
+            "Columns": "1",
+            "Header cells (th)": "0",
+            "Title": null,
+            "Summary": "résumé",
+            "role": "none",
+            "Visibility": null,
+            "Element": "<table>"
+          },
+          "html": "<table role=\"none\" summary=\"résumé\">Mise en page sémantique</table>",
+          "contextHtml": "<main>\n<table><caption>Données</caption><thead><tr><th scope=\"col\">A</th><th scope=\"col\">B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></tbody></table>\n<table><tbody><tr><td>Nom</td><td>Valeur</td></tr><tr><td>x</td><td>y</td></tr></tbody></table>\n<table role=\"presentation\"><tbody><tr><td>Mise en page</td><td>Autre</td></tr></tbody></table>\n<table role=\"none\" summary=\"résumé\" data-rgaa-target=\"\"><tbody><tr><td>Mise en page sémantique</td></tr></tbody></table>\n<div role=\"grid\" aria-label=\"Grille\"><div role=\"row\"><div role=\"columnheader\">H</div></div><div role=\"row\"><div role=\"gridcell\">c</div></div></div>\n<table style=\"display:none\"><tbody><tr><td>caché</td></tr></tbody></table>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "hasTitle": false,
+            "hasHeaders": false,
+            "layout": true,
+            "hidden": null
+          }
+        },
+        {
+          "type": "table-data",
+          "id": 5,
+          "label": "“Grille”",
+          "summary": "2 rows × 1 columns · 1 header cell(s)",
+          "facts": {
+            "Rows": "2",
+            "Columns": "1",
+            "Header cells (th)": "1",
+            "Title": "Grille",
+            "Summary": null,
+            "role": "grid",
+            "Visibility": null,
+            "Element": "<div>"
+          },
+          "html": "<div role=\"grid\" aria-label=\"Grille\">Hc</div>",
+          "contextHtml": "<main>\n<table><caption>Données</caption><thead><tr><th scope=\"col\">A</th><th scope=\"col\">B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></tbody></table>\n<table><tbody><tr><td>Nom</td><td>Valeur</td></tr><tr><td>x</td><td>y</td></tr></tbody></table>\n<table role=\"presentation\"><tbody><tr><td>Mise en page</td><td>Autre</td></tr></tbody></table>\n<table role=\"none\" summary=\"résumé\"><tbody><tr><td>Mise en page sémantique</td></tr></tbody></table>\n<div role=\"grid\" aria-label=\"Grille\" data-rgaa-target=\"\"><div role=\"row\"><div role=\"columnheader\">H</div></div><div role=\"row\"><div role=\"gridcell\">c</div></div></div>\n<table style=\"display:none\"><tbody><tr><td>caché</td></tr></tbody></table>\n</main>",
+          "count": 1,
+          "data": {
+            "humanNeeded": true,
+            "hasTitle": true,
+            "hasHeaders": true,
+            "layout": false,
+            "hidden": null
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 6": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 9": {
+    "returned": true,
+    "response": {
+      "findings": [
+        {
+          "type": "page-no-h1",
+          "id": 1,
+          "label": "No h1",
+          "summary": "",
+          "facts": {},
+          "html": "",
+          "contextHtml": "",
+          "count": 0,
+          "data": {
+            "humanNeeded": true,
+            "group": "page",
+            "level": 0,
+            "badge": ""
+          }
+        },
+        {
+          "type": "landmark",
+          "id": 2,
+          "label": "main",
+          "summary": "<main>",
+          "facts": {
+            "Role": "main",
+            "Name": null,
+            "Element": "<main>"
+          },
+          "html": "<main>DonnéesAB1234 NomValeurxy Mise en pageAutre Mise en page sémantique Hc caché</main>",
+          "contextHtml": "<body><main data-rgaa-target=\"\">\n<table><caption>Données</caption><thead><tr><th scope=\"col\">A</th><th scope=\"col\">B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></tbody></table>\n<table><tbody><tr><td>Nom</td><td>Valeur</td></tr><tr><td>x</td><td>y</td></tr></tbody></table>\n<table role=\"presentation\"><tbody><tr><td>Mise en page</td><td>Autre</td></tr></tbody></table>\n<table role=\"none\" summary=\"résumé\"><tbody><tr><td>Mise en page sémantique</td></tr></tbody></table>\n<div role=\"grid\" aria-label=\"Grille\"><div role=\"row\"><div role=\"columnheader\">H</div></div><div role=\"row\"><div role=\"gridcell\">c</div></div></div>\n<table style=\"display:none\"><tbody><tr><td>caché</td></tr></tbody></table>\n</main>\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div><div id=\"rgaa-assistant-overlay-t5\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">1</span></div><div style=\"position: absolute; left: 8px; top: 578px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">2</span></div><div style=\"position: absolute; left: 8px; top: 818px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"3\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; t …",
+          "count": 1,
+          "data": {
+            "humanNeeded": false,
+            "group": "landmark",
+            "level": 1,
+            "badge": "main"
+          }
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "scan theme 11": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "rules run": {
+    "returned": true,
+    "response": {
+      "url": "https://page.test/start",
+      "findings": [
+        {
+          "key": "no-media",
+          "count": 0
+        },
+        {
+          "key": "table-no-th",
+          "count": 1,
+          "samples": [
+            "table"
+          ]
+        },
+        {
+          "key": "no-form",
+          "count": 0
+        },
+        {
+          "key": "no-button",
+          "count": 0
+        },
+        {
+          "key": "no-link",
+          "count": 0
+        },
+        {
+          "key": "asq:8.4.1-relevance",
+          "count": 1,
+          "detail": "fr",
+          "asq": {
+            "criterion": "8.4",
+            "test": "8.4.1",
+            "status": "review",
+            "text": "RGAA 8.4.1: the language code is valid ({detail}): check that it is the language of the page."
+          }
+        },
+        {
+          "key": "asq:8.6.1",
+          "count": 1,
+          "detail": "Tableaux",
+          "asq": {
+            "criterion": "8.6",
+            "test": "8.6.1",
+            "status": "review",
+            "text": "RGAA 8.6.1: check that the page title ({detail}) is relevant."
+          }
+        },
+        {
+          "key": "asq:9.2.1-header",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no <header> element outside <article> and <section>."
+          }
+        },
+        {
+          "key": "asq:9.2.1-footer",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no <footer> element outside <article> and <section>."
+          }
+        },
+        {
+          "key": "asq:9.2.1-nav",
+          "count": 1,
+          "asq": {
+            "criterion": "9.2",
+            "test": "9.2.1",
+            "status": "nc",
+            "text": "RGAA 9.2.1: the page has no <nav> element."
+          }
+        },
+        {
+          "key": "asq:na:2.1",
+          "count": 0,
+          "asq": {
+            "criterion": "2.1",
+            "test": "2.1.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:2.2",
+          "count": 0,
+          "asq": {
+            "criterion": "2.2",
+            "test": "2.2.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.1",
+          "count": 0,
+          "asq": {
+            "criterion": "4.1",
+            "test": "4.1.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.2",
+          "count": 0,
+          "asq": {
+            "criterion": "4.2",
+            "test": "4.2.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.3",
+          "count": 0,
+          "asq": {
+            "criterion": "4.3",
+            "test": "4.3.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.4",
+          "count": 0,
+          "asq": {
+            "criterion": "4.4",
+            "test": "4.4.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.5",
+          "count": 0,
+          "asq": {
+            "criterion": "4.5",
+            "test": "4.5.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.6",
+          "count": 0,
+          "asq": {
+            "criterion": "4.6",
+            "test": "4.6.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.7",
+          "count": 0,
+          "asq": {
+            "criterion": "4.7",
+            "test": "4.7.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.8",
+          "count": 0,
+          "asq": {
+            "criterion": "4.8",
+            "test": "4.8.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.9",
+          "count": 0,
+          "asq": {
+            "criterion": "4.9",
+            "test": "4.9.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.11",
+          "count": 0,
+          "asq": {
+            "criterion": "4.11",
+            "test": "4.11.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.12",
+          "count": 0,
+          "asq": {
+            "criterion": "4.12",
+            "test": "4.12.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:4.13",
+          "count": 0,
+          "asq": {
+            "criterion": "4.13",
+            "test": "4.13.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:11.11",
+          "count": 0,
+          "asq": {
+            "criterion": "11.11",
+            "test": "11.11.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:11.12",
+          "count": 0,
+          "asq": {
+            "criterion": "11.12",
+            "test": "11.12.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:11.13",
+          "count": 0,
+          "asq": {
+            "criterion": "11.13",
+            "test": "11.13.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:13.3",
+          "count": 0,
+          "asq": {
+            "criterion": "13.3",
+            "test": "13.3.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:na:13.4",
+          "count": 0,
+          "asq": {
+            "criterion": "13.4",
+            "test": "13.4.1",
+            "status": "na",
+            "text": "RGAA {criterion}: no element to check on this page, not applicable."
+          }
+        },
+        {
+          "key": "asq:pass:8.1",
+          "count": 0,
+          "detail": "<!DOCTYPE html>",
+          "asq": {
+            "criterion": "8.1",
+            "test": "8.1.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:8.3",
+          "count": 0,
+          "asq": {
+            "criterion": "8.3",
+            "test": "8.3.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:8.5",
+          "count": 0,
+          "asq": {
+            "criterion": "8.5",
+            "test": "8.5.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "asq:pass:10.1",
+          "count": 0,
+          "asq": {
+            "criterion": "10.1",
+            "test": "10.1.1",
+            "status": "pass",
+            "text": ""
+          }
+        },
+        {
+          "key": "skip-link-missing",
+          "count": 1
+        }
+      ],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
+  "snapshot": {
+    "returned": true,
+    "response": {
+      "url": "https://page.test/start",
+      "title": "Tableaux",
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      },
+      "html": "<!DOCTYPE html>\n<html lang=\"fr\" data-rgaa-instance=\"X\"><head><meta charset=\"utf-8\"><title>Tableaux</title></head>\n<body><main>\n<table><caption>Données</caption><thead><tr><th scope=\"col\">A</th><th scope=\"col\">B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></tbody></table>\n<table><tbody><tr><td>Nom</td><td>Valeur</td></tr><tr><td>x</td><td>y</td></tr></tbody></table>\n<table role=\"presentation\"><tbody><tr><td>Mise en page</td><td>Autre</td></tr></tbody></table>\n<table role=\"none\" summary=\"résumé\"><tbody><tr><td>Mise en page sémantique</td></tr></tbody></table>\n<div role=\"grid\" aria-label=\"Grille\"><div role=\"row\"><div role=\"columnheader\">H</div></div><div role=\"row\"><div role=\"gridcell\">c</div></div></div>\n<table style=\"display:none\"><tbody><tr><td>caché</td></tr></tbody></table>\n</main>\n\n</body></html>"
+    }
+  },
+  "overlay after scans": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div>",
+    "<div id=\"rgaa-assistant-overlay-t5\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">1</span></div><div style=\"position: absolute; left: 8px; top: 578px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">2</span></div><div style=\"position: absolute; left: 8px; top: 818px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"3\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">3</span></div><div style=\"position: absolute; left: 8px; top: 968px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"4\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">4</span></div><div style=\"position: absolute; left: 8px; top: 1088px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"5\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">5</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"main\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · main</span></div></div>"
+  ],
+  "states theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "states theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay options": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "focus image 1": {
+    "returned": true,
+    "response": {
+      "ok": false
+    }
+  },
+  "focus link 2": {
+    "returned": true,
+    "response": {
+      "ok": false
+    }
+  },
+  "focus unknown": {
+    "returned": true,
+    "response": {
+      "ok": false
+    }
+  },
+  "show only theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "show only theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "locate": {
+    "returned": true,
+    "response": {
+      "rect": null
+    }
+  },
+  "locate unknown": {
+    "returned": true,
+    "response": {
+      "rect": null
+    }
+  },
+  "scroll restore": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "unfocus": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "relabel theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "relabel theme 6": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay options 2": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "tool reveal on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 0
+    }
+  },
+  "tool tables on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 6
+    }
+  },
+  "tool taborder on": {
+    "returned": true,
+    "response": {
+      "ok": true,
+      "count": 0
+    }
+  },
+  "overlay after interactions": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div>",
+    "<div id=\"rgaa-assistant-overlay-t5\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">1</span></div><div style=\"position: absolute; left: 8px; top: 578px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">2</span></div><div style=\"position: absolute; left: 8px; top: 818px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"3\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">3</span></div><div style=\"position: absolute; left: 8px; top: 968px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"4\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">4</span></div><div style=\"position: absolute; left: 8px; top: 1088px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"5\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">5</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"main\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · main</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-tools\" style=\"position: absolute; top: 0px; left: 0px; width: 0px; height: 0px; z-index: 2147483645; pointer-events: none;\"><div data-tool=\"tables\"><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; outline: 2px solid #0f766e; outline-offset: -1px; background: rgba(15, 118, 110, 0.133);\"><span style=\"position: absolute; left: 0px; top: 0px; transform: translateY(-100%); background: rgb(15, 118, 110); color: rgb(255, 255, 255); font: 600 11px / 1.3 system-ui, sans-serif; padding: 0px 4px; border-radius: 3px 3px 0 0; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis;\">caption: “Données”</span></div><div style=\"position: absolute; left: 8px; top: 308px; width: 100px; height: 20px; box-sizing: border-box; outline: 2px solid #2563eb; outline-offset: -1px; background: rgba(37, 99, 235, 0.133);\"><span style=\"position: absolute; left: 0px; top: 0px; transform: translateY(-100%); background: rgb(37, 99, 235); color: rgb(255, 255, 255); font: 600 11px / 1.3 system-ui, sans-serif; padding: 0px 4px; border-radius: 3px 3px 0 0; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis;\">th scope=col</span></div><div style=\"position: absolute; left: 8px; top: 338px; width: 100px; height: 20px; box-sizing: border-box; outline: 2px solid #2563eb; outline-offset: -1px; background: rgba(37, 99, 235, 0.133);\"><span style=\"position: absolute; left: 0px; top: 0px; transform: translateY(-100%); background: rgb(37, 99, 235); color: rgb(255, 255, 255); font: 600 11px / 1.3 system-ui, sans-serif; padding: 0px 4px; border-radius: 3px 3px 0 0; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis;\">th scope=col</span></div><div style=\"position: absolute; left: 8px; top: 578px; width: 100px; height: 20px; box-sizing: border-box; outline: 2px solid #b45309; outline-offset: -1px; background: rgba(180, 83, 9, 0.133);\"><span style=\"position: absolute; left: 0px; top: 0px; transform: translateY(-100%); background: rgb(180, 83, 9); color: rgb(255, 255, 255); font: 600 11px / 1.3 system-ui, sans-serif; padding: 0px 4px; border-radius: 3px 3px 0 0; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis;\">table: NO caption / title</span></div><div style=\"position: absolute; left: 8px; top: 818px; width: 100px; height: 20px; box-sizing: border-box; outline: 2px solid #64748b; outline-offset: -1px; background: rgba(100, 116, 139, 0.133);\"><span style=\"position: absolute; left: 0px; top: 0px; transform: translateY(-100%); background: rgb(100, 116, 139); color: rgb(255, 255, 255); font: 600 11px / 1.3 system-ui, sans-serif; padding: 0px 4px; border-radius: 3px 3px 0 0; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis;\">table: layout (presentation)</span></div><div style=\"position: absolute; left: 8px; top: 968px; width: 100px; height: 20px; box-sizing: border-box; outline: 2px solid #64748b; outline-offset: -1px; background: rgba(100, 116, 139, 0.133);\"><span style=\"position: absolute; left: 0px; top: 0px; transform: translateY(-100%); background: rgb(100, 116, 139); color: rgb(255, 255, 255); font: 600 11px / 1.3 system-ui, sans-serif; padding: 0px 4px; border-radius: 3px 3px 0 0; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis;\">table: layout (presentation)</span></div><div style=\"position: absolute; left: 8px; top: 1088px; width: 100px; height: 20px; box-sizing: border-box; outline: 2px solid #0f766e; outline-offset: -1px; background: rgba(15, 118, 110, 0.133);\"><span style=\"position: absolute; left: 0px; top: 0px; transform: translateY(-100%); background: rgb(15, 118, 110); color: rgb(255, 255, 255); font: 600 11px / 1.3 system-ui, sans-serif; padding: 0px 4px; border-radius: 3px 3px 0 0; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis;\">caption: “Grille”</span></div><div style=\"position: absolute; left: 8px; top: 1148px; width: 100px; height: 20px; box-sizing: border-box; outline: 2px solid #2563eb; outline-offset: -1px; background: rgba(37, 99, 235, 0.133);\"><span style=\"position: absolute; left: 0px; top: 0px; transform: translateY(-100%); background: rgb(37, 99, 235); color: rgb(255, 255, 255); font: 600 11px / 1.3 system-ui, sans-serif; padding: 0px 4px; border-radius: 3px 3px 0 0; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis;\">div columnheader</span></div></div><div data-tool=\"taborder\"></div></div>"
+  ],
+  "tools reset": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "pick cancel": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "unknown message": {},
+  "clear theme 3": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "clear theme 1": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay after clear themes": [
+    "<style id=\"rgaa-assistant-style\">\n    @keyframes rgaa-assistant-pulse {\n      0%, 100% { transform: scale(1); }\n      50% { transform: scale(1.02); }\n    }\n    @media (prefers-reduced-motion: reduce) {\n      #rgaa-assistant-overlay [data-focused=\"true\"] { animation: none !important; }\n    }\n  </style>",
+    "<div id=\"rgaa-assistant-overlay-t5\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 188px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"1\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">1</span></div><div style=\"position: absolute; left: 8px; top: 578px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"2\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">2</span></div><div style=\"position: absolute; left: 8px; top: 818px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"3\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">3</span></div><div style=\"position: absolute; left: 8px; top: 968px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"4\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">4</span></div><div style=\"position: absolute; left: 8px; top: 1088px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 5); background: rgba(0, 0, 5, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000005\" data-id=\"5\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 5);\">5</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-t9\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483646; pointer-events: none;\"><div style=\"position: absolute; left: 8px; top: 158px; width: 100px; height: 20px; box-sizing: border-box; pointer-events: none; border: 3px solid rgb(0, 0, 9); background: rgba(0, 0, 9, 0.1); box-shadow: 0 0 0 1px #fff; animation: none; z-index: 0;\" data-color=\"#000009\" data-id=\"2\" data-badge=\"main\" data-state=\"\" data-focused=\"false\"><span style=\"position: absolute; top: -1px; left: -1px; transform: translateY(-100%); color: rgb(255, 255, 255); font: bold 12px / 1.4 sans-serif; padding: 1px 5px; border-radius: 2px 2px 0 0; white-space: nowrap; background: rgb(0, 0, 9);\">2 · main</span></div></div>",
+    "<div id=\"rgaa-assistant-overlay-tools\" style=\"position: absolute; top: 0px; left: 0px; width: 0px; height: 0px; z-index: 2147483645; pointer-events: none;\"></div>"
+  ],
+  "clear highlights": {
+    "returned": true,
+    "response": {
+      "ok": true
+    }
+  },
+  "overlay after clear all": []
+}
