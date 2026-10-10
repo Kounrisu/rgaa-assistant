@@ -7,13 +7,12 @@ export default defineManifest({
   version: pkg.version,
   description:
     "AI-assisted RGAA 4.1 auditor, Theme 1 (Images) only. Numbers the images on a page, builds the element list, and prepares the AI prompt to paste into a chat UI.",
-  action: {
-    default_popup: 'src/popup/popup.html',
-  },
   background: {
     service_worker: 'src/background.ts',
     type: 'module',
   },
+  options_ui: { page: 'src/rgaa/rgaa.html', open_in_tab: true },
+  devtools_page: 'src/panel/devtools.html',
   content_scripts: [
     {
       matches: ['<all_urls>'],
@@ -21,6 +20,9 @@ export default defineManifest({
       run_at: 'document_idle',
     },
   ],
-  permissions: ['activeTab', 'scripting'],
+  browser_specific_settings: {
+    gecko: { id: 'rgaa-assistant@kounrisu', strict_min_version: '121.0' },
+  },
+  permissions: ['activeTab', 'scripting', 'storage', 'unlimitedStorage'],
   host_permissions: ['<all_urls>'],
 })

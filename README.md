@@ -1,26 +1,15 @@
-# RGAA Assistant — Images (Theme 1)
+# RGAA Assistant
 
-AI-assisted RGAA 4.1 auditor. This first slice covers **Theme 1 (Images)
-only** — criteria 1.1, 1.2, 1.3, 1.6, 1.7, 1.8, 1.9.
+A browser extension (Manifest V3, TypeScript, Vite + `@crxjs/vite-plugin`) that adds an
+**RGAA Assistant** tab to the DevTools and helps you run an RGAA 4.1 audit like the official
+Excel grid: a sample of pages (P01, P02…), the criteria of the 13 themes, and an overall
+accessibility rate.
 
-It's a Chrome extension (Manifest V3, TypeScript, Vite + `@crxjs/vite-plugin`)
-that:
-
-1. Numbers every `<img>` on the current page with a red box (content script:
-   [`src/content/inject.ts`](src/content/inject.ts)) and builds a matching
-   JSON element list (alt text, aria-label, nearby text, whether it's inside
-   a link, a few deterministic checks).
-2. Assembles the RGAA Theme 1 audit prompt for that element list
-   ([`src/lib/ai-client.ts`](src/lib/ai-client.ts) +
-   [`src/lib/prompt-template.ts`](src/lib/prompt-template.ts)) and copies it
-   to the clipboard.
-
-**v0.1 makes no AI API call.** The popup's "Copy AI prompt" button copies
-the ready-to-paste prompt text (system instructions + `Elements: [...]`) so
-you can test it manually: screenshot the numbered page, paste the
-screenshot into a chat UI, then paste the copied prompt after it. Wiring an
-actual model call in behind `ai-client.ts` is the next step once that manual
-flow checks out.
+- **Images (1), Frames (2), Colours (3)** are scanned: the extension finds the elements, draws
+  numbered boxes on the page, shows their code and default verdicts, and you confirm each one.
+- **The other themes** are criteria checklists with the official tests.
+- Results feed an **Audit pages overview** dashboard and an **.xlsx** export laid out like the
+  official grid.
 
 ## Develop
 
@@ -34,13 +23,21 @@ Then load the `dist/` folder as an unpacked extension at
 
 ## Use
 
-1. Open the popup on any page.
-2. Click **Number images on page** — red numbered boxes appear over every
-   image, and the matching element list renders in the popup.
-3. Take a screenshot of the page (boxes included).
-4. Click **Copy AI prompt**, then paste the screenshot and the prompt (in
-   that order) into a chat UI.
-5. **Clear highlights** removes the boxes when you're done.
+1. Open DevTools (F12) on a page and select the **RGAA Assistant** tab.
+2. Click **Scan as P01**. Each URL (ignoring `#fragment`) is a *page of the sample*: P01, P02…
+   Use the **Page** selector at the top to switch between saved pages; each has its own images and answers.
+3. Choose the RGAA themes to audit on each page (**Themes** menu, or the Sample table). Images (1) is scanned and reviewed image by image; the other 12 themes are criteria checklists (C / NC / NA + note) with the official tests.
+4. Open a popin or a tab and click **Rescan P01**: its images are added to the same page.
+4. Pick an image (or press `j` / `k`): it is highlighted on the page. Read its code, choose
+   informative or decorative, answer each criterion. Ignored images (`alt=""`, `aria-hidden`,
+   `role="presentation"`) are pre-filled as decorative and compliant, to confirm.
+5. **Page results** shows the official grid for this page, per-test results and per-image detail.
+   **Audit overview** shows the dashboard (accessibility rate), the sample form, the criteria
+   matrix and one grid per page. Both export the same sheets to **.xlsx**, laid out like the
+   official RGAA audit grid (Thématique | Critère | Recommandation | Statut | …).
+
+Everything is saved in `chrome.storage.local`. The accessibility rate is C / (C + NC) per page;
+the audit rate is the average of the page rates, as in the RGAA grid.
 
 ## Scope
 

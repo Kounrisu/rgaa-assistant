@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RGAA Assistant — Images</title>
+    <link rel="stylesheet" href="panel.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <h1>RGAA Assistant</h1>
+        <p>RGAA 4.1 audit</p>
+      </div>
+      <div class="top-info">
+        <div id="page-summary" class="theme-summary page-totals" data-scope="page" aria-label="Totals of the chosen themes on this page"></div>
+        <p id="status" role="status" class="status top-status"></p>
+      </div>
+      <div class="actions">
+        <a class="link-btn" href="../rgaa/rgaa.html" target="_blank" rel="noreferrer">RGAA coverage ↗</a>
+        <button id="sample-btn" type="button" aria-pressed="false" title="Register the pages to audit, edit their URLs and the audit fields">Audit pages sample</button>
+        <button id="results-btn" type="button" disabled aria-pressed="false" title="Results of this page, one line per official test">Audit page results</button>
+        <button id="audit-btn" type="button" disabled aria-pressed="false" title="All pages of the sample: dashboard, grid and Excel export">Audit pages overview</button>
+      </div>
+    </header>
+
+    <div class="pagebar">
+      <label for="page-select">Page</label>
+      <select id="page-select"></select>
+      <span id="live-url" class="live-url"></span>
+      <button id="scan-btn" type="button" class="primary">Scan page</button>
+      <button id="reset-page-btn" type="button" class="ghost-btn danger" disabled title="Clear the scans and every answer of this page; keep its URL, title and themes">Reset page</button>
+      <button id="delete-page-btn" type="button" class="ghost-btn" disabled>Remove page</button>
+    </div>
+    <nav id="themebar" class="themebar" aria-label="RGAA themes" hidden></nav>
+    <div id="nav-banner" class="banner" role="status" hidden>
+      <span id="nav-banner-text"></span>
+      <button id="nav-banner-btn" type="button"></button>
+    </div>
+    <div id="new-banner" class="banner" role="status" hidden>
+      <span id="new-banner-text"></span>
+      <button id="rescan-btn" type="button">Add them (Rescan)</button>
+    </div>
+
+    <header id="images-head" class="theme-head" hidden>
+      <div>
+        <h2>1. Images</h2>
+        <p class="hint-line">Every image of the page, reviewed one by one.</p>
+        <div id="images-summary" class="theme-summary" data-theme="1" aria-label="Images: totals"></div>
+      </div>
+      <div id="tools" class="tools" role="toolbar" aria-label="Tools of this theme" hidden>
+        <button id="boxes-btn" type="button" disabled aria-pressed="true" title="Show or hide the numbered boxes on the page">Hide boxes</button>
+        <button id="tint-btn" type="button" aria-pressed="true" title="The yellow wash over the element you are looking at: turn it off to see its real colours">Yellow tint: on</button>
+        <button id="clear-btn" type="button" disabled title="Remove the boxes from the page; the findings stay in the audit">Remove boxes</button>
+      </div>
+    </header>
+
+    <main id="app" class="layout" hidden>
+      <nav class="list-pane" aria-label="Images found on the page">
+        <div id="filters" class="filters" role="group" aria-label="Filter images"></div>
+        <ol id="element-list"></ol>
+      </nav>
+      <section id="detail" class="detail-pane" aria-label="Image details"></section>
+    </main>
+
+    <section id="theme-view" class="results" aria-label="Theme checklist" hidden></section>
+
+    <section id="results" class="results" aria-label="Page results" hidden></section>
+    <section id="audit" class="results" aria-label="Audit overview" hidden></section>
+    <section id="sample" class="results" aria-label="Sample of pages" hidden></section>
+
+    <section id="empty" class="empty">
+      <h2 id="empty-title">Start by registering the pages of your sample</h2>
+      <p id="empty-text">Open the first page in the browser and add it as page 1. You scan it afterwards.</p>
+      <p>
+        <button id="empty-add-btn" type="button" class="primary-cta">Add the current URL as P01</button>
+        <button id="empty-go-btn" type="button" class="primary-cta" hidden>Open the page in the browser</button>
+      </p>
+      <ol>
+        <li>Register each page in <strong>Sample</strong> (P01, P02…), with its URL.</li>
+        <li>Select a page in the <strong>Page</strong> list: the browser opens it. Click <strong>Scan</strong>.</li>
+        <li>Open a popin or a tab and click <strong>Rescan</strong>: its images join the same page.</li>
+      </ol>
+    </section>
+
+    <!-- DevTools panels cannot show the browser's confirm() popup, so confirmations live here -->
+    <dialog id="confirm-dialog" class="confirm" aria-labelledby="confirm-title">
+      <form method="dialog">
+        <h2 id="confirm-title">Are you sure?</h2>
+        <p id="confirm-text"></p>
+        <div class="confirm-actions">
+          <button id="confirm-cancel" type="button" autofocus>Cancel</button>
+          <button id="confirm-ok" type="button" class="danger-solid">Confirm</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script type="module" src="panel.ts"></script>
+  </body>
+</html>
