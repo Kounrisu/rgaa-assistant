@@ -89,6 +89,7 @@ function firstData(v: Record<string, unknown>): Record<string, unknown> | undefi
 
 const srcOf = (html: string): string => /\bsrc=["']([^"']+)["']/i.exec(html)?.[1] ?? ''
 const hrefOf = (html: string): string => /\bhref=["']([^"']+)["']/i.exec(html)?.[1] ?? ''
+const openTag = (html: string): string => /^<[^>]+>/.exec(html.trim())?.[0].replace(/\s+/g, ' ') ?? ''
 const textOf = (html: string): string => clean(html.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' '))
 const sameSrc = (a: string | null | undefined, b: string): boolean => {
   if (!a || !b) return false
@@ -159,11 +160,13 @@ export function applyToolResults(rec: PageRecord, res: ToolResults, opts: { addT
       continue
     }
 
-    if (criterion === '2.1' || criterion === '3.2' || criterion === '6.2') {
+    if (['2.1', '3.2', '6.2', '5.4', '5.7', '11.1'].includes(criterion)) {
       const fs = rec.findings.filter((f) => f.theme === theme && f.type !== 'contrast-ok')
       for (const node of v.nodes) {
         const f =
-          theme === 6
+          theme === 5 || theme === 11
+            ? fs.find((x) => Boolean(openTag(node.html)) && openTag(x.html) === openTag(node.html))
+            : theme === 6
             ? fs.find((x) => Boolean(x.facts.href) && (x.facts.href === hrefOf(node.html) || sameSrc(x.facts.href, hrefOf(node.html))) && (x.type === 'link-empty' || !x.facts['Accessible name']))
             : theme === 2
             ? fs.find((x) => sameSrc(x.facts.src, srcOf(node.html)) || (!srcOf(node.html) && clean(x.html).slice(0, 60) === clean(node.html).slice(0, 60)))
@@ -180,6 +183,11 @@ export function applyToolResults(rec: PageRecord, res: ToolResults, opts: { addT
         const ratio = theme === 3 && typeof v.data?.contrastRatio === 'number' ? ` (${v.data.contrastRatio}:1)` : ''
         review.note = addLine(review.note, `${mark} ${v.rule}${ratio}: ${v.help}`)
         // the script could not judge this text: the tool did, so its answer is offered as the pre-fill
+        if (theme === 11 && criterion === '11.1' && review.answers['11.1'] === undefined) {
+          review.answers['11.1'] = 'nc'
+          review.auto = true
+          report.set++
+        }
         if (f.type === 'link-empty' && review.answers['6.2'] === undefined) {
           review.answers['6.2'] = 'nc'
           review.auto = true
