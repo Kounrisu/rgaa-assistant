@@ -7,7 +7,7 @@ import { state } from './state'
 import { renderResults } from './results-view'
 import { renderAudit } from './audit-overview'
 import { renderSample } from './sample-view'
-import { loadPage, persist, pageLabel } from './model'
+import { loadPage, persist, pageLabel, normalizeTheme } from './model'
 import { dom, say } from './dom'
 import { normalizeUrl, emptyAudit } from '../lib/audit-store'
 import { t } from '../lib/i18n'
@@ -22,6 +22,7 @@ import { renderChecks } from './checks-view'
 import { setPageToolsTheme } from './page-tools-ui'
 
 export function renderAll(): void {
+  normalizeTheme() // a render never changes the state itself
   renderPageBar()
   renderThemeBar()
   renderFilters()

@@ -30,12 +30,12 @@ export async function exportWorkbook(pages: PageInput[], sheets: Sheet[], fileNa
 }
 
 /** The audit report: one printable HTML page (summary, non-conformities per page, draft accessibility statement). */
-export function openReport(download_: boolean): void {
+export function openReport(asDownload: boolean): void {
   const inputs = allPageInputs()
   if (!inputs.length) return void say(t('Add a page to the audit first.'))
   const html = buildReportHtml(state.audit, inputs, state.audit.pages)
   const date = new Date().toISOString().slice(0, 10)
-  if (download_) {
+  if (asDownload) {
     download(html, 'text/html', `${slugOf(state.audit.meta.site || state.audit.name)}_rapport_${date}.html`)
     say(t('Report downloaded. Open it in a browser and print it to PDF if you need one.'))
   } else {

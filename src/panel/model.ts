@@ -48,6 +48,12 @@ export function pageInput(rec: PageRecord): PageInput {
 
 export const allPageInputs = (): PageInput[] => state.audit.pages.map(pageInput)
 
+/** The theme shown must be one of the page's themes: when it is not, the first of them is shown. Call it where the page or its themes change, never from a render. */
+export function normalizeTheme(): void {
+  const themes = state.page ? [...state.page.themes].sort((a, b) => a - b) : []
+  if (state.page && !themes.includes(state.theme)) state.theme = themes[0] ?? 1
+}
+
 export function loadPage(rec: PageRecord | null): void {
   state.page = rec
   state.elements = rec ? rec.items : []
@@ -58,6 +64,7 @@ export function loadPage(rec: PageRecord | null): void {
   state.audit.current = rec ? rec.id : null
   // Images of a page that was not scanned in this session are shown as they were last seen.
   if (rec && !state.scannedThisSession.has(rec.id)) for (const el of state.elements) el.present = true
+  normalizeTheme()
 }
 
 export function nextPageLabel(): string {

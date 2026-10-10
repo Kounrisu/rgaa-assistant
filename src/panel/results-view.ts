@@ -12,27 +12,27 @@ import { exportWorkbook } from './exports'
 import { slugOf } from './helpers'
 import { actions } from './actions'
 
-export function tabsFor(host: HTMLElement, tabs: { name: string; render: () => HTMLElement }[]): void {
+export function tabsFor(host: HTMLElement, tabs: { name: string; render: () => HTMLElement }[], which: 'resultsSheet' | 'overviewSheet'): void {
   const bar = h('div', { class: 'sheet-tabs', role: 'tablist', 'aria-label': t('Sections') })
   const panel = h('div', { class: 'results-scroll', role: 'tabpanel' })
   const show = (index: number) => {
-    state.activeSheet = Math.min(index, tabs.length - 1)
+    state[which] = Math.min(index, tabs.length - 1)
     bar.querySelectorAll('button').forEach((b, i) => {
-      b.setAttribute('aria-selected', String(i === state.activeSheet))
-      b.tabIndex = i === state.activeSheet ? 0 : -1
+      b.setAttribute('aria-selected', String(i === state[which]))
+      b.tabIndex = i === state[which] ? 0 : -1
     })
-    panel.replaceChildren(tabs[state.activeSheet].render())
+    panel.replaceChildren(tabs[state[which]].render())
   }
   tabs.forEach((t, i) => bar.append(h('button', { type: 'button', role: 'tab', onclick: () => show(i) }, t.name)))
   bar.addEventListener('keydown', (event) => {
     const dir = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0
     if (!dir) return
-    const next = (state.activeSheet + dir + tabs.length) % tabs.length
+    const next = (state[which] + dir + tabs.length) % tabs.length
     show(next)
     ;(bar.children[next] as HTMLElement).focus()
   })
   host.append(bar, panel)
-  show(state.activeSheet)
+  show(state[which])
 }
 
 /** Renders one sheet exactly as it is exported to Excel. */
@@ -76,7 +76,7 @@ export function appendWithImageLinks(cell: HTMLElement, text: string): void {
 }
 
 /** Why a rate is marked provisional, and how criteria with unconfirmed or partial results are counted. */
-export const PROVISIONAL_HELP = (): string =>
+export const provisionalHelp = (): string =>
   t('Provisional rate: some criteria are still to test, are only partly covered by this tool, or rest on an automatic answer you have not confirmed. A criterion judged on only part of its tests keeps its result but keeps the rate provisional; a suggested compliance counts as to review until you confirm it; a failure is always kept.')
 
 export function renderResults(): void {
@@ -101,7 +101,7 @@ export function renderResults(): void {
     h(
       'div',
       { class: 'results-summary' },
-      h('div', { class: 'rate' }, h('strong', {}, stat.rate === null ? '—' : `${stat.rate}%`), ...(stat.rate !== null && isProvisional(stat.counts) ? [h('span', { class: 'pill warn-pill', title: PROVISIONAL_HELP() }, t('provisional'))] : []), h('span', {}, t('accessibility rate of {label} (C ÷ (C + NC), themes {themes})', { label: pageLabel(state.page), themes: stat.themes.join(', ') }))),
+      h('div', { class: 'rate' }, h('strong', {}, stat.rate === null ? '—' : `${stat.rate}%`), ...(stat.rate !== null && isProvisional(stat.counts) ? [h('span', { class: 'pill warn-pill', title: provisionalHelp() }, t('provisional'))] : []), h('span', {}, t('accessibility rate of {label} (C ÷ (C + NC), themes {themes})', { label: pageLabel(state.page), themes: stat.themes.join(', ') }))),
       pill('c', t('{n} compliant', { n: stat.counts.C })),
       pill('nc', t('{n} non-compliant', { n: stat.counts.NC })),
       pill('na', t('{n} not applicable', { n: stat.counts.NA })),
@@ -109,8 +109,8 @@ export function renderResults(): void {
       ...(stat.counts.suggested ? [pill('pending', t('{n} to confirm', { n: stat.counts.suggested }))] : []),
       ...(stat.counts.partial ? [pill('pending', t('{n} partly covered', { n: stat.counts.partial }))] : []),
     ),
-    ...(isProvisional(stat.counts) ? [h('p', { class: 'hint warn' }, PROVISIONAL_HELP())] : []),
+    ...(isProvisional(stat.counts) ? [h('p', { class: 'hint warn' }, provisionalHelp())] : []),
   )
   const sheets = pageSheets(input)
-  tabsFor(dom.resultsEl, sheets.map((sheet) => ({ name: sheet.name === pageLabel(state.page!) ? t('Grid ({label})', { label: pageLabel(state.page!) }) : sheet.name, render: () => sheetTable(sheet) })))
+  tabsFor(dom.resultsEl, sheets.map((sheet) => ({ name: sheet.name === pageLabel(state.page!) ? t('Grid ({label})', { label: pageLabel(state.page!) }) : sheet.name, render: () => sheetTable(sheet) })), 'resultsSheet')
 }

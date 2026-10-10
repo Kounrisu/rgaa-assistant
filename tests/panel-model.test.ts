@@ -136,3 +136,21 @@ describe('router: resetThemeData clears one theme of a page and nothing else', (
     expect(state.scannedThisSession.has(rec.id)).toBe(false)
   })
 })
+
+describe('normalizeTheme: the shown theme is one of the page themes, set by the code that changes them', () => {
+  it('moves to the first theme of the page when the current one is not audited, and leaves a valid theme alone', async () => {
+    const { normalizeTheme } = await import('../src/panel/model')
+    const { state: s } = await import('../src/panel/state')
+    s.page = { themes: [6, 2] } as never
+    s.theme = 3
+    normalizeTheme()
+    expect(s.theme).toBe(2)
+    s.theme = 6
+    normalizeTheme()
+    expect(s.theme).toBe(6)
+    s.page = null
+    s.theme = 4
+    normalizeTheme()
+    expect(s.theme).toBe(4)
+  })
+})
