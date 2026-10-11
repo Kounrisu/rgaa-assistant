@@ -64,6 +64,7 @@ export function download(bytes: BlobPart, type: string, name: string): void {
  * (`dom.scanBtn`) instead of declaring its own constants.
  */
 export const dom = {
+  reviewBtn: $<HTMLButtonElement>('review-btn'),
   scanBtn: $<HTMLButtonElement>('scan-btn'),
   clearBtn: $<HTMLButtonElement>('clear-btn'),
   statusEl: $('status'),

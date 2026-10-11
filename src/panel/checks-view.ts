@@ -7,12 +7,15 @@ import { h, dom, keepScroll, download, say } from './dom'
 import { t } from '../lib/i18n'
 import { coverageLines } from '../lib/scan-coverage'
 import { state } from './state'
-import { persist, pageLabel } from './model'
+import { pageInput, persist, pageLabel } from './model'
 import { criterionUrl } from '../lib/rgaa'
 import { runEverything, captureAndCheckHtml, validateSnapshot } from './auto-checks'
 import { dateTimeOf, slugOf, kb } from './helpers'
 import { unpackSnapshot } from '../lib/snapshot'
 import { actions } from './actions'
+import { goToFirst, goToFirstOnPage } from './chrome'
+import { VERDICT_WORD } from './checklist-view'
+import { evidenceConflicts } from '../lib/evidence'
 
 export function manualProgress(rec: PageRecord): { done: number; issues: number; total: number } {
   const answers = Object.values(rec.manualChecks ?? {})
@@ -22,6 +25,33 @@ export function manualProgress(rec: PageRecord): { done: number; issues: number;
 /** What the scans did not look at, in plain words (frames, shadow roots, lists cut at a limit). */
 export function coverageCard(cov: NonNullable<PageRecord['scanCoverage']>): HTMLElement {
   return h('div', { class: 'card' }, h('h3', {}, t('Scan coverage')), h('p', { class: 'hint-line' }, t('What the automatic scans did NOT look at. These parts need a manual check.')), h('ul', { class: 'checks' }, ...coverageLines(cov).map((x) => h('li', {}, x))))
+}
+
+/** Direct links to the decisions a run needs from the auditor, independent of tool history. */
+function reviewQueue(rec: PageRecord): HTMLElement {
+  const criteria = pageInput(rec).themes.filter((theme) => theme.selected).flatMap((theme) => theme.criteria)
+  const suggestions = criteria.filter((c) => c.suggested || c.unconfirmed || evidenceConflicts(rec.checklist[c.id]).length)
+  const pending = criteria.filter((c) => c.outcome === 'pending' || c.unconfirmed).length
+  const jump = (id: string) => {
+    state.theme = Number(id.split('.')[0])
+    actions.setView('review')
+    actions.renderThemeBar()
+    const card = document.getElementById(`crit-card-${id}`)
+    if (card) {
+      card.scrollIntoView({ block: 'center' })
+      card.querySelector<HTMLInputElement>('input[type="radio"]')?.focus({ preventScroll: true })
+    } else goToFirst(state.theme, 'pending')
+  }
+  return h('section', { class: 'card review-queue', 'aria-label': t('Review automatic findings') },
+    h('h3', {}, t('Review automatic findings')),
+    h('p', {}, t('{n} criteria need your review. Automatic suggestions do not replace your decision.', { n: pending })),
+    h('button', { type: 'button', class: 'primary', disabled: !pending, onclick: () => goToFirstOnPage('pending') }, t('Review next unresolved item')),
+    ...(suggestions.length ? [h('details', { class: 'queue-suggestions' }, h('summary', {}, t('Suggestions and conflicts ({n})', { n: suggestions.length })), h('ul', { class: 'review-queue-list' }, ...suggestions.map((c) => h('li', {},
+      h('button', { type: 'button', 'data-review-criterion': c.id, onclick: () => jump(c.id) },
+        `RGAA ${c.id} · ${evidenceConflicts(rec.checklist[c.id]).length ? t('Conflicting evidence') : t('Suggested: {verdict}', { verdict: t(VERDICT_WORD[c.suggested ?? (c.outcome === 'nc' ? 'nc' : c.outcome === 'na' ? 'na' : 'c')]) })}`),
+      h('span', {}, c.title.replace(/`/g, '')),
+    ))))] : []),
+  )
 }
 
 export function renderChecks(): void {
@@ -43,7 +73,7 @@ export function renderChecks(): void {
         keepScroll(dom.checksEl, renderChecks)
       }
       const radio = (value: 'todo' | 'ok' | 'issue', label: string) => [
-        h('input', { type: 'radio', name: `mc-${c.id}`, id: `mc-${c.id}-${value}`, checked: (answer?.state ?? 'todo') === value, onclick: () => set(value) }),
+        h('input', { type: 'radio', name: `mc-${c.id}`, id: `mc-${c.id}-${value}`, checked: (answer?.state ?? 'todo') === value, onchange: () => { set(value); document.getElementById(`mc-${c.id}-${value}`)?.focus({ preventScroll: true }) } }),
         h('label', { for: `mc-${c.id}-${value}` }, label),
       ]
       card.append(
@@ -84,11 +114,13 @@ export function renderChecks(): void {
       'div',
       { class: 'card' },
       h('h3', {}, t('Automatic checks')),
-      h('p', { class: 'hint-line' }, t('Runs every automatic test on the page you are inspecting: it scans all the themes, then runs axe, our RGAA checks, the Asqatasun-derived rules and the HTML check. A failure becomes a pre-filled “non-compliant” to confirm; a theme that clearly does not apply (no table, no media, no form…) is pre-filled “not applicable”. A criterion where nothing is found is pre-filled “compliant” to confirm. It covers only part of the RGAA: the manual checks below are still needed.')),
+      h('p', { class: 'hint-line' }, t('Find potential issues, then review the evidence and confirm each verdict. Manual checks are still required.')),
       h('div', { class: 'nav' }, h('button', { type: 'button', class: 'primary', disabled: state.axeRunning, onclick: () => void runEverything() }, state.axeRunning ? t('Running the checks…') : t('Run the automatic checks'))),
     ),
-    htmlCard(rec),
-    ...(rec.scanCoverage ? [coverageCard(rec.scanCoverage)] : []),
+    ...(reports.length ? [reviewQueue(rec)] : []),
+    body,
+    h('details', { class: 'card run-history', id: 'run-history' },
+      h('summary', {}, t('Automatic run history ({n})', { n: reports.length })),
     ...reports.map((r) =>
       h(
         'div',
@@ -100,8 +132,8 @@ export function renderChecks(): void {
         ...(r.unmatched.length ? [h('details', {}, h('summary', {}, t('{n} finding(s) not matched to a scanned element', { n: r.unmatched.length })), h('ul', { class: 'checks' }, ...r.unmatched.slice(0, 60).map((x) => h('li', {}, x))))] : []),
         ...(r.unmapped.length ? [h('details', {}, h('summary', {}, t('{n} rule(s) with no RGAA criterion in this tool', { n: r.unmapped.length })), h('p', { class: 'hint-line' }, r.unmapped.slice(0, 80).join(' · ')))] : []),
       ),
-    ),
-    body,
+    )),
+    h('details', { class: 'card scan-details' }, h('summary', {}, t('Scan coverage and page HTML')), htmlCard(rec), ...(rec.scanCoverage ? [coverageCard(rec.scanCoverage)] : [])),
   )
 }
 

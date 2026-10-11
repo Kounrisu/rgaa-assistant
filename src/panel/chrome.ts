@@ -1,7 +1,7 @@
 /**
  * The frame around the views: totals and their jumps, page bar, theme bar and its menu, address reminder, audit bar, empty screen.
  */
-import type { Outcome } from '../lib/results'
+import type { CriterionResult, Outcome } from '../lib/results'
 import { state } from './state'
 import { pageInput, pageLabel, adoptSite, persist, nextPageLabel, normalizeTheme } from './model'
 import { t, getLang } from '../lib/i18n'
@@ -86,16 +86,20 @@ export function renderSummaries(): void {
   }
 }
 
+/** Review navigation includes failed suggestions that still need a human decision. */
+export const matchesReviewOutcome = (criterion: CriterionResult, outcome: Outcome): boolean =>
+  criterion.outcome === outcome || (outcome === 'pending' && Boolean(criterion.unconfirmed))
+
 /** The first chosen theme (in order) that has something to jump to for this status. */
 export function firstThemeWith(outcome: Outcome): number | null {
   if (!state.page) return null
   const rec = state.page
   for (const t of pageInput(rec).themes.filter((x) => x.selected)) {
-    if (!t.criteria.some((c) => c.outcome === outcome)) continue
+    if (!t.criteria.some((c) => matchesReviewOutcome(c, outcome))) continue
     if (outcome === 'pending') {
       // a theme that was never scanned has criteria "to review" but no element to go to
       const perFinding = findingCriterionIds(t.number)
-      const pendingCards = t.criteria.some((c) => c.outcome === 'pending' && !perFinding.includes(c.id) && t.number !== 1)
+      const pendingCards = t.criteria.some((c) => matchesReviewOutcome(c, 'pending') && !perFinding.includes(c.id) && t.number !== 1)
       const hasElement =
         t.number === 1 ? state.elements.some((e) => needsReview(e)) : FINDING_THEMES.has(t.number) ? rec.findings.some((f) => f.theme === t.number && findingNeedsReview(f)) : false
       if (!hasElement && !pendingCards) continue
@@ -123,7 +127,7 @@ export function goToFirst(n: number, outcome: Outcome): void {
   if (!state.page) return
   const rec = state.page
   const result = pageInput(rec).themes.find((x) => x.number === n)
-  const first = result?.criteria.find((c) => c.outcome === outcome)
+  const first = result?.criteria.find((c) => matchesReviewOutcome(c, outcome))
   const verdictOf = (o: Outcome) => (o === 'c' ? 'c' : o === 'nc' ? 'nc' : o === 'na' ? 'na' : null)
 
   if (n === 1) {
@@ -196,15 +200,19 @@ export function renderPageBar(): void {
   }
   dom.pageSelect.disabled = !state.audit.pages.length
   dom.pageToolsEl.hidden = !state.page
+  $('page-tools-disclosure').hidden = !state.page
+  ;($('reset-theme-btn') as HTMLButtonElement).disabled = !state.page
   dom.nextBtn.disabled = !state.page
   dom.progressEl.replaceChildren()
   if (state.page) {
     const c = countsOf(pageInput(state.page))
     const total = c.C + c.NC + c.NA + c.NT || 1
-    const answered = c.C + c.NC + c.NA
+    const confirmed = pageInput(state.page).themes.flatMap((theme) => theme.criteria).filter((criterion) => !criterion.unconfirmed)
+    const count = (outcome: Outcome) => confirmed.filter((criterion) => criterion.outcome === outcome).length
+    const answered = count('c') + count('nc') + count('na')
     dom.progressEl.append(
       h('span', {}, t('{done}/{total} criteria answered', { done: answered, total })),
-      h('span', { class: 'meter', role: 'img', 'aria-label': t('Progress of {label}', { label: pageLabel(state.page) }) }, ...[['c', c.C], ['nc', c.NC], ['na', c.NA]].map(([k, n]) => h('i', { class: String(k), style: `width:${(Number(n) / total) * 100}%` }))),
+      h('span', { class: 'meter', role: 'img', 'aria-label': t('Progress of {label}', { label: pageLabel(state.page) }) }, ...[['c', count('c')], ['nc', count('nc')], ['na', count('na')]].map(([k, n]) => h('i', { class: String(k), style: `width:${(Number(n) / total) * 100}%` }))),
     )
   }
   dom.deletePageBtn.disabled = !state.page
@@ -267,12 +275,12 @@ export function showNavBanner(url: string): void {
   dom.navBanner.hidden = false
 }
 
-/** Share of a theme's criteria that have an answer (criteria this tool cannot assess count as done). */
+/** Only human-confirmed, assessed criteria count as answered. */
 export function themeProgress(rec: PageRecord, n: number): { done: number; total: number } {
   const t = pageInput(rec).themes.find((x) => x.number === n)
   const total = t?.criteria.length ?? 0
-  const pending = t?.criteria.filter((c) => c.outcome === 'pending').length ?? 0
-  return { done: total - pending, total }
+  const done = t?.criteria.filter((c) => ['c', 'nc', 'na'].includes(c.outcome) && !c.unconfirmed).length ?? 0
+  return { done, total }
 }
 
 export function setThemes(rec: PageRecord, themes: number[]): void {
@@ -334,7 +342,7 @@ export function renderThemeBar(): void {
   if (!state.page) return
   const rec = state.page
   const selected = [...rec.themes].sort((a, b) => a - b)
-  const tabs = h('div', { class: 'theme-tabs', role: 'tablist', 'aria-label': t('RGAA themes of this page') })
+  const tabs = h('div', { class: 'theme-tabs', role: 'group', 'aria-label': t('RGAA themes of this page') })
   for (const n of selected) {
     const { done, total } = themeProgress(rec, n)
     tabs.append(
@@ -342,9 +350,8 @@ export function renderThemeBar(): void {
         'button',
         {
           type: 'button',
-          role: 'tab',
           class: `theme-tab${done === total ? ' complete' : ''}`,
-          'aria-selected': String(n === state.theme),
+          'aria-pressed': String(n === state.theme),
           style: `--tc:${colorOf(n)}`,
           title: t('{n}. {name} (its boxes on the page use this colour)', { n, name: t(THEME_LABEL[n]) }),
           onclick: () => {
@@ -357,13 +364,12 @@ export function renderThemeBar(): void {
         },
         h('span', { class: 'tn' }, String(n)),
         ` ${t(THEME_LABEL[n])} `,
-        h('span', { class: 'tp' }, `${done}/${total}`),
+        h('span', { class: 'tp' }, t('{done}/{total} criteria answered', { done, total })),
       ),
     )
   }
   dom.themebarEl.append(
     tabs,
-    h('button', { type: 'button', class: 'ghost-btn danger', title: t('Clear the scan and the answers of {name} on this page only', { name: t(THEME_LABEL[state.theme]) }), onclick: () => actions.resetTheme() }, t('Reset {name}', { name: t(THEME_LABEL[state.theme]) })),
     themesMenu(rec),
   )
 }
@@ -376,6 +382,11 @@ export function renderEmpty(): void {
     dom.emptyTitle.textContent = t('Start by registering the pages of your sample')
     dom.emptyText.textContent = t('Open the first page in the browser and add it as page 1. You scan it afterwards, when you are ready.')
     dom.emptyAddBtn.textContent = t('Add the current URL as {label}', { label: nextPageLabel() })
+  } else if (state.page.scannedThemes.includes(1)) {
+    dom.emptyTitle.textContent = t('No images found on this page')
+    dom.emptyText.textContent = t('Review the other themes or open the page results. Rescan after revealing new content.')
+    $('empty-steps').replaceChildren()
+    return
   } else {
     const label = pageLabel(state.page)
     dom.emptyTitle.textContent = t('{label} is registered, not scanned yet', { label })

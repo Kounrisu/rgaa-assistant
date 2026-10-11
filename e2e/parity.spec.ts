@@ -50,7 +50,7 @@ async function serialize(panel: Page): Promise<string> {
     .replace(/></g, '>\n<')
 }
 
-test('every screen of the panel is unchanged', async ({ rig }) => {
+test('every screen of the panel matches the reviewed baseline', async ({ rig }) => {
   test.setTimeout(180_000)
   const { panel } = rig
   const out: string[] = []
@@ -148,6 +148,7 @@ test('every screen of the panel is unchanged', async ({ rig }) => {
   }
 
   // page totals: a total jumps to its first element
+  await panel.locator('.summary-disclosure > summary').click()
   await panel.locator('#page-summary .pill').nth(2).click()
   await shot('totals: to review')
   await panel.locator('#next-btn').click()

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>RGAA Assistant — Images</title>
+    <title>RGAA Assistant</title>
     <link rel="stylesheet" href="panel.css" />
   </head>
   <body>
@@ -25,17 +25,19 @@
     </div>
 
     <header class="topbar">
-      <div class="top-info">
+      <details class="top-info summary-disclosure">
+        <summary data-i18n>Page progress and activity</summary>
         <div id="page-summary" class="theme-summary page-totals" data-scope="page" aria-label="Totals of the chosen themes on this page" data-i18n-attrs="aria-label"></div>
-        <p id="status" role="status" class="status top-status"></p>
-      </div>
-      <div class="actions">
         <a class="link-btn" href="../rgaa/rgaa.html" target="_blank" rel="noreferrer" data-i18n>RGAA coverage ↗</a>
+      </details>
+      <nav class="actions" aria-label="Audit workflow" data-i18n-attrs="aria-label">
+        <button id="review-btn" type="button" aria-pressed="true" data-i18n>Review</button>
         <button id="sample-btn" type="button" aria-pressed="false" title="Register the pages to audit, edit their URLs and the audit fields" data-i18n data-i18n-attrs="title">Audit pages sample</button>
         <button id="checks-btn" type="button" aria-pressed="false" title="Automatic checks (axe), and the checks a script cannot do: keyboard, zoom, screen reader…" data-i18n data-i18n-attrs="title" disabled>Checks</button>
         <button id="results-btn" type="button" disabled aria-pressed="false" title="Results of this page, one line per official test" data-i18n data-i18n-attrs="title">Audit page results</button>
         <button id="audit-btn" type="button" disabled aria-pressed="false" title="All pages of the sample: dashboard, grid and Excel export" data-i18n data-i18n-attrs="title">Audit pages overview</button>
-      </div>
+      </nav>
+      <p id="status" role="status" class="status top-status"></p>
     </header>
 
     <div class="pagebar">
@@ -46,10 +48,18 @@
       <button id="auto-btn" type="button" title="Run every automatic test on the page in the browser: scan all the themes, then axe, our RGAA checks, the Asqatasun-derived rules and the HTML check" data-i18n data-i18n-attrs="title" disabled>Automatic checks</button>
       <span id="progress" class="progress" role="status" aria-live="polite"></span>
       <button id="next-btn" type="button" title="Go to the next element or criterion that still needs your answer, in any theme (shortcut: n)" data-i18n data-i18n-attrs="title" disabled>Next to review</button>
+      <details class="page-options disclosure-menu">
+        <summary data-i18n>Page actions</summary>
+        <div class="menu-content">
       <button id="reset-page-btn" type="button" class="ghost-btn danger" disabled title="Clear the scans and every answer of this page; keep its URL, title and themes" data-i18n data-i18n-attrs="title">Reset page</button>
       <button id="delete-page-btn" type="button" class="ghost-btn" disabled data-i18n>Remove page</button>
+        <button id="reset-theme-btn" type="button" class="ghost-btn danger" data-i18n>Reset current theme</button>
+        </div>
+      </details>
     </div>
+    <details id="page-tools-disclosure" class="page-tools-disclosure"><summary data-i18n>Display tools</summary>
     <div id="page-tools" class="toolsbar" role="toolbar" aria-label="Page tools" data-i18n-attrs="aria-label" hidden></div>
+    </details>
     <nav id="themebar" class="themebar" aria-label="RGAA themes" data-i18n-attrs="aria-label" hidden></nav>
     <div id="nav-banner" class="banner" role="status" hidden>
       <span id="nav-banner-text"></span>
@@ -64,18 +74,22 @@
       <div>
         <h2 data-i18n>1. Images</h2>
         <p class="hint-line" data-i18n>Every image of the page, reviewed one by one.</p>
+        <details class="theme-details"><summary data-i18n>Theme progress</summary>
         <div id="images-summary" class="theme-summary" data-theme="1" aria-label="Images: totals" data-i18n-attrs="aria-label"></div>
+        </details>
       </div>
-      <div id="tools" class="tools" role="toolbar" aria-label="Tools of this theme" data-i18n-attrs="aria-label" hidden>
+      <details id="tools" class="tools" aria-label="Tools of this theme" data-i18n-attrs="aria-label" hidden>
+        <summary data-i18n>Highlight options</summary>
         <button id="boxes-btn" type="button" disabled aria-pressed="true" title="Show or hide the numbered boxes on the page" data-i18n-attrs="title">Hide boxes</button>
         <button id="alt-btn" type="button" aria-pressed="false" title="Write the alternative text (or its absence) next to each image on the page" data-i18n-attrs="title">Alt text: off</button>
         <button id="tint-btn" type="button" aria-pressed="true" title="The thick yellow border and wash on the element you are looking at: turn it off to get a thin outline and see its real colours" data-i18n-attrs="title">Yellow highlight: on</button>
         <button id="clear-btn" type="button" disabled title="Remove the boxes from the page; the findings stay in the audit" data-i18n data-i18n-attrs="title">Remove boxes</button>
-      </div>
+      </details>
     </header>
 
     <main id="app" class="layout" hidden>
-      <nav class="list-pane" aria-label="Images found on the page" data-i18n-attrs="aria-label">
+      <details id="image-list-disclosure" class="list-pane" open aria-label="Images found on the page" data-i18n-attrs="aria-label">
+        <summary data-i18n>Images on this page</summary>
         <div id="filters" class="filters" role="group" aria-label="Filter images" data-i18n-attrs="aria-label"></div>
         <div class="legend" aria-hidden="true">
           <span class="lg"><i class="bar unnamed"></i><span data-i18n>No text alternative</span></span>
@@ -88,7 +102,7 @@
         </div>
         <p class="legend-note" data-i18n>On the page: solid red = error, dashed red = to review, light red = ignored, green = reviewed and compliant.</p>
         <ol id="element-list"></ol>
-      </nav>
+      </details>
       <section id="detail" class="detail-pane" aria-label="Image details" data-i18n-attrs="aria-label"></section>
     </main>
 

@@ -3,7 +3,7 @@
  */
 import { type Lang, setLang, translateStatic, t } from '../lib/i18n'
 import { dom, say } from './dom'
-import { renderAll, switchTo, removePage, resetPage, setView } from './router'
+import { resetTheme, renderAll, switchTo, removePage, resetPage, setView } from './router'
 import { renderAuditBar, renderPageBar, renderStats, renderEmpty, showNavBanner, goToFirstOnPage } from './chrome'
 import { renderPageTools, resetPageTools } from './page-tools-ui'
 import { applyBoxes, goTo, sendToPage, inspectedTabId } from './page-bridge'
@@ -28,12 +28,22 @@ export function applyLanguage(lang: Lang): void {
 
 /** Registers every listener of the panel: its buttons, the keyboard, the page navigation, the extension messages. Called once, at start-up. */
 export function wireEvents(): void {
+  dom.reviewBtn.addEventListener('click', () => setView('review'))
+  document.getElementById('reset-theme-btn')!.addEventListener('click', () => {
+    document.querySelector<HTMLDetailsElement>('.page-options')!.open = false
+    void resetTheme()
+  })
+  const compact = window.matchMedia('(max-width: 979px)')
+  const sizeList = () => { (document.getElementById('image-list-disclosure') as HTMLDetailsElement).open = !compact.matches }
+  sizeList()
+  compact.addEventListener('change', sizeList)
+
   dom.pageSelect.addEventListener('change', () => switchTo(dom.pageSelect.value, true))
   dom.deletePageBtn.addEventListener('click', () => removePage())
   dom.resetPageBtn.addEventListener('click', () => resetPage())
   dom.emptyAddBtn.addEventListener('click', () => void addPage(state.liveUrl))
   dom.emptyGoBtn.addEventListener('click', () => state.page && goTo(state.page.url))
-  dom.sampleBtn.addEventListener('click', () => setView(state.view === 'sample' ? 'review' : 'sample'))
+  dom.sampleBtn.addEventListener('click', () => setView('sample'))
   dom.scanBtn.addEventListener('click', scan)
   dom.rescanBtn.addEventListener('click', scan)
   chrome.runtime.onMessage.addListener((message) => {
@@ -82,12 +92,13 @@ export function wireEvents(): void {
     state.boxesOn[state.theme] = state.boxesOn[state.theme] === false
     void applyBoxes()
   })
-  dom.resultsBtn.addEventListener('click', () => setView(state.view === 'page' ? 'review' : 'page'))
-  dom.auditBtn.addEventListener('click', () => setView(state.view === 'audit' ? 'review' : 'audit'))
+  dom.resultsBtn.addEventListener('click', () => setView('page'))
+  dom.auditBtn.addEventListener('click', () => setView('audit'))
   dom.nextBtn.addEventListener('click', () => goToFirstOnPage('pending'))
   // Keyboard: n goes to the next element to review, j / k move between images (outside text fields).
   document.addEventListener('keydown', (event) => {
     const target = event.target as HTMLElement
+    if (document.querySelector('dialog[open]') || target.isContentEditable || event.ctrlKey || event.metaKey || event.altKey) return
     if (event.key === 'n' && !event.ctrlKey && !event.metaKey && !['TEXTAREA', 'INPUT', 'SELECT'].includes(target.tagName) && state.page && state.view === 'review') return void goToFirstOnPage('pending')
     if (['TEXTAREA', 'INPUT', 'SELECT'].includes(target.tagName) || state.view !== 'review' || state.theme !== 1 || !state.elements.length || state.selectedId === null) return
     const index = state.elements.findIndex((e) => e.id === state.selectedId)
@@ -96,10 +107,10 @@ export function wireEvents(): void {
   })
   window.addEventListener('error', (event) => say(t('Panel error: {message}', { message: event.message })))
   window.addEventListener('unhandledrejection', (event) => say(t('Panel error: {message}', { message: String(event.reason) })))
-  dom.checksBtn.addEventListener('click', () => setView(state.view === 'checks' ? 'review' : 'checks'))
+  dom.checksBtn.addEventListener('click', () => setView('checks'))
   dom.autoBtn.addEventListener('click', () => void runEverything())
   dom.auditNameBtn.addEventListener('click', () => void renameAudit())
-  dom.auditsBtn.addEventListener('click', () => setView(state.view === 'audits' ? 'review' : 'audits'))
+  dom.auditsBtn.addEventListener('click', () => setView('audits'))
   dom.saveFileBtn.addEventListener('click', () => void saveAuditToFile())
   dom.openFileBtn.addEventListener('click', () => dom.importInput.click())
   dom.langFrBtn.addEventListener('click', () => applyLanguage('fr'))

@@ -135,6 +135,8 @@ export async function resetAudit(): Promise<void> {
 
 export function setView(next: View): void {
   state.view = next
+  document.body.dataset.view = next
+  dom.reviewBtn.setAttribute('aria-pressed', String(next === 'review'))
   dom.resultsEl.hidden = next !== 'page'
   dom.auditEl.hidden = next !== 'audit'
   dom.sampleEl.hidden = next !== 'sample'
@@ -145,7 +147,7 @@ export function setView(next: View): void {
   dom.appEl.hidden = next !== 'review' || !imagesTheme || !state.elements.length
   dom.emptyEl.hidden = next !== 'review' || !imagesTheme || state.elements.length > 0
   dom.themeEl.hidden = next !== 'review' || imagesTheme
-  dom.themebarEl.hidden = !state.page
+  dom.themebarEl.hidden = !state.page || next !== 'review'
   updateTools()
   dom.resultsBtn.setAttribute('aria-pressed', String(next === 'page'))
   dom.auditBtn.setAttribute('aria-pressed', String(next === 'audit'))
@@ -167,12 +169,12 @@ export function setScanned(): void {
   const has = state.elements.length > 0
   dom.clearBtn.disabled = !has && !(state.page?.findings.length)
   dom.boxesBtn.disabled = !has && !(state.page?.findings.length)
-  dom.resultsBtn.disabled = !has
+  dom.resultsBtn.disabled = !state.page
   dom.auditBtn.disabled = !state.audit.pages.length
   dom.checksBtn.disabled = !state.page
   dom.autoBtn.disabled = !state.page || state.axeRunning
   dom.scanBtn.disabled = !state.page
-  setView(state.view === 'page' && !has ? 'review' : state.view)
+  setView(state.view === 'page' && !state.page ? 'review' : state.view)
 }
 
 /** Buttons that act on the boxes of the current theme live in that theme's own toolbar. */
