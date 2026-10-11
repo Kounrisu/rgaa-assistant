@@ -151,6 +151,7 @@ test('every screen of the panel matches the reviewed baseline', async ({ rig }) 
   // page totals: a total jumps to its first element
   await panel.locator('#page-summary .pill').nth(2).click()
   await shot('totals: to review')
+  await panel.locator('.page-options > summary').click()
   await panel.locator('#next-btn').click()
   await shot('next to review')
 
@@ -174,6 +175,7 @@ test('every screen of the panel matches the reviewed baseline', async ({ rig }) 
   await panel.locator('#audits-btn').click()
   await expect(panel.locator('#audits table')).toBeVisible()
   await shot('audits list')
+  await panel.locator('#audits').getByRole('button', { name: '← Retour à la relecture' }).click()
   await panel.locator('#checks-btn').click()
   await shot('checks')
 

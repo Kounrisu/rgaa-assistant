@@ -67,6 +67,7 @@ export const dom = {
   batchEl: $<HTMLDetailsElement>('batch-controls'),
   auditBar: document.querySelector<HTMLElement>('.auditbar')!,
   pageBar: document.querySelector<HTMLElement>('.pagebar')!,
+  pageOptions: document.querySelector<HTMLDetailsElement>('.page-options')!,
   auditNavigation: document.querySelector<HTMLElement>('.audit-navigation')!,
   pageNavigation: document.querySelector<HTMLElement>('.page-navigation')!,
   openPageBtn: $<HTMLButtonElement>('open-page-btn'),

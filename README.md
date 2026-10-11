@@ -44,8 +44,10 @@ accessibility statement). Print it to PDF from the browser.
 
 ## Use
 
-1. Open DevTools (F12), select **RGAA Assistant**, and register the pages in **Échantillon et suivi**.
-2. Open a registered page in the inspected browser tab. In **Évaluation** in the top bar beside **Audits**, click
+1. Open DevTools (F12), select **RGAA Assistant**, and register the pages in **Échantillon et suivi**
+   beside the audit name in the top bar.
+2. Open a registered page in the inspected browser tab. Use **Poursuivre l’évaluation** on its sample card.
+   The page header groups the page selector, **Évaluation**, **Contrôles manuels** and **Résultats de la page**. Click
    **Contrôler automatiquement la page ouverte**. It scans the elements and runs the automatic engines;
    **Actions de la page → Analyser / Réanalyser** only refreshes the detected elements (useful for popins).
 3. In **Évaluation**, answer each criterion and use **Suivant à évaluer** beside the decision to save and continue.
@@ -57,8 +59,8 @@ accessibility statement). Print it to PDF from the browser.
    Pause after the current page and resume the remaining pages; failed pages retain their own error and can be
    selected for a retry. Redirects to another URL require correcting/opening that page first. Closing DevTools
    abandons the remaining queue; saved results remain, and an unfinished run is shown as interrupted.
-6. Use **Synthèse et exports** for the overall results, Excel grid and report. Completing automatic runs is never
-   completion of the RGAA audit: dynamic states and manual checks still require the auditor.
+6. Use **Synthèse et exports** in the audit header for the overall results, Excel grid and report.
+   Completing automatic runs is never completion of the RGAA audit: dynamic states and manual checks still require the auditor.
 
 ## Limits
 
