@@ -30,7 +30,7 @@ export async function addPage(url: string, title?: string): Promise<void> {
   actions.renderAll()
   // the "this URL is not in the sample yet" banner is about this very page: re-evaluate it now, not at the next tab event
   if (state.liveUrl) showNavBanner(state.liveUrl)
-  say(t('{label} registered. It is not scanned yet: open it in the browser and click “Scan {label}”.', { label: pageLabel(rec) }))
+  say(t('{label} registered. Open it in the browser to find its elements.', { label: pageLabel(rec) }))
 }
 
 export function movePage(rec: PageRecord, dir: -1 | 1): void {
@@ -121,7 +121,7 @@ export function renderSample(): void {
       h('div', { class: 'add-row' }, urlNew, titleNew,
         h('button', { type: 'button', class: 'img-ref', onclick: () => { urlNew.value = state.liveUrl } }, t('Use current URL')),
         h('button', { type: 'button', class: 'primary', onclick: () => void addPage(urlNew.value.trim(), titleNew.value.trim() || undefined) }, t('Add to the sample'))),
-      h('p', { class: 'hint-line' }, t('Adding a page does not scan it. Select it, open it in the browser, then click Scan.')),
+      h('p', { class: 'hint-line' }, t('Adding a page does not scan it. Select it, open it in the browser, then find its elements.')),
     ),
   )
   dom.sampleEl.append(

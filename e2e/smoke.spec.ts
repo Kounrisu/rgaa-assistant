@@ -51,7 +51,7 @@ test('scan, review, save, reload, export, save to file and reopen', async ({ rig
     await expect(status(panel)).toContainText('P01 analysée : 3 image(s)')
     // three <img> in the fixture: with alt, without alt, decorative (empty alt)
     await expect(panel.locator('#element-list .item')).toHaveCount(3)
-    await expect(panel.locator('#images-summary')).toContainText('3 image(s)')
+    await expect(panel.locator('#image-inventory')).toContainText('3 image(s)')
     await expect(panel.locator('#element-list .item[data-detected="named"]')).toHaveCount(1)
     await expect(panel.locator('#element-list .item[data-detected="unnamed"]')).toHaveCount(1)
     await expect(panel.locator('#element-list .item[data-detected="ignored"]')).toHaveCount(1)

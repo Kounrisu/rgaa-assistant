@@ -10,6 +10,7 @@
     <div class="auditbar" role="region" aria-label="Current audit" data-i18n-attrs="aria-label">
       <h1 class="brand-inline">RGAA Assistant</h1>
       <span class="auditbar-sep" aria-hidden="true">›</span>
+      <span class="scope-label" data-i18n>Audit</span>
       <button id="audit-name-btn" type="button" class="audit-name" title="Rename this audit" data-i18n-attrs="title"></button>
       <nav class="audit-navigation" aria-label="Audit workflow" data-i18n-attrs="aria-label">
         <button id="evaluate-page-btn" type="button" disabled aria-pressed="false" data-i18n>Evaluate the page</button>
@@ -33,7 +34,7 @@
 
     <div class="pagebar">
       <div class="page-selection">
-        <label for="page-select" data-i18n>Page</label>
+        <label for="page-select" data-i18n>Audited page</label>
         <select id="page-select"></select>
       </div>
       <nav class="page-navigation" aria-label="Current page workflow" data-i18n-attrs="aria-label">
@@ -48,25 +49,17 @@
       <div class="page-actions">
         <button id="scan-btn" type="button" class="scan-btn">Scan page</button>
         <button id="auto-btn" type="button" class="primary" title="Run every automatic test on the page in the browser: scan all the themes, then axe, our RGAA checks, the Asqatasun-derived rules and the HTML check" data-i18n data-i18n-attrs="title" disabled>Check the open page automatically</button>
-        <details class="page-options disclosure-menu">
-          <summary data-i18n>Page actions</summary>
-          <div class="menu-content">
-            <button id="next-btn" type="button" title="Go to the next element or criterion that still needs your answer, in any theme (shortcut: n)" data-i18n data-i18n-attrs="title" disabled>Next to evaluate</button>
-            <button id="reset-page-btn" type="button" class="ghost-btn danger" disabled title="Clear the scans and every answer of this page; keep its URL, title and themes" data-i18n data-i18n-attrs="title">Reset page</button>
-            <button id="delete-page-btn" type="button" class="ghost-btn" disabled data-i18n>Remove page</button>
-            <button id="reset-theme-btn" type="button" class="ghost-btn danger" data-i18n>Reset current theme</button>
-            <a class="link-btn" href="../rgaa/rgaa.html" target="_blank" rel="noreferrer" data-i18n>RGAA coverage ↗</a>
-          </div>
-        </details>
+
       </div>
     </div>
-    <section id="page-progress" class="page-progress" aria-label="Page progress" data-i18n-attrs="aria-label" hidden>
-      <span id="progress" class="progress" role="status" aria-live="polite"></span>
-      <div id="page-summary" class="theme-summary page-totals" data-scope="page" aria-label="Totals of the chosen themes on this page" data-i18n-attrs="aria-label"></div>
+    <section id="page-progress" class="page-progress" aria-labelledby="page-summary-title" hidden>
+      <div class="summary-heading">
+        <h2 id="page-summary-title" class="scope-label"></h2>
+        <span id="progress" class="progress" role="status" aria-live="polite"></span>
+        <button id="next-btn" type="button" title="Go to the next element or criterion that still needs your answer, in any theme (shortcut: n)" data-i18n data-i18n-attrs="title" disabled>Next to evaluate</button>
+      </div>
+      <div id="page-summary" class="theme-summary page-totals" data-scope="page" aria-label="Criteria of the whole page" data-i18n-attrs="aria-label"></div>
     </section>
-    <details id="page-tools-disclosure" class="page-tools-disclosure" open><summary data-i18n>Display tools</summary>
-    <div id="page-tools" class="toolsbar" role="toolbar" aria-label="Page tools" data-i18n-attrs="aria-label" hidden></div>
-    </details>
     <nav id="themebar" class="themebar" aria-label="RGAA themes" data-i18n-attrs="aria-label" hidden></nav>
     <div id="nav-banner" class="banner" role="status" hidden>
       <span id="nav-banner-text"></span>
@@ -77,26 +70,28 @@
       <button id="rescan-btn" type="button" data-i18n>Add them (Rescan)</button>
     </div>
 
-    <header id="images-head" class="theme-head" hidden>
-      <div>
-        <h2 data-i18n>1. Images</h2>
-        <p class="hint-line" data-i18n>Every image of the page, reviewed one by one.</p>
-        <details class="theme-details" open><summary data-i18n>Theme progress</summary>
-        <div id="images-summary" class="theme-summary" data-theme="1" aria-label="Images: totals" data-i18n-attrs="aria-label"></div>
-        </details>
+    <header id="theme-head" class="theme-head" hidden>
+      <div class="summary-heading">
+        <h2 id="theme-summary-title"></h2>
+        <button id="reset-theme-btn" type="button" class="ghost-btn danger" data-i18n>Reset current theme</button>
       </div>
-      <details id="tools" open class="tools" aria-label="Tools of this theme" data-i18n-attrs="aria-label" hidden>
-        <summary data-i18n>Highlight options</summary>
+      <div id="theme-summary" class="theme-summary" data-theme="1" aria-labelledby="theme-summary-title"></div>
+    </header>
+    <section id="display-tools" class="display-tools" aria-labelledby="display-tools-title" hidden>
+      <h2 id="display-tools-title" class="scope-label" data-i18n>Display tools</h2>
+      <div id="page-tools" class="toolsbar" role="group" aria-label="Page tools" data-i18n-attrs="aria-label" hidden></div>
+      <div id="tools" class="tools" role="group" aria-label="Highlight options" data-i18n-attrs="aria-label" hidden>
         <button id="boxes-btn" type="button" disabled aria-pressed="true" title="Show or hide the numbered boxes on the page" data-i18n-attrs="title">Hide boxes</button>
         <button id="alt-btn" type="button" aria-pressed="false" title="Write the alternative text (or its absence) next to each image on the page" data-i18n-attrs="title">Alt text: off</button>
         <button id="tint-btn" type="button" aria-pressed="true" title="The thick yellow border and wash on the element you are looking at: turn it off to get a thin outline and see its real colours" data-i18n-attrs="title">Yellow highlight: on</button>
         <button id="clear-btn" type="button" disabled title="Remove the boxes from the page; the findings stay in the audit" data-i18n data-i18n-attrs="title">Remove boxes</button>
-      </details>
-    </header>
+      </div>
+    </section>
 
     <main id="app" class="layout" hidden>
       <details id="image-list-disclosure" class="list-pane" open aria-label="Images found on the page" data-i18n-attrs="aria-label">
         <summary data-i18n>Images on this page</summary>
+        <div id="image-inventory" class="theme-summary element-inventory" aria-label="Images found on the page" data-i18n-attrs="aria-label"></div>
         <div id="filters" class="filters" role="group" aria-label="Filter images" data-i18n-attrs="aria-label"></div>
         <div class="legend" aria-hidden="true">
           <span class="lg"><i class="bar unnamed"></i><span data-i18n>No text alternative</span></span>
@@ -132,6 +127,8 @@
       </p>
       <ol id="empty-steps"></ol>
     </section>
+
+    <footer id="review-reference" class="review-reference" hidden><a class="link-btn" href="../rgaa/rgaa.html" target="_blank" rel="noreferrer" data-i18n>RGAA coverage ↗</a></footer>
 
     <!-- DevTools panels cannot show the browser's confirm() popup, so confirmations live here -->
     <dialog id="confirm-dialog" class="confirm" aria-labelledby="confirm-title">

@@ -50,7 +50,7 @@ accessibility statement). Print it to PDF from the browser.
 2. Open a registered page in the inspected browser tab. Use **Poursuivre l’évaluation** on its sample card, or **Évaluer la page** in the top header to return to the selected page.
    The page header groups the page selector, **Évaluation**, **Contrôles manuels** and **Résultats de la page**. Click
    **Contrôler automatiquement la page ouverte**. It scans the elements and runs the automatic engines;
-   **Actions de la page → Analyser / Réanalyser** only refreshes the detected elements (useful for popins).
+   **Repérer les éléments / Actualiser les éléments** only refreshes the detected elements (useful for popins).
 3. In **Évaluation**, answer each criterion and use **Suivant à évaluer** beside the decision to save and continue.
    Answering never advances automatically. Page progress stays visible; theme bubbles keep `done/total` counts.
 4. Complete **Contrôles manuels** and inspect **Résultats de la page**. The sample dashboard tracks each page's
@@ -96,8 +96,10 @@ review decisions fit at 480, 768 and 1280 pixels, that results work on image-fre
 persist. They run the real automatic engines against an empty title and then a corrected title: evidence must
 change while the human verdict and note survive the rerun. Tool disagreements remain visible until resolved.
 
-The Evaluation button returns to the current theme. Page progress stays visible; display tools and page reset actions are expandable;
-on compact panels the image list is expandable too. After an automatic run, use the review queue to open a
+The Evaluation button returns to the current theme. **Bilan de la page** counts all 106 criteria; the theme summary counts only its own criteria. Extra confirmation/coverage badges are grouped separately under **À vérifier**.
+Display and highlight tools remain visible below theme navigation. **Suivant à évaluer** sits beside the page summary;
+page reset/removal remain in the sample table, theme reset beside its heading, and the coverage reference below the workspace.
+On compact panels the image list is expandable. After an automatic run, use the review queue to open a
 suggested criterion directly. Manual checks come before the run history. Information sections start expanded; collapse choices are kept during the panel session, including when answers rebuild a view. Action menus stay closed until opened.
 
 Load `dist/` as an unpacked extension (`chrome://extensions` with Developer mode, or `about:debugging` in

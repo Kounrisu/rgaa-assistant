@@ -151,7 +151,6 @@ test('every screen of the panel matches the reviewed baseline', async ({ rig }) 
   // page totals: a total jumps to its first element
   await panel.locator('#page-summary .pill').nth(2).click()
   await shot('totals: to review')
-  await panel.locator('.page-options > summary').click()
   await panel.locator('#next-btn').click()
   await shot('next to review')
 

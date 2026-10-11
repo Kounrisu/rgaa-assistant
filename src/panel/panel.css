@@ -692,14 +692,7 @@ summary { cursor: pointer; padding: 6px 0; font-weight: 600; }
 .topbar { gap: 6px 16px; padding: 8px 16px; }
 .topbar .actions { order: -1; }
 .top-status { flex-basis: 100%; padding: 0; font-size: 12px; }
-.disclosure-menu { position: relative; }
-.disclosure-menu > summary { padding: 6px 10px; border: 1px solid var(--border); border-radius: 7px; }
-.menu-content { position: absolute; right: 0; z-index: 25; min-width: 210px; display: grid; gap: 8px; background: var(--surface); border: 1px solid var(--border); padding: 12px; border-radius: 8px; box-shadow: 0 6px 20px #0002; }
-.page-tools-disclosure { padding: 0 16px; border-bottom: 1px solid var(--border); }
-.page-tools-disclosure .toolsbar { padding-left: 0; }
-body:not([data-view='review']) .page-tools-disclosure { display: none; }
 .theme-head { padding: 8px 16px; }
-.theme-details { display: inline-block; }
 .tools { display: block; }
 .tools > button { margin: 4px 2px; }
 .list-pane > summary { padding: 8px 12px; }
@@ -724,7 +717,6 @@ body:not([data-view='review']) .page-tools-disclosure { display: none; }
   .page-selection { flex: 1 1 100%; }
   .pagebar select { flex: 1; min-width: 0; max-width: none; }
   .page-actions { margin-left: 0; }
-  .page-options .menu-content { left: 0; right: auto; }
   .live-url { flex-basis: 100%; font-size: 11px; }
   .page-location { flex-basis: 100%; }
   .progress { flex-basis: 100%; }
@@ -762,9 +754,9 @@ body:not([data-view='review']) .page-tools-disclosure { display: none; }
 
 /* The audit and the selected page are separate workspaces. */
 .audit-navigation, .page-navigation { display:flex; flex-wrap:wrap; gap:6px; }
-body[data-view="sample"] :is(.pagebar,.page-progress,#page-tools-disclosure,#nav-banner,#new-banner),
-body[data-view="audit"] :is(.pagebar,.page-progress,#page-tools-disclosure,#nav-banner,#new-banner),
-body[data-view="audits"] :is(.pagebar,.page-progress,#page-tools-disclosure,#nav-banner,#new-banner) { display:none; }
+body[data-view="sample"] :is(.pagebar,.page-progress,#display-tools,#nav-banner,#new-banner),
+body[data-view="audit"] :is(.pagebar,.page-progress,#display-tools,#nav-banner,#new-banner),
+body[data-view="audits"] :is(.pagebar,.page-progress,#display-tools,#nav-banner,#new-banner) { display:none; }
 .top-status { margin:0; padding:4px 12px; }
 .top-status:empty { display:none; }
 .review-actions { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
@@ -788,8 +780,28 @@ body[data-view="audits"] :is(.pagebar,.page-progress,#page-tools-disclosure,#nav
 /* Image detail header: what is left for this image, without scrolling to the cards */
 .criteria-progress { margin-left: 10px; font-weight: 600; color: var(--text); }
 .criteria-progress:empty { display: none; }
-/* the disclosure already says "Display tools": its inner label only repeated it */
-.page-tools-disclosure .toolsbar-label { display: none; }
 
 /* A provisional rate is not the result: the label comes first and the number is muted until nothing is pending */
 .rate.provisional strong { color: var(--muted); font-weight: 600; }
+
+/* Visible scope labels keep audit, page and theme controls distinct without adding title bars. */
+.scope-label { font-size: 12px; font-weight: 650; color: var(--muted); margin: 0; }
+.summary-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; width: 100%; }
+.summary-heading > button { margin-left: auto; }
+.theme-head { display: block; }
+.theme-head h2 { font-size: 14px; }
+.theme-head .summary-heading { gap: 6px 12px; }
+.theme-head #reset-theme-btn { font-size: 12px; padding: 3px 6px; }
+.summary-qualifications { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; border-left: 1px solid var(--border); padding-left: 8px; }
+.display-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; padding: 6px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
+.display-tools .toolsbar { padding: 0; border: 0; }
+.display-tools .toolsbar-label { display: none; }
+.display-tools .tools { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.display-tools .tools > button { margin: 0; padding: 3px 10px; font-size: 12.5px; }
+.display-tools[hidden], .display-tools .tools[hidden] { display: none; }
+.element-inventory { padding: 0 8px 8px; margin: 0; }
+.review-reference { padding: 12px 16px; }
+@media (max-width: 979px) {
+  .display-tools { padding: 6px 10px; }
+  .summary-heading .progress { flex: 1 1 auto; }
+}
