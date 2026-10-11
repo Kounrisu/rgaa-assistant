@@ -4,6 +4,9 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## Current state (2026-10-11)
 
+- **Latest toolbar UX analysis:** `docs/ux-bars-review-2026-10-11.md` (`4c09ebf`) proposes visible scope labels,
+  removal of the mixed page-actions menu, page-wide criterion counts consistent with the 106-criterion meter,
+  and a non-collapsible display-tools area after theme navigation. Analysis only; no application changes.
 - Branch `master` (the Codex branch `codex/audit-workflow` was merged by fast-forward and can be deleted). The owner's approved workflow
   was implemented in `29eb344` on top of Claude's `51c1b1e` component work and `11fb2aa` UX verification. Version 0.1.0; saved audit format is now **v4**, with explicit
   migration from v3 and continued support for v2. Licence AGPL-3.0-only.
@@ -29,7 +32,8 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
   page, resume remaining pages, per-page failures and retry by selection. An already open URL keeps its dynamic state.
   Status/date/error persist; older audits do not invent complete run status. Closing DevTools loses the remaining queue;
   any saved running status is displayed as interrupted. A changed URL requires another run.
-- Latest `npm run check`: **187 tests**, typecheck, **700 texts / 1195 French entries / 0 missing**, build pass.
+- Latest `npm run check`: **189 tests**, typecheck, **710 texts / 1229 French entries / 0 missing**, build pass.
+  Latest toolbar review reran eight targeted browser scenarios successfully; full suite/parity not rerun in that review.
   Latest full `npm run test:e2e`: **14 passed**, including the reviewed **80-screen** parity baseline, 480/768/1280 layouts,
   sequential runs/pause/resume, engine failure/retry, source-URL isolation and keyboard continuation. Built content script:
   **0 module imports**. Real Firefox/DevTools still untested.
@@ -78,7 +82,7 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## In progress (claimed)
 
-- None. Expanded information and the top-header return to evaluation are verified in `bf247db`.
+- None. Toolbar analysis recorded in `4c09ebf`; proposed layout changes are not implemented.
 
 ## Next (suggested order; the owner decides)
 
@@ -86,6 +90,7 @@ The corrected audit/page navigation, dashboard, explicit next-review controls an
 Next verify the actual extension in Firefox/DevTools and collect feedback on a real audit, especially the top-header
 return from Échantillon et suivi and the initially expanded sections (collapse them, answer, navigate away and back).
 Keep page progress visible and preserve the owner's decorative-image counting decision.
+Toolbar follow-up: implement the reviewed layout proposal if requested; preserve Claude’s scan, preview and help changes.
 
 1. **Real Firefox test pass** by the owner: reload the extension, F5 on a real page, “Contrôler automatiquement la page ouverte”; report crashes (which step, which page), the save pill, the unsaved-work dialog, the layout. In narrow DevTools, check that page progress stays visible and each nonzero status count opens the expected item, including keyboard activation and focus; check French and English.
 2. **Per-test results** (as Asqatasun stores them: pass / fail / need more info / not applicable per test, with the elements). Needs a data-model addition + migration; also lets the auditor confirm the Images tests the tool cannot assess (image maps, CAPTCHAs), which today leave criteria “partly covered”.
@@ -96,6 +101,9 @@ Keep page progress visible and preserve the owner's decorative-image counting de
 
 ## Open decisions (owner)
 
+- **Toolbar proposal (`4c09ebf`)**: visible audit/page/theme labels, actions placed in their context, and page counters
+  aligned with the full 106-criterion meter. The owner specifically suggested display tools after theme navigation
+  with no collapse button; this review supports it. Application implementation has not been requested in this review.
 - **AI**: access (copy-paste / cloud API with own key / local model / company endpoint), first tasks, what may be sent — all undecided. Principles agreed for any design: suggestions only (never a verdict), opt-in, payload shown before any call, minimal data (no cookies, no full pages, nothing from logged-in sessions), traceable (model, prompt version, date), provider-neutral, measured against the owner's own past audits before being trusted. Safe order if approved: provider interface + copy-paste mode + payload preview + stored AI suggestions; relevance judgements from text; explain-and-fix and report drafting; optional API/local; images last with consent.
 - **Access42 JSON file / Stylus**: the owner will provide the file later; do not start before seeing it.
 - **Project licence**: AGPL-3.0 now; removing the Asqatasun-derived code is the precondition for relicensing (`NOTICE.md`).
@@ -111,6 +119,26 @@ Keep page progress visible and preserve the owner's decorative-image counting de
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-11 — Codex — toolbar UX analysis after Claude’s updates
+- Did: `4c09ebf`, documentation-only review in `docs/ux-bars-review-2026-10-11.md`, based on `f7d2c5a`.
+  Traced navigation, scans, summary counts and destinations, reset/remove actions, and contextual display tools.
+- Findings: page meter covers all 106 criteria while page pills filter to selected themes; the menu mixes review,
+  destructive actions and reference help; display tools precede the theme context that controls them. Expanded
+  narrow layout consumes the viewport; existing reachability tests first collapse sections, masking that default UX.
+- Recommendations: label scopes visibly in existing rows; Bilan de la page / Bilan de la thématique; align page
+  counts and destinations with the full-page scope; remove Actions de la page by moving its actions to their proper
+  contexts. Place Outils d’affichage after theme navigation, remove its outer collapse control, and group highlighting
+  there. Keep the direct top-header evaluation return and original sample table.
+- Checks: `npm run check` passed (189 unit tests, typecheck, 710 texts / 1229 French entries / 0 missing, build).
+  Eight targeted browser scenarios passed (audit navigation, 480/768/1280 review, three summary-navigation cases,
+  Claude’s compact-row/criteria-progress/manual-help case). Inspected wide/narrow screenshots.
+  Logs: `/tmp/rgaa-bars-review-check.log`, `/tmp/rgaa-bars-review-e2e.log`.
+- NOT tested: full browser suite/parity this turn, real Firefox or real DevTools. No baseline or application changes.
+- Next: implementation of the documented proposal when requested; regression priorities are in the report.
+- For Claude/other tools: do not treat recommendations as shipped. Preserve your visible scan button and recent
+  preview/manual-help changes. Changing the page-counter filter also requires fixing destinations for unselected
+  themes; no saved-data or verdict-policy change is proposed. User prefers visible information and tools.
 
 ### 2026-10-11 — Claude Code — "Analyser P01" is long: previews share screenshots
 - Why: the owner finds the scan long. It does: (1) the element scans of every chosen theme (fast: DOM reads), then (2) the previews:
