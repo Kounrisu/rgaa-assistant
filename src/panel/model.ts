@@ -55,6 +55,7 @@ export function normalizeTheme(): void {
 }
 
 export function loadPage(rec: PageRecord | null): void {
+  if (rec !== state.page) state.reviewCursor = undefined
   state.page = rec
   state.elements = rec ? rec.items : []
   state.reviews = rec ? rec.reviews : {}

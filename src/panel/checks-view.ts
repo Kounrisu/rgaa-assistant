@@ -1,3 +1,4 @@
+import { runLabel } from './page-work'
 /**
  * The Checks view: automatic checks, the page HTML card, scan coverage, the reports of each tool and the manual checks.
  */
@@ -9,11 +10,11 @@ import { coverageLines } from '../lib/scan-coverage'
 import { state } from './state'
 import { pageInput, persist, pageLabel } from './model'
 import { criterionUrl } from '../lib/rgaa'
-import { runEverything, captureAndCheckHtml, validateSnapshot } from './auto-checks'
+import { captureAndCheckHtml, validateSnapshot } from './auto-checks'
 import { dateTimeOf, slugOf, kb } from './helpers'
 import { unpackSnapshot } from '../lib/snapshot'
 import { actions } from './actions'
-import { goToFirst, goToFirstOnPage } from './chrome'
+import { goToFirst } from './chrome'
 import { VERDICT_WORD } from './checklist-view'
 import { evidenceConflicts } from '../lib/evidence'
 
@@ -45,7 +46,7 @@ function reviewQueue(rec: PageRecord): HTMLElement {
   return h('section', { class: 'card review-queue', 'aria-label': t('Review automatic findings') },
     h('h3', {}, t('Review automatic findings')),
     h('p', {}, t('{n} criteria need your review. Automatic suggestions do not replace your decision.', { n: pending })),
-    h('button', { type: 'button', class: 'primary', disabled: !pending, onclick: () => goToFirstOnPage('pending') }, t('Review next unresolved item')),
+    h('button', { type: 'button', class: 'primary', disabled: !pending, onclick: () => void actions.nextReview('') }, t('Review next unresolved item')),
     ...(suggestions.length ? [h('details', { class: 'queue-suggestions' }, h('summary', {}, t('Suggestions and conflicts ({n})', { n: suggestions.length })), h('ul', { class: 'review-queue-list' }, ...suggestions.map((c) => h('li', {},
       h('button', { type: 'button', 'data-review-criterion': c.id, onclick: () => jump(c.id) },
         `RGAA ${c.id} · ${evidenceConflicts(rec.checklist[c.id]).length ? t('Conflicting evidence') : t('Suggested: {verdict}', { verdict: t(VERDICT_WORD[c.suggested ?? (c.outcome === 'nc' ? 'nc' : c.outcome === 'na' ? 'na' : 'c')]) })}`),
@@ -105,18 +106,12 @@ export function renderChecks(): void {
       h(
         'div',
         {},
-        h('h2', {}, t('Checks — {label}', { label: pageLabel(rec) })),
+        h('h2', {}, t('Manual checks — {label}', { label: pageLabel(rec) })),
         h('p', { class: 'hint-line' }, t('What a script cannot judge: do each check on the page, then tick it. {done}/{total} done, {issues} problem(s).', { done: progress.done, total: progress.total, issues: progress.issues })),
       ),
       h('div', { class: 'nav' }, h('button', { type: 'button', onclick: () => actions.setView('review') }, t('← Back to review'))),
     ),
-    h(
-      'div',
-      { class: 'card' },
-      h('h3', {}, t('Automatic checks')),
-      h('p', { class: 'hint-line' }, t('Find potential issues, then review the evidence and confirm each verdict. Manual checks are still required.')),
-      h('div', { class: 'nav' }, h('button', { type: 'button', class: 'primary', disabled: state.axeRunning, onclick: () => void runEverything() }, state.axeRunning ? t('Running the checks…') : t('Run the automatic checks'))),
-    ),
+    h('p', { class: 'hint-line' }, runLabel(rec)),
     ...(reports.length ? [reviewQueue(rec)] : []),
     body,
     h('details', { class: 'card run-history', id: 'run-history' },

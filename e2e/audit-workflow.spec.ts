@@ -1,0 +1,138 @@
+import { expect, test } from '@playwright/test'
+import { scanElements, openRig, SITE_URL } from './harness'
+
+async function saved(panel: import('@playwright/test').Page) {
+  return panel.evaluate(() => {
+    const key = Object.keys(localStorage).find((k) => k.startsWith('e2e-chrome-storage:rgaa-audit:'))
+    return key ? JSON.parse(localStorage.getItem(key)!) : null
+  })
+}
+
+test('audit navigation, visible page progress and explicit save-and-next across criteria', async ({ context }, testInfo) => {
+  const { panel, problems } = await openRig(context)
+  await panel.locator('#empty-add-btn').click()
+  await scanElements(panel)
+  await panel.locator('label[for="kind-1-informative"]').click()
+  await panel.locator('label[for="crit-1-1.1-nc"]').click()
+  await expect(panel.locator('input[id="crit-1-1.1-nc"]')).toBeChecked()
+  // Choosing an answer does not auto-advance; explicit next moves keyboard focus.
+  await panel.locator('[data-review-after$=":1.1"]').click()
+  await expect(panel.locator('input[name="crit-1-1.3"]').first()).toBeFocused()
+  expect(Object.values<any>((await saved(panel)).pages[0].reviews).some((r) => r.answers['1.1'] === 'nc')).toBe(true)
+  await panel.locator('#sample-btn').click()
+  await expect(panel.locator('.pagebar')).not.toBeVisible()
+  await expect(panel.locator('.page-navigation')).not.toBeVisible()
+  await expect(panel.locator('#page-progress')).not.toBeVisible()
+  await expect(panel.locator('.page-work')).toContainText('décisions restantes')
+  await expect(panel.locator('.page-work')).toContainText('Contrôles automatiques non lancés')
+  await panel.screenshot({ path: testInfo.outputPath('sample-wide.png') })
+  await panel.setViewportSize({ width: 480, height: 800 })
+  await expect(panel.locator('.page-work')).toBeVisible()
+  expect(await panel.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+  await panel.screenshot({ path: testInfo.outputPath('sample-narrow.png') })
+  await panel.getByRole('button', { name: 'Vérifications manuelles : 0/18' }).click()
+  await expect(panel.locator('#page-progress')).toBeVisible()
+  await expect(panel.locator('#checks h2')).toContainText('Vérifications manuelles')
+  await expect(panel.locator('#checks').getByRole('button', { name: 'Lancer les contrôles automatiques' })).toHaveCount(0)
+  expect(problems).toEqual([])
+})
+
+test('selected pages run sequentially, pause and resume, retain independent outcomes and human verdicts', async ({ context }) => {
+  test.setTimeout(150_000)
+  const { panel, site, problems, reloadPanel } = await openRig(context)
+  await panel.locator('#empty-add-btn').click()
+  await scanElements(panel)
+  await panel.locator('label[for="kind-1-informative"]').click()
+  await panel.locator('label[for="crit-1-1.1-nc"]').click()
+  await panel.locator('#sample-btn').click()
+  await panel.getByLabel('URL de la nouvelle page', { exact: true }).fill(SITE_URL + '?second')
+  await panel.locator('.add-page button.primary').click()
+  await expect(panel.locator('.page-work')).toHaveCount(2)
+  await panel.locator('.page-work input[type="checkbox"]').nth(0).check()
+  await panel.locator('.page-work input[type="checkbox"]').nth(1).check()
+  await panel.getByRole('button', { name: 'Contrôler les pages sélectionnées', exact: true }).click()
+  await panel.getByRole('button', { name: 'Mettre en pause après cette page' }).click()
+  await expect(panel.getByRole('button', { name: 'Reprendre les pages restantes' })).toBeVisible({ timeout: 60_000 })
+  await expect(panel.locator('#batch-controls')).toContainText('1/2 pages traitées')
+  let audit = await saved(panel)
+  expect(audit.pages[0].automaticRun.status).toBe('complete')
+  expect(audit.pages[1].automaticRun).toBeUndefined()
+  await panel.getByRole('button', { name: 'Reprendre les pages restantes' }).click()
+  await expect(panel.locator('#status')).toContainText('Traitement terminé', { timeout: 60_000 })
+  await expect.poll(async () => (await saved(panel)).pages[1].automaticRun?.status).toBe('complete')
+  audit = await saved(panel)
+  expect(audit.pages[1].automaticRun.url).toBe(SITE_URL + '?second')
+  expect(Object.values<any>(audit.pages[0].reviews).some((r) => r.answers['1.1'] === 'nc' && !r.auto)).toBe(true)
+  expect(site.url()).toBe(SITE_URL + '?second')
+  await reloadPanel()
+  await panel.locator('#sample-btn').click()
+  await expect(panel.locator('.run-status')).toHaveCount(2)
+  await expect(panel.locator('.run-status').nth(0)).toContainText('évaluation humaine requise')
+  expect(problems).toEqual([])
+})
+
+test('a failed engine is visible per page and a retry preserves the auditor answer', async ({ context }) => {
+  const { panel } = await openRig(context)
+  await panel.locator('#empty-add-btn').click()
+  await scanElements(panel)
+  await panel.locator('label[for="kind-1-informative"]').click()
+  await panel.locator('label[for="crit-1-1.1-nc"]').click()
+  await panel.evaluate(() => {
+    const bridge = (window as any).__rgaaBridge
+    let fail = true
+    ;(window as any).__rgaaBridge = (m: any) => {
+      if (m.type === 'RGAA_AXE' && fail) { fail = false; return { error: 'Simulated engine failure' } }
+      return bridge(m)
+    }
+  })
+  await panel.locator('#auto-btn').click()
+  await expect.poll(async () => (await saved(panel))?.pages[0]?.automaticRun?.status, { timeout: 40_000 }).toBe('failed')
+  await panel.locator('#sample-btn').click()
+  await expect(panel.locator('.run-status')).toContainText('Échec des contrôles')
+  await expect(panel.locator('.page-work')).toContainText('Simulated engine failure')
+  await panel.locator('#page-work-btn').click()
+  await panel.locator('#auto-btn').click()
+  await expect.poll(async () => (await saved(panel))?.pages[0]?.automaticRun?.status, { timeout: 40_000 }).toBe('complete')
+  const page = (await saved(panel)).pages[0]
+  expect(page.automaticRun.error).toBeUndefined()
+  expect(Object.values<any>(page.reviews).some((r) => r.answers['1.1'] === 'nc' && !r.auto)).toBe(true)
+})
+
+test('findings and manual criteria have the same explicit keyboard continuation', async ({ context }) => {
+  const { panel, problems } = await openRig(context)
+  await panel.locator('#empty-add-btn').click()
+  await panel.locator('#auto-btn').click()
+  await expect.poll(async () => (await saved(panel))?.pages[0]?.automaticRun?.status, { timeout: 40_000 }).toBe('complete')
+  await panel.locator('#review-btn').click()
+  await panel.locator('.theme-tab').filter({ hasText: 'Formulaires' }).click()
+  const next = panel.locator('#theme-view .review-continue[data-review-after^="finding:"]').first()
+  await expect(next).toBeVisible()
+  await next.locator('..').locator('label[for$="-nc"]').click()
+  await next.click()
+  await expect.poll(() => panel.evaluate(() => (document.activeElement as HTMLInputElement)?.name)).toMatch(/^fnd-/)
+  await panel.locator('.theme-tab').filter({ hasText: 'Éléments obligatoires' }).click()
+  const card = panel.locator('[id="crit-card-8.1"]')
+  await card.locator('label[for$="-na"]').click()
+  await card.locator('.review-continue').click()
+  await expect(panel.locator('input[name="chk-8.2"]').first()).toBeFocused()
+  expect((await saved(panel)).pages[0].checklist['8.1'].verdict).toBe('na')
+  expect(problems).toEqual([])
+})
+
+test('checks refuse another inspected URL without mixing its results into the registered page', async ({ context }) => {
+  const { panel, site, problems } = await openRig(context)
+  await panel.locator('#empty-add-btn').click()
+  await scanElements(panel)
+  await expect.poll(async () => (await saved(panel))?.pages[0]?.scanCount).toBe(1)
+  const before = (await saved(panel)).pages[0]
+  await site.goto(SITE_URL + '?other')
+  await panel.locator('#auto-btn').click()
+  await expect(panel.locator('#status')).toContainText('Ouvrez la page enregistrée')
+  await expect.poll(async () => (await saved(panel))?.pages[0]?.automaticRun?.status).toBe('failed')
+  const after = (await saved(panel)).pages[0]
+  expect(after.url).toBe(SITE_URL)
+  expect(after.scanCount).toBe(before.scanCount)
+  expect(after.findings).toEqual(before.findings)
+  expect(after.imports).toBeUndefined()
+  expect(problems).toEqual([])
+})

@@ -308,6 +308,7 @@ export function renderPageBar(): void {
   dom.deletePageBtn.disabled = !state.page
   dom.resetPageBtn.disabled = !state.page
   const onLive = Boolean(state.page && state.liveUrl && normalizeUrl(state.page.url) === normalizeUrl(state.liveUrl))
+  dom.openPageBtn.hidden = !state.page?.url || onLive
   dom.liveUrlEl.textContent = state.liveUrl ? t('Browser: {url}', { url: state.liveUrl }) : ''
   dom.liveUrlEl.title = state.liveUrl
   dom.liveUrlEl.className = `live-url${onLive ? ' same' : ''}`

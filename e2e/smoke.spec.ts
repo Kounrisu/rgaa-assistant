@@ -1,6 +1,6 @@
 import { expect, test as base, type Download, type Page } from '@playwright/test'
 import { readFileSync } from 'node:fs'
-import { openRig, SITE_URL, type Rig } from './harness'
+import { scanElements, openRig, SITE_URL, type Rig } from './harness'
 
 /** The rig, plus a failure report: the panel status line, the progress and every console error of both pages. */
 const test = base.extend<{ rig: Rig }>({
@@ -47,7 +47,7 @@ test('scan, review, save, reload, export, save to file and reopen', async ({ rig
     await expect(panel.locator('#live-url')).toContainText('127.0.0.1:4174')
     await panel.locator('#empty-add-btn').click()
     await expect(status(panel)).toContainText('P01 enregistrée')
-    await panel.locator('#scan-btn').click()
+    await scanElements(panel)
     await expect(status(panel)).toContainText('P01 analysée : 3 image(s)')
     // three <img> in the fixture: with alt, without alt, decorative (empty alt)
     await expect(panel.locator('#element-list .item')).toHaveCount(3)

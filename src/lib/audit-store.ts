@@ -19,7 +19,7 @@ const newId = (): string => (typeof crypto !== 'undefined' && 'randomUUID' in cr
 export const emptyAudit = (name = ''): Audit => {
   const now = Date.now()
   return {
-    version: 3,
+    version: CURRENT_VERSION,
     id: newId(),
     name,
     createdAt: now,
@@ -124,7 +124,10 @@ function v2ToV3(a: Rec): void {
 }
 
 /** One entry per version that can still be read: it brings an audit of that version to the next one. */
-const MIGRATIONS: Record<number, (a: Rec) => void> = { 2: v2ToV3 }
+const MIGRATIONS: Record<number, (a: Rec) => void> = { 2: v2ToV3, 3: (a) => {
+  // v3 had tool reports but no reliable full-run status. Leave it unknown.
+  for (const p of (a.pages as unknown[]).filter(isRecord)) delete p.automaticRun
+} }
 
 /**
  * Brings a raw audit up to the current version, in place. The version is checked first (a newer or unknown version
@@ -320,7 +323,7 @@ export function copyOf(audit: Audit, name: string): Audit {
 /* ------------------------------------------------------------------ */
 
 export function auditToFile(audit: Audit): string {
-  return JSON.stringify({ format: FILE_FORMAT, version: 3, exportedAt: Date.now(), audit }, null, 1)
+  return JSON.stringify({ format: FILE_FORMAT, version: CURRENT_VERSION, exportedAt: Date.now(), audit }, null, 1)
 }
 
 /** Rejects a file that is too big before it is read at all (File.size). */

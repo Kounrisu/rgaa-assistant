@@ -1,80 +1,80 @@
-00 empty                                                               bc087bf260 7282
-01 registered, not scanned                                             5a2a7a1c06 15912
-02 checks after the automatic run                                      76d5d9b560 46510
-03 checks, one problem noted                                           a88e2db7f3 46632
-04 images                                                              205379cdea 36355
-05 images, unnamed one selected (problem banner)                       7026948d5c 36973
-06 images, applied from the problem banner                             8ba0e48438 46356
-07 images, kind chosen                                                 2c0c10682e 37920
-08 images, criterion answered                                          b6d59a36b7 38236
-09 images, note typed                                                  f65986f180 38417
-10 images, filter to review                                            d026796388 37854
-11 images, next with the keyboard                                      f65986f180 38417
-theme 2 Cadres 2/2                                                     71cc5a97d4 18634
-theme 3 Couleurs 0/3                                                   0c2ae59b04 39763
-theme 3 Couleurs 0/3, contrast checker with black text                 ea5c8a6cb0 39281
-theme 3 Couleurs 0/3, contrast checker with light text                 d8aa46e63e 39647
-theme 3 Couleurs 0/3, finding verdict clicked                          e7ce13470d 39324
-theme 3 Couleurs 0/3, filter to review                                 8cfeccaa53 25205
-theme 3 Couleurs 0/3, checklist verdict clicked                        0d44f66549 39317
-theme 4 Multimédia 0/13                                                f95074f882 49424
-theme 4 Multimédia 0/13, checklist verdict clicked                     4bf041a310 49173
-theme 4 Multimédia 0/13, suggestion confirmed                          24c5727adf 48924
-theme 5 Tableaux 2/8                                                   ace3527ea8 39872
-theme 5 Tableaux 2/8, finding verdict clicked                          b33214d757 39464
-theme 5 Tableaux 2/8, filter to review                                 2d94ba9ea9 39210
-theme 5 Tableaux 2/8, checklist verdict clicked                        b886fb2a05 39205
-theme 6 Liens 0/2                                                      53b7070c6b 38245
-theme 6 Liens 0/2, second finding                                      46467548bd 27667
-theme 6 Liens 0/2, finding verdict clicked                             351907ffce 27540
-theme 6 Liens 0/2, filter to review                                    859b83cb05 26279
-theme 7 Scripts 0/5                                                    294d76e4e4 43710
-theme 7 Scripts 0/5, second finding                                    7995eab426 43013
-theme 7 Scripts 0/5, finding verdict clicked                           2213c905c2 42529
-theme 7 Scripts 0/5, filter to review                                  670ab0c1a6 42527
-theme 7 Scripts 0/5, checklist verdict clicked                         58460a94f1 42563
-theme 8 Éléments obligatoires 0/10                                     cd7fb02905 37326
-theme 8 Éléments obligatoires 0/10, checklist verdict clicked          4f6607c0a7 37081
-theme 8 Éléments obligatoires 0/10, suggestion confirmed               98ed8f690a 36793
-theme 9 Structure 0/4                                                  7a7aaa20a1 31405
-theme 9 Structure 0/4, second finding                                  7a7aaa20a1 31405
-theme 9 Structure 0/4, finding verdict clicked                         364bb146a8 31278
-theme 9 Structure 0/4, filter to review                                adc579ba41 24073
-theme 9 Structure 0/4, checklist verdict clicked                       831b0d69e2 41454
-theme 10 Présentation 0/14                                             ba47624893 49741
-theme 10 Présentation 0/14, checklist verdict clicked                  b12ccacb38 49497
-theme 10 Présentation 0/14, suggestion confirmed                       e1c8444fec 48919
-theme 11 Formulaires 0/13                                              9aabf82853 55045
-theme 11 Formulaires 0/13, second finding                              1d702b6130 55131
-theme 11 Formulaires 0/13, finding verdict clicked                     7c4f74645d 55004
-theme 11 Formulaires 0/13, filter to review                            165e6db644 54653
-theme 11 Formulaires 0/13, checklist verdict clicked                   20f8ef0eef 55081
-theme 11 Formulaires 0/13, suggestion confirmed                        049f7823c3 54502
-theme 12 Navigation 0/11                                               7155f38b61 39775
-theme 12 Navigation 0/11, checklist verdict clicked                    e359da6c72 39811
-theme 12 Navigation 0/11, suggestion confirmed                         2e81cdfd18 39531
-theme 13 Consultation 0/12                                             3ec5b399eb 43705
-theme 13 Consultation 0/12, checklist verdict clicked                  e502692aef 43741
-theme 13 Consultation 0/12, suggestion confirmed                       8085555af1 43162
-totals: to review                                                      311294528d 46701
-next to review                                                         2bef1a3b55 46132
-page results                                                           6fd6a7f7d0 61465
-page results, sheet 1                                                  c184de4c1b 20723
-page results, sheet 2                                                  f3ea3492fb 49441
-page results, sheet 3                                                  1eb6ccc44f 16769
-page results, sheet 4                                                  dcfbc97c23 32562
-page results, sheet 5                                                  f120750bee 19454
-audit overview                                                         c85adfdc9a 27015
-audit overview, sheet 1                                                24d7f7bf5a 19806
-audit overview, sheet 2                                                cf8b6c2548 12825
-audit overview, sheet 3                                                4d9fb0b951 46593
-audit overview, sheet 4                                                3831d8b0ad 60261
-audit overview, sheet 5                                                bf862d6a0d 47429
-audit overview, sheet 6                                                29617d9862 15852
-audit overview, sheet 7                                                2907f20558 31645
-sample                                                                 14091e5427 14766
-audits list                                                            f3b4039dd3 10781
-checks                                                                 f1921ae03f 43728
-checks, English                                                        566b73c340 42137
-review, English                                                        c6206f346f 44389
-theme 3, English                                                       678a993be3 37958
+00 empty                                                               b09104a3ff 6938
+01 registered, not scanned                                             9632e8a2df 15568
+02 checks after the automatic run                                      3ca7647890 45267
+03 checks, one problem noted                                           6e6f8c4e75 45389
+04 images                                                              e09bfded38 36087
+05 images, unnamed one selected (problem banner)                       b2d9e56232 36706
+06 images, applied from the problem banner                             a365b7ac08 46977
+07 images, kind chosen                                                 8eafd35958 37799
+08 images, criterion answered                                          1070f0d80e 38115
+09 images, note typed                                                  94f14a1fcd 38298
+10 images, filter to review                                            56e48ead2a 37735
+11 images, next with the keyboard                                      94f14a1fcd 38298
+theme 2 Cadres 2/2                                                     e420987d83 18290
+theme 3 Couleurs 0/3                                                   35585e389c 39796
+theme 3 Couleurs 0/3, contrast checker with black text                 434bc7d83e 39314
+theme 3 Couleurs 0/3, contrast checker with light text                 363f95d756 39680
+theme 3 Couleurs 0/3, finding verdict clicked                          251672f25c 39357
+theme 3 Couleurs 0/3, filter to review                                 da6dcbd107 25075
+theme 3 Couleurs 0/3, checklist verdict clicked                        ae70906aca 39350
+theme 4 Multimédia 0/13                                                6fea5e4f98 50475
+theme 4 Multimédia 0/13, checklist verdict clicked                     6c011d773d 50224
+theme 4 Multimédia 0/13, suggestion confirmed                          18a35d5012 49975
+theme 5 Tableaux 2/8                                                   efac091c86 40442
+theme 5 Tableaux 2/8, finding verdict clicked                          709afe4756 40034
+theme 5 Tableaux 2/8, filter to review                                 ae8df90d38 39780
+theme 5 Tableaux 2/8, checklist verdict clicked                        6e2d8d2f9e 39775
+theme 6 Liens 0/2                                                      9d89490834 38201
+theme 6 Liens 0/2, second finding                                      7c36787be2 27603
+theme 6 Liens 0/2, finding verdict clicked                             f0405f1552 27476
+theme 6 Liens 0/2, filter to review                                    d5462579df 26253
+theme 7 Scripts 0/5                                                    9daac6d9e4 43989
+theme 7 Scripts 0/5, second finding                                    fd949571d5 43334
+theme 7 Scripts 0/5, finding verdict clicked                           fccd719aaa 42850
+theme 7 Scripts 0/5, filter to review                                  751def4f09 42848
+theme 7 Scripts 0/5, checklist verdict clicked                         8bc758e107 42884
+theme 8 Éléments obligatoires 0/10                                     854bac135e 38053
+theme 8 Éléments obligatoires 0/10, checklist verdict clicked          e68f0a2f91 37808
+theme 8 Éléments obligatoires 0/10, suggestion confirmed               621380fa34 37520
+theme 9 Structure 0/4                                                  85e0bb3ebb 31434
+theme 9 Structure 0/4, second finding                                  85e0bb3ebb 31434
+theme 9 Structure 0/4, finding verdict clicked                         4f9cdfe429 31307
+theme 9 Structure 0/4, filter to review                                6e79527870 23943
+theme 9 Structure 0/4, checklist verdict clicked                       00431ed0c8 41469
+theme 10 Présentation 0/14                                             a6fb3a8421 50914
+theme 10 Présentation 0/14, checklist verdict clicked                  3a6d5c6c3b 50670
+theme 10 Présentation 0/14, suggestion confirmed                       a62f4d3a2a 50092
+theme 11 Formulaires 0/13                                              cec3691b4b 56283
+theme 11 Formulaires 0/13, second finding                              319238ea72 56312
+theme 11 Formulaires 0/13, finding verdict clicked                     1b5ebdf75f 56185
+theme 11 Formulaires 0/13, filter to review                            d2ef763e79 55891
+theme 11 Formulaires 0/13, checklist verdict clicked                   a929560e9a 56319
+theme 11 Formulaires 0/13, suggestion confirmed                        44ca4e4371 55740
+theme 12 Navigation 0/11                                               a8734b3f68 40621
+theme 12 Navigation 0/11, checklist verdict clicked                    a27629f5e0 40657
+theme 12 Navigation 0/11, suggestion confirmed                         7510f0fda6 40377
+theme 13 Consultation 0/12                                             c050736248 44660
+theme 13 Consultation 0/12, checklist verdict clicked                  3671c1df77 44696
+theme 13 Consultation 0/12, suggestion confirmed                       20986e7bd9 44117
+totals: to review                                                      29b9cb37d4 47322
+next to review                                                         ad19f94552 38312
+page results                                                           765a327333 60431
+page results, sheet 1                                                  36378a7f76 19689
+page results, sheet 2                                                  38794a7a5c 48407
+page results, sheet 3                                                  5f3c4abd74 15735
+page results, sheet 4                                                  cc71f41da6 31528
+page results, sheet 5                                                  053df38582 18420
+audit overview                                                         0c64c16b65 20098
+audit overview, sheet 1                                                23ae4f3a99 12889
+audit overview, sheet 2                                                4dc0cdbca4 5908
+audit overview, sheet 3                                                0d16f8e224 39676
+audit overview, sheet 4                                                4dc08fce80 53344
+audit overview, sheet 5                                                595113a0f4 40512
+audit overview, sheet 6                                                ad433820f6 8935
+audit overview, sheet 7                                                2f890fab62 24728
+sample                                                                 67229a726e 9303
+audits list                                                            22f7b3ade3 3864
+checks                                                                 1d1bfb51d9 42485
+checks, English                                                        38d8ae13d2 40888
+review, English                                                        5573f11876 36824
+theme 3, English                                                       1033e784b8 37950

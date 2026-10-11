@@ -31,6 +31,7 @@ export async function scan(): Promise<void> {
       adoptSite(rec.url)
     }
     else if (url && normalizeUrl(url) !== normalizeUrl(rec.url)) {
+      if (state.runBusy) throw new Error('The inspected URL changed during automatic checks')
       const other = findPage(state.audit, url)
       const question = other
         ? `${t('The browser is on {other} ({url}), not on {label}.', { other: pageLabel(other), url, label })}\n\n${t('OK: scan into {other} instead.', { other: pageLabel(other) })}\n${t('Cancel: stop.')}`
@@ -49,6 +50,7 @@ export async function scan(): Promise<void> {
     const selectedKey = state.elements.find((e) => e.id === state.selectedId)?.key
     if (rec.themes.includes(1)) {
       const response = await sendToPage(inspectedTabId(), { type: 'RGAA_HIGHLIGHT_IMAGES', color: colorOf(1) })
+      if (state.runBusy && normalizeUrl(await inspectedUrl()) !== normalizeUrl(rec.url)) throw new Error('The inspected URL changed during automatic checks')
       rec.scanCoverage = mergeCoverage(rec.scanCoverage, response?.coverage)
       const { added, map } = mergeScan(response?.elements ?? [])
       await sendToPage(inspectedTabId(), { type: 'RGAA_RELABEL', map })
@@ -61,6 +63,7 @@ export async function scan(): Promise<void> {
     }
     for (const tn of rec.themes.filter((n) => FINDING_THEMES.has(n))) {
       const response = await sendToPage(inspectedTabId(), { type: 'RGAA_SCAN_THEME', theme: tn, color: colorOf(tn) })
+      if (state.runBusy && normalizeUrl(await inspectedUrl()) !== normalizeUrl(rec.url)) throw new Error('The inspected URL changed during automatic checks')
       rec.scanCoverage = mergeCoverage(rec.scanCoverage, response?.coverage)
       const { map, added } = mergeFindings(tn, response?.findings ?? [])
       await sendToPage(inspectedTabId(), { type: 'RGAA_RELABEL', map, theme: tn })
@@ -82,7 +85,7 @@ export async function scan(): Promise<void> {
     state.lastScanOk = true
     say(
       first
-        ? t('{label} scanned: {parts}. Open a popin or a tab, then click “Rescan {label}” to add what appears.', { label, parts: parts.join(' · ') })
+        ? t('{label} scanned: {parts}.', { label, parts: parts.join(' · ') })
         : t('Rescan {n} of {label}: {parts}.', { n: state.scanCount, label, parts: parts.join(' · ') }),
     )
   } catch (err) {

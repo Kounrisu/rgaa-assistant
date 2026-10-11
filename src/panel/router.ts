@@ -3,6 +3,7 @@
  */
 import { renderPageBar, renderThemeBar, renderStats, showNavBanner, renderSummaries, renderEmpty, renderAuditBar } from './chrome'
 import { renderFilters, renderList, renderDetail } from './images-view'
+import { renderBatch } from './batch-view'
 import { state } from './state'
 import { renderResults } from './results-view'
 import { renderAudit } from './audit-overview'
@@ -62,6 +63,8 @@ export async function removePage(rec: PageRecord | null = state.page): Promise<v
   if (!rec) return
   const label = pageLabel(rec)
   if (!(await askConfirm(t('Remove {label}?', { label }), `${rec.title || rec.url}\n\n${t('The page and all its answers are deleted from the audit and the other pages are renumbered.')}`, t('Remove page')))) return
+  state.batchSelection.delete(rec.id)
+  state.batch = undefined
   state.audit.pages = state.audit.pages.filter((p) => p !== rec)
   state.scannedThisSession.delete(rec.id)
   if (state.page === rec) loadPage(state.audit.pages[0] ?? null)
@@ -103,6 +106,7 @@ export async function resetPage(rec: PageRecord | null = state.page): Promise<vo
   const label = pageLabel(rec)
   if (!(await askConfirm(t('Reset {label}?', { label }), `${rec.title || rec.url}\n\n${t('This clears its scans and every answer, in all themes. Its URL, title and chosen themes are kept.')}`, t('Reset page')))) return
   for (const n of THEMES.map((t) => t.number)) resetThemeData(rec, n)
+  delete rec.automaticRun
   rec.scanCount = 0
   rec.nextId = 1
   rec.nextFindingId = 1
@@ -120,6 +124,9 @@ export async function resetPage(rec: PageRecord | null = state.page): Promise<vo
 
 export async function resetAudit(): Promise<void> {
   if (!(await askConfirm(t('Reset the whole audit?'), t('This deletes all {n} page(s), their scans and answers, and the site, auditor and context fields. It cannot be undone.', { n: state.audit.pages.length }), t('Delete everything')))) return
+  state.batch = undefined
+  state.batchSelection.clear()
+  state.reviewCursor = undefined
   const fresh = emptyAudit(state.audit.name)
   state.audit = { ...fresh, id: state.audit.id, createdAt: state.audit.createdAt }
   state.scannedThisSession.clear()
@@ -134,8 +141,10 @@ export async function resetAudit(): Promise<void> {
 }
 
 export function setView(next: View): void {
+  if (state.batch?.running) next = 'sample'
   state.view = next
   document.body.dataset.view = next
+  dom.pageWorkBtn.setAttribute('aria-pressed', String(['review', 'page', 'checks'].includes(next)))
   dom.reviewBtn.setAttribute('aria-pressed', String(next === 'review'))
   dom.resultsEl.hidden = next !== 'page'
   dom.auditEl.hidden = next !== 'audit'
@@ -162,6 +171,8 @@ export function setView(next: View): void {
   if (next === 'sample') renderSample()
   if (next === 'audits') void renderAuditsView()
   if (next === 'checks') renderChecks()
+  for (const el of [dom.auditBar, dom.pageBar, dom.auditNavigation, dom.pageNavigation, dom.appEl, dom.themeEl, dom.checksEl, dom.themebarEl]) el.inert = state.runBusy || Boolean(state.batch?.running)
+  renderBatch()
   renderAuditBar()
 }
 

@@ -52,6 +52,14 @@ export async function openRig(context: BrowserContext): Promise<Rig> {
     switch (message?.type) {
       case 'E2E_EVAL':
         try {
+          if (message.expression.startsWith('location.href = ')) {
+            const url = JSON.parse(message.expression.slice('location.href = '.length))
+            await site.goto(url)
+            axeInjected = false
+            await site.addScriptTag({ content: contentScriptSource() })
+            await panel.evaluate((url) => (window as any).__rgaaNavigated(url), site.url())
+            return { result: site.url() }
+          }
           return { result: await site.evaluate(message.expression) }
         } catch (err) {
           return { error: String(err) }
@@ -98,4 +106,10 @@ export async function openRig(context: BrowserContext): Promise<Rig> {
       await panel.reload()
     },
   }
+}
+
+/** Element-only scans are a secondary page action, distinct from the full automatic run. */
+export async function scanElements(panel: Page): Promise<void> {
+  if (!(await panel.locator('#scan-btn').isVisible())) await panel.locator('.page-options > summary').click()
+  await panel.locator('#scan-btn').click()
 }

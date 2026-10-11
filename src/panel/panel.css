@@ -749,3 +749,25 @@ body:not([data-view='review']) .page-tools-disclosure { display: none; }
 .apg-checks li.fail { color: var(--nc, #b91c1c); }
 .apg-checks .detail { color: var(--muted); }
 .apg-keys li { margin: 2px 0; }
+
+/* The audit and the selected page are separate workspaces. */
+.audit-navigation, .page-navigation { display:flex; flex-wrap:wrap; gap:6px; padding:8px 12px; border-bottom:1px solid var(--border); }
+.audit-navigation { background:var(--surface, #f5f6f8); }
+body[data-view="sample"] :is(.pagebar,.page-navigation,.page-progress,#page-tools-disclosure,#nav-banner,#new-banner),
+body[data-view="audit"] :is(.pagebar,.page-navigation,.page-progress,#page-tools-disclosure,#nav-banner,#new-banner),
+body[data-view="audits"] :is(.pagebar,.page-navigation,.page-progress,#page-tools-disclosure,#nav-banner,#new-banner) { display:none; }
+.top-status { margin:0; padding:4px 12px; }
+.top-status:empty { display:none; }
+.review-continue { margin-top:10px; }
+.sample-work { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr)); gap:12px; margin:12px 0; }
+.sample-work .card { margin:0; min-width:0; }
+.sample-work .page-address { overflow-wrap:anywhere; }
+.sample-work .nav { flex-wrap:wrap; }
+.sample-work progress { width:100%; }
+.sample-management { margin:16px 0; }
+
+@media (max-width: 600px) {
+  .audit-navigation, .page-navigation { padding:6px 10px; gap:5px; }
+}
+.batch-controls { margin:12px 0; }
+.page-work p { margin:8px 0; }

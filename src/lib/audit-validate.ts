@@ -6,9 +6,9 @@
 import type { Audit } from './types'
 import { MAX_SNAPSHOT_BASE64, MAX_SNAPSHOT_BYTES } from './snapshot'
 
-export const CURRENT_VERSION = 3
+export const CURRENT_VERSION = 4
 /** Versions this code knows how to migrate (explicitly, see migrate() in audit-store.ts). */
-export const SUPPORTED_VERSIONS: readonly number[] = [2, 3]
+export const SUPPORTED_VERSIONS: readonly number[] = [2, 3, 4]
 
 /** Largest audit file accepted (bytes of the text). Checked on file.size before reading, then on the text. */
 export const MAX_IMPORT_BYTES = 100 * 1024 * 1024
@@ -212,12 +212,20 @@ function page(v: unknown, path: string): void {
       }),
     `${path}.manualChecks`,
   )
+  optional(v.automaticRun, (r, p) => {
+    if (!isRecord(r)) return bad(p, 'an object is expected')
+    oneOf(['running', 'complete', 'partial', 'failed'])(r.status, `${p}.status`)
+    num(r.startedAt, `${p}.startedAt`)
+    str(r.url, `${p}.url`)
+    optional(r.finishedAt, num, `${p}.finishedAt`)
+    optional(r.error, str, `${p}.error`)
+  }, `${path}.automaticRun`)
   optional(v.imports, (a, p) => array(a, p, importReport, 1000), `${path}.imports`)
   optional(v.snapshot, snapshot, `${path}.snapshot`)
   optional(v.htmlCheck, htmlCheck, `${path}.htmlCheck`)
 }
 
-/** Throws unless `v` is a complete, current (v3) audit. */
+/** Throws unless `v` is a complete, current (v4) audit. */
 export function validateAudit(v: unknown): asserts v is Audit {
   if (!isRecord(v)) return bad('audit', 'an object is expected')
   if (v.version !== CURRENT_VERSION) bad('version', `version ${CURRENT_VERSION} is expected after migration`)

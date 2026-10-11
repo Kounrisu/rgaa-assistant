@@ -42,6 +42,10 @@ export interface PanelState {
   resultsSheet: number
   overviewSheet: number
   /** The automatic checks are running. */
+  reviewCursor?: { page: string; key: string }
+  batchSelection: Set<string>
+  batch?: { auditId: string; ids: string[]; index: number; paused: boolean; running: boolean }
+  runBusy: boolean
   axeRunning: boolean
   /** The last scan() went through (runEverything goes on to the checks only then). */
   lastScanOk: boolean
@@ -71,6 +75,8 @@ export const state: PanelState = {
   navDismissed: '',
   resultsSheet: 0,
   overviewSheet: 0,
+  batchSelection: new Set(),
+  runBusy: false,
   axeRunning: false,
   lastScanOk: false,
   session: undefined as unknown as AuditSession,

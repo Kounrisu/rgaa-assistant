@@ -1,3 +1,4 @@
+import { reviewContinue } from './review-controls'
 /**
  * The checklist themes: one card per official criterion, with a verdict, the tools' hints and a note.
  */
@@ -128,6 +129,7 @@ export function renderChecklist(host: HTMLElement = dom.themeEl): void {
       }),
     )
     if (outcome === 'pending') card.classList.add('todo')
+    card.append(reviewContinue(`criterion:${c.id}`))
     list.append(card)
   }
   host.append(list)
