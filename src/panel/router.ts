@@ -1,7 +1,7 @@
 /**
  * Which view is shown, which page is selected, and the resets (a theme, a page, the whole audit). renderAll() redraws everything.
  */
-import { renderPageBar, renderThemeBar, renderStats, showNavBanner, renderSummaries, renderEmpty, renderAuditBar } from './chrome'
+import { renderPageBar, renderThemeBar, renderStats, showNavBanner, renderSummaries, renderEmpty, renderAuditBar, themeSummaryHeading } from './chrome'
 import { renderFilters, renderList, renderDetail } from './images-view'
 import { renderBatch } from './batch-view'
 import { state } from './state'
@@ -197,7 +197,7 @@ export function updateTools(): void {
   dom.themeHeadEl.hidden = !reviewing
   dom.displayToolsEl.hidden = !reviewing
   dom.themeSummaryEl.dataset.theme = String(state.theme)
-  dom.themeSummaryTitle.textContent = t('Theme summary — {name}', { name: t(THEME_LABEL[state.theme]) })
+  dom.themeSummaryTitle.textContent = themeSummaryHeading(state.theme)
   dom.resetThemeBtn.setAttribute('aria-label', t('Reset {name}', { name: t(THEME_LABEL[state.theme]) }))
   dom.toolsEl.hidden = !(reviewing && SCANNED_THEMES.has(state.theme))
 }

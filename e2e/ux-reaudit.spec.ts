@@ -15,14 +15,15 @@ test('the browser address shares the row of the page navigation; the image heade
   const top = async (selector: string) => Math.round((await panel.locator(selector).boundingBox())!.y)
   expect(Math.abs((await top('#live-url')) - (await top('.page-navigation')))).toBeLessThan(24)
 
-  // what is left for the image, visible next to its title
+  // what is left for the image, visible next to its title: the scan pre-filled the first image (text alternative present: 1.1 compliant)
   await panel.locator('#element-list .item').first().click()
   const progress = panel.locator('#criteria-progress')
-  await expect(progress).toBeEmpty() // no type chosen yet: nothing to count
-  await panel.locator('label[for="kind-1-informative"]').click()
-  await expect(progress).toContainText('0/6 critères répondus · prochain : 1.1')
-  await panel.locator('label[for="crit-1-1.1-c"]').click()
-  await expect(progress).toContainText('1/6 critères répondus · prochain : 1.3')
+  await expect(progress).toContainText('1/6 critères de cette image renseignés · prochain : 1.3 · pré-rempli, à confirmer')
+  await panel.locator('label[for="crit-1-1.1-c"]').click() // confirming 1.1 removes the pre-filled mark
+  await expect(progress).toContainText('1/6 critères de cette image renseignés · prochain : 1.3')
+  await expect(progress).not.toContainText('pré-rempli')
+  await panel.locator('label[for="crit-1-1.3-c"]').click()
+  await expect(progress).toContainText('2/6 critères de cette image renseignés · prochain : 1.6')
 
   // every manual check says how to do it
   await panel.locator('#checks-btn').click()

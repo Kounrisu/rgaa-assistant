@@ -124,6 +124,35 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Handoff log (newest first)
 
+### 2026-10-11 — Claude Code — numbers follow the page, pre-filled criteria, a list you can see and use with the keyboard
+- Context: the owner said the image numbering "is not right at all", did not understand the "1/9", asked for the analysis to pre-complete
+  more, said the list of elements looked dim and asked for a visible focus and keyboard use. Codex was working on image numbering on this
+  branch at the same time (`7bd2e60`, `5f1b1be`: stable numbers on rescans, internal ids kept apart): I read both entries first. Their
+  identity fixes (keys, collisions) are untouched; I changed one DECISION of theirs, see "For the other agent".
+- Did (numbering): `src/panel/page-order.ts` (`pageOrder`). After each scan the images, and the findings of the scanned theme, are numbered in
+  the reading order of that scan (#1 = first on the page); an element that is not on the page now stays next to the neighbour it had. Answers
+  follow the element through its key, not its number. The status says "N renumérotée(s)". The real audit showed why: numbers were in
+  discovery order (a logo #2, another logo #24, then menu icons #25 to #30 found later at the top of the page).
+- Did ("x/9"): the 9 on the theme tab is the number of RGAA criteria of the theme (1.1 to 1.9), nothing to do with images. The theme
+  heading now says it: "Bilan de la thématique — Images · 0/9 critères RGAA confirmés · 2 à confirmer". The image header said "1 / 3" next to the
+  criteria count: it now reads "image 3 sur 9" and "1/6 critères de cette image renseignés · prochain : 1.3 · pré-rempli, à confirmer".
+- Did (pre-completed): `prefill` (`src/panel/scan-merge.ts`) now also answers from the markup, flagged `auto` (counts as to confirm): ignored =
+  decorative 1.2 C (unchanged); has an accessible name = informative 1.1 C; no name and not ignored = informative 1.1 NC (decorative would
+  fail 1.2 anyway). 1.3 (relevance) and the others stay the auditor's. New button "Confirmer les N images pré-remplies" (with a dialog that
+  says what is confirmed) for pages with dozens of icons; `themeProgress` also returns `suggested`.
+- Did (list): the list no longer fades done and ignored rows (opacity rules removed); the current image has a thick frame and a ▶ marker;
+  keyboard focus is a thick dark ring; the lists of images and of findings are one Tab stop with Arrow / Page / Home / End moving the selection
+  (and the box on the page), Tab leaves the list.
+- Tests: `e2e/element-list.spec.ts` (numbering of icons added at the top, roving tabindex, arrows, ring, marker, Tab leaves, confirm-all),
+  `tests/panel-scan-merge.test.ts` (page order, answers follow, absent images keep their place, findings, pre-fill rules);
+  `e2e/image-numbering.spec.ts`, `e2e/smoke.spec.ts`, `e2e/summary-navigation.spec.ts`, `e2e/ux-reaudit.spec.ts` updated to the new rules;
+  parity baseline updated (read: tabindex on items, the review-actions and pre-filled notes, the theme heading text, the confirm button).
+  `npm run check` 197 unit tests, 721 texts / 1256 French / 0 missing; `npm run test:e2e` all passed. Not tested in a real Firefox.
+- For the other agent (Codex): `7bd2e60` / its test required that a NEW image inserted before an existing one gets the next number and the
+  old one keeps #1. That is now reversed on purpose (numbers = reading order); its test asserts the new order and that the old image keeps its
+  record, key and answers. If the owner prefers stable numbers, revert `pageOrder` in `mergeScan` / `mergeFindings` only.
+  Notes the auditor typed with "#12" in them do not follow a renumbering.
+
 ### 2026-10-11 — Codex — separate internal image IDs from displayed audit numbers
 - Did: `5f1b1be` removes the write of audit numbers back into the DOM WeakMap and its counter during relabeling.
   These are independent identities: otherwise a hidden node can retain an internal ID later assigned as another

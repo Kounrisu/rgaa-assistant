@@ -14,7 +14,7 @@ describe('review navigation and confirmed progress', () => {
     page.checklist['8.5'] = { suggested: 'nc', source: 'axe', note: '' }
     state.page = page
     expect(firstThemeWith('pending')).toBe(8)
-    expect(themeProgress(page, 8)).toEqual({ done: criteria.length - 1, total: criteria.length })
+    expect(themeProgress(page, 8)).toEqual({ done: criteria.length - 1, total: criteria.length, suggested: 1 }) // the automatic failure is counted as waiting for confirmation, not as done
     page.checklist['8.5'] = { verdict: 'nc', note: '' }
     expect(firstThemeWith('pending')).toBeNull()
     expect(themeProgress(page, 8).done).toBe(criteria.length)

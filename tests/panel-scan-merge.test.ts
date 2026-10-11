@@ -6,6 +6,7 @@ import type { FindingItem, ImageElementInfo, ImageReview, PageRecord, RawFinding
 import { applyContrastVerdict, contrastOutcome } from '../src/panel/contrast-checker'
 import { keyOf } from '../src/panel/helpers'
 import { keyOfFinding, mergeFindings, mergeScan, nextFindingNumber, prefill } from '../src/panel/scan-merge'
+import { pageOrder } from '../src/panel/page-order'
 import { state } from '../src/panel/state'
 import type { Item } from '../src/panel/types'
 
@@ -72,9 +73,10 @@ describe('mergeScan: a scan joins the images already known', () => {
     const key = state.elements[0].key
     state.reviews[key] = { kind: 'informative', answers: { '1.1': 'c' }, note: 'Auditor note' }
     const changedContext = info(17, { ...info(1), id: 17, contextHtml: '<p>New sibling<img id="1"></p>' })
-    expect(mergeScan([info(2), changedContext])).toEqual({ added: 1, map: [{ from: 2, to: 2 }, { from: 17, to: 1 }] })
+    // numbers follow the page order: the new image comes first on the page, so it is #1 and the known image is #2 (its answers stay with it)
+    expect(mergeScan([info(2), changedContext])).toEqual({ added: 1, renumbered: 1, map: [{ from: 2, to: 1 }, { from: 17, to: 2 }] })
     expect(state.elements).toHaveLength(2)
-    expect(state.elements[0]).toMatchObject({ id: 1, key, present: true, contextHtml: changedContext.contextHtml })
+    expect(state.elements.find((e) => e.key === key)).toMatchObject({ id: 2, key, present: true, contextHtml: changedContext.contextHtml })
     // Reopen using only the persisted record: matching needs no session cache.
     rec = JSON.parse(JSON.stringify(rec))
     state.page = rec
@@ -101,7 +103,7 @@ describe('mergeScan: a scan joins the images already known', () => {
     expect(mergeScan([info(1, { linkHref: '/another', contextHtml: '<a href="/another"><img id="1"></a>' })]).added).toBe(1)
   })
 
-  it('pre-fills as decorative (1.2 compliant) an image hidden from assistive tech with no name, and only that', () => {
+  it('pre-fills what the markup answers: decorative if ignored, informative 1.1 compliant if named, informative 1.1 non-compliant if nothing names it', () => {
     mergeScan([
       info(1, { alt: '', accessibleName: null, ignoredBy: 'aria-hidden="true"' }),
       info(2, { alt: 'Logo' }),
@@ -109,9 +111,16 @@ describe('mergeScan: a scan joins the images already known', () => {
     ])
     const [a, b, c] = state.elements
     expect(state.reviews[a.key]).toEqual({ kind: 'decorative', answers: { '1.2': 'c' }, note: '', auto: true })
-    // the others only get the empty review that reviewOf creates on the way
-    expect(state.reviews[b.key]).toEqual({ answers: {}, note: '' })
-    expect(state.reviews[c.key]).toEqual({ answers: {}, note: '' })
+    expect(state.reviews[b.key]).toEqual({ kind: 'informative', answers: { '1.1': 'c' }, note: '', auto: true })
+    expect(state.reviews[c.key]).toEqual({ kind: 'informative', answers: { '1.1': 'nc' }, note: '', auto: true })
+  })
+
+  it('pre-filling never touches an image the auditor already worked on', () => {
+    mergeScan([info(1, { alt: 'Logo' })])
+    const key = state.elements[0].key
+    state.reviews[key] = { kind: 'decorative', answers: { '1.2': 'nc' }, note: 'mine' }
+    mergeScan([info(1, { alt: 'Logo' })])
+    expect(state.reviews[key]).toEqual({ kind: 'decorative', answers: { '1.2': 'nc' }, note: 'mine' })
   })
 
   it('prefill never overwrites an answer the auditor gave', () => {
@@ -223,5 +232,52 @@ describe('contrast checker maths', () => {
     applyContrastVerdict(f({ fg: '#bbbbbb', bg: '#ffffff' }), review, false)
     expect(review.answers).toEqual({})
     expect(review.note).toMatch(/^Contrast too low/)
+  })
+})
+
+describe('numbers follow the page order', () => {
+  const keys = (list: { key: string }[]) => list.map((x) => x.key)
+
+  it('pageOrder: found items in the latest scan order, absent ones stay behind the neighbour they had', () => {
+    const items = ['a', 'b', 'c', 'd'].map((key) => ({ key }))
+    // b is not found this time; e is new at the top; d now sits before c
+    const merged = [...items, { key: 'e' }]
+    expect(keys(pageOrder(merged, ['e', 'a', 'd', 'c']))).toEqual(['e', 'a', 'b', 'd', 'c'])
+    // an absent item that was first stays first
+    expect(keys(pageOrder([{ key: 'x' }, { key: 'y' }], ['y']))).toEqual(['x', 'y'])
+    // nothing found: order unchanged
+    expect(keys(pageOrder(items, []))).toEqual(['a', 'b', 'c', 'd'])
+  })
+
+  it('an image found by a rescan at the top of the page becomes #1; the others shift and keep their answers', () => {
+    mergeScan([info(1), info(2)])
+    const keyOne = state.elements[0].key
+    state.reviews[keyOne] = { kind: 'informative', answers: { '1.1': 'c' }, note: 'logo' }
+    const { added, renumbered, map } = mergeScan([info(9), info(1), info(2)])
+    expect(added).toBe(1)
+    expect(renumbered).toBe(2)
+    expect(state.elements.map((e) => [e.id, e.src])).toEqual([[1, 'https://x.test/9.png'], [2, 'https://x.test/1.png'], [3, 'https://x.test/2.png']])
+    expect(map).toEqual([{ from: 9, to: 1 }, { from: 1, to: 2 }, { from: 2, to: 3 }])
+    expect(state.reviews[keyOne]).toMatchObject({ kind: 'informative', note: 'logo' }) // the answer stayed with the image
+    expect(rec.nextId).toBe(4)
+  })
+
+  it('an image that is not on the page now keeps its place between its neighbours', () => {
+    mergeScan([info(1), info(2), info(3)])
+    mergeScan([info(1), info(3)]) // 2 is gone (a closed popin)
+    expect(state.elements.map((e) => [e.id, e.present, e.src?.slice(-5)])).toEqual([[1, true, '1.png'], [2, false, '2.png'], [3, true, '3.png']])
+    mergeScan([info(1), info(5), info(3)]) // a new one appears between 1 and 3
+    expect(state.elements.map((e) => e.src?.slice(-5))).toEqual(['1.png', '2.png', '5.png', '3.png'])
+    expect(state.elements.map((e) => e.id)).toEqual([1, 2, 3, 4])
+  })
+
+  it('findings of a theme are numbered in the order of the latest scan, and their answers follow them', () => {
+    mergeFindings(6, [raw({ type: 'link', id: 1, label: 'B', summary: 'b' }), raw({ type: 'link', id: 2, label: 'C', summary: 'c' })])
+    const second = rec.findings.find((f) => f.label === 'C')!
+    rec.findingReviews[second.key] = { answers: { '6.1': 'nc' }, note: 'n' }
+    const { map } = mergeFindings(6, [raw({ type: 'link', id: 1, label: 'A', summary: 'a' }), raw({ type: 'link', id: 2, label: 'B', summary: 'b' }), raw({ type: 'link', id: 3, label: 'C', summary: 'c' })])
+    expect(rec.findings.filter((f) => f.theme === 6).map((f) => [f.id, f.label])).toEqual([[1, 'A'], [2, 'B'], [3, 'C']])
+    expect(map).toEqual([{ from: 1, to: 1 }, { from: 2, to: 2 }, { from: 3, to: 3 }])
+    expect(rec.findingReviews[second.key]).toMatchObject({ answers: { '6.1': 'nc' }, note: 'n' })
   })
 })

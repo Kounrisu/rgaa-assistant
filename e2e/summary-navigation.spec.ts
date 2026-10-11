@@ -117,7 +117,7 @@ test('page and theme summaries have explicit scopes; unselected criteria remain 
   await panel.locator('#empty-add-btn').click()
   await restorePage(rig, { themes: [8], checklist: { '8.1': { verdict: 'c', note: '' } } })
   await expect(panel.locator('#page-summary-title')).toHaveText('Bilan de la page — P01')
-  await expect(panel.locator('#theme-summary-title')).toHaveText('Bilan de la thématique — Éléments obligatoires')
+  await expect(panel.locator('#theme-summary-title')).toHaveText('Bilan de la thématique — Éléments obligatoires · 1/10 critères RGAA confirmés')
   const countStatuses = (selector: string) => panel.locator(`${selector} > button > strong`).evaluateAll((nodes) => nodes.reduce((sum, node) => sum + Number(node.textContent), 0))
   expect(await countStatuses('#page-summary')).toBe(106)
   expect(await countStatuses('#theme-summary')).toBe(10)

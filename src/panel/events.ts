@@ -10,7 +10,7 @@ import { applyBoxes, goTo, sendToPage, inspectedTabId } from './page-bridge'
 import { addPage } from './sample-view'
 import { state } from './state'
 import { scan } from './scan-flow'
-import { renderList, select } from './images-view'
+import { renderList, select, listKeyDown } from './images-view'
 import { normalizeUrl } from '../lib/audit-store'
 import { actions } from './actions'
 import { runEverything } from './auto-checks'
@@ -91,6 +91,7 @@ export function wireEvents(): void {
   })
   dom.resultsBtn.addEventListener('click', () => setView('page'))
   dom.auditBtn.addEventListener('click', () => setView('audit'))
+  dom.listEl.addEventListener('keydown', listKeyDown)
   dom.nextBtn.addEventListener('click', () => { void actions.nextReview() })
   // Keyboard: n goes to the next element to review, j / k move between images (outside text fields).
   document.addEventListener('keydown', (event) => {

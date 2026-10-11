@@ -257,7 +257,7 @@ textarea {
 
 .banner { display: flex; align-items: center; gap: 10px; margin: 0; padding: 8px 16px; background: var(--warn-soft); color: var(--warn); font-weight: 600; }
 .banner button { padding: 3px 12px; border: 1px solid currentColor; border-radius: 6px; background: transparent; color: inherit; }
-.item.absent { opacity: 0.6; }
+.item.absent { opacity: 0.78; }
 .item .type.popin { background: var(--accent-soft); color: var(--accent); }
 .item .type.new { background: var(--warn-soft); color: var(--warn); }
 .item .type.gone { background: var(--bad-soft); color: var(--bad); }
@@ -615,12 +615,11 @@ dialog.confirm { width: min(460px, 92vw); }
 .item[data-detected='unnamed'] { border-left-color: var(--bad); }
 .item[data-detected='named'] { border-left-color: #2563eb; }
 .item[data-detected='ignored'] { border-left-color: #94a3b8; }
-.item[data-detected='ignored'] .thumb { opacity: .55; }
+.item[data-detected='ignored'] .thumb { opacity: .85; }
 .item[data-kind='contrast-fail'] { border-left-color: var(--bad); }
 .item[data-kind='contrast-unknown'] { border-left-color: var(--warn); }
-/* what still needs you stands out, what is done recedes */
+/* what still needs you stands out; what is done is marked by its tick, not by fading the whole row (faded rows were hard to read) */
 .item[data-status='todo'] .num { font-weight: 800; }
-.item[data-status='c']:not([aria-current='true']):not(:hover) { opacity: .68; }
 
 .dot { width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center; box-sizing: border-box; border: 2px solid var(--muted); background: transparent; color: #fff; font: 700 13px/1 system-ui, sans-serif; flex: none; }
 .dot.progress { border-color: var(--warn); background: conic-gradient(var(--warn) 0 50%, transparent 50% 100%); }
@@ -805,3 +804,9 @@ body[data-view="audits"] :is(.pagebar,.page-progress,#display-tools,#nav-banner,
   .display-tools { padding: 6px 10px; }
   .summary-heading .progress { flex: 1 1 auto; }
 }
+
+/* The element you are on: unmistakable (a thick frame, a marker before its number), and a dark ring when the keyboard is on it */
+.item[aria-current='true'] { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--tc, var(--accent)); }
+.item[aria-current='true'] .num::before { content: '▶ '; font-size: 11px; }
+.item:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; box-shadow: 0 0 0 5px var(--surface); z-index: 1; position: relative; }
+.item[aria-current='true']:focus-visible { box-shadow: inset 0 0 0 2px var(--tc, var(--accent)), 0 0 0 5px var(--surface); }
