@@ -9,6 +9,7 @@ import { suggestFinding } from '../lib/findings'
 import { applyContrastVerdict } from './contrast-checker'
 import type { Item } from './types'
 import { reviewOf } from './review-state'
+import { pageOrder } from './page-order'
 import { hintFor } from '../lib/rgaa'
 
 export function keyOfFinding(theme: number, f: RawFinding): string {
@@ -49,19 +50,19 @@ export function mergeFindings(themeNo: number, raw: RawFinding[]): { map: { from
   for (const f of rec.findings.filter((x) => x.theme === themeNo && !seen.has(x.key) && !worked(x))) delete rec.findingReviews[f.key]
   rec.findings = rec.findings.filter((x) => x.theme !== themeNo || seen.has(x.key) || worked(x))
   const byKey = new Map(rec.findings.filter((f) => f.theme === themeNo).map((f) => [f.key, f]))
-  const map: { from: number; to: number }[] = []
+  const matched: { from: number; item: FindingItem }[] = []
   let added = 0
   raw.forEach((r, i) => {
     const key = rawKeys[i]
     const existing = byKey.get(key)
     if (existing) {
       Object.assign(existing, r, { id: existing.id, key, theme: themeNo, present: true, scan: existing.scan })
-      map.push({ from: r.id, to: existing.id })
+      matched.push({ from: r.id, item: existing })
     } else {
       const item: FindingItem = { ...r, id: r.type === 'contrast-ok' ? 0 : nextFindingNumber(rec, themeNo), theme: themeNo, key, present: true, scan: state.scanCount }
       rec.findings.push(item)
       byKey.set(key, item)
-      map.push({ from: r.id, to: item.id })
+      matched.push({ from: r.id, item })
       added++
     }
   })
@@ -81,9 +82,17 @@ export function mergeFindings(themeNo: number, raw: RawFinding[]): { map: { from
     if (f.type === 'contrast-fail' && !review.note.trim()) applyContrastVerdict(f, review, false)
     if (filled) review.auto = true
   }
+  // Numbers follow the page (reading order of the latest scan), like the images; answers follow the element through its key.
+  // The unnumbered “text that passes” line of Colours keeps 0.
+  const numbered = rec.findings.filter((f) => f.theme === themeNo && f.type !== 'contrast-ok')
+  const selected = state.page === rec && state.theme === themeNo ? numbered.find((f) => f.id === state.findingSel) : undefined
+  const ordered = pageOrder(numbered, rawKeys.filter((k) => byKey.get(k)?.type !== 'contrast-ok'))
+  ordered.forEach((f, i) => (f.id = i + 1))
+  if (selected) state.findingSel = selected.id
+  rec.findings = [...rec.findings.filter((f) => f.theme !== themeNo), ...rec.findings.filter((f) => f.theme === themeNo && f.type === 'contrast-ok'), ...ordered]
   rec.findings.sort((a, b) => a.theme - b.theme || a.id - b.id)
   if (!rec.scannedThemes.includes(themeNo)) rec.scannedThemes.push(themeNo)
-  return { map, added }
+  return { map: matched.map(({ from, item }) => ({ from, to: item.id })), added }
 }
 
 /** Next number of a theme: one more than the highest still in use, so numbering stays 1, 2, 3… */
@@ -92,23 +101,36 @@ export function nextFindingNumber(rec: PageRecord, themeNo: number): number {
   return used + 1
 }
 
-/** Ignored by assistive tech and nameless: decorative + 1.2 compliant, until a human says otherwise. */
+/**
+ * What the markup already answers, until a human says otherwise (flagged `auto`: it counts as “to confirm”, never as confirmed):
+ * - ignored by assistive tech and nameless: decorative, 1.2 compliant;
+ * - it has an accessible name: informative, 1.1 compliant (the text alternative exists: its relevance, 1.3 and the others, stay yours);
+ * - no name and not ignored: informative, 1.1 non-compliant (decorative would fail 1.2 for the same reason: either way it fails).
+ */
 export function prefill(el: Item): void {
   const review = reviewOf(el)
-  if (!el.ignoredBy || hintFor('1.2', el)?.tone !== 'ok') return
   const untouched = !review.kind && !Object.keys(review.answers).length
-  const decorativeWithoutVerdict = review.kind === 'decorative' && review.answers['1.2'] === undefined
-  if (!untouched && !decorativeWithoutVerdict) return
-  review.kind = 'decorative'
-  review.answers['1.2'] = 'c'
+  if (el.ignoredBy) {
+    if (hintFor('1.2', el)?.tone !== 'ok') return
+    const decorativeWithoutVerdict = review.kind === 'decorative' && review.answers['1.2'] === undefined
+    if (!untouched && !decorativeWithoutVerdict) return
+    review.kind = 'decorative'
+    review.answers['1.2'] = 'c'
+    review.auto = true
+    return
+  }
+  if (!untouched) return
+  review.kind = 'informative'
+  review.answers['1.1'] = el.accessibleName ? 'c' : 'nc'
   review.auto = true
 }
 
 /** Merges a scan into the current page. Returns the new count and the renumbering for the page's boxes. */
-export function mergeScan(found: ImageElementInfo[]): { added: number; map: { from: number; to: number }[] } {
+export function mergeScan(found: ImageElementInfo[]): { added: number; renumbered: number; map: { from: number; to: number }[] } {
   const rec = state.page!
   state.scanCount++
   const byKey = new Map(state.elements.map((el) => [el.key, el]))
+  const before = new Map(state.elements.map((el) => [el.key, el.id])) // the numbers of the images known before this scan
   // Surrounding text/siblings are evidence, but can change without replacing the image.
   // Fall back only for a unique, unchanged image (including its link destination).
   // Never guess between identical images or transfer an answer after its markup changes.
@@ -129,7 +151,8 @@ export function mergeScan(found: ImageElementInfo[]): { added: number; map: { fr
     return n ? `${base}~${n}` : base
   })
   const reserved = new Set(keys.filter(key => byKey.has(key)))
-  const map: { from: number; to: number }[] = []
+  const matched: { from: number; item: Item }[] = []
+  const foundKeys: string[] = []
   let added = 0
   for (const [index, info] of found.entries()) {
     let key = keys[index]
@@ -142,19 +165,25 @@ export function mergeScan(found: ImageElementInfo[]): { added: number; map: { fr
       }
     }
     seen.add(key)
+    foundKeys.push(key)
     if (existing) {
       Object.assign(existing, info, { id: existing.id, key, present: true, scan: existing.scan })
-      map.push({ from: info.id, to: existing.id })
+      matched.push({ from: info.id, item: existing })
     } else {
-      const item: Item = { ...info, id: rec.nextId++, key, present: true, scan: state.scanCount }
+      const item: Item = { ...info, id: 0, key, present: true, scan: state.scanCount }
       state.elements.push(item)
       byKey.set(key, item)
-      map.push({ from: info.id, to: item.id })
+      matched.push({ from: info.id, item })
       added++
     }
   }
   for (const el of state.elements) if (!seen.has(el.key)) el.present = false
   for (const el of state.elements) if (el.present) prefill(el)
-  state.elements.sort((a, b) => a.scan - b.scan || a.id - b.id)
-  return { added, map }
+  // Numbers follow the page: #1 is the first image in reading order, whatever order the scans found them in. Answers belong to the
+  // element (its key), not to its number. Images not found this time stay next to the neighbours they had.
+  state.elements.splice(0, state.elements.length, ...pageOrder(state.elements, foundKeys))
+  state.elements.forEach((el, i) => (el.id = i + 1))
+  rec.nextId = state.elements.length + 1
+  const renumbered = state.elements.filter((el) => before.get(el.key) !== undefined && before.get(el.key) !== el.id).length
+  return { added, renumbered, map: matched.map(({ from, item }) => ({ from, to: item.id })) }
 }

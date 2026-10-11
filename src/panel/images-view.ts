@@ -58,7 +58,10 @@ export function renderFilters(): void {
 
 export function renderList(): void {
   dom.listEl.replaceChildren()
-  for (const el of visibleElements()) {
+  const shown = visibleElements()
+  // one stop for the Tab key in the whole list (the selected image, else the first); the arrows move inside it
+  const tabStop = shown.some((e) => e.id === state.selectedId) ? state.selectedId : shown[0]?.id
+  for (const el of shown) {
     const alt = altLabel(el)
     const status = statusOf(el)
     const detected = detectedOf(el)
@@ -71,6 +74,7 @@ export function renderList(): void {
         'data-detected': detected,
         'data-status': status,
         'aria-current': el.id === state.selectedId ? 'true' : 'false',
+        tabindex: el.id === tabStop ? '0' : '-1',
         onclick: () => select(el.id, true),
       },
       previewOf(el)
@@ -104,6 +108,7 @@ export function refreshListState(): void {
     const el = state.elements.find((e) => e.id === Number(btn.dataset.id))
     if (!el) continue
     btn.setAttribute('aria-current', el.id === state.selectedId ? 'true' : 'false')
+    btn.tabIndex = el.id === state.selectedId ? 0 : -1
     btn.dataset.status = statusOf(el)
     const dot = btn.querySelector('.dot') as HTMLElement
     const status = statusOf(el)
@@ -146,7 +151,7 @@ export function renderDetailNow(): void {
         previewOf(el) ? h('img', { class: 'compact-preview', src: previewOf(el)!, alt: t('Preview of image {id}', { id: el.id }) }) : null,
         `${t('Image #{id}', { id: el.id })} `,
         h('span', { class: `result ${statusOf(el)}`, id: 'result-badge' }, t(STATUS_LABEL[statusOf(el)])),
-        h('span', { class: 'hint-line' }, `  ${index + 1} / ${state.elements.length}`),
+        h('span', { class: 'hint-line' }, `  ${t('image {n} of {total}', { n: index + 1, total: state.elements.length })}`),
         h('span', { class: 'hint-line criteria-progress', id: 'criteria-progress' }, criteriaProgressText(el)),
       ),
       h(
@@ -370,14 +375,15 @@ export function criterionCard(el: Item, review: ImageReview, criterion: Criterio
   return card
 }
 
-/** “3/7 criteria answered · next: 1.3”: what is left for this image, visible without scrolling to the cards. Empty before the type is chosen. */
+/** “3/7 criteria of this image answered · next: 1.3”: what is left for this image, visible without scrolling to the cards. Empty before the type is chosen. */
 export function criteriaProgressText(el: Item): string {
   const review = state.reviews[reviewKey(el)]
   if (!review?.kind) return ''
   const list = criteriaFor(review.kind)
   const open = list.find((c) => review.answers[c.id] === undefined)
   const done = list.length - list.filter((c) => review.answers[c.id] === undefined).length
-  return open ? t('{done}/{total} criteria answered · next: {id}', { done, total: list.length, id: open.id }) : t('{done}/{total} criteria answered', { done, total: list.length })
+  const text = open ? t('{done}/{total} criteria of this image answered · next: {id}', { done, total: list.length, id: open.id }) : t('{done}/{total} criteria of this image answered', { done, total: list.length })
+  return review.auto && done ? `${text} · ${t('pre-filled, confirm it')}` : text
 }
 
 export function refreshAll(): void {
@@ -404,4 +410,28 @@ export function select(id: number, scroll: boolean): void {
   refreshListState()
   renderDetail()
   focusOnPage(id, scroll)
+}
+
+/**
+ * Keyboard in the list of images: Tab enters the list once (on the selected image) and leaves it with the next Tab; the arrows
+ * (and Home / End / Page Up / Page Down) move to the previous or next image of the shown list, select it and show it on the page.
+ */
+export function listKeyDown(event: KeyboardEvent): void {
+  const keys: Record<string, (i: number, n: number) => number> = {
+    ArrowDown: (i) => i + 1,
+    ArrowUp: (i) => i - 1,
+    PageDown: (i) => i + 5,
+    PageUp: (i) => i - 5,
+    Home: () => 0,
+    End: (_i, n) => n - 1,
+  }
+  const move = keys[event.key]
+  if (!move || event.altKey || event.ctrlKey || event.metaKey) return
+  const shown = visibleElements()
+  if (!shown.length) return
+  event.preventDefault()
+  const current = shown.findIndex((e) => e.id === state.selectedId)
+  const target = shown[Math.min(shown.length - 1, Math.max(0, move(current < 0 ? 0 : current, shown.length)))]
+  select(target.id, true)
+  dom.listEl.querySelector<HTMLElement>(`.item[data-id="${target.id}"]`)?.focus()
 }

@@ -68,7 +68,9 @@ test('scan, review, save, reload, export, save to file and reopen', async ({ rig
 
   await test.step('review the first image: answer a criterion', async () => {
     const first = panel.locator('#element-list .item').first()
-    await expect(first).toHaveAttribute('data-status', 'todo')
+    // the scan already answered from the markup (the image has a text alternative: informative, 1.1 compliant), flagged as pre-filled
+    await expect(first).toHaveAttribute('data-status', 'progress')
+    await expect(first.locator('.auto-tag')).toBeVisible()
     await panel.locator('label[for="kind-1-informative"]').click()
     await panel.locator('label[for="crit-1-1.1-c"]').click()
     await expect(panel.locator('#crit-1-1\\.1-c')).toBeChecked()

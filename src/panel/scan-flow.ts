@@ -52,12 +52,12 @@ export async function scan(): Promise<void> {
       const response = await sendToPage(inspectedTabId(), { type: 'RGAA_HIGHLIGHT_IMAGES', color: colorOf(1) })
       if (state.runBusy && normalizeUrl(await inspectedUrl()) !== normalizeUrl(rec.url)) throw new Error('The inspected URL changed during automatic checks')
       rec.scanCoverage = mergeCoverage(rec.scanCoverage, response?.coverage)
-      const { added, map } = mergeScan(response?.elements ?? [])
+      const { added, renumbered, map } = mergeScan(response?.elements ?? [])
       await sendToPage(inspectedTabId(), { type: 'RGAA_RELABEL', map })
       if (!rec.scannedThemes.includes(1)) rec.scannedThemes.push(1)
       state.selectedId = state.elements.find((e) => e.key === selectedKey)?.id ?? state.elements[0]?.id ?? null
       const gone = state.elements.filter((e) => !e.present).length
-      parts.push([t('{n} image(s)', { n: state.elements.length }), ...(first ? [] : [t('{n} new', { n: added })]), ...(gone ? [t('{n} gone', { n: gone })] : [])].join(', '))
+      parts.push([t('{n} image(s)', { n: state.elements.length }), ...(first ? [] : [t('{n} new', { n: added })]), ...(gone ? [t('{n} gone', { n: gone })] : []), ...(!first && renumbered ? [t('{n} renumbered (numbers follow the page order)', { n: renumbered })] : [])].join(', '))
     } else {
       state.scanCount++
     }

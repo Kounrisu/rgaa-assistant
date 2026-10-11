@@ -19,9 +19,11 @@ import { colorOf } from '../lib/theme-colors'
 import { auditTitle, timeOf } from './helpers'
 import { actions } from './actions'
 import { criteriaFor } from '../lib/rgaa'
+import { askConfirm } from './dialogs'
 
 /** Kept as the single entry point the rest of the panel calls after any answer. */
 export function renderStats(): void {
+  dom.themeSummaryTitle.textContent = themeSummaryHeading(state.theme)
   renderSummaries()
 }
 
@@ -112,10 +114,30 @@ export function renderSummaries(): void {
           const first = state.elements.find((e) => state.reviews[reviewKey(e)]?.auto)
           if (first) { select(first.id, true); focusReviewTarget(dom.detailEl) }
           void syncFilterBoxes()
-        } }, t('{n} pre-filled, to confirm', { n: prefilled }), h('span', { class: 'summary-arrow', 'aria-hidden': 'true' }, '→'))]
+        } }, t('{n} pre-filled, to confirm', { n: prefilled }), h('span', { class: 'summary-arrow', 'aria-hidden': 'true' }, '→')),
+          h('button', { type: 'button', class: 'pill plain confirm-all', onclick: () => void confirmPrefilledImages() }, prefilled === 1 ? t('Confirm the pre-filled image') : t('Confirm the {n} pre-filled images', { n: prefilled }))]
         : []),
     )
   }
+}
+
+/**
+ * One decision for all the images whose answer the scan pre-filled (the page has dozens of decorative icons): after looking at them
+ * (the “Pre-filled” filter shows them), the auditor confirms them together. Their answers are then confirmed like any other.
+ */
+async function confirmPrefilledImages(): Promise<void> {
+  const list = state.elements.filter((e) => state.reviews[reviewKey(e)]?.auto)
+  if (!list.length) return
+  const yes = await askConfirm(
+    t('Confirm the pre-filled images?'),
+    t('You confirm the {n} answers the scan pre-filled from the markup: decorative images that are hidden from assistive technologies, images that have a text alternative (1.1 compliant) and images that nothing names (1.1 non-compliant). Look at them first with the “Pre-filled” filter. This does not judge whether a text alternative is relevant (1.3): that stays yours.', { n: list.length }),
+    t('Confirm {n}', { n: list.length }),
+  )
+  if (!yes) return
+  for (const el of list) state.reviews[reviewKey(el)].auto = false
+  persist()
+  actions.renderAll()
+  say(t('{n} pre-filled images confirmed.', { n: list.length }))
 }
 
 /** Open the exact criterion counted by a status, and a relevant element when one exists. */
@@ -372,11 +394,21 @@ export function showNavBanner(url: string): void {
 }
 
 /** Only human-confirmed, assessed criteria count as answered. */
-export function themeProgress(rec: PageRecord, n: number): { done: number; total: number } {
+export function themeProgress(rec: PageRecord, n: number): { done: number; total: number; suggested: number } {
   const t = pageInput(rec).themes.find((x) => x.number === n)
   const total = t?.criteria.length ?? 0
   const done = t?.criteria.filter((c) => ['c', 'nc', 'na'].includes(c.outcome) && !c.unconfirmed).length ?? 0
-  return { done, total }
+  // criteria the tools already answered and that wait for your confirmation (they count as done once you confirm)
+  const suggested = t?.criteria.filter((c) => (['c', 'nc', 'na'].includes(c.outcome) && c.unconfirmed) || (c.outcome === 'pending' && Boolean(c.suggested))).length ?? 0
+  return { done, total, suggested }
+}
+
+/** “Theme summary — Images · 2/9 RGAA criteria confirmed · 3 to confirm”: what the x/9 on the theme tab means. */
+export function themeSummaryHeading(n: number): string {
+  const name = t('Theme summary — {name}', { name: t(THEME_LABEL[n]) })
+  if (!state.page) return name
+  const { done, total, suggested } = themeProgress(state.page, n)
+  return `${name} · ${t('{done}/{total} RGAA criteria confirmed', { done, total })}${suggested ? ` · ${t('{n} to confirm', { n: suggested })}` : ''}`
 }
 
 export function setThemes(rec: PageRecord, themes: number[]): void {
@@ -434,6 +466,7 @@ export function themesMenu(rec: PageRecord): HTMLElement {
 
 export function renderThemeBar(): void {
   document.documentElement.style.setProperty('--tc', colorOf(state.theme))
+  dom.themeSummaryTitle.textContent = themeSummaryHeading(state.theme)
   dom.themebarEl.replaceChildren()
   if (!state.page) return
   const rec = state.page

@@ -103,7 +103,8 @@ export function renderFindingsView(): void {
         ),
       )
     }
-    const listEl2 = h('ol', { class: 'finding-list' })
+    const tabStop = shown.some((x) => x.id === state.findingSel) ? state.findingSel : shown[0]?.id
+    const listEl2 = h('ol', { class: 'finding-list', onkeydown: (event: KeyboardEvent) => findingListKeyDown(event, shown) })
     for (const f of shown) {
       const st = findingStatus(f)
       const bad = findingFails(f)
@@ -121,6 +122,7 @@ export function renderFindingsView(): void {
               'data-kind': f.type,
               'data-status': st,
               'aria-current': String(f.id === state.findingSel),
+              tabindex: f.id === tabStop ? '0' : '-1',
               onclick: () => {
                 state.findingSel = f.id
                 renderThemeView()
@@ -224,4 +226,18 @@ export function findingCard(f: FindingItem, review: ImageReview, c: FindingCrite
   )
   card.append(reviewActions(`finding:${f.key}:${c.id}`, () => focusFinding(f, true)))
   return card
+}
+
+/** Arrow keys in a list of findings (like the list of images): select the previous or next one, show it on the page, keep the focus on it. */
+function findingListKeyDown(event: KeyboardEvent, shown: FindingItem[]): void {
+  const keys: Record<string, (i: number, n: number) => number> = { ArrowDown: (i) => i + 1, ArrowUp: (i) => i - 1, PageDown: (i) => i + 5, PageUp: (i) => i - 5, Home: () => 0, End: (_i, n) => n - 1 }
+  const move = keys[event.key]
+  if (!move || event.altKey || event.ctrlKey || event.metaKey || !shown.length) return
+  event.preventDefault()
+  const current = shown.findIndex((x) => x.id === state.findingSel)
+  const target = shown[Math.min(shown.length - 1, Math.max(0, move(current < 0 ? 0 : current, shown.length)))]
+  state.findingSel = target.id
+  renderThemeView()
+  dom.themeEl.querySelector<HTMLElement>(`.item.finding[data-fid="${target.id}"]`)?.focus()
+  void focusFinding(target, true)
 }

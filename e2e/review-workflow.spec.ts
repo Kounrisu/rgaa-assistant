@@ -62,7 +62,7 @@ for (const width of [480, 768, 1280]) {
     await choice.scrollIntoViewIfNeeded()
     const box = await choice.boundingBox()
     expect(box!.y).toBeGreaterThanOrEqual(0)
-    expect(box!.y + box!.height).toBeLessThanOrEqual(800)
+    expect(Math.round(box!.y + box!.height)).toBeLessThanOrEqual(800) // sub-pixel rounding of the scroll position
     await choice.click()
     await panel.locator('label[for="crit-1-1.1-c"]').click()
     await expect.poll(async () => Object.values<any>((await storedPage(panel))?.reviews ?? {}).some((r) => r.answers['1.1'] === 'c')).toBe(true)
