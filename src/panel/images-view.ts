@@ -1,4 +1,4 @@
-import { reviewContinue } from './review-controls'
+import { reviewActions } from './review-controls'
 /**
  * The Images theme: the list with its filters, the detail of an image, the kind and criteria cards.
  */
@@ -304,7 +304,7 @@ export function renderKindPicker(el: Item, review: ImageReview): HTMLElement {
         t('Informative: carries content or a function (logo, photo that illustrates, icon in a button…). Decorative: pure ornament that adds nothing.'),
       ),
     ),
-    reviewContinue(`image:${el.key}:kind`),
+    reviewActions(`image:${el.key}:kind`, () => focusOnPage(el.id, true)),
   )
 }
 
@@ -362,7 +362,7 @@ export function criterionCard(el: Item, review: ImageReview, criterion: Criterio
       h('div', { class: 'verdicts' }, ...verdict('c', t('Compliant')), ...verdict('nc', t('Non-compliant')), ...verdict('na', t('Not applicable'))),
     ),
   )
-  card.append(reviewContinue(`image:${el.key}:${criterion.id}`))
+  card.append(reviewActions(`image:${el.key}:${criterion.id}`, () => focusOnPage(el.id, true)))
   return card
 }
 

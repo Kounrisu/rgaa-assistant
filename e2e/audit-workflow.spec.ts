@@ -183,7 +183,7 @@ test('findings and manual criteria have the same explicit keyboard continuation'
   await panel.locator('.theme-tab').filter({ hasText: 'Formulaires' }).click()
   const next = panel.locator('#theme-view .review-continue[data-review-after^="finding:"]').first()
   await expect(next).toBeVisible()
-  await next.locator('..').locator('label[for$="-nc"]').click()
+  await next.locator('xpath=ancestor::div[contains(@class,"criterion")][1]').locator('label[for$="-nc"]').click()
   await next.click()
   await expect.poll(() => panel.evaluate(() => (document.activeElement as HTMLInputElement)?.name)).toMatch(/^fnd-/)
   await panel.locator('.theme-tab').filter({ hasText: 'Éléments obligatoires' }).click()

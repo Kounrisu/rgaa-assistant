@@ -764,6 +764,8 @@ body[data-view="audit"] :is(.pagebar,.page-progress,#page-tools-disclosure,#nav-
 body[data-view="audits"] :is(.pagebar,.page-progress,#page-tools-disclosure,#nav-banner,#new-banner) { display:none; }
 .top-status { margin:0; padding:4px 12px; }
 .top-status:empty { display:none; }
+.review-actions { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.review-actions .review-continue { margin-top:0; }
 .review-continue { margin-top:10px; }
 .sample-work { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr)); gap:12px; margin:12px 0; }
 .sample-work .card { margin:0; min-width:0; }
