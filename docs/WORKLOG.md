@@ -124,6 +124,16 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Handoff log (newest first)
 
+### 2026-10-11 — Claude Code — Colours: "introuvable" texts were never dropped
+- Why: the owner saw many Colours findings marked "Introuvable" (not found at the last scan). `mergeFindings` drops a gone finding that no
+  human worked on, but `worked()` counted ANY note, and the contrast checker writes its own note (`autoNote`) on every failing text, so none of
+  them was ever dropped. Fix (`src/panel/scan-merge.ts`): the checker's own note no longer counts as human work (a note the auditor wrote, or
+  an answer they gave, still keeps the finding, flagged as gone, with its "Retirer de l'audit" button). Test in `tests/panel-scan-merge.test.ts`.
+  The stale ones already in an audit disappear at the next scan of the Colours theme.
+- State: `npm run check` 198 unit tests, translations complete; `npm run test:e2e` 24 passed. Not tested in a real Firefox.
+- Note: images that are no longer found are still never dropped (they stay marked "absente de la page"); a "Retirer les images absentes"
+  action was offered to the owner, not asked for yet.
+
 ### 2026-10-11 — Claude Code — numbers follow the page, pre-filled criteria, a list you can see and use with the keyboard
 - Context: the owner said the image numbering "is not right at all", did not understand the "1/9", asked for the analysis to pre-complete
   more, said the list of elements looked dim and asked for a visible focus and keyboard use. Codex was working on image numbering on this

@@ -43,9 +43,11 @@ export function mergeFindings(themeNo: number, raw: RawFinding[]): { map: { from
   const seen = new Set(rawKeys)
   // A finding that is gone and was never touched by a human only adds noise: drop it FIRST, so the numbers it frees
   // are reused by the new findings and the numbering stays 1, 2, 3… instead of 1, 3.
+  // “Touched by a human”: a note they wrote (the contrast checker writes its own note on every failing text: that one does not count)
+  // or an answer they gave (an answer pre-filled by the scan does not count).
   const worked = (f: FindingItem) => {
     const r = rec.findingReviews[f.key]
-    return Boolean(r && (r.note.trim() || (!r.auto && Object.keys(r.answers).length)))
+    return Boolean(r && ((r.note.trim() && r.note !== r.autoNote) || (!r.auto && Object.keys(r.answers).length)))
   }
   for (const f of rec.findings.filter((x) => x.theme === themeNo && !seen.has(x.key) && !worked(x))) delete rec.findingReviews[f.key]
   rec.findings = rec.findings.filter((x) => x.theme !== themeNo || seen.has(x.key) || worked(x))
