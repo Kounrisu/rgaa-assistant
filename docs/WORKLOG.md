@@ -5,10 +5,11 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 ## Current state (2026-10-11)
 
 - Branch `master`. Latest application change reviewed: `347f289` (Claude Code security fixes); latest implemented UX change: `02e485c`. Version 0.1.0. Licence AGPL-3.0-only (because of the Asqatasun-derived rules).
-- UX audit of `347f289`: audit/page scope is mixed, the overview prioritizes compliance charts over work remaining,
-  and an image can leave the review queue after one NC answer despite other unanswered criteria. Analysis recorded below;
-  redesign and queue correction are proposed, not implemented. Current `npm run check`: 170 unit tests, 656 texts /
-  1000 French entries / 0 missing, typecheck and build pass. Targeted local Chromium walkthrough completed; no full E2E rerun in this analysis session.
+- UX audit of `347f289` (Codex, below): audit/page scope is mixed and the overview prioritizes compliance charts over work
+  remaining; redesign proposed, not implemented, the owner decides. The queue defect it reproduced (an image left the review
+  queue after one NC answer despite unanswered criteria; pre-filled images were not in the queue either) is **fixed** in
+  `src/panel/review-state.ts` with a regression test. Current `npm run check`: 171 unit tests, 656 texts / 1000 French entries /
+  0 missing, typecheck and build pass; `npm run test:e2e` 9 passed (parity baseline updated for the Images screens, see handoff).
 - Checks for `02e485c`: `npm run check` passes (typecheck, 165 unit tests, translations 655 texts / 999 French entries / 0 missing,
   build); `npm run test:e2e` passes (9 browser tests: smoke, parity of 77 screens, review workflow at 480/768/1280 px,
   automatic evidence and persistence, three status-navigation regressions). Built content script has 0 module imports.
@@ -74,6 +75,21 @@ after the single-page workflow and run-status tracking are reliable. These are p
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-11 — Claude Code — review-queue completeness (fix of the defect found by Codex's UX audit)
+- Did: `needsReview()` in `src/panel/review-state.ts` now keeps an image in the queue while any applicable criterion is
+  unanswered, even when another one is already NC, and while its answers are still pre-filled (`auto`) and unconfirmed;
+  `boxStates()` uses the same predicate, so the box colours and the "À relire" filter now agree (they already did for the
+  other themes through `findingNeedsReview`). `statusOf()` is unchanged: the list and the box still say NC as soon as one
+  criterion fails. Regression test in `tests/panel-review-state.test.ts` (NC with gaps, pre-filled, next-to-review, boxes).
+- Parity baseline updated on purpose. Diff read: the "À relire" count rises on the Images screens; "Prochaine à relire" is
+  enabled; the page-level "Suivant à relire" now lands on the second image (still incomplete) instead of a Colours finding,
+  so every later screen keeps Images as the current theme (its toolbar shows "Contenu masqué" / "Autres outils"). No other change.
+- State: `npm run check` (171 unit tests, 0 missing translations, build), `npm run test:e2e` 9 passed. Not tested in a real Firefox.
+- Next: owner's decisions on Codex's navigation proposal (audit vs page screens) and on explicit "Suivant à évaluer" beside
+  the answers. The verified Codex findings that remain open: mixed audit/page scope, overview ordered by compliance rather
+  than remaining work, no inline "next" for findings and checklists.
+- For the other agent: the fix is behavioural, not cosmetic: counts of "to review" go up on audits in progress. Nothing to migrate.
 
 ### 2026-10-11 — Codex — UX audit of the end-to-end audit workflow (analysis only)
 - Reviewed application commit `347f289`; only this WORKLOG is changed. No application behavior, schema or parity baseline changed.

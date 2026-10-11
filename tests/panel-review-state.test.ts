@@ -63,6 +63,32 @@ describe('review state of the images', () => {
     expect([a, b, c, d, e].map(needsReview)).toEqual([true, true, true, false, false])
   })
 
+  it('needsReview: one NC answer does not finish the review while other criteria are open (reported by the UX audit of 2026-10-11)', () => {
+    const [ncWithGaps, ncComplete, prefilled, confirmed] = [item(), item(), item(), item()]
+    const first = criteriaFor('informative')[0].id
+    seed([ncWithGaps, ncComplete, prefilled, confirmed], {
+      [ncWithGaps.key]: { kind: 'informative', note: '', answers: { [first]: 'nc' } },
+      [ncComplete.key]: { ...answered('informative', 'c'), answers: { ...answered('informative', 'c').answers, [first]: 'nc' } },
+      [prefilled.key]: { ...answered('decorative', 'c'), auto: true },
+      [confirmed.key]: answered('decorative', 'c'),
+    })
+    expect(statusOf(ncWithGaps)).toBe('nc') // the list and the box still say non-compliant
+    expect(needsReview(ncWithGaps)).toBe(true) // but it stays in the review queue
+    expect(needsReview(ncComplete)).toBe(false)
+    expect(needsReview(prefilled)).toBe(true) // pre-filled from the markup: a human has to confirm
+    expect(needsReview(confirmed)).toBe(false)
+    state.filter = 'review'
+    expect(visibleElements().map((e) => e.id)).toEqual([ncWithGaps.id, prefilled.id])
+    expect(nextToReview(ncWithGaps)?.id).toBe(prefilled.id)
+    expect(nextToReview(prefilled)?.id).toBe(ncWithGaps.id)
+    // the box colour agrees with the queue
+    const boxes = boxStates(1)
+    expect(boxes[ncWithGaps.id]).toBe('review')
+    expect(boxes[prefilled.id]).toBe('review')
+    expect(boxes[ncComplete.id]).toBe('nc')
+    expect(boxes[confirmed.id]).toBe('c')
+  })
+
   it('reviewOf creates the review once, under the element key', () => {
     const a = item()
     seed([a])
