@@ -4,7 +4,11 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## Current state (2026-10-11)
 
-- Branch `master`. Latest UX change: `02e485c`, committed locally; no push performed in the Codex handoff session. Version 0.1.0. Licence AGPL-3.0-only (because of the Asqatasun-derived rules).
+- Branch `master`. Latest application change reviewed: `347f289` (Claude Code security fixes); latest implemented UX change: `02e485c`. Version 0.1.0. Licence AGPL-3.0-only (because of the Asqatasun-derived rules).
+- UX audit of `347f289`: audit/page scope is mixed, the overview prioritizes compliance charts over work remaining,
+  and an image can leave the review queue after one NC answer despite other unanswered criteria. Analysis recorded below;
+  redesign and queue correction are proposed, not implemented. Current `npm run check`: 170 unit tests, 656 texts /
+  1000 French entries / 0 missing, typecheck and build pass. Targeted local Chromium walkthrough completed; no full E2E rerun in this analysis session.
 - Checks for `02e485c`: `npm run check` passes (typecheck, 165 unit tests, translations 655 texts / 999 French entries / 0 missing,
   build); `npm run test:e2e` passes (9 browser tests: smoke, parity of 77 screens, review workflow at 480/768/1280 px,
   automatic evidence and persistence, three status-navigation regressions). Built content script has 0 module imports.
@@ -38,6 +42,10 @@ Nothing claimed. Add a line here before starting anything bigger than a small fi
 
 ## Next (suggested order; the owner decides)
 
+UX recommendation from the owner's latest request: first fix review-queue completeness (NC is not the same as fully reviewed),
+then separate audit/page navigation and extend the sample into a page-progress dashboard. Add multi-page automatic checks
+after the single-page workflow and run-status tracking are reliable. These are proposals, not implemented changes.
+
 1. **Real Firefox test pass** by the owner: reload the extension, F5 on a real page, “Contrôles automatiques”; report crashes (which step, which page), the save pill, the unsaved-work dialog, the layout. In narrow DevTools, check that page progress stays visible and each nonzero status count opens the expected item, including keyboard activation and focus; check French and English.
 2. **Per-test results** (as Asqatasun stores them: pass / fail / need more info / not applicable per test, with the elements). Needs a data-model addition + migration; also lets the auditor confirm the Images tests the tool cannot assess (image maps, CAPTCHAs), which today leave criteria “partly covered”.
 3. **Port more Asqatasun tests** (26 left: marker-based image and table tests, contrast, stylesheet test 10.4.1 — the background page could fetch stylesheets across origins).
@@ -47,6 +55,10 @@ Nothing claimed. Add a line here before starting anything bigger than a small fi
 
 ## Open decisions (owner)
 
+- **UX workflow proposal**: audit-level “Échantillon et suivi” / “Synthèse et exports”; page-level “Évaluation” /
+  “Vérifications manuelles” / “Résultats”; one clearly named page automatic-check action. Prefer explicit “Suivant à évaluer”
+  beside answers, with automatic advancement optional and off by default. Multi-page runs proposed as a later, explicit
+  selection of URLs using the browser session, with pause/resume and per-page failures. Not yet accepted or implemented.
 - **AI**: access (copy-paste / cloud API with own key / local model / company endpoint), first tasks, what may be sent — all undecided. Principles agreed for any design: suggestions only (never a verdict), opt-in, payload shown before any call, minimal data (no cookies, no full pages, nothing from logged-in sessions), traceable (model, prompt version, date), provider-neutral, measured against the owner's own past audits before being trusted. Safe order if approved: provider interface + copy-paste mode + payload preview + stored AI suggestions; relevance judgements from text; explain-and-fix and report drafting; optional API/local; images last with consent.
 - **Access42 JSON file / Stylus**: the owner will provide the file later; do not start before seeing it.
 - **Project licence**: AGPL-3.0 now; removing the Asqatasun-derived code is the precondition for relicensing (`NOTICE.md`).
@@ -62,6 +74,51 @@ Nothing claimed. Add a line here before starting anything bigger than a small fi
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-11 — Codex — UX audit of the end-to-end audit workflow (analysis only)
+- Reviewed application commit `347f289`; only this WORKLOG is changed. No application behavior, schema or parity baseline changed.
+  Read the navigation, sample, overview, checks, automatic-run and review-queue implementations; walked the built panel
+  in local Chromium at 1280×900 and 480×800 with the existing fixture/extension-API harness.
+- Findings: audit-wide sample/overview navigation is mixed with page review/checks/results. Page controls, page totals and
+  an old scan message remain on audit-wide screens; at 480 px they consume over half the initial screen before sample content.
+  “Contrôles” opens a mixed manual/automatic screen; “Contrôles automatiques” and the run button inside that screen both
+  call `runEverything()`. Scan is a separate, narrower action. The sample table shows image/scan counts rather than remaining
+  audit work; the overview is mainly a compliance/reporting dashboard. These are different needs, presently mixed together.
+- Reproduced queue defect: select informative image #1, answer 1.1 NC, leave five criteria unanswered, then activate the
+  review filter. Image #1 disappears from the list. `statusOf()` returns NC before checking missing answers and
+  `needsReview()` checks only todo/progress (`src/panel/review-state.ts`). Automatically prefilled images are also excluded
+  by that predicate unless otherwise incomplete. The page “next” action goes to the first unresolved item, whereas image
+  “next to review” advances after the current image; findings/checklists lack the same inline flow. Needs regression coverage.
+- Proposed hierarchy: audit header with audit identity, “Échantillon et suivi”, “Synthèse et exports”, saved-state/file actions;
+  page workspace with page identity/URL, “Évaluation”, “Vérifications manuelles”, “Résultats” and one automatic-run action.
+  Hide page controls on audit-wide screens. Keep compact theme done/total counters and visible progress within the page workspace.
+  “Évaluation” includes first-time human assessment as well as confirmation of suggestions. Link manual activities to their
+  affected RGAA criteria; marking an activity done must not silently create a criterion verdict.
+- Proposed overall tracking: extend the sample screen rather than adding another overlapping dashboard. Each page needs
+  automatic-run status/date (never run, running, completed, partial/error), human criteria answered/total, suggestions awaiting
+  confirmation, manual activities done/total, latest activity and a contextual “Ouvrir / Lancer / Reprendre” action.
+  Show aggregate work remaining above the table; keep compliance rates and exports in the synthesis. Do not equate an
+  automatic run finishing, a failure being found, or a provisional compliance rate with completion of a human audit.
+- Automatic scope: current runners address the inspected tab; listing a URL does not run anything there. Recommended copy:
+  “Lancer les contrôles automatiques sur P02” with inspected URL and last-run status. A wrong tab should lead to opening the
+  intended page, with clear target ownership. Later “Lancer sur N pages” should use a sequential browser queue, verify loaded
+  URLs, allow pause/cancel/retry, isolate page errors and preserve human answers. Authentication, popins and interactive states
+  require explicit handling; bulk initial-load checks cannot cover every state. No remote crawler/service proposed.
+  Persistent run records and batch state will require schema design, migration and tests; imports currently record engine reports.
+- Recommended answer flow: save each human choice, retain focus, show “Suivant à évaluer” next to the decision and
+  optionally “Passer pour l’instant”. Track unresolved criterion/element pairs independently of C/NC outcomes; continue
+  within the element before the next element, then the next theme. Keep incomplete/auto-unconfirmed items in the queue.
+  Default to explicit advancement; an optional auto-advance must wait until the relevant review is complete and never
+  interrupt notes or an in-flight save. Provide a clear end-of-queue state rather than reopening the same item.
+- Tests to add with implementation: incomplete NC stays queued; prefilled answers need confirmation; next skips resolved
+  items and handles end-of-queue/focus/saving; page vs audit navigation exposes the right controls; per-page progress survives
+  reload; batch redirects, failed pages, interrupted runs and reruns never mix pages or overwrite human decisions.
+- State: `npm run check` passed (170 unit tests, typecheck, translations 0 missing, production build). Targeted browser
+  walkthrough completed without console errors; screenshots in `/tmp/rgaa-ux-audit-2026-10-11` are temporary diagnostic artifacts.
+  Did not rerun the full E2E suite or Asqatasun fixture suite for this documentation-only audit. Real Firefox/DevTools,
+  screen-reader use, multi-page execution and moderated user testing were not tested. Local test server stopped; no push.
+- Next / for other tools: implement only after the owner chooses the proposed scope. Preserve `347f289` URL/image safety checks.
+  Fix queue completeness before adding automatic advancement or batch runs; the current passing tests do not cover that defect.
 
 ### 2026-10-11 — Claude Code — security pass over audit-file handling
 - Did: re-checked the whole folder after Codex's commits (`02e485c`, `4e3d24d`: all checks green) and reviewed where an audit file
