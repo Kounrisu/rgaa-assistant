@@ -7,11 +7,11 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 - Branch `codex/audit-workflow`. Implemented the owner's approved workflow in `29eb344` on top of Claude's
   `51c1b1e` component work and `11fb2aa` UX verification. Version 0.1.0; saved audit format is now **v4**, with explicit
   migration from v3 and continued support for v2. Licence AGPL-3.0-only.
-- **Navigation correction pending (owner clarification):** `0f1dec8` put the wrong group in the top bar.
-  The intended hierarchy is audit name + Échantillon et suivi + Synthèse et exports at the top; selected page +
-  Évaluation / Contrôles manuels / Résultats de la page in the page area below. The current implementation still has
-  page modes in the top bar; the latest analysis below supersedes the previous placement instructions.
-  Page progress stays visible in the page workspace. Compact theme `done/total` bubbles are unchanged.
+- **Navigation follows audit/page scope:** Échantillon et suivi / Synthèse et exports sit beside the audit name in
+  the top bar; Évaluation / Contrôles manuels / Résultats de la page sit beside the selected page below. Page actions
+  and page progress are hidden on global views; dashboard actions and existing return links reopen page work.
+  Automatic checking remains a distinct page action. Inline next-review buttons stay beside decisions; the duplicate
+  global shortcut is secondary in Page actions. Compact theme `done/total` bubbles are unchanged.
 - **Page-work dashboard:** progress, pending decisions in selected themes, suggested criteria, manual activity counts,
   last activity and latest automatic run outcome per page, with direct evaluation/manual/results/open actions.
   Metadata and sample editing are disclosures; the duplicate automatic-run button is removed. Element-only scanning
@@ -72,13 +72,12 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## In progress (claimed)
 
-- None. Corrected navigation analysis recorded; runtime changes remain to be implemented.
+- None. Corrected audit/page navigation implemented and verified in `96b1ebb`.
 
 ## Next (suggested order; the owner decides)
 
-Correct the navigation scope per the owner's latest clarification: audit-wide views in the top bar and page modes
-in the selected-page header. The dashboard, explicit next-review controls and selected-page runs are implemented.
-Then verify the actual extension in Firefox/DevTools and collect feedback on a real audit.
+The corrected audit/page navigation, dashboard, explicit next-review controls and selected-page runs are implemented.
+Next verify the actual extension in Firefox/DevTools and collect feedback on a real audit.
 Keep page progress visible and preserve the owner's decorative-image counting decision.
 
 1. **Real Firefox test pass** by the owner: reload the extension, F5 on a real page, “Contrôler automatiquement la page ouverte”; report crashes (which step, which page), the save pill, the unsaved-work dialog, the layout. In narrow DevTools, check that page progress stays visible and each nonzero status count opens the expected item, including keyboard activation and focus; check French and English.
@@ -105,6 +104,32 @@ Keep page progress visible and preserve the owner's decorative-image counting de
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-11 — Codex — implement the corrected audit/page hierarchy
+- Did: `96b1ebb` moves Échantillon et suivi / Synthèse et exports beside the audit name in the top bar.
+  Évaluation / Contrôles manuels / Résultats de la page now share the selected-page header. The automatic-run button
+  is a distinct page action, with browser URL/match state below. Global views hide page controls/progress and retain
+  dashboard entry points and existing return links. Both header groups wrap within their own scope.
+- Continue reviewing: the inline decision controls are unchanged; the duplicate global next shortcut is secondary
+  in Page actions. Its handler closes the menu before advancing. Menu lookup is shared in dom.ts, including scan/reset.
+- Regression coverage: audit controls beside the audit name, page modes beside the selector, page controls hidden on
+  global views, keyboard entry from the dashboard and between page views, selected page and answer retained after
+  summary/audit-list round trips. Responsive tests assert selector → Évaluation tab order, menu bounds, no overflow
+  and first-decision reachability at 480/768/1280px. The same 14 browser scenarios cover the broader workflows.
+- Parity: read all distinct changes in `/tmp/rgaa-scope.diff` comparing `/tmp/rgaa-topbar-after.txt` with
+  `/tmp/rgaa-scope-after.txt` before accepting the 80-screen baseline. Intended changes only: navigation relocation,
+  page selection/action/location wrappers and the next shortcut in its menu. Reviewed wide page/sample and narrow
+  page/sample screenshots. French/English labels and saved data are unchanged; README describes the corrected route.
+- Verification note: an intermediate rerun overlapped a rebuild and failed the retry test because dist/axe.min.js
+  was briefly absent (ENOENT confirmed in the trace). Final checks/build and browser suite run sequentially.
+- Checks: final sequential `npm run check` passed (187 unit tests; typecheck; 700 texts / 1194 French entries /
+  0 missing; build), followed by full `npm run test:e2e`: 14 passed, including the reviewed 80-screen parity baseline.
+  Built content script: 0 module imports. Logs: `/tmp/rgaa-scope-release-check.log`, `/tmp/rgaa-scope-release-e2e.log`.
+- NOT tested: real Firefox, real DevTools or the Asqatasun fixture download suite (engine rules unchanged).
+- Next: owner reloads the extension and panel, checks the top audit navigation, opens a page from the sample,
+  switches between its three page views, and returns from the summary at both wide and narrow DevTools widths.
+- For Claude/other tools: this implements the clarified hierarchy in `2f1cdab` and supersedes the mistaken placement
+  in `0f1dec8`. Keep audit-wide navigation in the audit header and page modes beside the selected page.
 
 ### 2026-10-11 — Codex — corrected navigation analysis after owner clarification
 - Finding: the preceding `0f1dec8` placement reversed the owner's intended hierarchy. Its tests verified that mistaken
