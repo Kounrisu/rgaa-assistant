@@ -7,9 +7,10 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 - Branch `codex/audit-workflow`. Implemented the owner's approved workflow in `29eb344` on top of Claude's
   `51c1b1e` component work and `11fb2aa` UX verification. Version 0.1.0; saved audit format is now **v4**, with explicit
   migration from v3 and continued support for v2. Licence AGPL-3.0-only.
-- **Audit/page scope separated:** audit-wide Échantillon et suivi / Synthèse et exports / Évaluer une page; page-level
-  Évaluation / Contrôles manuels / Résultats de la page. Audit-wide views hide page controls and progress; page progress
-  stays visible in the page workspace. Compact theme `done/total` bubbles are unchanged.
+- **Audit/page scope separated:** audit-wide Échantillon et suivi / Synthèse et exports; page-level
+  Évaluation / Contrôles manuels / Résultats de la page now sit in the top bar beside Audits and stay accessible
+  from global views. The redundant Évaluer une page action is removed. Audit-wide views hide page actions and progress;
+  page progress stays visible in the page workspace. Compact theme `done/total` bubbles are unchanged.
 - **Page-work dashboard:** progress, pending decisions in selected themes, suggested criteria, manual activity counts,
   last activity and latest automatic run outcome per page, with direct evaluation/manual/results/open actions.
   Metadata and sample editing are disclosures; the duplicate automatic-run button is removed. Element-only scanning
@@ -21,7 +22,7 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
   page, resume remaining pages, per-page failures and retry by selection. An already open URL keeps its dynamic state.
   Status/date/error persist; older audits do not invent complete run status. Closing DevTools loses the remaining queue;
   any saved running status is displayed as interrupted. A changed URL requires another run.
-- Latest `npm run check`: **187 tests**, typecheck, **701 texts / 1194 French entries / 0 missing**, build pass.
+- Latest `npm run check`: **187 tests**, typecheck, **700 texts / 1194 French entries / 0 missing**, build pass.
   Latest full `npm run test:e2e`: **14 passed**, including the reviewed **80-screen** parity baseline, 480/768/1280 layouts,
   sequential runs/pause/resume, engine failure/retry, source-URL isolation and keyboard continuation. Built content script:
   **0 module imports**. Real Firefox/DevTools still untested.
@@ -70,12 +71,12 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## In progress (claimed)
 
-- None. Codex workflow implementation and handoff complete on `codex/audit-workflow`.
+- None. Codex top-bar navigation correction complete in `0f1dec8`.
 
 ## Next (suggested order; the owner decides)
 
 The approved navigation, page-work dashboard, explicit next-review controls and selected-page automatic runs are
-implemented. Next priority: verify the actual extension in Firefox/DevTools and collect feedback on a real audit.
+implemented, with the requested top-bar page navigation corrected in `0f1dec8`. Next priority: verify the actual extension in Firefox/DevTools and collect feedback on a real audit.
 Keep page progress visible and preserve the owner's decorative-image counting decision.
 
 1. **Real Firefox test pass** by the owner: reload the extension, F5 on a real page, “Contrôler automatiquement la page ouverte”; report crashes (which step, which page), the save pill, the unsaved-work dialog, the layout. In narrow DevTools, check that page progress stays visible and each nonzero status count opens the expected item, including keyboard activation and focus; check French and English.
@@ -102,6 +103,24 @@ Keep page progress visible and preserve the owner's decorative-image counting de
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-11 — Codex — put page modes beside Audits
+- Did: `0f1dec8` moves Évaluation / Contrôles manuels / Résultats de la page into the top audit bar immediately
+  before Audits. They remain accessible from the sample, summary and audits list; the redundant Évaluer une page
+  button and its wiring are removed. Narrow headers wrap. README updated; saved data and automatic checks unchanged.
+- Checks: `npm run check` passed (187 tests; typecheck; 700 texts / 1194 French entries / 0 missing; build).
+  Full `npm run test:e2e` passed (14). The browser workflow now checks same-line placement beside Audits at 1800px,
+  direct navigation from all three audit-wide views, pressed states and page progress. Existing 480/768/1280 decision
+  reachability checks pass. Reviewed wide and 480px screenshots, with no horizontal overflow.
+- Parity: compared `/tmp/rgaa-workflow-approved.txt` with `/tmp/rgaa-topbar-after.txt`, read every distinct changed
+  line in `/tmp/rgaa-topbar.diff` before accepting the 80-screen baseline. Only intended changes: moved page navigation,
+  its visibility in global views and removed redundant button. The first run had 13 passes and expected parity failure;
+  the full verification run against the reviewed baseline passed normally.
+- NOT tested: real Firefox or real DevTools; Asqatasun fixture suite (engine rules unchanged).
+- Next: owner reloads the extension and reopens the RGAA Assistant panel, then checks the three header buttons from
+  Échantillon et suivi and Synthèse et exports in the actual DevTools width.
+- For other tools: preserve this explicit placement requested from the owner's screenshot; do not hide page navigation
+  on audit-wide views or restore a separate Page workspace button. No dependencies, network calls or schema changes.
 
 ### 2026-10-11 — Codex — implement the approved audit workflow
 - Did: `29eb344` separates global audit navigation from page work, adds per-page progress/activity/run tracking,
