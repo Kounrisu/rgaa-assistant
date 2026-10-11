@@ -36,8 +36,11 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 - **Image numbers on rescan (`7bd2e60`):** exclude assistant overlays from captured image context; retain the number and
   review key of a unique unchanged image when surrounding HTML changes. Newly found images receive new numbers.
   Ambiguous matches/changed markup are not guessed; historical duplicate records are not merged or deleted.
+- **Overlay numbering follow-up (`5f1b1be`):** internal DOM IDs no longer change when audit numbers are assigned.
+  A hidden image returning after relabeling cannot collide with another image’s internal ID. Owner reports numbering
+  still off after the previous fix; this second defect is reproduced, but the exact real-site symptom is unconfirmed.
 - Latest `npm run check`: **192 tests**, typecheck, **710 texts / 1245 French entries / 0 missing**, build pass.
-  Latest full `npm run test:e2e`: **22 passed**, including the reviewed **80-screen** parity baseline, 480/768/1280 layouts,
+  Latest full `npm run test:e2e`: **23 passed**, including the reviewed **80-screen** parity baseline, 480/768/1280 layouts,
   sequential runs/pause/resume, engine failure/retry, source-URL isolation and keyboard continuation. Built content script:
   **0 module imports**. Real Firefox/DevTools still untested.
 - **Components review (theme 7, APG patterns)** shipped: every ARIA component (tabs, dialog, menu, disclosure / accordion,
@@ -85,7 +88,7 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## In progress (claimed)
 
-- None. Image rescan numbering fix implemented and verified in `7bd2e60`.
+- None. Second numbering defect fixed in `5f1b1be`; owner’s exact visible symptom still needs confirmation.
 
 ## Next (suggested order; the owner decides)
 
@@ -120,6 +123,24 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-11 — Codex — separate internal image IDs from displayed audit numbers
+- Did: `5f1b1be` removes the write of audit numbers back into the DOM WeakMap and its counter during relabeling.
+  These are independent identities: otherwise a hidden node can retain an internal ID later assigned as another
+  node’s audit number, and both return with the same ID on rescan, corrupting box lookup/relabeling.
+- Reproduction: new built-content-script browser test scans two images, hides one, relabels the visible image #1
+  (as another audit can do), then reveals the hidden image and rescans. Before fix: one distinct ID for two nodes.
+  After fix: distinct IDs; custom displayed numbers #7 and #3 locate and overlay their correct physical image bounds.
+  The earlier numbering/answer-preservation test also passes.
+- State: `npm run check` passes (192 unit tests, typecheck, 710 texts / 1245 French entries / 0 missing, build).
+  Full `npm run test:e2e`: **23 passed**, unchanged 80-screen panel parity and content parity fixtures. Built classic
+  content script has **0 imports**. Logs: `/tmp/rgaa-number-collision-before.log`, `/tmp/rgaa-number-collision-check.log`,
+  `/tmp/rgaa-number-collision-e2e.log`.
+- Not tested: real Firefox/DevTools, downloaded Asqatasun fixtures. No saved-data, dependency or network changes.
+- Next: owner must reload the extension AND inspected webpage before rescanning. Ask for an example/screenshot showing
+  both list and page box if mismatch persists; symptom clarification was requested but not yet received.
+- For other tools: do not claim this proves the owner’s exact case is resolved. Existing historical duplicates and
+  ambiguous image matching remain unchanged. Internal IDs must never be overwritten with per-audit display numbers.
 
 ### 2026-10-11 — Codex — stable image numbering on rescans
 - Did: `7bd2e60` excludes assistant overlay markup from image context. Before the fix, answering a body-level image
