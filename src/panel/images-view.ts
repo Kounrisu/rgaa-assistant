@@ -1,4 +1,5 @@
 import { reviewActions } from './review-controls'
+import { previewBackgroundControl } from './preview-bg'
 /**
  * The Images theme: the list with its filters, the detail of an image, the kind and criteria cards.
  */
@@ -187,6 +188,7 @@ export function renderDetailNow(): void {
       'div',
       { class: 'card preview' },
       h('div', { class: 'preview-img' }, el.thumb ? h('img', { src: el.thumb, alt: t('Preview of image {id}', { id: el.id }) }) : h('span', { class: 'hint-line' }, t('No preview for <{type}>', { type: el.type }))),
+      ...(el.thumb ? [previewBackgroundControl()] : []),
       facts,
     ),
   )

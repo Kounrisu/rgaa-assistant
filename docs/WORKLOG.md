@@ -112,6 +112,23 @@ Keep page progress visible and preserve the owner's decorative-image counting de
 
 ## Handoff log (newest first)
 
+### 2026-10-11 — Claude Code — background choice for the image previews (transparent icons)
+- Did: `src/panel/preview-bg.ts`: a "Fond de l'aperçu" select (checkerboard by default, white, light pink, light grey, dark,
+  custom colour with a colour picker) in the big preview card of Images. It sets `--preview-bg` on the document, read by the
+  list thumbnails, the big preview and the compact preview (narrow screens). A per-browser view option kept in `localStorage`
+  (`rgaa-preview-bg`, `rgaa-preview-bg-color`), never in the audit. `e2e/preview-bg.spec.ts`; French in `i18n-fr-ux.ts`;
+  parity baseline updated (the new control in the Images detail).
+- Also answered the owner's questions on saving (no code change): audits live in `chrome.storage.local` (extension storage
+  of the browser profile), written as you work; "Enregistrer" downloads a copy `.rgaa.json` to the Downloads folder and only
+  records the time of the export (`exportedAt`), not a path (a browser extension cannot know where a download went).
+  "Mes audits" shows "Fichier: jamais / modifié depuis… / à jour" from that time; the open audit has no Open button
+  (it is already open). Possible follow-ups, owner's call: show the last saved file name in "Mes audits", an "Ouvert" marker
+  instead of an empty action cell, an optional automatic backup reminder.
+- State: `npm run check` 187 unit tests, 702 texts / 1203 French / 0 missing; `npm run test:e2e` 16 passed.
+  Checked on screen with a white SVG icon: invisible on the checkerboard, visible on light pink, in the big preview and the list.
+  Not tested in a real Firefox.
+- Next: unchanged.
+
 ### 2026-10-11 — Claude Code — page scan button back beside the automatic checks
 - Did: `#scan-btn` ("Analyser P01" / "Réanalyser P01") moved out of the "Actions de la page" dropdown to sit right
   before "Contrôler automatiquement la page ouverte" in `src/panel/panel.html`, with its own style (`.scan-btn`, outlined, so the
