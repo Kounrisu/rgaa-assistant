@@ -4,7 +4,7 @@ export const FR_UX: Record<string, string> = {
   'Suggested: {verdict}': 'Suggestion : {verdict}',
   'Review': 'Relire',
   'Audit workflow': 'Étapes de l’audit',
-  'Page progress and activity': 'Progression et activité',
+  'Page progress': 'Progression de la page',
   'Page actions': 'Actions de la page',
   'Reset current theme': 'Réinitialiser cette thématique',
   'Display tools': 'Outils d’affichage',

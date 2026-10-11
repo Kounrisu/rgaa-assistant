@@ -21,6 +21,8 @@ for (const width of [480, 768, 1280]) {
     await panel.setViewportSize({ width, height: 800 })
     await panel.locator('#empty-add-btn').click()
     await panel.locator('#scan-btn').click()
+    await expect(panel.locator('#progress')).toBeVisible()
+    await expect(panel.locator('#page-summary .sum-pending')).toBeVisible()
     const choice = panel.locator('label[for="kind-1-informative"]')
     await expect(choice).toBeVisible()
     await panel.evaluate(() => window.scrollTo(0, 0))

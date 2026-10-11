@@ -25,11 +25,6 @@
     </div>
 
     <header class="topbar">
-      <details class="top-info summary-disclosure">
-        <summary data-i18n>Page progress and activity</summary>
-        <div id="page-summary" class="theme-summary page-totals" data-scope="page" aria-label="Totals of the chosen themes on this page" data-i18n-attrs="aria-label"></div>
-        <a class="link-btn" href="../rgaa/rgaa.html" target="_blank" rel="noreferrer" data-i18n>RGAA coverage ↗</a>
-      </details>
       <nav class="actions" aria-label="Audit workflow" data-i18n-attrs="aria-label">
         <button id="review-btn" type="button" aria-pressed="true" data-i18n>Review</button>
         <button id="sample-btn" type="button" aria-pressed="false" title="Register the pages to audit, edit their URLs and the audit fields" data-i18n data-i18n-attrs="title">Audit pages sample</button>
@@ -46,7 +41,6 @@
       <span id="live-url" class="live-url"></span>
       <button id="scan-btn" type="button" class="primary">Scan page</button>
       <button id="auto-btn" type="button" title="Run every automatic test on the page in the browser: scan all the themes, then axe, our RGAA checks, the Asqatasun-derived rules and the HTML check" data-i18n data-i18n-attrs="title" disabled>Automatic checks</button>
-      <span id="progress" class="progress" role="status" aria-live="polite"></span>
       <button id="next-btn" type="button" title="Go to the next element or criterion that still needs your answer, in any theme (shortcut: n)" data-i18n data-i18n-attrs="title" disabled>Next to review</button>
       <details class="page-options disclosure-menu">
         <summary data-i18n>Page actions</summary>
@@ -54,9 +48,14 @@
       <button id="reset-page-btn" type="button" class="ghost-btn danger" disabled title="Clear the scans and every answer of this page; keep its URL, title and themes" data-i18n data-i18n-attrs="title">Reset page</button>
       <button id="delete-page-btn" type="button" class="ghost-btn" disabled data-i18n>Remove page</button>
         <button id="reset-theme-btn" type="button" class="ghost-btn danger" data-i18n>Reset current theme</button>
+        <a class="link-btn" href="../rgaa/rgaa.html" target="_blank" rel="noreferrer" data-i18n>RGAA coverage ↗</a>
         </div>
       </details>
     </div>
+    <section id="page-progress" class="page-progress" aria-label="Page progress" data-i18n-attrs="aria-label" hidden>
+      <span id="progress" class="progress" role="status" aria-live="polite"></span>
+      <div id="page-summary" class="theme-summary page-totals" data-scope="page" aria-label="Totals of the chosen themes on this page" data-i18n-attrs="aria-label"></div>
+    </section>
     <details id="page-tools-disclosure" class="page-tools-disclosure"><summary data-i18n>Display tools</summary>
     <div id="page-tools" class="toolsbar" role="toolbar" aria-label="Page tools" data-i18n-attrs="aria-label" hidden></div>
     </details>
