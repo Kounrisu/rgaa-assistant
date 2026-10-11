@@ -101,7 +101,6 @@ export const dom = {
   themeSummaryEl: $('theme-summary'),
   imageInventoryEl: $('image-inventory'),
   displayToolsEl: $('display-tools'),
-  reviewReferenceEl: $('review-reference'),
   navBanner: $('nav-banner'),
   navBannerText: $('nav-banner-text'),
   navBannerBtn: $<HTMLButtonElement>('nav-banner-btn'),

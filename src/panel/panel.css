@@ -800,7 +800,7 @@ body[data-view="audits"] :is(.pagebar,.page-progress,#display-tools,#nav-banner,
 .display-tools .tools > button { margin: 0; padding: 3px 10px; font-size: 12.5px; }
 .display-tools[hidden], .display-tools .tools[hidden] { display: none; }
 .element-inventory { padding: 0 8px 8px; margin: 0; }
-.review-reference { padding: 12px 16px; }
+.auditbar .coverage-reference { font-size: 12.5px; white-space: nowrap; }
 @media (max-width: 979px) {
   .display-tools { padding: 6px 10px; }
   .summary-heading .progress { flex: 1 1 auto; }
