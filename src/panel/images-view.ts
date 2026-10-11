@@ -140,6 +140,7 @@ export function renderDetailNow(): void {
       h(
         'h2',
         {},
+        el.thumb ? h('img', { class: 'compact-preview', src: el.thumb, alt: t('Preview of image {id}', { id: el.id }) }) : null,
         `${t('Image #{id}', { id: el.id })} `,
         h('span', { class: `result ${statusOf(el)}`, id: 'result-badge' }, t(STATUS_LABEL[statusOf(el)])),
         h('span', { class: 'hint-line' }, `  ${index + 1} / ${state.elements.length}`),

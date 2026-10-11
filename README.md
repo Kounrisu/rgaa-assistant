@@ -77,7 +77,14 @@ npm run check:asqatasun   # run the ported rules on Asqatasun's own test pages (
 The smoke test (`e2e/`) opens the **built** panel and the **built** content script in two Chromium pages, with a
 fixture site and a thin stub of the extension API in between, and runs scan, review, save, reload and export. First
 run: `npx playwright install chromium`. It does not touch the network (`e2e/parity.spec.ts` also walks through every screen and compares a hash of each with `e2e/__snapshots__`), and it does not replace a manual check in a real
-DevTools panel or in Firefox.
+DevTools panel or in Firefox. The behavioral tests in `e2e/review-workflow.spec.ts` also verify that
+review decisions fit at 480, 768 and 1280 pixels, that results work on image-free pages, and that keyboard verdicts
+persist. They run the real automatic engines against an empty title and then a corrected title: evidence must
+change while the human verdict and note survive the rerun. Tool disagreements remain visible until resolved.
+
+The Review button returns to the current theme. Progress, display tools and page reset actions are expandable;
+on compact panels the image list is expandable too. After an automatic run, use the review queue to open a
+suggested criterion directly. Manual checks come before the collapsed run history.
 
 Load `dist/` as an unpacked extension (`chrome://extensions` with Developer mode, or `about:debugging` in
 Firefox), then reload the page you inspect after reloading the extension.

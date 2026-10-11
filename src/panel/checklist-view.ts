@@ -61,22 +61,26 @@ export function renderChecklist(host: HTMLElement = dom.themeEl): void {
     const answer = (rec.checklist[c.id] ??= { note: '' })
     const outcome = result.criteria.find((x) => x.id === c.id)?.outcome
     const card = h('div', { class: 'card criterion', 'data-state': answer.verdict ?? '', id: `crit-card-${c.id}` })
+    const conflicts = h('div', { class: 'evidence-conflicts', 'aria-live': 'polite' })
+    const refreshConflicts = () => conflicts.replaceChildren(...evidenceConflictsOf(answer).map((x) => h('p', { class: 'hint warn' }, t('Conflicting evidence: {x}.', { x }))))
+    const setVerdict = (value: ChecklistVerdict) => {
+      confirmVerdict(answer, value)
+      card.querySelector('.source-note')?.remove()
+      card.dataset.state = value
+      card.classList.remove('todo')
+      card.querySelectorAll<HTMLInputElement>('input[type="radio"]').forEach((input) => { input.checked = input.value === value })
+      refreshConflicts()
+      persist()
+      actions.renderThemeBar()
+      actions.renderStats()
+      actions.renderPageBar()
+    }
+    refreshConflicts()
     const verdict = (value: ChecklistVerdict, label: string) => [
       h('input', {
-        type: 'radio',
-        name: `chk-${c.id}`,
-        id: `chk-${c.id}-${value}`,
-        value,
+        type: 'radio', name: `chk-${c.id}`, id: `chk-${c.id}-${value}`, value,
         checked: answer.verdict === value,
-        onclick: () => {
-          confirmVerdict(answer, value) // the auditor's answer replaces any tool suggestion
-          card.querySelector('.source-note')?.remove()
-          card.dataset.state = value
-          persist()
-          actions.renderThemeBar()
-          actions.renderStats()
-          actions.renderPageBar()
-        },
+        onchange: () => setVerdict(value),
       }),
       h('label', { for: `chk-${c.id}-${value}` }, label),
     ]
@@ -98,13 +102,13 @@ export function renderChecklist(host: HTMLElement = dom.themeEl): void {
               { class: 'hint info source-note' },
               h('strong', {}, t('Suggested: {verdict} (from {tool}).', { verdict: t(VERDICT_WORD[answer.suggested]).toLowerCase(), tool: answer.source ?? '—' })),
               ` ${t('Not counted as confirmed until you confirm it.')} `,
-              h('button', { type: 'button', class: 'ghost-btn', onclick: () => { confirmVerdict(answer, answer.suggested!); persist(); actions.renderAll() } }, t('Confirm')),
+              h('button', { type: 'button', class: 'ghost-btn', onclick: () => { const value = answer.suggested!; setVerdict(value); card.querySelector<HTMLInputElement>('input:checked')?.focus() } }, t('Confirm')),
               ' ',
               h('button', { type: 'button', class: 'ghost-btn', onclick: () => card.querySelector<HTMLInputElement>(`input[name="chk-${c.id}"]`)?.focus() }, t('Change')),
             ),
           ]
         : []),
-      ...(evidenceConflictsOf(answer).map((x) => h('p', { class: 'hint warn' }, t('Conflicting evidence: {x}.', { x })))),
+      conflicts,
       h(
         'details',
         { class: 'tests-detail' },
