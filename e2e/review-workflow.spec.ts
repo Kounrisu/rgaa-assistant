@@ -25,9 +25,19 @@ for (const width of [480, 768, 1280]) {
     await expect(panel.locator('#page-summary .sum-pending')).toBeVisible()
     const choice = panel.locator('label[for="kind-1-informative"]')
     await expect(choice).toBeVisible()
+    // Information is discoverable first; the auditor can then compact the view using the keyboard.
+    for (const selector of ['#page-tools-disclosure', '.theme-details', '#tools', '#image-list-disclosure']) {
+      await expect(panel.locator(selector)).toHaveAttribute('open', '')
+    }
+    await panel.screenshot({ path: testInfo.outputPath(`expanded-${width}.png`), fullPage: false })
+    for (const selector of ['#page-tools-disclosure', '.theme-details', '#tools', ...(width <= 979 ? ['#image-list-disclosure'] : [])]) {
+      await panel.locator(`${selector} > summary`).focus()
+      await panel.keyboard.press('Enter')
+      await expect(panel.locator(selector)).not.toHaveAttribute('open', '')
+    }
     await panel.evaluate(() => window.scrollTo(0, 0))
     const box = await choice.boundingBox()
-    expect(box!.y + box!.height, 'the first decision fits in the initial viewport').toBeLessThan(800)
+    expect(box!.y + box!.height, 'the first decision fits after the auditor compacts the view').toBeLessThan(800)
     expect(await panel.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
     await expect(panel.locator('#reset-page-btn')).not.toBeVisible()
     // Page navigation follows the selected page in keyboard order; its action menu stays on screen.
@@ -46,6 +56,13 @@ for (const width of [480, 768, 1280]) {
       await expect(panel.locator('#element-list .item')).toHaveCount(3)
       await panel.locator('#image-list-disclosure > summary').click()
     }
+    // Crossing the responsive breakpoint must not reopen a list the auditor closed.
+    if (width <= 979) {
+      await panel.setViewportSize({ width: 1280, height: 800 })
+      await expect(panel.locator('#image-list-disclosure')).not.toHaveAttribute('open', '')
+      await panel.setViewportSize({ width, height: 800 })
+      await expect(panel.locator('#image-list-disclosure')).not.toHaveAttribute('open', '')
+    }
     await panel.screenshot({ path: testInfo.outputPath(`initial-${width}.png`) })
     await choice.click()
     await panel.locator('label[for="crit-1-1.1-c"]').click()
@@ -63,6 +80,13 @@ test('real automatic evidence leads to keyboard review, survives reruns, and wor
   await panel.locator('#empty-add-btn').click()
   await runChecks(panel)
   await expect(panel.locator('#results-btn')).toBeEnabled()
+  await expect(panel.locator('#run-history')).toHaveAttribute('open', '')
+  await expect(panel.locator('.scan-details')).toHaveAttribute('open', '')
+  // A manual answer rebuilds this screen: it must preserve the user's collapsed history.
+  await panel.locator('#run-history > summary').focus()
+  await panel.keyboard.press('Enter')
+  await expect(panel.locator('#run-history')).not.toHaveAttribute('open', '')
+  await panel.locator('.check-row label[for$="-ok"]').first().click()
   await expect(panel.locator('#run-history')).not.toHaveAttribute('open', '')
   await expect(panel.locator('.checks-body')).toBeVisible()
   const rec = await storedPage(panel)
@@ -79,7 +103,7 @@ test('real automatic evidence leads to keyboard review, survives reruns, and wor
   expect(rec.findingReviews[missingLabel.key]?.answers['11.1']).toBe('nc')
   expect(rec.findingReviews[labelled.key]?.answers['11.1']).not.toBe('nc')
   await panel.screenshot({ path: testInfo.outputPath('automatic-review.png') })
-  await panel.locator('.queue-suggestions > summary').click()
+  await expect(panel.locator('.queue-suggestions')).toHaveAttribute('open', '')
   await panel.locator('[data-review-criterion="8.5"]').click()
   const card = panel.locator('[id="crit-card-8.5"]')
   const compliant = card.locator('input[value="c"]')
@@ -100,6 +124,7 @@ test('real automatic evidence leads to keyboard review, survives reruns, and wor
   // The site is fixed: the real axe engine must now pass; it must not overwrite the human verdict or note.
   await site.evaluate(() => { document.title = 'Contact — Example company' })
   await runChecks(panel)
+  await expect(panel.locator('#run-history')).not.toHaveAttribute('open', '')
   const after = (await storedPage(panel)).checklist['8.5']
   expect(after.autoResults.axe.result).toBe('pass')
   expect(after.verdict).toBe('nc')

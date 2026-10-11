@@ -72,6 +72,7 @@ export const dom = {
   pageNavigation: document.querySelector<HTMLElement>('.page-navigation')!,
   openPageBtn: $<HTMLButtonElement>('open-page-btn'),
   reviewBtn: $<HTMLButtonElement>('review-btn'),
+  evaluatePageBtn: $<HTMLButtonElement>('evaluate-page-btn'),
   scanBtn: $<HTMLButtonElement>('scan-btn'),
   clearBtn: $<HTMLButtonElement>('clear-btn'),
   statusEl: $('status'),

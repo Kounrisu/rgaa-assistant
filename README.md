@@ -47,7 +47,7 @@ accessibility statement). Print it to PDF from the browser.
 1. Open DevTools (F12), select **RGAA Assistant**, and register the pages in **Échantillon et suivi**
    beside the audit name in the top bar. The editable pages table appears first, followed by the add-page form;
    audit settings, automatic batch controls and per-page progress follow below.
-2. Open a registered page in the inspected browser tab. Use **Poursuivre l’évaluation** on its sample card.
+2. Open a registered page in the inspected browser tab. Use **Poursuivre l’évaluation** on its sample card, or **Évaluer la page** in the top header to return to the selected page.
    The page header groups the page selector, **Évaluation**, **Contrôles manuels** and **Résultats de la page**. Click
    **Contrôler automatiquement la page ouverte**. It scans the elements and runs the automatic engines;
    **Actions de la page → Analyser / Réanalyser** only refreshes the detected elements (useful for popins).
@@ -98,7 +98,7 @@ change while the human verdict and note survive the rerun. Tool disagreements re
 
 The Evaluation button returns to the current theme. Page progress stays visible; display tools and page reset actions are expandable;
 on compact panels the image list is expandable too. After an automatic run, use the review queue to open a
-suggested criterion directly. Manual checks come before the collapsed run history.
+suggested criterion directly. Manual checks come before the run history. Information sections start expanded; collapse choices are kept during the panel session, including when answers rebuild a view. Action menus stay closed until opened.
 
 Load `dist/` as an unpacked extension (`chrome://extensions` with Developer mode, or `about:debugging` in
 Firefox), then reload the page you inspect after reloading the extension.

@@ -1,3 +1,4 @@
+import { disclosure } from './disclosures'
 import { pageWork } from './page-work'
 /**
  * The sample: the pages to audit (P01, P02...), their URLs, and the audit fields.
@@ -124,7 +125,7 @@ export function renderSample(): void {
     ),
   )
   dom.sampleEl.append(
-    h('details', { class: 'sample-management' }, h('summary', {}, t('Audit details and settings')),
+    disclosure('sample-settings', { class: 'sample-management' }, h('summary', {}, t('Audit details and settings')),
       h('div', { class: 'sample-meta' }, field(t('Site'), 'site', t('Name of the site')), field(t('Auditor'), 'auditor', t('First name Last name')), field(t('Context'), 'context', t('Initial visit'))),
       h('button', { type: 'button', class: 'danger-btn', disabled: !state.audit.pages.length && !state.audit.meta.site && !state.audit.meta.auditor, onclick: () => actions.resetAudit() }, t('Reset the whole audit'))),
     dom.batchEl,

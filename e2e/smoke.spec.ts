@@ -85,7 +85,7 @@ test('scan, review, save, reload, export, save to file and reopen', async ({ rig
     await expect(panel.locator('#auto-btn')).toBeEnabled()
     // the run opens the Checks view by itself, with one report card per tool
     await expect(panel.locator('#checks')).toBeVisible()
-    await panel.locator('#run-history > summary').click()
+    await expect(panel.locator('#run-history')).toHaveAttribute('open', '')
     await expect(panel.getByRole('heading', { name: /Contrôles automatiques \(axe\)/ })).toBeVisible()
     await expect(panel.getByRole('heading', { name: /Contrôles automatiques \(RGAA\)/ })).toBeVisible()
     // the fixture has an image without alt and an unnamed link: axe must have failed something

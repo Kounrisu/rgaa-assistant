@@ -20,6 +20,7 @@ export const FR_WORKFLOW: Record<string, string> = {
   'Page workspace': 'Évaluer une page',
   'Current page workflow': 'Travail sur la page sélectionnée',
   'Evaluation': 'Évaluation',
+  'Evaluate the page': 'Évaluer la page',
   'Check the open page automatically': 'Contrôler automatiquement la page ouverte',
   'Next to evaluate': 'Suivant à évaluer',
   'Manual checks — {label}': 'Vérifications manuelles — {label}',

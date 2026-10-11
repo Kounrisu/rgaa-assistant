@@ -6,7 +6,6 @@ import { t } from '../lib/i18n'
 export function renderBatch(): void {
   const b = state.batch?.auditId === state.audit.id ? state.batch : undefined
   dom.batchEl.hidden = state.view !== 'sample' && !b?.running
-  if (b?.running || state.batchSelection.size) dom.batchEl.open = true
   dom.batchEl.replaceChildren(
     h('summary', {}, t('Automatic checks on selected pages')),
     h('p', { class: 'hint-line' }, t('Select pages below. This replaces the page in the inspected browser tab for each URL, using your browser session. Keep DevTools open. Dynamic states still need checks on the page.')),

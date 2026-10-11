@@ -43,6 +43,8 @@ export interface PanelState {
   overviewSheet: number
   /** The automatic checks are running. */
   reviewCursor?: { page: string; key: string }
+  /** Information disclosure choices for this panel session only; never part of saved audits. */
+  disclosures: Map<string, boolean>
   batchSelection: Set<string>
   batch?: { auditId: string; ids: string[]; index: number; paused: boolean; running: boolean }
   runBusy: boolean
@@ -75,6 +77,7 @@ export const state: PanelState = {
   navDismissed: '',
   resultsSheet: 0,
   overviewSheet: 0,
+  disclosures: new Map(),
   batchSelection: new Set(),
   runBusy: false,
   axeRunning: false,

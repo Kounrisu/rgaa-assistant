@@ -31,14 +31,14 @@ export function applyLanguage(lang: Lang): void {
 export function wireEvents(): void {
   dom.openPageBtn.addEventListener('click', () => { if (state.page) goTo(state.page.url) })
   dom.reviewBtn.addEventListener('click', () => setView('review'))
+  dom.evaluatePageBtn.addEventListener('click', () => {
+    setView('review')
+    dom.reviewBtn.focus()
+  })
   document.getElementById('reset-theme-btn')!.addEventListener('click', () => {
     dom.pageOptions.open = false
     void resetTheme()
   })
-  const compact = window.matchMedia('(max-width: 979px)')
-  const sizeList = () => { (document.getElementById('image-list-disclosure') as HTMLDetailsElement).open = !compact.matches }
-  sizeList()
-  compact.addEventListener('change', sizeList)
 
   dom.pageSelect.addEventListener('change', () => switchTo(dom.pageSelect.value, true))
   dom.deletePageBtn.addEventListener('click', () => removePage())
