@@ -45,3 +45,31 @@ test('sprite and CSS-background icons get a picture of the element, kept after a
   await expect(items).toHaveCount(5)
   expect((await thumbs()).slice(0, 2)).toEqual(before)
 })
+
+test('one screenshot serves every element in view (a scan of many icons is not one screenshot per icon)', async ({ rig }) => {
+  test.setTimeout(120_000)
+  const { panel, site } = rig
+  await site.evaluate(() => {
+    const row = Array.from({ length: 12 }, (_, i) => `<svg role="img" aria-label="Icône ${i}" style="width:24px;height:24px;margin:2px;fill:#06c"><circle cx="12" cy="12" r="${6 + (i % 5)}"/></svg>`).join('')
+    document.body.insertAdjacentHTML('afterbegin', `<div style="background:#eef">${row}</div>`)
+  })
+  await panel.evaluate(() => {
+    const w = window as unknown as { __captures: number }
+    w.__captures = 0
+    const send = chrome.runtime.sendMessage.bind(chrome.runtime)
+    ;(chrome.runtime as unknown as { sendMessage: unknown }).sendMessage = (m: { type?: string }) => {
+      if (m?.type === 'RGAA_CAPTURE') w.__captures++
+      return send(m)
+    }
+  })
+  await panel.locator('#empty-add-btn').click()
+  await scanElements(panel)
+  const items = panel.locator('#element-list .item')
+  await expect(items).toHaveCount(15) // 12 icons + the 3 images of the fixture
+  const pictures = () => items.evaluateAll((els) => els.slice(0, 12).filter((e) => e.querySelector('img.thumb')?.getAttribute('src')?.startsWith('data:image/png')).length)
+  await expect.poll(pictures).toBe(12)
+  // 12 icons + the findings previews of the fixture, all in the first screen of the page: a few screenshots at most, never one per element
+  const captures = await panel.evaluate(() => (window as unknown as { __captures: number }).__captures)
+  expect(captures).toBeGreaterThan(0)
+  expect(captures).toBeLessThanOrEqual(4)
+})

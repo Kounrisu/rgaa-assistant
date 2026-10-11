@@ -3,7 +3,7 @@
  * states, labels, focus, numbering and clean-up. Imported by the content script only (inlined in its bundle).
  */
 import { DEFAULT_COLOR, OVERLAY_ID, STYLE_ID, removeById } from './dom-utils'
-import type { LocatedElement } from '../lib/messages'
+import type { LocatedElement, ViewportRects } from '../lib/messages'
 import { noteCut } from './scan-coverage'
 
 const FOCUS_COLOR = '#facc15'
@@ -266,6 +266,25 @@ export function locateTheme(theme: number, id: number): LocatedElement | null {
   el.scrollIntoView({ block: 'center', inline: 'center', behavior: 'instant' as ScrollBehavior })
   const r = el.getBoundingClientRect()
   return { rect: { x: r.left, y: r.top, w: r.width, h: r.height }, vw: window.innerWidth, vh: window.innerHeight }
+}
+
+/**
+ * Where each element is on screen NOW (no scrolling): one screenshot can then serve every element that is fully in view and
+ * not covered by something else (a sticky header, a banner), instead of one screenshot per element.
+ */
+export function viewportRects(targets: { theme: number; id: number }[]): ViewportRects {
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+  const rects = targets.map(({ theme, id }) => {
+    const el = theme === 1 ? boxes.get(id)?.img : themeOverlays.get(theme)?.items.get(id)?.els[0]
+    if (!el) return null
+    const r = el.getBoundingClientRect()
+    const inView = r.width >= 2 && r.height >= 2 && r.left >= 0 && r.top >= 0 && r.right <= vw && r.bottom <= vh
+    const hit = inView ? document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) : null
+    const visible = inView && hit !== null && (el.contains(hit) || hit.contains(el))
+    return { x: r.left, y: r.top, w: r.width, h: r.height, visible }
+  })
+  return { vw, vh, rects }
 }
 
 export function relabelTheme(theme: number, map: { from: number; to: number }[]): void {

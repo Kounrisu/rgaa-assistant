@@ -1,7 +1,7 @@
 00 empty                                                               4b76116a9f 7191
 01 registered, not scanned                                             b2b38d9d8c 15832
-02 checks after the automatic run                                      ffb4f950da 49795
-03 checks, one problem noted                                           66a8f9d79b 49917
+02 checks after the automatic run                                      7bd56a451b 49795
+03 checks, one problem noted                                           0bcf6aa5ee 49917
 04 images                                                              44a5e72c83 37036
 05 images, unnamed one selected (problem banner)                       c310a05660 37655
 06 images, applied from the problem banner                             83485b77cb 48617
@@ -74,7 +74,7 @@ audit overview, sheet 6                                                1bb64d23e
 audit overview, sheet 7                                                b2544c1e69 24748
 sample                                                                 9837bca7e3 9283
 audits list                                                            98601c0a24 3884
-checks                                                                 1af77f7c16 47013
-checks, English                                                        a8bf446c61 44900
+checks                                                                 de646a76a3 47013
+checks, English                                                        1ab8350717 44900
 review, English                                                        e8a30f7517 37885
 theme 3, English                                                       c956f538d2 38314
