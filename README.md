@@ -98,7 +98,7 @@ change while the human verdict and note survive the rerun. Tool disagreements re
 
 The Evaluation button returns to the current theme. **Bilan de la page** counts all 106 criteria; the theme summary counts only its own criteria. Extra confirmation/coverage badges are grouped separately under **À vérifier**.
 Display and highlight tools remain visible below theme navigation. **Suivant à évaluer** sits beside the page summary;
-page reset/removal remain in the sample table, theme reset beside its heading, and the coverage reference below the workspace.
+page reset/removal remain in the sample table, theme reset beside its heading, and the coverage reference in the top audit bar.
 On compact panels the image list is expandable. After an automatic run, use the review queue to open a
 suggested criterion directly. Manual checks come before the run history. Information sections start expanded; collapse choices are kept during the panel session, including when answers rebuild a view. Action menus stay closed until opened.
 

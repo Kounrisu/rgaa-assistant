@@ -196,7 +196,6 @@ export function updateTools(): void {
   const reviewing = Boolean(state.page) && state.view === 'review'
   dom.themeHeadEl.hidden = !reviewing
   dom.displayToolsEl.hidden = !reviewing
-  dom.reviewReferenceEl.hidden = !reviewing
   dom.themeSummaryEl.dataset.theme = String(state.theme)
   dom.themeSummaryTitle.textContent = t('Theme summary — {name}', { name: t(THEME_LABEL[state.theme]) })
   dom.resetThemeBtn.setAttribute('aria-label', t('Reset {name}', { name: t(THEME_LABEL[state.theme]) }))
