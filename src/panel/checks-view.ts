@@ -83,6 +83,7 @@ export function renderChecks(): void {
           'div',
           { class: 'check-row', 'data-state': answer?.state ?? '' },
           h('p', { class: 'question' }, t(c.text)),
+          h('p', { class: 'hint-line how' }, h('strong', {}, `${t('How to check:')} `), t(c.how)),
           h('p', { class: 'hint-line' }, t('Feeds RGAA'), ' ', ...c.criteria.flatMap((id, i) => [i ? ', ' : '', h('a', { href: criterionUrl(id), target: '_blank', rel: 'noreferrer' }, id)])),
           h('div', { class: 'verdicts' }, ...radio('todo', t('To do')), ...radio('ok', t('Checked, OK')), ...radio('issue', t('Problem found'))),
           answer?.state === 'issue'

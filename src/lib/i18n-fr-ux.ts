@@ -114,6 +114,7 @@ export const FR_UX: Record<string, string> = {
   Dark: 'Sombre',
   'Custom colour': 'Couleur personnalisée',
   '{n} image picture(s)': '{n} image(s) photographiée(s)',
+  '{done}/{total} criteria answered · next: {id}': '{done}/{total} critères répondus · prochain : {id}',
   'Other tools': 'Autres outils',
   'Fewer tools': 'Moins d’outils',
   'Show the tools': 'Afficher les outils',

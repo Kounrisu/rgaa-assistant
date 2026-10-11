@@ -4,8 +4,8 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## Current state (2026-10-11)
 
-- Branch `codex/audit-workflow`. Implemented the owner's approved workflow in `29eb344` on top of Claude's
-  `51c1b1e` component work and `11fb2aa` UX verification. Version 0.1.0; saved audit format is now **v4**, with explicit
+- Branch `master` (the Codex branch `codex/audit-workflow` was merged by fast-forward and can be deleted). The owner's approved workflow
+  was implemented in `29eb344` on top of Claude's `51c1b1e` component work and `11fb2aa` UX verification. Version 0.1.0; saved audit format is now **v4**, with explicit
   migration from v3 and continued support for v2. Licence AGPL-3.0-only.
 - **Navigation follows audit/page scope:** Échantillon et suivi / Synthèse et exports sit beside the audit name in
   the top bar; Évaluation / Contrôles manuels / Résultats de la page sit beside the selected page below. Page actions
@@ -111,6 +111,19 @@ Keep page progress visible and preserve the owner's decorative-image counting de
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-11 — Claude Code — re-audit of the UX proposals, corrections that were still valid
+- Did: re-checked U1–U9 of `docs/ux-review-newcomer-2026-10-11.md` on the built panel (new section 7 with a verdict each).
+  Implemented: U1 (the browser address sits on the row of the page selector and navigation, `src/panel/panel.html` + `.page-location`
+  in `panel.css`; the display-tools label that repeated its heading is hidden), U3 (`criteriaProgressText` in
+  `src/panel/images-view.ts`: "1/6 critères répondus · prochain : 1.3" in the image header, refreshed in `refreshAll`),
+  U5 (`.rate.provisional`: label first, number muted), U8 (`how` on each manual check in `src/lib/manual-checks.ts`, French in the new
+  `src/lib/i18n-fr-manual.ts`, rendered in `checks-view.ts`). U2 and U7 were already resolved by Codex's rework; U4 declined for now
+  (a rename across ~15 texts); U6 is the owner's decision (keep C); U9 left.
+- Tests: `e2e/ux-reaudit.spec.ts`; parity baseline updated (diff read: the address row moved, the how lines, the criteria progress,
+  the rate markup, nothing else). `npm run check` 189 unit tests, 710 texts / 1229 French / 0 missing; `npm run test:e2e` 18 passed.
+  Not tested in a real Firefox.
+- Next: the owner's call on U4 and U9; try the extension on a real site (Firefox) and report what is still in the way at DevTools height.
 
 ### 2026-10-11 — Claude Code — a real picture of the element for icons that cannot be redrawn
 - Why: the owner saw no icon even on the pink preview background. Reproduced: an inline SVG that draws from a sprite
