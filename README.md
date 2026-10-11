@@ -45,7 +45,8 @@ accessibility statement). Print it to PDF from the browser.
 ## Use
 
 1. Open DevTools (F12), select **RGAA Assistant**, and register the pages in **Échantillon et suivi**
-   beside the audit name in the top bar.
+   beside the audit name in the top bar. The editable pages table appears first, followed by the add-page form;
+   audit settings, automatic batch controls and per-page progress follow below.
 2. Open a registered page in the inspected browser tab. Use **Poursuivre l’évaluation** on its sample card.
    The page header groups the page selector, **Évaluation**, **Contrôles manuels** and **Résultats de la page**. Click
    **Contrôler automatiquement la page ouverte**. It scans the elements and runs the automatic engines;

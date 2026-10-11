@@ -57,13 +57,7 @@ export function renderSample(): void {
       { class: 'results-head' },
       h('div', {}, h('h2', {}, t('Sample and progress')), h('p', { class: 'hint-line' }, t('Follow the audit page by page: automatic suggestions, human decisions and manual activities.'))),
     ),
-    h('details', { class: 'sample-management' }, h('summary', {}, t('Audit details and settings')),
-      h('div', { class: 'sample-meta' }, field(t('Site'), 'site', t('Name of the site')), field(t('Auditor'), 'auditor', t('First name Last name')), field(t('Context'), 'context', t('Initial visit'))),
-      h('button', { type: 'button', class: 'danger-btn', disabled: !state.audit.pages.length && !state.audit.meta.site && !state.audit.meta.auditor, onclick: () => actions.resetAudit() }, t('Reset the whole audit'))),
   )
-
-  dom.sampleEl.append(dom.batchEl)
-  dom.sampleEl.append(h('div', { class: 'sample-work' }, ...state.audit.pages.map(pageWork)))
 
   const table = h('table', { class: 'results-table sample-table' })
   table.append(
@@ -114,7 +108,7 @@ export function renderSample(): void {
     )
   })
   table.append(body)
-  dom.sampleEl.append(h('details', { class: 'sample-management' }, h('summary', {}, t('Edit page titles, URLs and themes')), h('div', { class: 'results-scroll' }, table)))
+  dom.sampleEl.append(h('div', { class: 'results-scroll', tabindex: '0', role: 'region', 'aria-label': t('Pages of the sample') }, table))
 
   const urlNew = h('input', { type: 'url', value: state.liveUrl, placeholder: 'https://…', 'aria-label': t('URL of the new page') })
   const titleNew = h('input', { type: 'text', placeholder: t('Title (optional)'), 'aria-label': t('Title of the new page') })
@@ -128,6 +122,13 @@ export function renderSample(): void {
         h('button', { type: 'button', class: 'primary', onclick: () => void addPage(urlNew.value.trim(), titleNew.value.trim() || undefined) }, t('Add to the sample'))),
       h('p', { class: 'hint-line' }, t('Adding a page does not scan it. Select it, open it in the browser, then click Scan.')),
     ),
+  )
+  dom.sampleEl.append(
+    h('details', { class: 'sample-management' }, h('summary', {}, t('Audit details and settings')),
+      h('div', { class: 'sample-meta' }, field(t('Site'), 'site', t('Name of the site')), field(t('Auditor'), 'auditor', t('First name Last name')), field(t('Context'), 'context', t('Initial visit'))),
+      h('button', { type: 'button', class: 'danger-btn', disabled: !state.audit.pages.length && !state.audit.meta.site && !state.audit.meta.auditor, onclick: () => actions.resetAudit() }, t('Reset the whole audit'))),
+    dom.batchEl,
+    h('div', { class: 'sample-work' }, ...state.audit.pages.map(pageWork)),
   )
   for (const child of dom.sampleEl.children) if (child !== dom.batchEl) (child as HTMLElement).inert = state.runBusy || Boolean(state.batch?.running)
 }
