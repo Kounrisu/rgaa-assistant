@@ -112,6 +112,20 @@ Keep page progress visible and preserve the owner's decorative-image counting de
 
 ## Handoff log (newest first)
 
+### 2026-10-11 — Claude Code — opening a file over the same audit (work on two computers)
+- Did: the owner works on several computers: save to file on one, open it on the other and replace the original. That already
+  worked (same audit id → "replace or import as a copy"), but the prompt only showed the browser's date. `importAuditFile`
+  (`src/panel/audit-session.ts`) now shows both dates ("Dans le navigateur : modifié le… Dans le fichier : modifié le…"),
+  says whether the file is more recent, older (warning: replacing loses the changes made since) or the same date, and
+  says that replacing overwrites the whole audit (no merge). Bug found by the new assertion in `e2e/smoke.spec.ts`: renaming an
+  audit did not bump `updatedAt`, so a rename left "last change" and "changed since the file" unchanged; renaming (open or
+  stored audit) now sets it. French in `i18n-fr-panel.ts`.
+- State: `npm run check` 187 unit tests, 707 texts / 1208 French / 0 missing; `npm run test:e2e` all passed. Not tested in a real Firefox
+  or between two real machines.
+- Next / for the owner: there is no merge of two copies edited on both computers (the newer file replaces the browser
+  audit, or the file is imported as a copy). Always save the file before moving, and do not edit the same audit on both
+  machines at once. A merge by page (take the newest page of each) is possible later if that is a real need.
+
 ### 2026-10-11 — Claude Code — background choice for the image previews (transparent icons)
 - Did: `src/panel/preview-bg.ts`: a "Fond de l'aperçu" select (checkerboard by default, white, light pink, light grey, dark,
   custom colour with a colour picker) in the big preview card of Images. It sets `--preview-bg` on the document, read by the
