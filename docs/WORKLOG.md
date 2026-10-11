@@ -14,8 +14,9 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
   global shortcut is secondary in Page actions. Compact theme `done/total` bubbles are unchanged.
 - **Page-work dashboard:** progress, pending decisions in selected themes, suggested criteria, manual activity counts,
   last activity and latest automatic run outcome per page, with direct evaluation/manual/results/open actions.
-  Metadata and sample editing are disclosures; the duplicate automatic-run button is removed. Element-only scanning
-  is under Page actions; the primary automatic action explicitly targets the open registered page.
+  The original editable pages table now appears first in Échantillon et suivi, followed by the add-page form;
+  metadata settings, batch controls and progress cards follow below. The duplicate automatic-run button is removed.
+  Element-only scanning is under Page actions; the primary automatic action explicitly targets the open registered page.
 - **Continue reviewing:** a common explicit save-and-next queue beside image, finding and checklist decisions, with
   keyboard focus, continuation across themes and wraparound. Answering alone never advances. Empty queues explicitly
   remind the auditor about unscanned themes/manual work. Existing verdict/rate/export rules are preserved.
@@ -23,7 +24,7 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
   page, resume remaining pages, per-page failures and retry by selection. An already open URL keeps its dynamic state.
   Status/date/error persist; older audits do not invent complete run status. Closing DevTools loses the remaining queue;
   any saved running status is displayed as interrupted. A changed URL requires another run.
-- Latest `npm run check`: **187 tests**, typecheck, **700 texts / 1194 French entries / 0 missing**, build pass.
+- Latest `npm run check`: **187 tests**, typecheck, **699 texts / 1194 French entries / 0 missing**, build pass.
   Latest full `npm run test:e2e`: **14 passed**, including the reviewed **80-screen** parity baseline, 480/768/1280 layouts,
   sequential runs/pause/resume, engine failure/retry, source-URL isolation and keyboard continuation. Built content script:
   **0 module imports**. Real Firefox/DevTools still untested.
@@ -72,7 +73,7 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## In progress (claimed)
 
-- None. Corrected audit/page navigation implemented and verified in `96b1ebb`.
+- None. Pages table restored and verified in `d8e1d53`.
 
 ## Next (suggested order; the owner decides)
 
@@ -104,6 +105,28 @@ Keep page progress visible and preserve the owner's decorative-image counting de
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-11 — Codex — restore the pages table at the start of the sample
+- Did: `d8e1d53` restores the original editable pages table directly below the Échantillon et suivi heading,
+  followed by the add-page form. It is no longer collapsed below the dashboard. Existing title/URL/theme editing,
+  open/reorder/reset/remove actions are preserved; metadata settings, batch controls and progress cards follow below.
+- Narrow panels: the table scrolls inside a named keyboard-focusable region; title/URL inputs retain a readable
+  minimum width instead of shrinking to a single character. Audit/page navigation remains as implemented in `96b1ebb`.
+- Tests: extended existing browser scenarios to check the table is immediately visible and precedes add/progress,
+  two registered pages appear in order, keyboard access reaches the title field and its width remains usable at 480px.
+  Reviewed wide/narrow screenshots. Read the full `/tmp/rgaa-table.diff` before updating the parity baseline;
+  only the sample screen changes among the 80 screens (table disclosure removed and blocks reordered).
+- Verification note: one intermediate full run had a transient Links-screen parity difference. Trace reconstruction
+  (`/tmp/rgaa-table-unexpected.diff`) showed extra page-highlight overlay markup in the displayed HTML excerpt.
+  The focused parity rerun passed without changing that baseline; only the intended sample-screen baseline is updated.
+- Checks: `npm run check` passed (187 unit tests, typecheck, 699 texts / 1194 French entries / 0 missing, build).
+  Final full `npm run test:e2e`: 14 passed, including the reviewed 80-screen baseline. Logs:
+  `/tmp/rgaa-table-release-check.log`, `/tmp/rgaa-table-final-e2e.log`.
+- NOT tested: real Firefox or real DevTools; Asqatasun fixture download suite (content/engine rules unchanged).
+- Next: owner reloads the extension/panel, opens Échantillon et suivi, and checks the restored table with several
+  real pages, including editing/reordering and horizontal keyboard scrolling in narrow DevTools.
+- For Claude/other tools: keep the editable table first and expanded; keep the new progress/batch features below it.
+  No data migration, dependencies, network calls or automatic-verdict changes.
 
 ### 2026-10-11 — Codex — implement the corrected audit/page hierarchy
 - Did: `96b1ebb` moves Échantillon et suivi / Synthèse et exports beside the audit name in the top bar.
