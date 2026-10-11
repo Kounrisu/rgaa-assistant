@@ -407,7 +407,7 @@ body { display: block; }
 /* ---------- Sample view ---------- */
 .primary-cta { padding: 8px 16px; border: 1px solid var(--accent); border-radius: 8px; background: var(--accent); color: #fff; font-weight: 600; margin-right: 8px; }
 .sample-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin: 12px 0; }
-.sample-table input { width: 100%; padding: 5px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font: inherit; }
+.sample-table input { width: 100%; min-width: 20ch; padding: 5px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font: inherit; }
 .sample-table tr.current th, .sample-table tr.current td { background: var(--accent-soft); }
 .sample-table th { white-space: nowrap; }
 .row-actions { white-space: nowrap; }
