@@ -32,7 +32,7 @@ export function wireEvents(): void {
   dom.openPageBtn.addEventListener('click', () => { if (state.page) goTo(state.page.url) })
   dom.reviewBtn.addEventListener('click', () => setView('review'))
   document.getElementById('reset-theme-btn')!.addEventListener('click', () => {
-    document.querySelector<HTMLDetailsElement>('.page-options')!.open = false
+    dom.pageOptions.open = false
     void resetTheme()
   })
   const compact = window.matchMedia('(max-width: 979px)')
@@ -46,7 +46,7 @@ export function wireEvents(): void {
   dom.emptyAddBtn.addEventListener('click', () => void addPage(state.liveUrl))
   dom.emptyGoBtn.addEventListener('click', () => state.page && goTo(state.page.url))
   dom.sampleBtn.addEventListener('click', () => setView('sample'))
-  dom.scanBtn.addEventListener('click', () => { document.querySelector<HTMLDetailsElement>('.page-options')!.open = false; void scan() })
+  dom.scanBtn.addEventListener('click', () => { dom.pageOptions.open = false; void scan() })
   dom.rescanBtn.addEventListener('click', scan)
   chrome.runtime.onMessage.addListener((message) => {
     if (message?.type !== 'RGAA_NEW_IMAGES' || !state.scanCount) return
@@ -96,7 +96,7 @@ export function wireEvents(): void {
   })
   dom.resultsBtn.addEventListener('click', () => setView('page'))
   dom.auditBtn.addEventListener('click', () => setView('audit'))
-  dom.nextBtn.addEventListener('click', () => actions.nextReview())
+  dom.nextBtn.addEventListener('click', () => { dom.pageOptions.open = false; void actions.nextReview() })
   // Keyboard: n goes to the next element to review, j / k move between images (outside text fields).
   document.addEventListener('keydown', (event) => {
     const target = event.target as HTMLElement

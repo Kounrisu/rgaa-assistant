@@ -30,6 +30,15 @@ for (const width of [480, 768, 1280]) {
     expect(box!.y + box!.height, 'the first decision fits in the initial viewport').toBeLessThan(800)
     expect(await panel.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
     await expect(panel.locator('#reset-page-btn')).not.toBeVisible()
+    // Page navigation follows the selected page in keyboard order; its action menu stays on screen.
+    await panel.locator('#page-select').focus()
+    await panel.keyboard.press('Tab')
+    await expect(panel.locator('#review-btn')).toBeFocused()
+    await panel.locator('.page-options > summary').click()
+    const menu = await panel.locator('.page-options .menu-content').boundingBox()
+    expect(menu!.x).toBeGreaterThanOrEqual(0)
+    expect(menu!.x + menu!.width).toBeLessThanOrEqual(width)
+    await panel.locator('.page-options > summary').click()
     // The list remains available on narrow screens, including its review filters.
     if (width <= 979) {
       await expect(panel.locator('.compact-preview')).toBeVisible()

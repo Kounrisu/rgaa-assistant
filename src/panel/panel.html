@@ -11,15 +11,14 @@
       <h1 class="brand-inline">RGAA Assistant</h1>
       <span class="auditbar-sep" aria-hidden="true">›</span>
       <button id="audit-name-btn" type="button" class="audit-name" title="Rename this audit" data-i18n-attrs="title"></button>
+      <nav class="audit-navigation" aria-label="Audit workflow" data-i18n-attrs="aria-label">
+        <button id="sample-btn" type="button" aria-pressed="false" data-i18n>Sample and progress</button>
+        <button id="audit-btn" type="button" disabled aria-pressed="false" data-i18n>Summary and exports</button>
+      </nav>
+      <span class="spacer"></span>
       <span id="save-state" class="pill" role="status" aria-live="polite"></span>
       <button id="save-retry-btn" type="button" class="pill error-retry" hidden></button>
       <span id="backup-state" class="pill muted"></span>
-      <span class="spacer"></span>
-      <nav class="page-navigation" aria-label="Current page workflow" data-i18n-attrs="aria-label">
-        <button id="review-btn" type="button" aria-pressed="true" data-i18n>Evaluation</button>
-        <button id="checks-btn" type="button" aria-pressed="false" disabled data-i18n>Manual checks</button>
-        <button id="results-btn" type="button" disabled aria-pressed="false" data-i18n>Page results</button>
-      </nav>
       <button id="audits-btn" type="button" aria-pressed="false" data-i18n>Audits</button>
       <button id="open-file-btn" type="button" title="Reopen an audit saved earlier in a .rgaa.json file, to carry on" data-i18n data-i18n-attrs="title">Open file</button>
       <button id="save-file-btn" type="button" title="Download the whole audit as a .rgaa.json file, to keep or to reopen later" data-i18n data-i18n-attrs="title">Save file</button>
@@ -29,29 +28,36 @@
       </div>
     </div>
 
-    <nav class="audit-navigation" aria-label="Audit workflow" data-i18n-attrs="aria-label">
-      <button id="sample-btn" type="button" aria-pressed="false" data-i18n>Sample and progress</button>
-      <button id="audit-btn" type="button" disabled aria-pressed="false" data-i18n>Summary and exports</button>
-    </nav>
     <p id="status" role="status" class="status top-status"></p>
 
     <div class="pagebar">
-      <label for="page-select" data-i18n>Page</label>
-      <select id="page-select"></select>
-      <span id="live-url" class="live-url"></span>
-      <button id="open-page-btn" type="button" hidden data-i18n>Open registered page</button>
-      <button id="auto-btn" type="button" class="primary" title="Run every automatic test on the page in the browser: scan all the themes, then axe, our RGAA checks, the Asqatasun-derived rules and the HTML check" data-i18n data-i18n-attrs="title" disabled>Check the open page automatically</button>
-      <button id="next-btn" type="button" title="Go to the next element or criterion that still needs your answer, in any theme (shortcut: n)" data-i18n data-i18n-attrs="title" disabled>Next to evaluate</button>
-      <details class="page-options disclosure-menu">
-        <summary data-i18n>Page actions</summary>
-        <div class="menu-content">
-      <button id="scan-btn" type="button" >Scan page</button>
-      <button id="reset-page-btn" type="button" class="ghost-btn danger" disabled title="Clear the scans and every answer of this page; keep its URL, title and themes" data-i18n data-i18n-attrs="title">Reset page</button>
-      <button id="delete-page-btn" type="button" class="ghost-btn" disabled data-i18n>Remove page</button>
-        <button id="reset-theme-btn" type="button" class="ghost-btn danger" data-i18n>Reset current theme</button>
-        <a class="link-btn" href="../rgaa/rgaa.html" target="_blank" rel="noreferrer" data-i18n>RGAA coverage ↗</a>
-        </div>
-      </details>
+      <div class="page-selection">
+        <label for="page-select" data-i18n>Page</label>
+        <select id="page-select"></select>
+      </div>
+      <nav class="page-navigation" aria-label="Current page workflow" data-i18n-attrs="aria-label">
+        <button id="review-btn" type="button" aria-pressed="true" data-i18n>Evaluation</button>
+        <button id="checks-btn" type="button" aria-pressed="false" disabled data-i18n>Manual checks</button>
+        <button id="results-btn" type="button" disabled aria-pressed="false" data-i18n>Page results</button>
+      </nav>
+      <div class="page-actions">
+        <button id="auto-btn" type="button" class="primary" title="Run every automatic test on the page in the browser: scan all the themes, then axe, our RGAA checks, the Asqatasun-derived rules and the HTML check" data-i18n data-i18n-attrs="title" disabled>Check the open page automatically</button>
+        <details class="page-options disclosure-menu">
+          <summary data-i18n>Page actions</summary>
+          <div class="menu-content">
+            <button id="next-btn" type="button" title="Go to the next element or criterion that still needs your answer, in any theme (shortcut: n)" data-i18n data-i18n-attrs="title" disabled>Next to evaluate</button>
+            <button id="scan-btn" type="button" >Scan page</button>
+            <button id="reset-page-btn" type="button" class="ghost-btn danger" disabled title="Clear the scans and every answer of this page; keep its URL, title and themes" data-i18n data-i18n-attrs="title">Reset page</button>
+            <button id="delete-page-btn" type="button" class="ghost-btn" disabled data-i18n>Remove page</button>
+            <button id="reset-theme-btn" type="button" class="ghost-btn danger" data-i18n>Reset current theme</button>
+            <a class="link-btn" href="../rgaa/rgaa.html" target="_blank" rel="noreferrer" data-i18n>RGAA coverage ↗</a>
+          </div>
+        </details>
+      </div>
+      <div class="page-location">
+        <span id="live-url" class="live-url"></span>
+        <button id="open-page-btn" type="button" hidden data-i18n>Open registered page</button>
+      </div>
     </div>
     <section id="page-progress" class="page-progress" aria-label="Page progress" data-i18n-attrs="aria-label" hidden>
       <span id="progress" class="progress" role="status" aria-live="polite"></span>
