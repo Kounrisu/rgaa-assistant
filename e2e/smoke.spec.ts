@@ -167,6 +167,10 @@ test('scan, review, save, reload, export, save to file and reopen', async ({ rig
     await chooser.setFiles(rgaaFile)
     // the same audit is already in the browser: the app asks before replacing it
     await expect(panel.locator('#confirm-dialog')).toBeVisible()
+    // both dates are shown and the file, older than the changes made since, is flagged
+    await expect(panel.locator('#confirm-dialog')).toContainText('Dans le navigateur : modifié le')
+    await expect(panel.locator('#confirm-dialog')).toContainText('Dans le fichier : modifié le')
+    await expect(panel.locator('#confirm-dialog')).toContainText('PLUS ANCIEN')
     await panel.locator('#confirm-ok').click()
     await expect(status(panel)).toContainText(`Audit « ${AUDIT_NAME} » rouvert depuis le fichier : 1 page(s)`)
     await expect(panel.locator('#audit-name-btn')).toHaveText(AUDIT_NAME)

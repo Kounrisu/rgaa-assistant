@@ -313,6 +313,7 @@ export function createAuditSession(deps: SessionDeps) {
       const name = await deps.askText(t('Rename this audit'), t('Name of the audit'), open.name)
       if (name === null || name === open.name) return null
       open.name = name
+      open.updatedAt = Date.now() // a rename is a change: the file / browser comparison and “changed since the file” rely on this date
       markDirty()
       deps.say(t('Audit renamed “{name}”.', { name }))
       return name
@@ -322,6 +323,7 @@ export function createAuditSession(deps: SessionDeps) {
     const name = await deps.askText(t('Rename this audit'), t('Name of the audit'), other.name)
     if (name === null) return null
     other.name = name
+    other.updatedAt = Date.now()
     const response = await transport.save(other, 0)
     if (!response.ok) failedWrite(response)
     deps.onListChanged()
@@ -431,10 +433,16 @@ export function createAuditSession(deps: SessionDeps) {
     if (existing) {
       const replace = await deps.askConfirm(
         t('This audit is already in the browser'),
-        t('“{name}” (saved {date}) has the same identifier as the file. Replace it with the file, or cancel to choose another option?', {
-          name: existing.name,
-          date: new Date(existing.updatedAt).toLocaleString(),
-        }),
+        [
+          t('“{name}” is already in this browser (same identifier as the file).', { name: existing.name }),
+          t('In the browser: changed {date}. In the file: changed {fileDate}.', { date: new Date(existing.updatedAt).toLocaleString(), fileDate: new Date(incoming.updatedAt).toLocaleString() }),
+          incoming.updatedAt > existing.updatedAt
+            ? t('The file is more recent.')
+            : incoming.updatedAt < existing.updatedAt
+              ? t('Warning: the file is OLDER than the audit in the browser. Replacing it loses the changes made since.')
+              : t('Both have the same date.'),
+          t('Replacing overwrites the whole audit in the browser with the file. Cancel to choose another option (import as a copy).'),
+        ].join(' '),
         t('Replace it'),
       )
       if (!replace) {
