@@ -280,4 +280,20 @@ describe('numbers follow the page order', () => {
     expect(map).toEqual([{ from: 1, to: 1 }, { from: 2, to: 2 }, { from: 3, to: 3 }])
     expect(rec.findingReviews[second.key]).toMatchObject({ answers: { '6.1': 'nc' }, note: 'n' })
   })
+  it('Colours: texts that are no longer found are dropped unless a human worked on them (the checker’s own note does not count)', () => {
+    const fail = (id: number, label: string) => raw({ type: 'contrast-fail', id, label, summary: label, facts: {}, html: `<p>${label}</p>`, contextHtml: `<div><p>${label}</p></div>`, data: { fg: '#bbbbbb', bg: '#ffffff', large: false } })
+    mergeFindings(3, [fail(1, '“A”'), fail(2, '“B”'), fail(3, '“C”')])
+    const [a, b, c] = ['“A”', '“B”', '“C”'].map((l) => rec.findings.find((f) => f.label === l)!)
+    expect(rec.findingReviews[a.key].autoNote).toBeTruthy() // every failing text got the checker's note
+    rec.findingReviews[b.key].note = 'à corriger par l’équipe' // a human note
+    rec.findingReviews[c.key].answers['3.2'] = 'na' // a human answer
+    rec.findingReviews[c.key].auto = false
+    mergeFindings(3, [fail(1, '“D”')]) // A, B and C are not on the page any more
+    const labels = rec.findings.filter((f) => f.theme === 3).map((f) => f.label)
+    expect(labels).not.toContain('“A”') // only the checker's note and a pre-filled answer: dropped
+    expect(rec.findingReviews[a.key]).toBeUndefined()
+    expect(labels).toContain('“B”') // the human note: kept, flagged as gone
+    expect(labels).toContain('“C”') // the human answer: kept
+    expect(rec.findings.find((f) => f.label === '“B”')!.present).toBe(false)
+  })
 })
