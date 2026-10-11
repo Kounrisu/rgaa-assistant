@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { dataImage, isNavigableUrl } from '../src/lib/url-safety'
+import { dataImage, isNavigableUrl, previewOf } from '../src/lib/url-safety'
 import { auditFromFile, auditToFile, parseAudit } from '../src/lib/audit-store'
 import { buildReportHtml } from '../src/lib/report'
 import { auditStats, type PageInput } from '../src/lib/audit-sheet'
@@ -66,5 +66,28 @@ describe('opening an audit file', () => {
     ]
     const loaded = auditFromFile(auditToFile(audit))
     expect(loaded.pages[0].items.map((i) => i.thumb)).toEqual(['data:image/png;base64,iVBORw0KGgo=', 'https://www.example.org/img/a.png', null])
+  })
+})
+
+describe('pictures of elements (shot)', () => {
+  it('previewOf shows the picture when it is a base64 image, never an address, else the thumbnail', () => {
+    const png = 'data:image/png;base64,iVBORw0KGgo='
+    expect(previewOf({ shot: png, thumb: 'https://x.test/a.svg' })).toBe(png)
+    expect(previewOf({ shot: null, thumb: 'https://x.test/a.svg' })).toBe('https://x.test/a.svg')
+    expect(previewOf({ thumb: null })).toBeNull()
+    expect(previewOf({ shot: 'https://tracker.example/p.gif', thumb: 'data:image/png;base64,AAAA' })).toBe('data:image/png;base64,AAAA')
+  })
+
+  it('opening a file drops a picture that is not a base64 image, for images and findings', () => {
+    const audit = sampleAudit('Shots')
+    const page = audit.pages[0]
+    const png = 'data:image/png;base64,iVBORw0KGgo='
+    const [first] = page.items
+    page.items = [{ ...first, id: 1, key: 'i1', shot: png }, { ...first, id: 2, key: 'i2', shot: 'https://tracker.example/pixel.gif' }]
+    const finding = (id: number, shot: string) => ({ type: 'link-empty', id, key: `k${id}`, theme: 6, label: `link ${id}`, summary: '', facts: {}, html: '', contextHtml: '', count: 1, data: {}, present: true, scan: 1, shot })
+    page.findings = [finding(1, png), finding(2, 'javascript:alert(1)')]
+    const loaded = auditFromFile(auditToFile(audit)).pages[0]
+    expect(loaded.items.map((i) => i.shot)).toEqual([png, null])
+    expect(loaded.findings.map((f) => f.shot)).toEqual([png, null])
   })
 })

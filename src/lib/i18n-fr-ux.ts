@@ -113,6 +113,7 @@ export const FR_UX: Record<string, string> = {
   'Light grey': 'Gris clair',
   Dark: 'Sombre',
   'Custom colour': 'Couleur personnalisée',
+  '{n} image picture(s)': '{n} image(s) photographiée(s)',
   'Other tools': 'Autres outils',
   'Fewer tools': 'Moins d’outils',
   'Show the tools': 'Afficher les outils',

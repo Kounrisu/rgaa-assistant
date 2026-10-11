@@ -1,6 +1,7 @@
 import { OUTCOME_LABEL, statusOf, type CriterionResult, type Outcome, type Status, type Theme1Results, type ThemeResult } from './results'
 import { CRITERION_LEVEL, THEME_LABEL, type Level } from './themes'
 import type { Thumb } from './thumbs'
+import { previewOf } from './url-safety'
 import { buildXlsx, type CellInput, type Sheet } from './xlsx'
 import { findingCriteriaOf } from './findings'
 import { tFr } from './i18n'
@@ -469,7 +470,7 @@ export function imagesSheet(pages: PageInput[]): Sheet {
       rows.push([
         { v: page.label, s: 'crit' },
         el.id,
-        { v: '', s: 'wrap', image: el.thumb ?? undefined, imageId: thumbKey(pageIndex, el.id) },
+        { v: '', s: 'wrap', image: previewOf(el) ?? undefined, imageId: thumbKey(pageIndex, el.id) },
         `${el.type}${el.inDialog ? ' (popin)' : ''}`,
         { v: el.src && !el.src.startsWith('data:') ? el.src : '(graphique intégré)', s: 'wrap' },
         { v: DETECTED_FR[page.detectedOf(el)] + (el.ignoredBy ? ` (${el.ignoredBy})` : ''), s: 'wrap' },

@@ -9,6 +9,7 @@ import { t } from '../lib/i18n'
 import { THEME_LABEL, SCANNED_THEMES, FINDING_THEMES } from '../lib/themes'
 import { visibleElements, findingMatches, boxStates } from './review-state'
 import type { FindingItem } from '../lib/types'
+import type { Item } from './types'
 import { sleep } from './helpers'
 import { isNavigableUrl } from '../lib/url-safety'
 
@@ -95,13 +96,14 @@ export function cropShot(dataUrl: string, loc: { rect: { x: number; y: number; w
     const img = new Image()
     img.onload = () => {
       const k = img.naturalWidth / loc.vw
-      const pad = 8
+      const pad = loc.rect.w < 120 && loc.rect.h < 120 ? 4 : 8 // a small icon: less of its neighbours
       const x = Math.max(0, (loc.rect.x - pad) * k)
       const y = Math.max(0, (loc.rect.y - pad) * k)
       const w = Math.min(img.naturalWidth - x, (loc.rect.w + pad * 2) * k)
       const h = Math.min(img.naturalHeight - y, (loc.rect.h + pad * 2) * k)
       if (w < 4 || h < 4) return resolve(null)
-      const scale = Math.min(1, 280 / w, 140 / h)
+      // a small icon is enlarged (up to 4x) so it can be seen; a big element is reduced to fit
+      const scale = Math.min(w < 120 ? 4 : 1, 280 / w, 140 / h)
       const canvas = document.createElement('canvas')
       canvas.width = Math.max(1, Math.round(w * scale))
       canvas.height = Math.max(1, Math.round(h * scale))
@@ -113,19 +115,29 @@ export function cropShot(dataUrl: string, loc: { rect: { x: number; y: number; w
   })
 }
 
+/** One element to photograph: where to find it on the page, and where to put the picture. */
+export interface ShotTarget {
+  theme: number
+  id: number
+  set: (dataUrl: string) => void
+}
+
 /**
- * Takes a small picture of each finding: scroll it to the middle of the screen, photograph the tab,
- * crop. The boxes are hidden meanwhile so they are not in the pictures, and the scroll position is restored.
+ * Takes a small picture of each element: scroll it to the middle of the screen, photograph the tab, crop.
+ * The boxes are hidden meanwhile so they are not in the pictures, and the scroll position is restored.
+ * Returns how many pictures were taken (an element that is not on the page, or too small, is skipped).
  */
-export async function captureShots(list: FindingItem[]): Promise<number> {
-  if (!list.length) return 0
+export async function captureCrops(targets: ShotTarget[]): Promise<number> {
+  if (!targets.length) return 0
   const tabId = inspectedTabId()
   let done = 0
   try {
-    await sendToPage(tabId, { type: 'RGAA_OVERLAY', visibility: { 1: false, 2: false, 3: false } })
-    for (const f of list) {
-      say(t('Taking previews… {done}/{total}', { done, total: list.length }))
-      const loc = await sendToPage(tabId, { type: 'RGAA_LOCATE', theme: f.theme, id: f.id }).catch(() => null)
+    const hidden: Record<number, boolean> = {}
+    for (const n of SCANNED_THEMES) hidden[n] = false
+    await sendToPage(tabId, { type: 'RGAA_OVERLAY', visibility: hidden })
+    for (const target of targets) {
+      say(t('Taking previews… {done}/{total}', { done, total: targets.length }))
+      const loc = await sendToPage(tabId, { type: 'RGAA_LOCATE', theme: target.theme, id: target.id }).catch(() => null)
       if (!loc?.rect) continue
       await sleep(180)
       const cap: CaptureResponse | undefined = await chrome.runtime.sendMessage({ type: 'RGAA_CAPTURE', tabId })
@@ -136,8 +148,11 @@ export async function captureShots(list: FindingItem[]): Promise<number> {
         else say(t('Could not take previews ({error}). Check that the extension may access this site.', { error: cap && 'error' in cap ? cap.error : t('no screenshot') }))
         break
       }
-      f.shot = await cropShot(cap.dataUrl, loc)
-      if (f.shot) done++
+      const shot = await cropShot(cap.dataUrl, loc)
+      if (shot) {
+        target.set(shot)
+        done++
+      }
     }
   } finally {
     await sendToPage(tabId, { type: 'RGAA_SCROLL_RESTORE' }).catch(() => undefined)
@@ -145,6 +160,19 @@ export async function captureShots(list: FindingItem[]): Promise<number> {
   }
   return done
 }
+
+/** A small picture of each finding (see captureCrops). */
+export const captureShots = (list: FindingItem[]): Promise<number> => captureCrops(list.map((f) => ({ theme: f.theme, id: f.id, set: (url) => (f.shot = url) })))
+
+/**
+ * Graphics that cannot be redrawn from their markup need a real picture: an inline SVG that draws from a sprite (<use>)
+ * or from the page's CSS, an icon set as a CSS background (no image address at all). A plain <img> is shown from its address.
+ */
+export const needsPicture = (el: { tag: string; thumb: string | null; shot?: string | null; present: boolean }): boolean => el.present && !el.shot && (el.tag === 'svg' || !el.thumb)
+
+/** Takes the pictures of the images that need one (see needsPicture). */
+export const captureImagePictures = (items: Item[]): Promise<number> =>
+  captureCrops(items.filter(needsPicture).slice(0, 40).map((el) => ({ theme: 1, id: el.id, set: (url) => (el.shot = url) })))
 
 /** Evaluates an expression in the inspected page; '' when DevTools gives no usable string. */
 export function inspectedEval(expression: string): Promise<string> {

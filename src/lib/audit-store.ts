@@ -1,5 +1,5 @@
 import { migrateEvidence } from './evidence'
-import { isNavigableUrl } from './url-safety'
+import { dataImage, isNavigableUrl } from './url-safety'
 import type { Audit, AuditSummary, PageRecord } from './types'
 import { AuditFormatError, CURRENT_VERSION, MAX_IMPORT_BYTES, isRecord, readVersion, validateAudit } from './audit-validate'
 
@@ -364,6 +364,9 @@ function dropForeignPreviews(audit: Audit): Audit {
   }
   for (const page of audit.pages) {
     const pageHost = host(page.url)
+    // pictures of the page must be base64 images, nothing that loads from the network
+    for (const item of page.items) if (item.shot && !dataImage(item.shot)) item.shot = null
+    for (const f of page.findings ?? []) if (f.shot && !dataImage(f.shot)) f.shot = null
     for (const item of page.items) {
       if (typeof item.thumb !== 'string' || item.thumb.startsWith('data:')) continue
       if (!pageHost || host(item.thumb) !== pageHost) item.thumb = null

@@ -6,6 +6,7 @@ import type { Sheet } from '../lib/xlsx'
 import { say, download } from './dom'
 import { t } from '../lib/i18n'
 import { makeThumbs } from '../lib/thumbs'
+import { previewOf } from '../lib/url-safety'
 import { allPageInputs } from './model'
 import { buildReportHtml } from '../lib/report'
 import { state } from './state'
@@ -17,7 +18,7 @@ export async function exportWorkbook(pages: PageInput[], sheets: Sheet[], fileNa
   try {
     say(t('Building the Excel file with image previews…'))
     const sources = pages.flatMap((p, pi) => [
-      ...p.images.map((el) => ({ id: thumbKey(pi, el.id), source: el.thumb })),
+      ...p.images.map((el) => ({ id: thumbKey(pi, el.id), source: previewOf(el) })),
       ...p.findings.map((f) => ({ id: thumbKey(pi, 50000 + f.theme * 1000 + f.id), source: f.shot ?? null })),
     ])
     const thumbs = await makeThumbs(sources)

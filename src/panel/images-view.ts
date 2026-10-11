@@ -1,5 +1,6 @@
 import { reviewActions } from './review-controls'
 import { previewBackgroundControl } from './preview-bg'
+import { previewOf } from '../lib/url-safety'
 /**
  * The Images theme: the list with its filters, the detail of an image, the kind and criteria cards.
  */
@@ -72,8 +73,8 @@ export function renderList(): void {
         'aria-current': el.id === state.selectedId ? 'true' : 'false',
         onclick: () => select(el.id, true),
       },
-      el.thumb
-        ? h('img', { class: 'thumb', src: el.thumb, alt: '', loading: 'lazy' })
+      previewOf(el)
+        ? h('img', { class: 'thumb', src: previewOf(el)!, alt: '', loading: 'lazy' })
         : h('span', { class: 'thumb placeholder', 'aria-hidden': 'true' }, el.tag),
       h(
         'span',
@@ -142,7 +143,7 @@ export function renderDetailNow(): void {
       h(
         'h2',
         {},
-        el.thumb ? h('img', { class: 'compact-preview', src: el.thumb, alt: t('Preview of image {id}', { id: el.id }) }) : null,
+        previewOf(el) ? h('img', { class: 'compact-preview', src: previewOf(el)!, alt: t('Preview of image {id}', { id: el.id }) }) : null,
         `${t('Image #{id}', { id: el.id })} `,
         h('span', { class: `result ${statusOf(el)}`, id: 'result-badge' }, t(STATUS_LABEL[statusOf(el)])),
         h('span', { class: 'hint-line' }, `  ${index + 1} / ${state.elements.length}`),
@@ -187,8 +188,8 @@ export function renderDetailNow(): void {
     h(
       'div',
       { class: 'card preview' },
-      h('div', { class: 'preview-img' }, el.thumb ? h('img', { src: el.thumb, alt: t('Preview of image {id}', { id: el.id }) }) : h('span', { class: 'hint-line' }, t('No preview for <{type}>', { type: el.type }))),
-      ...(el.thumb ? [previewBackgroundControl()] : []),
+      h('div', { class: 'preview-img' }, previewOf(el) ? h('img', { src: previewOf(el)!, alt: t('Preview of image {id}', { id: el.id }) }) : h('span', { class: 'hint-line' }, t('No preview for <{type}>', { type: el.type }))),
+      ...(previewOf(el) ? [previewBackgroundControl()] : []),
       facts,
     ),
   )

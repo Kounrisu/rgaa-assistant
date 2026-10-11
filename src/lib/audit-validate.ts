@@ -110,7 +110,7 @@ function checklistAnswer(v: unknown, path: string): void {
   )
 }
 
-const NULLABLE_TEXT = ['src', 'thumb', 'alt', 'ariaLabel', 'labelledByText', 'title', 'svgTitle', 'accessibleName', 'ignoredBy', 'role', 'nearbyText', 'linkHref', 'linkText', 'figcaption']
+const NULLABLE_TEXT = ['src', 'thumb', 'shot', 'alt', 'ariaLabel', 'labelledByText', 'title', 'svgTitle', 'accessibleName', 'ignoredBy', 'role', 'nearbyText', 'linkHref', 'linkText', 'figcaption']
 
 function item(v: unknown, path: string): void {
   if (!isRecord(v)) return bad(path, 'an object is expected')
