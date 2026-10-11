@@ -554,11 +554,10 @@ button.pill:not(:disabled):hover { border-color: currentColor; }
 @keyframes flash-row { 0%, 60% { background: var(--warn-soft); } 100% { background: transparent; } }
 .flash { animation: flash-row 1.8s ease-out; outline: 2px solid var(--warn); outline-offset: 2px; }
 
-/* ---------- Page totals to the right of the title ---------- */
-.top-info { flex: 1; min-width: 260px; display: flex; flex-direction: column; gap: 4px; }
-.top-info .page-totals { margin-top: 0; }
-.top-info .top-status { flex: none; min-width: 0; }
-.top-info .top-status:empty { display: none; }
+/* Progress and status shortcuts stay visible beside the page controls. */
+.page-progress { padding: 8px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
+.page-progress .page-totals { margin-top: 6px; gap: 4px; }
+.page-totals .pill::before { display: none; }
 
 .contrast-checker .color-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 8px 0; }
 .contrast-checker .color-label { min-width: 84px; font-weight: 600; }
@@ -687,8 +686,6 @@ input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); ou
 summary { cursor: pointer; padding: 6px 0; font-weight: 600; }
 .topbar { gap: 6px 16px; padding: 8px 16px; }
 .topbar .actions { order: -1; }
-.top-info { display: block; flex: 1; min-width: 180px; }
-.top-info[open] { flex-basis: 100%; order: 1; }
 .top-status { flex-basis: 100%; padding: 0; font-size: 12px; }
 .disclosure-menu { position: relative; }
 .disclosure-menu > summary { padding: 6px 10px; border: 1px solid var(--border); border-radius: 7px; }
@@ -712,7 +709,7 @@ body:not([data-view='review']) .page-tools-disclosure { display: none; }
 .review-queue-list span { color: var(--muted); font-size: 12px; }
 .run-history > summary, .scan-details > summary { color: var(--text); }
 @media (max-width: 979px) {
-  .auditbar, .topbar, .pagebar { padding: 6px 10px; }
+  .auditbar, .topbar, .pagebar, .page-progress { padding: 6px 10px; }
   .auditbar .spacer, .auditbar-sep, .brand-inline { display: none; }
   .audit-name { max-width: 18ch; }
   .auditbar #backup-state { font-size: 11px; }
@@ -722,7 +719,7 @@ body:not([data-view='review']) .page-tools-disclosure { display: none; }
   .pagebar select { flex: 1; min-width: 0; max-width: calc(100% - 50px); }
   .live-url { flex-basis: 100%; font-size: 11px; }
   .progress { flex-basis: 100%; }
-  .pagebar .meter { flex: 1; max-width: 120px; }
+  .page-progress .meter { flex: 1; max-width: 120px; }
   .themebar { padding: 5px 10px; gap: 4px; }
   .theme-tabs { flex: 1; flex-wrap: nowrap; overflow-x: auto; }
   .theme-tab { flex: none; }

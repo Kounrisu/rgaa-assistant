@@ -9,15 +9,16 @@ import { h, say, dom, $, tNodes } from './dom'
 import { reviewKey, needsReview, findingNeedsReview, statusOf } from './review-state'
 import { renderFilters, renderList, select } from './images-view'
 import { syncFilterBoxes, focusFinding } from './page-bridge'
-import { findingCriterionIds } from '../lib/findings'
+import { findingCriterionIds, findingCriteriaOf } from '../lib/findings'
 import { FINDING_THEMES, THEMES, THEME_LABEL, SCANNED_THEMES } from '../lib/themes'
 import { renderThemeView } from './findings-view'
 import { rateOf, auditStats, isProvisional, countsOf } from '../lib/audit-sheet'
 import { normalizeUrl, findPage } from '../lib/audit-store'
-import type { PageRecord } from '../lib/types'
+import type { PageRecord, ImageReview } from '../lib/types'
 import { colorOf } from '../lib/theme-colors'
 import { auditTitle, timeOf } from './helpers'
 import { actions } from './actions'
+import { criteriaFor } from '../lib/rgaa'
 
 /** Kept as the single entry point the rest of the panel calls after any answer. */
 export function renderStats(): void {
@@ -32,6 +33,16 @@ export const OUTCOME_PILLS: [Outcome, string, string][] = [
   ['na', 'not applicable', ''],
   ['unassessed', 'not tested', ''],
 ]
+
+type SummaryTarget = Outcome | 'suggested' | 'unconfirmed' | 'partial'
+
+/** Counts and their destinations must use the same criteria, including coverage. */
+function matchesSummaryCriterion(c: CriterionResult, target: SummaryTarget): boolean {
+  if (target === 'suggested') return c.outcome === 'pending' && Boolean(c.suggested)
+  if (target === 'unconfirmed') return c.outcome === 'nc' && Boolean(c.unconfirmed)
+  if (target === 'partial') return c.coverage === 'partial'
+  return c.outcome === target && !((target === 'c' || target === 'na') && c.coverage !== 'full')
+}
 
 /**
  * The totals of a theme, in the theme's own header: criteria compliant, non-compliant, to review,
@@ -50,8 +61,7 @@ export function renderSummaries(): void {
     if (!criteria.length) continue
     for (const [outcome, labelEn, cls] of OUTCOME_PILLS) {
       const label = t(labelEn)
-      // compliant / not applicable only on the tests this tool can assess does not count here: see the partial pill
-      const count = criteria.filter((c) => c.outcome === outcome && !((outcome === 'c' || outcome === 'na') && c.coverage !== 'full')).length
+      const count = criteria.filter((c) => matchesSummaryCriterion(c, outcome)).length
       host.append(
         h(
           'button',
@@ -60,30 +70,111 @@ export function renderSummaries(): void {
             class: `pill ${cls} sum-${outcome}`,
             disabled: count === 0,
             title: count ? t('Go to the first one ({label})', { label }) : t('Nothing {label}', { label }),
-            onclick: () => (pageScope ? goToFirstOnPage(outcome) : goToFirst(n, outcome)),
+            onclick: () => goToSummary(pageScope ? null : n, outcome),
           },
           h('strong', {}, String(count)),
           ` ${label}`,
+          ...(count ? [h('span', { class: 'summary-arrow', 'aria-hidden': 'true' }, '→')] : []),
         ),
       )
     }
-    const toConfirm = criteria.filter((c) => c.outcome === 'pending' && c.suggested).length
-    const partial = criteria.filter((c) => c.coverage === 'partial').length
-    const unconfirmedNc = criteria.filter((c) => c.unconfirmed && c.outcome === 'nc').length
-    if (toConfirm) host.append(h('span', { class: 'pill warn-pill', title: t('A tool suggests an answer for these criteria. Confirm or change each one: until then they count as to review.') }, t('{n} to confirm', { n: toConfirm })))
-    if (unconfirmedNc) host.append(h('span', { class: 'pill warn-pill', title: t('Failures found by a tool and not yet confirmed. They are counted as non-compliant, so the rate is provisional.') }, t('{n} failure(s) to confirm', { n: unconfirmedNc })))
-    if (partial) host.append(h('span', { class: 'pill warn-pill', title: t('Some tests of these criteria are not supported by this tool. The result counts, but only for the tests this tool can assess, so the rate stays provisional; a failure is always kept.') }, t('{n} partly covered', { n: partial })))
+    const extraPills: [SummaryTarget, string, string][] = [
+      ['suggested', '{n} to confirm', 'A tool suggests an answer for these criteria. Confirm or change each one: until then they count as to review.'],
+      ['unconfirmed', '{n} failure(s) to confirm', 'Failures found by a tool and not yet confirmed. They are counted as non-compliant, so the rate is provisional.'],
+      ['partial', '{n} partly covered', 'Some tests of these criteria are not supported by this tool. The result counts, but only for the tests this tool can assess, so the rate stays provisional; a failure is always kept.'],
+    ]
+    for (const [target, label, explanation] of extraPills) {
+      const count = criteria.filter((c) => matchesSummaryCriterion(c, target)).length
+      if (!count) continue
+      const text = t(label, { n: count })
+      host.append(h('button', {
+        type: 'button', class: `pill warn-pill sum-${target}`,
+        title: `${t('Go to the first one ({label})', { label: text })}. ${t(explanation)}`,
+        onclick: () => goToSummary(pageScope ? null : n, target),
+      }, text, h('span', { class: 'summary-arrow', 'aria-hidden': 'true' }, '→')))
+    }
     if (!pageScope && n === 1 && state.elements.length) {
       const prefilled = state.elements.filter((e) => state.reviews[reviewKey(e)]?.auto).length
       host.append(
         h('span', { class: 'pill plain' }, t('{n} image(s)', { n: state.elements.length })),
         ...(state.elements.some((e) => !e.present) ? [h('span', { class: 'pill plain' }, t('{n} on page now', { n: state.elements.filter((e) => e.present).length }))] : []),
         ...(prefilled
-          ? [h('button', { type: 'button', class: 'pill plain', title: t('Show the images whose answer was pre-filled'), onclick: () => { state.filter = 'prefilled'; renderFilters(); renderList(); void syncFilterBoxes() } }, t('{n} pre-filled, to confirm', { n: prefilled }))]
+          ? [h('button', { type: 'button', class: 'pill plain', title: t('Show the images whose answer was pre-filled'), onclick: () => {
+            state.filter = 'prefilled'
+            renderFilters()
+            renderList()
+            const first = state.elements.find((e) => state.reviews[reviewKey(e)]?.auto)
+            if (first) { select(first.id, true); focusReviewTarget(dom.detailEl) }
+            void syncFilterBoxes()
+          } }, t('{n} pre-filled, to confirm', { n: prefilled }), h('span', { class: 'summary-arrow', 'aria-hidden': 'true' }, '→'))]
           : []),
       )
     }
   }
+}
+
+/** Open the exact criterion counted by a status, and a relevant element when one exists. */
+function goToSummary(theme: number | null, target: SummaryTarget): void {
+  if (!state.page) return
+  const themes = pageInput(state.page).themes.filter((t) => t.selected && (theme === null || t.number === theme))
+  for (const t of themes) {
+    const criterion = t.criteria.find((c) => matchesSummaryCriterion(c, target))
+    if (!criterion) continue
+    state.theme = t.number
+    state.findingFilter = 'all'
+    state.filter = 'all'
+    renderThemeBar()
+    // Unsupported/partial criteria need their test breakdown, including tests with no element.
+    if (target === 'partial' || target === 'unassessed') return openGridAt(criterion.id)
+    actions.setView('review')
+    const card = dom.themeEl.querySelector<HTMLElement>(`[id="crit-card-${criterion.id}"]`)
+    if (t.number !== 1 && card) return focusReviewTarget(card)
+
+    const matchesAnswer = (review: ImageReview | undefined) => {
+      const answer = review?.answers[criterion.id]
+      if (target === 'pending' || target === 'suggested') return answer === undefined || Boolean(review?.auto)
+      if (target === 'unconfirmed') return answer === 'nc' && Boolean(review?.auto)
+      return answer === target
+    }
+    if (t.number === 1) {
+      const ids = new Set(criterion.tests.flatMap((test) => target === 'nc' || target === 'unconfirmed' ? test.nc : test.imageIds))
+      const image = state.elements.find((e) => {
+        const review = state.reviews[reviewKey(e)]
+        return ids.has(e.id) && (!review?.kind || criteriaFor(review.kind).some((c) => c.id === criterion.id)) && matchesAnswer(review)
+      })
+      if (image) {
+        renderFilters()
+        renderList()
+        select(image.id, true)
+        const input = dom.detailEl.querySelector(`[name="crit-${image.id}-${criterion.id}"]`)
+        focusReviewTarget(input?.closest<HTMLElement>('.criterion') ?? dom.detailEl)
+        void syncFilterBoxes()
+        return
+      }
+    } else if (FINDING_THEMES.has(t.number)) {
+      const finding = state.page.findings.find((f) => f.theme === t.number && f.type !== 'contrast-ok' && findingCriteriaOf(f).some((c) => c.id === criterion.id) && matchesAnswer(state.page!.findingReviews[f.key]))
+      if (finding) {
+        state.findingSel = finding.id
+        renderThemeView()
+        const input = dom.themeEl.querySelector(`[name="fnd-${finding.id}-${criterion.id}"]`)
+        focusReviewTarget(input?.closest<HTMLElement>('.criterion') ?? dom.themeEl)
+        void focusFinding(finding, true)
+        void syncFilterBoxes()
+        return
+      }
+    }
+    return openGridAt(criterion.id)
+  }
+}
+
+/** A jump moves keyboard focus as well as the viewport. */
+function focusReviewTarget(target: HTMLElement): void {
+  const input = target.querySelector<HTMLElement>('input[type="radio"]:checked') ?? target.querySelector<HTMLElement>('input[type="radio"]')
+  if (!input) target.tabIndex = -1
+  ;(input ?? target).focus({ preventScroll: true })
+  target.scrollIntoView({ block: 'center' })
+  target.classList.add('flash')
+  setTimeout(() => target.classList.remove('flash'), 1800)
 }
 
 /** Review navigation includes failed suggestions that still need a human decision. */
@@ -183,9 +274,7 @@ export function openGridAt(criterionId: string): void {
   state.resultsSheet = 0
   actions.setView('page')
   const row = dom.resultsEl.querySelector<HTMLElement>(`tr[data-crit="${criterionId}"]`)
-  row?.scrollIntoView({ block: 'center' })
-  row?.classList.add('flash')
-  setTimeout(() => row?.classList.remove('flash'), 1800)
+  if (row) focusReviewTarget(row)
 }
 
 export function renderPageBar(): void {
@@ -204,6 +293,7 @@ export function renderPageBar(): void {
   ;($('reset-theme-btn') as HTMLButtonElement).disabled = !state.page
   dom.nextBtn.disabled = !state.page
   dom.progressEl.replaceChildren()
+  $('page-progress').hidden = !state.page
   if (state.page) {
     const c = countsOf(pageInput(state.page))
     const total = c.C + c.NC + c.NA + c.NT || 1
