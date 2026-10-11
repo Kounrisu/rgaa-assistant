@@ -336,6 +336,26 @@
       }
     }
   },
+  "scan theme 7": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 2,
+          "sameOrigin": 0,
+          "crossOrigin": 2
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": [
+          "The scanners look at the main document only; the axe run is made with iframes: false."
+        ]
+      }
+    }
+  },
   "scan theme 9": {
     "returned": true,
     "response": {

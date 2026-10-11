@@ -121,6 +121,27 @@ export const FINDING_CRITERIA: Record<number, FindingCriterion[]> = {
       checks: ['The link has text, or an image with an alt, or an aria-label / aria-labelledby, or a title that gives it a name (test 6.2.1).', 'An empty link, or an icon without a name, is non-compliant.'],
     },
   ],
+  7: [
+    {
+      id: '7.1',
+      level: 'A',
+      question: 'Is this component compatible with assistive technologies: right roles, names, states and properties, following its APG design pattern?',
+      checks: [
+        'The component exposes a role, a name and its state (expanded, selected, checked, value…) through the markup or ARIA (test 7.1.1).',
+        'Its structure follows the WAI-ARIA Authoring Practices pattern listed below (test 7.1.3): the script checked what it could, read the result.',
+        'A failing structural check is a non-compliance; a passing one proves nothing about the behaviour (see 7.3).',
+      ],
+    },
+    {
+      id: '7.3',
+      level: 'A',
+      question: 'Can this component be operated with the keyboard (and with any pointing device)?',
+      checks: [
+        'Reach it with Tab, then try every interaction of the pattern below with the keys listed (test 7.3.1).',
+        'What the mouse can do, the keyboard can do too (test 7.3.2): no action is pointer-only.',
+      ],
+    },
+  ],
   3: [
     {
       id: '3.2',
@@ -202,6 +223,12 @@ export function hintForFinding(f: FindingItem, criterionId: string): Hint | null
     case '6.2':
       if (f.type === 'link-empty') return { tone: 'warn', text: t('This link has no accessible name: no text, alt, aria-label, aria-labelledby or title.') }
       return { tone: 'ok', text: t('Name found: “{name}”.', { name: f.facts['Accessible name'] ?? '' }) }
+    case '7.1': {
+      const fails = Number(f.data.fails ?? 0)
+      return fails ? { tone: 'warn', text: t('{n} structural check(s) of the pattern fail in the markup (list below): the component is not exposed as the pattern expects.', { n: fails }) } : { tone: 'ok', text: t('The markup follows the structure of the pattern. This says nothing about the behaviour: try the keys in 7.3.') }
+    }
+    case '7.3':
+      return { tone: 'info', text: t('Open the page, put the focus on the component with Tab and try every line of the keyboard checklist below. One missing interaction is a non-compliance.') }
     default:
       return null
   }
@@ -230,6 +257,8 @@ export function suggestFinding(f: FindingItem): Record<string, Verdict> {
   if (f.type === 'link') return { '6.1': 'c', '6.2': 'c' }
   if (f.type === 'contrast-ok') return { '3.2': 'c' }
   if (f.type === 'contrast-fail') return { '3.2': 'nc' }
+  // a component whose markup breaks its pattern fails 7.1; a passing structure is not a verdict (the keyboard is untested)
+  if (f.type.startsWith('widget-')) return Number(f.data.fails ?? 0) > 0 ? { '7.1': 'nc' } : {}
   return {}
 }
 

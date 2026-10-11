@@ -74,7 +74,8 @@ export function nextToReview(from: Item): Item | undefined {
 export function findingFails(f: FindingItem): boolean {
   return (
     ['contrast-fail', 'link-empty', 'heading-empty', 'page-no-h1', 'page-no-main', 'table-nohead', 'table-layout-semantic', 'field-nolabel', 'field-placeholder'].includes(f.type) ||
-    (f.theme === 2 && !f.facts.title?.trim())
+    (f.theme === 2 && !f.facts.title?.trim()) ||
+    (f.type.startsWith('widget-') && Number(f.data.fails ?? 0) > 0)
   )
 }
 
@@ -143,5 +144,6 @@ export function findingMatches(f: FindingItem, value: FindingFilter): boolean {
   if (value === 'link-skip') return f.type === 'link-skip' || f.type === 'link-skip-broken'
   if (value === 'headings') return f.data.group === 'heading'
   if (value === 'landmarks') return f.data.group === 'landmark'
+  if (value === 'widget-fail') return findingFails(f)
   return f.type === value
 }

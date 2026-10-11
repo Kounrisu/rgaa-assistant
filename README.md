@@ -19,8 +19,9 @@ confirms or changes every verdict.
 | 5 Tables | Every table (data / layout), header cells and titles; criteria 5.3 to 5.8 per table |
 | 6 Links | Every link (identical ones grouped), name, generic text, skip links |
 | 9 Structure | Outline of headings and landmarks, skipped levels, missing `h1` / `main` |
+| 7 Scripts (components) | Every ARIA component (tabs, dialog, menu, disclosure / accordion, combobox, listbox, slider, switch, radio group, tree, tooltip, custom button, toolbar): the structure of its [APG pattern](https://www.w3.org/WAI/ARIA/apg/patterns/) checked by script, the keyboard interaction as a checklist; 7.1 and 7.3 per component |
 | 11 Forms | Every field with its accessible name, placeholder-only fields, autocomplete on personal fields |
-| 4, 7, 8, 10, 12, 13 and the other criteria | Checklists with the official tests, pre-filled where a check can say something |
+| 4, 8, 10, 12, 13 and the other criteria | Checklists with the official tests, pre-filled where a check can say something |
 
 **Automatic checks** (button “Contrôles automatiques”): scans every scannable theme, then runs
 [axe-core](https://github.com/dequelabs/axe-core) (only the rules that map to an RGAA criterion), our own RGAA

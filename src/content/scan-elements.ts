@@ -1,6 +1,7 @@
 /**
  * Element scanners for the themes 2 (frames), 6 (links), 9 (structure), 5 (tables) and 11 (form fields), and the entry
- * point that draws a theme's boxes (`scanTheme`). Imported by the content script only (inlined in its bundle).
+ * point that draws a theme's boxes (`scanTheme`); components (7) are in `scan-components.ts`. Imported by the content
+ * script only (inlined in its bundle).
  */
 import { OVERLAY_ID, boundedContext, labelledByTextFor, linkNameOf, rendered, shortHtml, skipTarget, visibilityOf, visible } from './dom-utils'
 import { drawThemeBoxes, themeOverlayFor } from './overlay'
@@ -8,6 +9,7 @@ import { scanContrast } from './scan-contrast'
 import type { RawFinding } from '../lib/types'
 import { tabOrder } from './page-tools'
 import { noteCut, resetCuts } from './scan-coverage'
+import { scanComponents } from './scan-components'
 
 function scanFrames(): { findings: RawFinding[]; els: Element[][] } {
   const findings: RawFinding[] = []
@@ -257,10 +259,10 @@ function scanFields(): { findings: RawFinding[]; els: Element[][] } {
 
 export function scanTheme(theme: number, color: string): RawFinding[] {
   resetCuts()
-  const { findings, els } = theme === 2 ? scanFrames() : theme === 6 ? scanLinks() : theme === 9 ? scanStructure() : theme === 5 ? scanTables() : theme === 11 ? scanFields() : scanContrast()
+  const { findings, els } = theme === 2 ? scanFrames() : theme === 6 ? scanLinks() : theme === 9 ? scanStructure() : theme === 5 ? scanTables() : theme === 11 ? scanFields() : theme === 7 ? scanComponents() : scanContrast()
   themeOverlayFor(theme, color)
   // every element keeps its box, unless the page has so many that only the ones to look at stay (hundreds of boxes slow a page down)
   const many = findings.length > 350
-  findings.forEach((f, i) => drawThemeBoxes(theme, f.id, els[i], theme === 3 ? f.type !== 'contrast-ok' : [2, 5, 6, 9, 11].includes(theme) && !many ? els[i].length > 0 : f.data.humanNeeded === true, typeof f.data.badge === 'string' ? f.data.badge : ''))
+  findings.forEach((f, i) => drawThemeBoxes(theme, f.id, els[i], theme === 3 ? f.type !== 'contrast-ok' : [2, 5, 6, 7, 9, 11].includes(theme) && !many ? els[i].length > 0 : f.data.humanNeeded === true, typeof f.data.badge === 'string' ? f.data.badge : ''))
   return findings
 }

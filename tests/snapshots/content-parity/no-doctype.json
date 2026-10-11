@@ -197,6 +197,24 @@
       }
     }
   },
+  "scan theme 7": {
+    "returned": true,
+    "response": {
+      "findings": [],
+      "coverage": {
+        "at": 0,
+        "frames": {
+          "total": 0,
+          "sameOrigin": 0,
+          "crossOrigin": 0
+        },
+        "openShadowRoots": 0,
+        "closedShadowRoots": "unknown",
+        "truncated": [],
+        "notes": []
+      }
+    }
+  },
   "scan theme 9": {
     "returned": true,
     "response": {

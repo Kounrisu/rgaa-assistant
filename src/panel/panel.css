@@ -739,3 +739,13 @@ body:not([data-view='review']) .page-tools-disclosure { display: none; }
   .review-queue-list li { grid-template-columns: minmax(0, 1fr); gap: 3px; }
   .results { padding: 10px; }
 }
+
+/* Components (theme 7): structural checks and keyboard checklist of the APG pattern */
+.apg-block { margin: 8px 0 4px; }
+.apg-checks, .apg-keys { margin: 4px 0 0; padding-left: 18px; font-size: 13px; }
+.apg-checks li { list-style: none; margin-left: -18px; padding: 2px 0; }
+.apg-checks .mark { display: inline-block; width: 16px; font-weight: 700; }
+.apg-checks li.ok .mark { color: var(--ok, #15803d); }
+.apg-checks li.fail { color: var(--nc, #b91c1c); }
+.apg-checks .detail { color: var(--muted); }
+.apg-keys li { margin: 2px 0; }
