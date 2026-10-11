@@ -4,27 +4,28 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## Current state (2026-10-11)
 
-- **Latest toolbar UX analysis:** `docs/ux-bars-review-2026-10-11.md` (`4c09ebf`) proposes visible scope labels,
-  removal of the mixed page-actions menu, page-wide criterion counts consistent with the 106-criterion meter,
-  and a non-collapsible display-tools area after theme navigation. Analysis only; no application changes.
-- Branch `master` (the Codex branch `codex/audit-workflow` was merged by fast-forward and can be deleted). The owner's approved workflow
-  was implemented in `29eb344` on top of Claude's `51c1b1e` component work and `11fb2aa` UX verification. Version 0.1.0; saved audit format is now **v4**, with explicit
-  migration from v3 and continued support for v2. Licence AGPL-3.0-only.
-- **Navigation follows audit/page scope:** Échantillon et suivi / Synthèse et exports sit beside the audit name in
-  the top bar; Évaluation / Contrôles manuels / Résultats de la page sit beside the selected page below. Page actions
-  and page progress are hidden on global views; **Évaluer la page** stays in the top header as a direct return to the
-  selected page, with keyboard focus and existing answers preserved. Dashboard actions and return links also remain.
-  Automatic checking remains a distinct page action. Inline next-review buttons stay beside decisions; the duplicate
-  global shortcut is secondary in Page actions. Compact theme `done/total` bubbles are unchanged.
-- **Information is expanded initially:** display tools, theme progress, highlight options, image list (including narrow
-  panels), audit settings, batch controls, suggestions, automatic run history and coverage. Auditor collapse choices
-  survive rerenders/navigation during the panel session; resizing no longer changes the image-list choice. Popup
-  action/theme menus stay closed initially. These preferences do not change saved audit data.
+- Branch `codex/toolbar-clarity`, based on `master` at `86767a5` (Claude's latest application work: `f7d2c5a`).
+  Version 0.1.0; saved audit format **v4**, licence AGPL-3.0-only. No saved-data changes in the toolbar work.
+- **Approved toolbar hierarchy implemented (`25afd1e`):** visible Audit / Page auditée / Bilan de la page / Thématiques RGAA /
+  Bilan de la thématique / Outils d’affichage labels. Display and highlight controls share a non-collapsible area
+  below the theme navigation and summary. One shared theme header replaces repeated headers inside each view.
+- **Actions in their context:** the Actions de la page dropdown is removed. Repérer / Actualiser les éléments and
+  automatic checks are direct page actions; Suivant à évaluer sits beside the page summary. Page reset/removal stay
+  in the sample table, theme reset beside its heading, and the local coverage reference below the workspace.
+  Évaluer la page stays in the audit header as a direct return; page modes stay beside the selected-page control.
+- **Consistent counter scope:** page summary covers all 106 criteria like its meter; theme summary covers that theme.
+  Unselected themes count as untested, with direct results-row navigation that preserves selected themes. Partial
+  positive/NA results remain to review in these shortcuts, rather than disappearing from the five-status breakdown;
+  saved verdicts/rates are unchanged. Coverage/confirmation qualifications sit separately under À vérifier.
+  Image inventory and pre-filled-image counts live beside the image list, separate from criterion counters.
+- **Information remains visible initially:** image list, audit settings, batch controls, suggestions, automatic run
+  history and coverage start expanded; user collapse choices survive rerenders during the session. Display tools,
+  highlighting and theme summary are now always visible during evaluation. Theme-selection menus retain their behavior.
 - **Page-work dashboard:** progress, pending decisions in selected themes, suggested criteria, manual activity counts,
   last activity and latest automatic run outcome per page, with direct evaluation/manual/results/open actions.
   The original editable pages table now appears first in Échantillon et suivi, followed by the add-page form;
   metadata settings, batch controls and progress cards follow below. The duplicate automatic-run button is removed.
-  Element-only scanning is under Page actions; the primary automatic action explicitly targets the open registered page.
+  Element-only scanning is a direct secondary action; the primary automatic action targets the open registered page.
 - **Continue reviewing:** a common explicit save-and-next queue beside image, finding and checklist decisions, with
   keyboard focus, continuation across themes and wraparound. Answering alone never advances. Empty queues explicitly
   remind the auditor about unscanned themes/manual work. Existing verdict/rate/export rules are preserved.
@@ -32,9 +33,8 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
   page, resume remaining pages, per-page failures and retry by selection. An already open URL keeps its dynamic state.
   Status/date/error persist; older audits do not invent complete run status. Closing DevTools loses the remaining queue;
   any saved running status is displayed as interrupted. A changed URL requires another run.
-- Latest `npm run check`: **189 tests**, typecheck, **710 texts / 1229 French entries / 0 missing**, build pass.
-  Latest toolbar review reran eight targeted browser scenarios successfully; full suite/parity not rerun in that review.
-  Latest full `npm run test:e2e`: **14 passed**, including the reviewed **80-screen** parity baseline, 480/768/1280 layouts,
+- Latest `npm run check`: **189 tests**, typecheck, **710 texts / 1245 French entries / 0 missing**, build pass.
+  Latest full `npm run test:e2e`: **21 passed**, including the reviewed **80-screen** parity baseline, 480/768/1280 layouts,
   sequential runs/pause/resume, engine failure/retry, source-URL isolation and keyboard continuation. Built content script:
   **0 module imports**. Real Firefox/DevTools still untested.
 - **Components review (theme 7, APG patterns)** shipped: every ARIA component (tabs, dialog, menu, disclosure / accordion,
@@ -82,7 +82,7 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## In progress (claimed)
 
-- None. Toolbar analysis recorded in `4c09ebf`; proposed layout changes are not implemented.
+- None. Approved toolbar corrections implemented and verified in `25afd1e`; smooth-scroll test fix in `86a96a7`.
 
 ## Next (suggested order; the owner decides)
 
@@ -90,7 +90,8 @@ The corrected audit/page navigation, dashboard, explicit next-review controls an
 Next verify the actual extension in Firefox/DevTools and collect feedback on a real audit, especially the top-header
 return from Échantillon et suivi and the initially expanded sections (collapse them, answer, navigate away and back).
 Keep page progress visible and preserve the owner's decorative-image counting decision.
-Toolbar follow-up: implement the reviewed layout proposal if requested; preserve Claude’s scan, preview and help changes.
+Toolbar follow-up: check the new labels, full-page status links and visible display tools in real Firefox/DevTools;
+preserve Claude’s scan, preview and manual-help changes.
 
 1. **Real Firefox test pass** by the owner: reload the extension, F5 on a real page, “Contrôler automatiquement la page ouverte”; report crashes (which step, which page), the save pill, the unsaved-work dialog, the layout. In narrow DevTools, check that page progress stays visible and each nonzero status count opens the expected item, including keyboard activation and focus; check French and English.
 2. **Per-test results** (as Asqatasun stores them: pass / fail / need more info / not applicable per test, with the elements). Needs a data-model addition + migration; also lets the auditor confirm the Images tests the tool cannot assess (image maps, CAPTCHAs), which today leave criteria “partly covered”.
@@ -101,9 +102,6 @@ Toolbar follow-up: implement the reviewed layout proposal if requested; preserve
 
 ## Open decisions (owner)
 
-- **Toolbar proposal (`4c09ebf`)**: visible audit/page/theme labels, actions placed in their context, and page counters
-  aligned with the full 106-criterion meter. The owner specifically suggested display tools after theme navigation
-  with no collapse button; this review supports it. Application implementation has not been requested in this review.
 - **AI**: access (copy-paste / cloud API with own key / local model / company endpoint), first tasks, what may be sent — all undecided. Principles agreed for any design: suggestions only (never a verdict), opt-in, payload shown before any call, minimal data (no cookies, no full pages, nothing from logged-in sessions), traceable (model, prompt version, date), provider-neutral, measured against the owner's own past audits before being trusted. Safe order if approved: provider interface + copy-paste mode + payload preview + stored AI suggestions; relevance judgements from text; explain-and-fix and report drafting; optional API/local; images last with consent.
 - **Access42 JSON file / Stylus**: the owner will provide the file later; do not start before seeing it.
 - **Project licence**: AGPL-3.0 now; removing the Asqatasun-derived code is the precondition for relicensing (`NOTICE.md`).
@@ -119,6 +117,42 @@ Toolbar follow-up: implement the reviewed layout proposal if requested; preserve
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-11 — Codex — implement approved toolbar and counter corrections
+- Did: `25afd1e` on `codex/toolbar-clarity` implements the owner-approved review (`4c09ebf`). Visible labels identify
+  Audit, Page auditée, Bilan de la page, Thématiques RGAA, Bilan de la thématique and Outils d’affichage. The theme
+  header/summary is shared across image, finding and checklist views. Display and highlight controls follow theme
+  navigation/summary in one visible area with no outer collapse button. The context-specific Autres outils control
+  and theme-selection menu retain their existing behavior.
+- Actions: removed Actions de la page. Repérer / Actualiser les éléments and automatic checks stay directly on the
+  page bar; Suivant à évaluer is next to the page summary. Page reset/removal remain in the sample table; theme
+  reset is beside the theme heading with a scoped accessible name; coverage help is below the workspace. Updated
+  onboarding/scan instructions and README. Busy-state protection includes the relocated next button and tools.
+- Counts: page summary now covers all 106 criteria; local summary covers the active theme. Unselected themes are
+  untested and their status link opens the right result row without changing review selection. Partly covered C/NA
+  criteria remain in the shortcut’s to-review bucket, completing its five-status partition without presenting full
+  compliance. Saved verdicts/rates are unchanged. Additional confirmation/coverage badges are grouped under À vérifier;
+  image inventory/pre-filled-image counts move beside the image list.
+- Tests: new scope test covers all 106 versus ten theme-8 criteria, navigation to unselected criteria, P01/P02
+  independence and English labels. Reset test covers cancellation and preservation of another theme’s answer.
+  Responsive tests use the expanded default UI, check tool position/toggles and overflow at 480/768/1280px, then
+  scroll to actual decisions. Existing review, persistence, exports, screenshots and automatic-run scenarios pass.
+- Separate test fix: `86a96a7` waits for the existing smooth-scroll effect before asserting positive scrollY. An
+  intermediate run exposed an immediate assertion racing the animation; no content-script behavior was changed.
+- Parity: captured the passing pre-change 80-screen dump at `/tmp/rgaa-bars-before.txt`; read all distinct changes
+  in `/tmp/rgaa-bars-first.diff` and the subsequent wording-only `/tmp/rgaa-bars-copy.diff` before accepting the
+  baseline from `/tmp/rgaa-bars-reviewed.txt`. Intended hierarchy, labels, counters and copy changes only. Inspected
+  wide and narrow screenshots, including final `/tmp/rgaa-bars-release/` expanded views.
+- Checks: final sequential `npm run check` passed (189 unit tests, typecheck, 710 texts / 1245 French entries /
+  0 missing, build); full `npm run test:e2e`: **21 passed**, including all 80 parity screens. Built content script:
+  0 module imports. Logs: `/tmp/rgaa-bars-release-check.log`, `/tmp/rgaa-bars-release-e2e.log`.
+- NOT tested: real Firefox, real DevTools, or downloaded Asqatasun fixtures (rules/content unchanged).
+- Next: reload the built extension and panel; verify page versus theme labels/counts, direct next-review, display
+  tools after theme navigation, and reset/remove access through the sample on a real multi-page audit.
+- For Claude/other tools: preserve the shared theme header and static display-tools area; do not append tools into
+  per-theme view headers again. `pageOptions`, deleted header reset/remove lookups and `images-summary` are gone;
+  shared `theme-summary` and `image-inventory` replace the latter. No new dependencies, network calls, audit-data
+  migrations or automatic-verdict policy changes. This supersedes the “proposal only” state in the previous entry.
 
 ### 2026-10-11 — Codex — toolbar UX analysis after Claude’s updates
 - Did: `4c09ebf`, documentation-only review in `docs/ux-bars-review-2026-10-11.md`, based on `f7d2c5a`.
