@@ -145,6 +145,8 @@ export function setView(next: View): void {
   state.view = next
   document.body.dataset.view = next
   dom.reviewBtn.setAttribute('aria-pressed', String(next === 'review'))
+  dom.evaluatePageBtn.disabled = !state.page
+  dom.evaluatePageBtn.setAttribute('aria-pressed', String(next === 'review' && Boolean(state.page)))
   dom.resultsEl.hidden = next !== 'page'
   dom.auditEl.hidden = next !== 'audit'
   dom.sampleEl.hidden = next !== 'sample'

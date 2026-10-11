@@ -10,6 +10,7 @@ async function saved(panel: import('@playwright/test').Page) {
 
 test('audit navigation, visible page progress and explicit save-and-next across criteria', async ({ context }, testInfo) => {
   const { panel, problems } = await openRig(context)
+  await expect(panel.locator('#evaluate-page-btn')).toBeDisabled()
   await panel.locator('#empty-add-btn').click()
   await scanElements(panel)
   await panel.locator('label[for="kind-1-informative"]').click()
@@ -33,7 +34,7 @@ test('audit navigation, visible page progress and explicit save-and-next across 
   // Audit-wide navigation belongs beside the audit name, separate from page work.
   await panel.setViewportSize({ width: 1800, height: 900 })
   const auditName = await panel.locator('#audit-name-btn').boundingBox()
-  for (const id of ['sample-btn', 'audit-btn']) {
+  for (const id of ['evaluate-page-btn', 'sample-btn', 'audit-btn']) {
     const mode = panel.locator(`.auditbar .audit-navigation #${id}`)
     await expect(mode).toBeVisible()
     const box = await mode.boundingBox()
@@ -41,6 +42,18 @@ test('audit navigation, visible page progress and explicit save-and-next across 
     expect(box!.x).toBeGreaterThan(auditName!.x)
   }
   const selectedPage = await panel.locator('#page-select').inputValue()
+  await expect(panel.locator('.sample-management')).toHaveAttribute('open', '')
+  await expect(panel.locator('#batch-controls')).toHaveAttribute('open', '')
+  await panel.locator('.sample-management > summary').click()
+  await panel.locator('#batch-controls > summary').click()
+  await panel.locator('.auditbar #evaluate-page-btn').focus()
+  await panel.keyboard.press('Enter')
+  await expect(panel.locator('#review-btn')).toBeFocused()
+  await expect(panel.locator('#page-select')).toHaveValue(selectedPage)
+  await expect(panel.locator('input[id="crit-1-1.1-nc"]')).toBeChecked()
+  await panel.locator('#sample-btn').click()
+  await expect(panel.locator('.sample-management')).not.toHaveAttribute('open', '')
+  await expect(panel.locator('#batch-controls')).not.toHaveAttribute('open', '')
   await panel.getByRole('button', { name: 'Poursuivre l’évaluation' }).focus()
   await panel.keyboard.press('Enter')
   await expect(panel.locator('input[name="crit-1-1.3"]').first()).toBeFocused()
@@ -67,7 +80,8 @@ test('audit navigation, visible page progress and explicit save-and-next across 
     await panel.locator(`#${button}`).click()
     await expect(panel.locator('.pagebar')).not.toBeVisible()
     await expect(panel.locator('#page-progress')).not.toBeVisible()
-    await panel.locator(`#${view}`).getByRole('button', { name: '← Retour à la relecture' }).click()
+    await expect(panel.locator(`#${view}`)).toBeVisible()
+    await panel.locator('#evaluate-page-btn').click()
     await expect(panel.locator('#review-btn')).toHaveAttribute('aria-pressed', 'true')
     await expect(panel.locator('#page-select')).toHaveValue(selectedPage)
     await expect(panel.locator('input[id="crit-1-1.1-nc"]')).toBeChecked()
@@ -85,6 +99,11 @@ test('audit navigation, visible page progress and explicit save-and-next across 
   expect((await panel.getByRole('textbox', { name: 'Titre de P01', exact: true }).boundingBox())!.width).toBeGreaterThan(120)
   await panel.evaluate(() => window.scrollTo(0, 0))
   await panel.screenshot({ path: testInfo.outputPath('sample-narrow.png') })
+  await panel.locator('#evaluate-page-btn').focus()
+  await panel.keyboard.press('Enter')
+  await expect(panel.locator('#review-btn')).toBeFocused()
+  await expect(panel.locator('#page-select')).toHaveValue(selectedPage)
+  await panel.locator('#sample-btn').click()
   await panel.getByRole('button', { name: 'Vérifications manuelles : 0/18' }).click()
   await expect(panel.locator('#page-progress')).toBeVisible()
   await expect(panel.locator('#checks h2')).toContainText('Vérifications manuelles')

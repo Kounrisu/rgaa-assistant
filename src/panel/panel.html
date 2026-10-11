@@ -12,6 +12,7 @@
       <span class="auditbar-sep" aria-hidden="true">›</span>
       <button id="audit-name-btn" type="button" class="audit-name" title="Rename this audit" data-i18n-attrs="title"></button>
       <nav class="audit-navigation" aria-label="Audit workflow" data-i18n-attrs="aria-label">
+        <button id="evaluate-page-btn" type="button" disabled aria-pressed="false" data-i18n>Evaluate the page</button>
         <button id="sample-btn" type="button" aria-pressed="false" data-i18n>Sample and progress</button>
         <button id="audit-btn" type="button" disabled aria-pressed="false" data-i18n>Summary and exports</button>
       </nav>
@@ -63,7 +64,7 @@
       <span id="progress" class="progress" role="status" aria-live="polite"></span>
       <div id="page-summary" class="theme-summary page-totals" data-scope="page" aria-label="Totals of the chosen themes on this page" data-i18n-attrs="aria-label"></div>
     </section>
-    <details id="page-tools-disclosure" class="page-tools-disclosure"><summary data-i18n>Display tools</summary>
+    <details id="page-tools-disclosure" class="page-tools-disclosure" open><summary data-i18n>Display tools</summary>
     <div id="page-tools" class="toolsbar" role="toolbar" aria-label="Page tools" data-i18n-attrs="aria-label" hidden></div>
     </details>
     <nav id="themebar" class="themebar" aria-label="RGAA themes" data-i18n-attrs="aria-label" hidden></nav>
@@ -80,11 +81,11 @@
       <div>
         <h2 data-i18n>1. Images</h2>
         <p class="hint-line" data-i18n>Every image of the page, reviewed one by one.</p>
-        <details class="theme-details"><summary data-i18n>Theme progress</summary>
+        <details class="theme-details" open><summary data-i18n>Theme progress</summary>
         <div id="images-summary" class="theme-summary" data-theme="1" aria-label="Images: totals" data-i18n-attrs="aria-label"></div>
         </details>
       </div>
-      <details id="tools" class="tools" aria-label="Tools of this theme" data-i18n-attrs="aria-label" hidden>
+      <details id="tools" open class="tools" aria-label="Tools of this theme" data-i18n-attrs="aria-label" hidden>
         <summary data-i18n>Highlight options</summary>
         <button id="boxes-btn" type="button" disabled aria-pressed="true" title="Show or hide the numbered boxes on the page" data-i18n-attrs="title">Hide boxes</button>
         <button id="alt-btn" type="button" aria-pressed="false" title="Write the alternative text (or its absence) next to each image on the page" data-i18n-attrs="title">Alt text: off</button>
@@ -116,7 +117,7 @@
 
     <section id="results" class="results" aria-label="Page results" data-i18n-attrs="aria-label" hidden></section>
     <section id="audit" class="results" aria-label="Audit overview" data-i18n-attrs="aria-label" hidden></section>
-    <details id="batch-controls" class="card batch-controls" hidden></details>
+    <details id="batch-controls" class="card batch-controls" open hidden></details>
     <section id="sample" class="results" aria-label="Sample of pages" data-i18n-attrs="aria-label" hidden></section>
     <section id="checks" class="results" aria-label="Manual checks" hidden></section>
     <section id="audits" class="results" aria-label="Audits" data-i18n-attrs="aria-label" hidden></section>

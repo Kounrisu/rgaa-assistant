@@ -1,3 +1,4 @@
+import { disclosure } from './disclosures'
 import { runLabel } from './page-work'
 /**
  * The Checks view: automatic checks, the page HTML card, scan coverage, the reports of each tool and the manual checks.
@@ -47,7 +48,7 @@ function reviewQueue(rec: PageRecord): HTMLElement {
     h('h3', {}, t('Review automatic findings')),
     h('p', {}, t('{n} criteria need your review. Automatic suggestions do not replace your decision.', { n: pending })),
     h('button', { type: 'button', class: 'primary', disabled: !pending, onclick: () => void actions.nextReview('') }, t('Review next unresolved item')),
-    ...(suggestions.length ? [h('details', { class: 'queue-suggestions' }, h('summary', {}, t('Suggestions and conflicts ({n})', { n: suggestions.length })), h('ul', { class: 'review-queue-list' }, ...suggestions.map((c) => h('li', {},
+    ...(suggestions.length ? [disclosure('suggestions', { class: 'queue-suggestions' }, h('summary', {}, t('Suggestions and conflicts ({n})', { n: suggestions.length })), h('ul', { class: 'review-queue-list' }, ...suggestions.map((c) => h('li', {},
       h('button', { type: 'button', 'data-review-criterion': c.id, onclick: () => jump(c.id) },
         `RGAA ${c.id} · ${evidenceConflicts(rec.checklist[c.id]).length ? t('Conflicting evidence') : t('Suggested: {verdict}', { verdict: t(VERDICT_WORD[c.suggested ?? (c.outcome === 'nc' ? 'nc' : c.outcome === 'na' ? 'na' : 'c')]) })}`),
       h('span', {}, c.title.replace(/`/g, '')),
@@ -114,7 +115,7 @@ export function renderChecks(): void {
     h('p', { class: 'hint-line' }, runLabel(rec)),
     ...(reports.length ? [reviewQueue(rec)] : []),
     body,
-    h('details', { class: 'card run-history', id: 'run-history' },
+    disclosure('run-history', { class: 'card run-history', id: 'run-history' },
       h('summary', {}, t('Automatic run history ({n})', { n: reports.length })),
     ...reports.map((r) =>
       h(
@@ -123,12 +124,12 @@ export function renderChecks(): void {
         h('h3', {}, t('Automatic checks ({tool}) — {date}', { tool: r.tool, date: dateTimeOf(r.at) })),
         h('p', { class: 'hint-line' }, t('{set} verdict(s) pre-filled, {noted} element note(s). {passes} passed rule(s) ignored, {incomplete} to check by hand.', { set: r.set, noted: r.noted, passes: r.passes, incomplete: r.incomplete })),
         ...(r.conflicts.length ? [h('p', { class: 'hint warn' }, t('The scan disagrees with your answer:')), h('ul', { class: 'checks' }, ...r.conflicts.map((x) => h('li', {}, x)))] : []),
-        ...((r.items ?? []).length ? [h('details', {}, h('summary', {}, t('Rule by rule ({n})', { n: (r.items ?? []).length })), h('table', { class: 'audit-table' }, h('tbody', {}, ...(r.items ?? []).slice(0, 300).map((i) => h('tr', {}, h('td', {}, i.criterion), h('td', {}, i.rule), h('td', {}, i.result === 'nc' ? t('problem') : i.result === 'pass' ? t('nothing found') : i.result === 'na' ? t('not applicable') : t('to check')), h('td', {}, i.text))))))] : []),
-        ...(r.unmatched.length ? [h('details', {}, h('summary', {}, t('{n} finding(s) not matched to a scanned element', { n: r.unmatched.length })), h('ul', { class: 'checks' }, ...r.unmatched.slice(0, 60).map((x) => h('li', {}, x))))] : []),
-        ...(r.unmapped.length ? [h('details', {}, h('summary', {}, t('{n} rule(s) with no RGAA criterion in this tool', { n: r.unmapped.length })), h('p', { class: 'hint-line' }, r.unmapped.slice(0, 80).join(' · ')))] : []),
+        ...((r.items ?? []).length ? [disclosure(`report:${state.audit.id}:${rec.id}:${r.tool}:${r.at}:rules`, {}, h('summary', {}, t('Rule by rule ({n})', { n: (r.items ?? []).length })), h('table', { class: 'audit-table' }, h('tbody', {}, ...(r.items ?? []).slice(0, 300).map((i) => h('tr', {}, h('td', {}, i.criterion), h('td', {}, i.rule), h('td', {}, i.result === 'nc' ? t('problem') : i.result === 'pass' ? t('nothing found') : i.result === 'na' ? t('not applicable') : t('to check')), h('td', {}, i.text))))))] : []),
+        ...(r.unmatched.length ? [disclosure(`report:${state.audit.id}:${rec.id}:${r.tool}:${r.at}:unmatched`, {}, h('summary', {}, t('{n} finding(s) not matched to a scanned element', { n: r.unmatched.length })), h('ul', { class: 'checks' }, ...r.unmatched.slice(0, 60).map((x) => h('li', {}, x))))] : []),
+        ...(r.unmapped.length ? [disclosure(`report:${state.audit.id}:${rec.id}:${r.tool}:${r.at}:unmapped`, {}, h('summary', {}, t('{n} rule(s) with no RGAA criterion in this tool', { n: r.unmapped.length })), h('p', { class: 'hint-line' }, r.unmapped.slice(0, 80).join(' · ')))] : []),
       ),
     )),
-    h('details', { class: 'card scan-details' }, h('summary', {}, t('Scan coverage and page HTML')), htmlCard(rec), ...(rec.scanCoverage ? [coverageCard(rec.scanCoverage)] : [])),
+    disclosure('scan-details', { class: 'card scan-details' }, h('summary', {}, t('Scan coverage and page HTML')), htmlCard(rec), ...(rec.scanCoverage ? [coverageCard(rec.scanCoverage)] : [])),
   )
 }
 

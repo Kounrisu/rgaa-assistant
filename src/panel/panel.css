@@ -740,6 +740,7 @@ body:not([data-view='review']) .page-tools-disclosure { display: none; }
   .cols { display: flex; flex-direction: column; gap: 10px; }
   .col { width: 100%; min-width: 0; }
   .decision { order: -1; }
+  .detail-head { gap: 6px; margin-bottom: 6px; }
   .detail-head .nav { flex-wrap: wrap; }
   .detail-head .nav button { font-size: 12px; padding: 4px 7px; }
   .review-queue-list li { grid-template-columns: minmax(0, 1fr); gap: 3px; }
