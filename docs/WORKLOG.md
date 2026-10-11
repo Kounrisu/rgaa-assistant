@@ -9,9 +9,14 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
   migration from v3 and continued support for v2. Licence AGPL-3.0-only.
 - **Navigation follows audit/page scope:** Échantillon et suivi / Synthèse et exports sit beside the audit name in
   the top bar; Évaluation / Contrôles manuels / Résultats de la page sit beside the selected page below. Page actions
-  and page progress are hidden on global views; dashboard actions and existing return links reopen page work.
+  and page progress are hidden on global views; **Évaluer la page** stays in the top header as a direct return to the
+  selected page, with keyboard focus and existing answers preserved. Dashboard actions and return links also remain.
   Automatic checking remains a distinct page action. Inline next-review buttons stay beside decisions; the duplicate
   global shortcut is secondary in Page actions. Compact theme `done/total` bubbles are unchanged.
+- **Information is expanded initially:** display tools, theme progress, highlight options, image list (including narrow
+  panels), audit settings, batch controls, suggestions, automatic run history and coverage. Auditor collapse choices
+  survive rerenders/navigation during the panel session; resizing no longer changes the image-list choice. Popup
+  action/theme menus stay closed initially. These preferences do not change saved audit data.
 - **Page-work dashboard:** progress, pending decisions in selected themes, suggested criteria, manual activity counts,
   last activity and latest automatic run outcome per page, with direct evaluation/manual/results/open actions.
   The original editable pages table now appears first in Échantillon et suivi, followed by the add-page form;
@@ -24,7 +29,7 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
   page, resume remaining pages, per-page failures and retry by selection. An already open URL keeps its dynamic state.
   Status/date/error persist; older audits do not invent complete run status. Closing DevTools loses the remaining queue;
   any saved running status is displayed as interrupted. A changed URL requires another run.
-- Latest `npm run check`: **187 tests**, typecheck, **699 texts / 1194 French entries / 0 missing**, build pass.
+- Latest `npm run check`: **187 tests**, typecheck, **700 texts / 1195 French entries / 0 missing**, build pass.
   Latest full `npm run test:e2e`: **14 passed**, including the reviewed **80-screen** parity baseline, 480/768/1280 layouts,
   sequential runs/pause/resume, engine failure/retry, source-URL isolation and keyboard continuation. Built content script:
   **0 module imports**. Real Firefox/DevTools still untested.
@@ -73,12 +78,13 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## In progress (claimed)
 
-- None. Pages table restored and verified in `d8e1d53`.
+- None. Expanded information and the top-header return to evaluation are verified in `bf247db`.
 
 ## Next (suggested order; the owner decides)
 
 The corrected audit/page navigation, dashboard, explicit next-review controls and selected-page runs are implemented.
-Next verify the actual extension in Firefox/DevTools and collect feedback on a real audit.
+Next verify the actual extension in Firefox/DevTools and collect feedback on a real audit, especially the top-header
+return from Échantillon et suivi and the initially expanded sections (collapse them, answer, navigate away and back).
 Keep page progress visible and preserve the owner's decorative-image counting decision.
 
 1. **Real Firefox test pass** by the owner: reload the extension, F5 on a real page, “Contrôler automatiquement la page ouverte”; report crashes (which step, which page), the save pill, the unsaved-work dialog, the layout. In narrow DevTools, check that page progress stays visible and each nonzero status count opens the expected item, including keyboard activation and focus; check French and English.
@@ -105,6 +111,33 @@ Keep page progress visible and preserve the owner's decorative-image counting de
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-11 — Codex — visible information and a direct return to evaluation
+- Did: `bf247db` adds **Évaluer la page** in the audit header, available from Échantillon et suivi, summary and
+  audit list. It returns to the selected page/theme without losing answers and puts keyboard focus on Évaluation.
+  It is disabled before a page exists; the three page modes remain beside the selected-page control.
+- Information disclosures now start open: tools, theme progress, highlight options, image list, audit settings,
+  batch controls, suggestions, run history (including individual reports), coverage and page HTML. User choices
+  survive view rebuilds and navigation during the panel session. Resizing no longer forces the image list closed
+  or open. Action/theme popup menus remain closed initially. Narrow image-heading spacing keeps the first answer
+  within an 800px viewport after the auditor compacts the view. README updated.
+- Regression coverage: top-header keyboard returns at wide/narrow widths, selected page and verdict retained,
+  no-page disabled state, initial expanded sections, manual collapse across answers/navigation/reruns, and image
+  list state retained across responsive breakpoints. Existing batch/review/persistence/export scenarios still pass.
+- Parity: read every distinct change in the full `/tmp/rgaa-expanded-reviewed.diff` before accepting the 80-screen
+  baseline: the new translated button and information `open` attributes only. An initial run also captured the
+  known transient Links highlight fragment; the next dump excluded it and only intended changes were accepted.
+  Reviewed wide and narrow screenshots, including the expanded and user-compacted evaluation views.
+- Checks: `npm run check` passed (187 unit tests, typecheck, 700 texts / 1195 French entries / 0 missing, build).
+  Final full `npm run test:e2e`: **14 passed**, including all 80 parity screens. Built content script: 0 module imports.
+  Logs: `/tmp/rgaa-expanded-release-check.log`, `/tmp/rgaa-expanded-final-e2e.log`.
+- NOT tested: real Firefox, real DevTools or the Asqatasun fixture download suite (engine rules unchanged).
+- Next: reload the extension and panel; open Échantillon et suivi and return through Évaluer la page. Collapse a
+  section, answer a question, navigate away/back and resize DevTools to verify the chosen state remains comfortable.
+- For Claude/other tools: preserve the editable table first, the visible header return, and open-first disclosures.
+  Disclosure preferences are panel-session state, deliberately outside saved audit data; reopening the panel starts
+  expanded again. No migration, dependencies, network calls or automatic-verdict changes. The known intermittent
+  highlight fragment in parity remains a test-stability follow-up; do not accept it as an intended UI change.
 
 ### 2026-10-11 — Codex — restore the pages table at the start of the sample
 - Did: `d8e1d53` restores the original editable pages table directly below the Échantillon et suivi heading,
