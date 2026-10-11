@@ -4,11 +4,27 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## Current state (2026-10-11)
 
-- Branch `master`. Latest application change reviewed: `51c1b1e` (ARIA component review); visible-progress UX: `02e485c`; image-queue completeness fix: `0d33d15`. Version 0.1.0. Licence AGPL-3.0-only (because of the Asqatasun-derived rules).
-- Owner-requested UX recheck on `51c1b1e`: the queue fix is verified in the built panel, but audit/page navigation separation,
-  an overall page-work dashboard, clearer automatic-run actions, unified inline next navigation and batch checks remain
-  unimplemented. Latest `npm run check`: 183 tests, typecheck, 670 texts / 1152 French entries / 0 missing, build pass.
-  Targeted Chromium walkthrough passed; full E2E suite was not rerun in this documentation-only recheck.
+- Branch `codex/audit-workflow`. Implemented the owner's approved workflow in `29eb344` on top of Claude's
+  `51c1b1e` component work and `11fb2aa` UX verification. Version 0.1.0; saved audit format is now **v4**, with explicit
+  migration from v3 and continued support for v2. Licence AGPL-3.0-only.
+- **Audit/page scope separated:** audit-wide Échantillon et suivi / Synthèse et exports / Évaluer une page; page-level
+  Évaluation / Contrôles manuels / Résultats de la page. Audit-wide views hide page controls and progress; page progress
+  stays visible in the page workspace. Compact theme `done/total` bubbles are unchanged.
+- **Page-work dashboard:** progress, pending decisions in selected themes, suggested criteria, manual activity counts,
+  last activity and latest automatic run outcome per page, with direct evaluation/manual/results/open actions.
+  Metadata and sample editing are disclosures; the duplicate automatic-run button is removed. Element-only scanning
+  is under Page actions; the primary automatic action explicitly targets the open registered page.
+- **Continue reviewing:** a common explicit save-and-next queue beside image, finding and checklist decisions, with
+  keyboard focus, continuation across themes and wraparound. Answering alone never advances. Empty queues explicitly
+  remind the auditor about unscanned themes/manual work. Existing verdict/rate/export rules are preserved.
+- **Selected-URL runs:** selected pages run sequentially in the inspected tab and browser session; pause after the current
+  page, resume remaining pages, per-page failures and retry by selection. An already open URL keeps its dynamic state.
+  Status/date/error persist; older audits do not invent complete run status. Closing DevTools loses the remaining queue;
+  any saved running status is displayed as interrupted. A changed URL requires another run.
+- Latest `npm run check`: **187 tests**, typecheck, **701 texts / 1194 French entries / 0 missing**, build pass.
+  Latest full `npm run test:e2e`: **14 passed**, including the reviewed **80-screen** parity baseline, 480/768/1280 layouts,
+  sequential runs/pause/resume, engine failure/retry, source-URL isolation and keyboard continuation. Built content script:
+  **0 module imports**. Real Firefox/DevTools still untested.
 - **Components review (theme 7, APG patterns)** shipped: every ARIA component (tabs, dialog, menu, disclosure / accordion,
   details, combobox, listbox, slider, spinbutton, switch, checkbox, radio group, tree, tooltip, custom button, toolbar) is a
   finding with the structural checks of its WAI-ARIA Authoring Practices pattern run by the script (7.1, pre-filled NC when
@@ -22,9 +38,9 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
   unconfirmed pre-filled C counts in the rate), and an answer to "does the app check the WAI-ARIA APG patterns?"
   (markup validity only, through axe; a "Composants" element review is proposed).
 - UX audit of `347f289` (Codex, below): audit/page scope is mixed and the overview prioritizes compliance charts over work
-  remaining; redesign proposed, not implemented, the owner decides. The queue defect it reproduced (an image left the review
+  remaining; redesign proposed there and now implemented on `codex/audit-workflow`. The queue defect it reproduced (an image left the review
   queue after one NC answer despite unanswered criteria; pre-filled images were not in the queue either) is **fixed** in
-  `src/panel/review-state.ts` with a regression test. Current `npm run check`: 171 unit tests, 656 texts / 1000 French entries /
+  `src/panel/review-state.ts` with a regression test. Checks at that time: `npm run check`: 171 unit tests, 656 texts / 1000 French entries /
   0 missing, typecheck and build pass; `npm run test:e2e` 9 passed (parity baseline updated for the Images screens, see handoff).
 - Checks for `02e485c`: `npm run check` passes (typecheck, 165 unit tests, translations 655 texts / 999 French entries / 0 missing,
   build); `npm run test:e2e` passes (9 browser tests: smoke, parity of 77 screens, review workflow at 480/768/1280 px,
@@ -54,29 +70,23 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## In progress (claimed)
 
-Nothing claimed. Add a line here before starting anything bigger than a small fix:
-`- <who>: <what>, files: <...>, since <date>`
+- None. Codex workflow implementation and handoff complete on `codex/audit-workflow`.
 
 ## Next (suggested order; the owner decides)
 
-Image review-queue completeness is fixed and verified. The outstanding UX work is to separate audit/page navigation,
-extend the sample into a page-progress dashboard, clarify automatic-run actions and provide consistent next-review controls
-beside decisions. Keep page progress visible, per the owner's explicit preference. Add multi-page automatic checks after
-the single-page workflow and run-status tracking are reliable. These remaining changes are not implemented.
+The approved navigation, page-work dashboard, explicit next-review controls and selected-page automatic runs are
+implemented. Next priority: verify the actual extension in Firefox/DevTools and collect feedback on a real audit.
+Keep page progress visible and preserve the owner's decorative-image counting decision.
 
-1. **Real Firefox test pass** by the owner: reload the extension, F5 on a real page, “Contrôles automatiques”; report crashes (which step, which page), the save pill, the unsaved-work dialog, the layout. In narrow DevTools, check that page progress stays visible and each nonzero status count opens the expected item, including keyboard activation and focus; check French and English.
+1. **Real Firefox test pass** by the owner: reload the extension, F5 on a real page, “Contrôler automatiquement la page ouverte”; report crashes (which step, which page), the save pill, the unsaved-work dialog, the layout. In narrow DevTools, check that page progress stays visible and each nonzero status count opens the expected item, including keyboard activation and focus; check French and English.
 2. **Per-test results** (as Asqatasun stores them: pass / fail / need more info / not applicable per test, with the elements). Needs a data-model addition + migration; also lets the auditor confirm the Images tests the tool cannot assess (image maps, CAPTCHAs), which today leave criteria “partly covered”.
 3. **Port more Asqatasun tests** (26 left: marker-based image and table tests, contrast, stylesheet test 10.4.1 — the background page could fetch stylesheets across origins).
 4. **Scan inside same-origin iframes and open shadow roots** (today only reported in the coverage card; overlay, positions, snapshot and screenshots assume one document).
-5. **Audit several pages in one go** (open each page of the sample, run everything), then rates per test/criterion and a comparison of two audits.
+5. **Batch follow-up**, if wanted: persist/resume the remaining queue across DevTools closures; test real redirects, login pages and extension permissions. Then rates per test/criterion and comparison of two audits.
 6. Smaller: keyboard shortcuts to confirm/reject a suggestion; consistency of navigation/titles across the sample (RGAA 12.x); `npm audit` reports 5 issues in dev tooling only (vitest, vite's esbuild, tinypool): fix by upgrading Vite/Vitest when convenient.
 
 ## Open decisions (owner)
 
-- **UX workflow proposal**: audit-level “Échantillon et suivi” / “Synthèse et exports”; page-level “Évaluation” /
-  “Vérifications manuelles” / “Résultats”; one clearly named page automatic-check action. Prefer explicit “Suivant à évaluer”
-  beside answers, with automatic advancement optional and off by default. Multi-page runs proposed as a later, explicit
-  selection of URLs using the browser session, with pause/resume and per-page failures. Not yet accepted or implemented.
 - **AI**: access (copy-paste / cloud API with own key / local model / company endpoint), first tasks, what may be sent — all undecided. Principles agreed for any design: suggestions only (never a verdict), opt-in, payload shown before any call, minimal data (no cookies, no full pages, nothing from logged-in sessions), traceable (model, prompt version, date), provider-neutral, measured against the owner's own past audits before being trusted. Safe order if approved: provider interface + copy-paste mode + payload preview + stored AI suggestions; relevance judgements from text; explain-and-fix and report drafting; optional API/local; images last with consent.
 - **Access42 JSON file / Stylus**: the owner will provide the file later; do not start before seeing it.
 - **Project licence**: AGPL-3.0 now; removing the Asqatasun-derived code is the precondition for relicensing (`NOTICE.md`).
@@ -92,6 +102,35 @@ the single-page workflow and run-status tracking are reliable. These remaining c
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-11 — Codex — implement the approved audit workflow
+- Did: `29eb344` separates global audit navigation from page work, adds per-page progress/activity/run tracking,
+  removes the duplicate automatic run action, moves scan-only into Page actions, adds explicit save-and-next beside
+  image/finding/checklist decisions and selected-URL runs with pause/resume. README documents the workflow.
+- Data: audit schema v4, explicit v3 migration and validator; old tool history stays unknown rather than being labelled
+  a completed run. Latest run records running/complete/partial/failed, URL, dates and error. Reopening a saved running
+  status shows interrupted. Automatic checks remain suggestions; human answers and notes survive reruns.
+- Checks: `npm run check` passed (187 tests; typecheck; 701 texts / 1194 French entries / 0 missing; build).
+  Full `npm run test:e2e` passed (14); content script has 0 module imports. Five new browser scenarios cover audit/page
+  scope, visible progress and saved explicit continuation; two-page pause/resume and independent outcomes;
+  engine failure/retry preserving a human answer; finding/checklist keyboard continuation; wrong-source-URL refusal.
+  Pure tests cover NC/unanswered queue behavior, auto-prefill confirmation, theme transition/wrap/end and v4 migration.
+- Parity: captured `/tmp/rgaa-workflow-before.txt` before source edits; read all distinct changes in the full DOM diff,
+  then the final sample/settings delta and timestamp-only normalization diff before accepting the 80-screen baseline.
+  Intended differences: split navigation, hidden page controls on global screens, scan action relocation, run state,
+  per-page dashboard/settings, inline next buttons and the next-item cursor advancing instead of returning to the first.
+  English dates/AM-PM are now normalized to avoid time-dependent failures. Reviewed wide/narrow dashboard screenshots.
+- Fixed during verification: 480px first decision initially fell below the viewport; reducing duplicate controls and
+  moving scan-only into Page actions restored the existing reachability test. New tests use visible labels for styled
+  radio controls and wait for asynchronous persistence before inspecting saved state.
+- NOT tested: real Firefox, real DevTools, authenticated/redirecting sites or real extension permission failures;
+  Asqatasun fixture download suite not rerun (engine/content rules unchanged). Batch queue is session-only; keep DevTools
+  open and retry failed pages explicitly. Navigation replaces the inspected tab's page, as explained in the UI.
+- Next: owner reloads the rebuilt extension, refreshes a real page and tries Échantillon et suivi → select two pages →
+  run/pause/resume, then C/NC/NA → Suivant à évaluer and manual activity tracking; check French/English and narrow layout.
+- For Claude/other tools: work is on `codex/audit-workflow`, not master. Rebuild before testing: **older v3-only builds
+  reject newly saved v4 audits**. Preserve Claude's APG components/security work and the owner's prefilled decorative C
+  rate/export decision. No dependencies or external service calls added; batch uses explicit browser navigation only.
 
 ### 2026-10-11 — Codex — verify Claude changes against the owner's UX concerns
 - Reviewed `51c1b1e` and changes since `d116a3d`. Repository was clean before review. Application code unchanged;
