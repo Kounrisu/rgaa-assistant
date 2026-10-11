@@ -63,6 +63,21 @@ Nothing claimed. Add a line here before starting anything bigger than a small fi
 
 ## Handoff log (newest first)
 
+### 2026-10-11 — Claude Code — security pass over audit-file handling
+- Did: re-checked the whole folder after Codex's commits (`02e485c`, `4e3d24d`: all checks green) and reviewed where an audit file
+  (anyone can edit one) reaches the page. Found and fixed two real problems, each with a test that fails on the old code:
+  (1) the HTML report put `shot` / `thumb` values into `src="…"` unescaped, so a tampered file could inject script into the
+  report page (now only base64 image data URLs, escaped: `src/lib/url-safety.ts`, `src/lib/report.ts`);
+  (2) a page address such as `javascript:…` was sent to the inspected tab by `goTo` (now only http, https, file, both when
+  loading an audit — `src/lib/audit-store.ts` — and in `src/panel/page-bridge.ts`). Also: opening a file drops preview
+  addresses that are not on the page's own host (a tampered file could otherwise make the panel request any server).
+  Reviewed and found fine: no `innerHTML` writes, no `eval`/`Function` in our code, Excel cells are inline strings (no formulas), links use `noreferrer`.
+- State: `npm run check` (170 unit tests, 0 missing translations, build) and `npm run test:e2e` (9) pass; not tried in real Firefox.
+- Next: unchanged (see “Next”). One thing to decide: previews of page images are stored as addresses, so they point to the
+  audited site by design; the panel loads them when you open an audit.
+- For the other tool: new tests in `tests/security.test.ts`; keep `isNavigableUrl` / `dataImage` for anything that turns
+  audit data into a navigation or an image source. New French text is in `i18n-fr-persist.ts`.
+
 ### 2026-10-11 — Codex — visible progress and consistent status navigation
 - Did: `02e485c` moves page progress and counts out of “Progression et activité” into an always-visible section below the
   page controls. Moves the coverage link into Page actions. Adds explicit arrows and navigation for suggestions,
