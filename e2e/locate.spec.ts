@@ -29,7 +29,8 @@ test('locate on page from the criterion cards gives the same focus as a click on
   await expect.poll(async () => (await focusOnSite()).id).toBe('3')
   const clicked = await focusOnSite()
   expect(clicked.border).toContain('4px solid')
-  expect(clicked.scrollY).toBeGreaterThan(0)
+  // The focus outline is synchronous, but scrolling is deliberately smooth.
+  await expect.poll(async () => (await focusOnSite()).scrollY).toBeGreaterThan(0)
 
   // the image card: “Repérer sur la page” comes right before “Suivant à évaluer”, in the card and in the header
   await items.nth(0).click()
