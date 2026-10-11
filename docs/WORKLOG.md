@@ -112,6 +112,21 @@ Keep page progress visible and preserve the owner's decorative-image counting de
 
 ## Handoff log (newest first)
 
+### 2026-10-11 — Claude Code — "Repérer sur la page" in every element criterion card
+- Did: new `reviewActions(key, locate)` in `src/panel/review-controls.ts`: under every element-level criterion card (image
+  kind card, image criteria, finding criteria in Frames, Colours, Tables, Links, Components, Structure, Forms) the buttons are now
+  "Repérer sur la page" then "Suivant à évaluer". The locate button calls the same functions as a click on the element in
+  the list (`focusOnPage` / `focusFinding`): its box takes the yellow focus outline and the page scrolls to it. Page-level
+  checklist cards have no element, so no locate button. New `e2e/locate.spec.ts` (Images and Links: same outline and
+  animation as a click, order of the two buttons, short page window so the scroll matters). `e2e/audit-workflow.spec.ts` used
+  the button's parent as the card: it now looks for the `.criterion` ancestor. Parity baseline updated: the only diff is
+  the new `div.review-actions` + button on 92 card renders.
+- State: `npm run check` 187 unit tests, 700 texts / 1195 French / 0 missing, build, content script 0 imports;
+  `npm run test:e2e` all passed after the baseline update. Checked on screen at 1280 and 480 px. Not tested in a real Firefox:
+  in Chromium the outline and the scroll were identical between the header button, the card button and a list click;
+  if Firefox shows a difference (smooth scroll while the DevTools panel has the focus), report the page.
+- Next: unchanged (see the list above).
+
 ### 2026-10-11 — Codex — visible information and a direct return to evaluation
 - Did: `bf247db` adds **Évaluer la page** in the audit header, available from Échantillon et suivi, summary and
   audit list. It returns to the selected page/theme without losing answers and puts keyboard focus on Évaluation.
