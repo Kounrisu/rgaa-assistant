@@ -5,6 +5,11 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 ## Current state (2026-10-11)
 
 - Branch `master`. Latest application change reviewed: `347f289` (Claude Code security fixes); latest implemented UX change: `02e485c`. Version 0.1.0. Licence AGPL-3.0-only (because of the Asqatasun-derived rules).
+- **Newcomer UX review** (Claude Code, `docs/ux-review-newcomer-2026-10-11.md`): three defects fixed in `e600848`
+  (axe reported our own overlay as a 12.6 failure of the page; stale "URL not in the sample" banner after adding
+  P01; English labels in the French Excel detail sheets), nine UX proposals, one decision for the owner (how an
+  unconfirmed pre-filled C counts in the rate), and an answer to "does the app check the WAI-ARIA APG patterns?"
+  (markup validity only, through axe; a "Composants" element review is proposed).
 - UX audit of `347f289` (Codex, below): audit/page scope is mixed and the overview prioritizes compliance charts over work
   remaining; redesign proposed, not implemented, the owner decides. The queue defect it reproduced (an image left the review
   queue after one NC answer despite unanswered criteria; pre-filled images were not in the queue either) is **fixed** in
@@ -75,6 +80,19 @@ after the single-page workflow and run-status tracking are reliable. These are p
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-11 — Claude Code — newcomer UX walkthrough, three fixes, APG answer
+- Did: walked the built panel as a first-time auditor (Chromium, 1280×900 and 1280×520, fixture site, French UI),
+  opened the Excel and the HTML report. Wrote `docs/ux-review-newcomer-2026-10-11.md`. Fixed what was unambiguous:
+  `src/content/axe-run.ts` (axe context excludes `[id^="rgaa-assistant-"]`, nodes pointing at our layers dropped),
+  `src/panel/sample-view.ts` (banner re-evaluated after `addPage`), `src/lib/audit-sheet.ts` (`tFr` on per-test
+  outcome labels and per-element facts). Tests: `tests/axe-run.test.ts`, smoke asserts the report never mentions
+  `rgaa-assistant-overlay`. Commit `e600848`; parity baseline updated (one failing rule fewer everywhere, French labels).
+- State: `npm run check` 173 unit tests, 0 missing translations, build; `npm run test:e2e` 10 passed. Not tested in real Firefox.
+- Next: owner's decisions on U6 (unconfirmed per-element C counted as C today), then U1/U5 (height budget,
+  work-remaining first), U2/U3 (one "next"), and whether to build the "Composants" (APG) element review.
+- For the other agent: the APG question is answered in section 4 of the review; do not start the components
+  review without the owner's go. The parity baseline moved twice today (`0d33d15`, `e600848`): read the handoffs before updating it again.
 
 ### 2026-10-11 — Claude Code — review-queue completeness (fix of the defect found by Codex's UX audit)
 - Did: `needsReview()` in `src/panel/review-state.ts` now keeps an image in the queue while any applicable criterion is
