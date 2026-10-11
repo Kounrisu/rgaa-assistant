@@ -112,6 +112,22 @@ Keep page progress visible and preserve the owner's decorative-image counting de
 
 ## Handoff log (newest first)
 
+### 2026-10-11 — Claude Code — "Analyser P01" is long: previews share screenshots
+- Why: the owner finds the scan long. It does: (1) the element scans of every chosen theme (fast: DOM reads), then (2) the previews:
+  one scroll + one tab screenshot + a 180 ms pause PER element (up to 40 images needing a picture and 50 findings), which on a real page
+  (Firefox, large screen) is tens of seconds. That second part was mine (the image pictures) added to the findings previews.
+- Did: `captureCrops` (`src/panel/page-bridge.ts`) now takes ONE screenshot for every pending element that is fully in view and not
+  covered (new message `RGAA_RECTS` → `viewportRects` in `src/content/overlay.ts`: rect + `elementFromPoint` hit test, so an element
+  under a sticky header is not photographed through it): scroll the first pending element to the middle, ask where the others are, photograph once,
+  crop them all, repeat. Images and findings are captured together (`capturePreviews`), the pause is 120 ms. Dead helpers removed.
+- Tests: `e2e/image-pictures.spec.ts` (12 icons + the page's findings: at most 4 screenshots, all 12 pictures present). The parity baseline
+  moved by 1 KB in "stored as … KB": the e2e rig injects the content script as a `<script>` into the page DOM, which the HTML snapshot
+  includes, so a bigger content script is a bigger snapshot (not a real page effect). `npm run check` 189 unit tests, 710 texts / 1229 French /
+  0 missing; `npm run test:e2e` all passed after the baseline update. NOT measured in a real Firefox: the gain depends on how many elements
+  share a screen; a real page should drop from one screenshot per element to a handful.
+- Next: if it is still slow on a real site, make the previews optional or lazy (a "Prendre les aperçus" button), and time each step
+  in the status line.
+
 ### 2026-10-11 — Claude Code — re-audit of the UX proposals, corrections that were still valid
 - Did: re-checked U1–U9 of `docs/ux-review-newcomer-2026-10-11.md` on the built panel (new section 7 with a verdict each).
   Implemented: U1 (the browser address sits on the row of the page selector and navigation, `src/panel/panel.html` + `.page-location`

@@ -5,7 +5,7 @@ import { state } from './state'
 import { say, dom } from './dom'
 import { t } from '../lib/i18n'
 import { SCANNED_THEMES, FINDING_THEMES } from '../lib/themes'
-import { inspectedUrl, inspectedTitle, sendToPage, inspectedTabId, captureShots, captureImagePictures, applyBoxes } from './page-bridge'
+import { inspectedUrl, inspectedTitle, sendToPage, inspectedTabId, capturePreviews, applyBoxes } from './page-bridge'
 import { pageLabel, adoptSite, persist } from './model'
 import { normalizeUrl, findPage } from '../lib/audit-store'
 import { askConfirm } from './dialogs'
@@ -70,11 +70,10 @@ export async function scan(): Promise<void> {
       const n = rec.findings.filter((f) => f.theme === tn).length
       parts.push(tn === 2 ? t('{n} frame(s)', { n }) : tn === 6 ? t('{n} link(s)', { n }) : tn === 9 ? t('{n} heading(s) and landmark(s)', { n }) : tn === 5 ? t('{n} table(s)', { n }) : tn === 11 ? t('{n} field(s)', { n }) : tn === 7 ? t('{n} component(s)', { n }) : `${t('{n} contrast finding(s)', { n: listedFindings(tn).length })}${added ? ` (${t('{n} new', { n: added })})` : ''}`)
     }
-    const pictures = await captureImagePictures(state.elements)
-    if (pictures) parts.push(t('{n} image picture(s)', { n: pictures }))
-    const missing = rec.findings.filter((f) => f.present && !f.shot && f.type !== 'contrast-ok' && rec.themes.includes(f.theme)).slice(0, 50)
-    const shots = await captureShots(missing)
-    if (shots) parts.push(t('{n} preview(s)', { n: shots }))
+    const missing = rec.findings.filter((f) => f.present && !f.shot && f.type !== 'contrast-ok' && rec.themes.includes(f.theme))
+    const taken = await capturePreviews(state.elements, missing)
+    if (taken.images) parts.push(t('{n} image picture(s)', { n: taken.images }))
+    if (taken.findings) parts.push(t('{n} preview(s)', { n: taken.findings }))
     state.filter = 'all'
     state.findingFilter = 'all'
     await applyBoxes()

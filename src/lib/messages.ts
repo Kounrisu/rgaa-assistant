@@ -89,10 +89,18 @@ export interface LocatedElement {
   vh: number
 }
 
+/** Where several elements are on screen right now, and whether each one is fully in view and not covered. */
+export interface ViewportRects {
+  vw: number
+  vh: number
+  rects: ({ x: number; y: number; w: number; h: number; visible: boolean } | null)[]
+}
+
 export type ContentMessage =
   | { type: 'RGAA_HIGHLIGHT_IMAGES'; color?: string }
   | { type: 'RGAA_CLEAR_HIGHLIGHTS' }
   | { type: 'RGAA_LOCATE'; theme: number; id: number }
+  | { type: 'RGAA_RECTS'; targets: { theme: number; id: number }[] }
   | { type: 'RGAA_SCROLL_RESTORE' }
   | { type: 'RGAA_SHOW_ONLY'; theme: number; ids?: number[] | null }
   | { type: 'RGAA_CLEAR_THEME'; theme: number }
@@ -146,6 +154,7 @@ export interface ContentResponses {
   RGAA_HIGHLIGHT_IMAGES: { elements: ImageElementInfo[]; coverage: ScanCoverage }
   RGAA_CLEAR_HIGHLIGHTS: OkResponse
   RGAA_LOCATE: LocatedElement | { rect: null }
+  RGAA_RECTS: ViewportRects
   RGAA_SCROLL_RESTORE: OkResponse
   RGAA_SHOW_ONLY: OkResponse
   RGAA_CLEAR_THEME: OkResponse

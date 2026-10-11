@@ -1,6 +1,6 @@
 import type { ContentMessage, ContentResponses } from '../lib/messages'
 import { DEFAULT_COLOR, purgeOverlays } from './dom-utils'
-import { applyOverlayOptions, boxes, clearTheme, focusImage, focusThemeFinding, ids, locateTheme, relabel, relabelTheme, repositionBoxes, restoreScroll, setFocused, setStates, showOnly, themeOverlays } from './overlay'
+import { applyOverlayOptions, boxes, clearTheme, focusImage, focusThemeFinding, ids, locateTheme, viewportRects, relabel, relabelTheme, repositionBoxes, restoreScroll, setFocused, setStates, showOnly, themeOverlays } from './overlay'
 import { highlightImages, setImageColor, startObserving, stopObserving } from './scan-images'
 import { scanTheme } from './scan-elements'
 import { runRgaaRules, runUxRules } from './rgaa-rules-run'
@@ -71,6 +71,8 @@ chrome.runtime.onMessage.addListener((message: ContentMessage, _sender, sendResp
       return respond(message.type, { ok: true })
     case 'RGAA_LOCATE':
       return respond(message.type, locateTheme(message.theme, message.id) ?? { rect: null })
+    case 'RGAA_RECTS':
+      return respond(message.type, viewportRects(message.targets))
     case 'RGAA_SCROLL_RESTORE':
       restoreScroll()
       return respond(message.type, { ok: true })

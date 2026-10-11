@@ -123,23 +123,31 @@ export interface ShotTarget {
 }
 
 /**
- * Takes a small picture of each element: scroll it to the middle of the screen, photograph the tab, crop.
- * The boxes are hidden meanwhile so they are not in the pictures, and the scroll position is restored.
+ * Takes a small picture of each element. One screenshot of the tab serves EVERY pending element that is fully in view and not
+ * covered by something (a sticky header…): scroll the first pending element to the middle, ask where all the others are,
+ * photograph once, crop them all, repeat for what is left. A page of 50 icons in the header and a few sections needs a handful of
+ * screenshots, not 50. The boxes are hidden meanwhile so they are not in the pictures, and the scroll position is restored.
  * Returns how many pictures were taken (an element that is not on the page, or too small, is skipped).
  */
 export async function captureCrops(targets: ShotTarget[]): Promise<number> {
   if (!targets.length) return 0
   const tabId = inspectedTabId()
   let done = 0
+  let pending = [...targets]
   try {
     const hidden: Record<number, boolean> = {}
     for (const n of SCANNED_THEMES) hidden[n] = false
     await sendToPage(tabId, { type: 'RGAA_OVERLAY', visibility: hidden })
-    for (const target of targets) {
-      say(t('Taking previews… {done}/{total}', { done, total: targets.length }))
-      const loc = await sendToPage(tabId, { type: 'RGAA_LOCATE', theme: target.theme, id: target.id }).catch(() => null)
-      if (!loc?.rect) continue
-      await sleep(180)
+    for (let round = 0; pending.length && round < targets.length; round++) {
+      say(t('Taking previews… {done}/{total}', { done: targets.length - pending.length, total: targets.length }))
+      const first = pending[0]
+      const loc = await sendToPage(tabId, { type: 'RGAA_LOCATE', theme: first.theme, id: first.id }).catch(() => null)
+      if (!loc?.rect) {
+        pending = pending.slice(1)
+        continue
+      }
+      await sleep(120) // lets the page settle after the scroll (lazy content, sticky bars)
+      const view = await sendToPage(tabId, { type: 'RGAA_RECTS', targets: pending.map((p) => ({ theme: p.theme, id: p.id })) }).catch(() => null)
       const cap: CaptureResponse | undefined = await chrome.runtime.sendMessage({ type: 'RGAA_CAPTURE', tabId })
       if (!cap || !('dataUrl' in cap) || !cap.dataUrl) {
         // nothing is saved: a picture of another tab must never be attached to this page
@@ -148,11 +156,23 @@ export async function captureCrops(targets: ShotTarget[]): Promise<number> {
         else say(t('Could not take previews ({error}). Check that the extension may access this site.', { error: cap && 'error' in cap ? cap.error : t('no screenshot') }))
         break
       }
-      const shot = await cropShot(cap.dataUrl, loc)
-      if (shot) {
-        target.set(shot)
-        done++
+      const taken = new Set<ShotTarget>()
+      const gone = new Set<ShotTarget>()
+      for (let i = 0; i < pending.length; i++) {
+        const rect = view?.rects[i]
+        if (rect === null) gone.add(pending[i]) // no element on the page: it will never have a picture
+        // the first element was scrolled to the middle (keep it whatever happens); the others only when fully in view and uncovered
+        if (!rect || (i > 0 && !rect.visible)) continue
+        const shot = await cropShot(cap.dataUrl, { rect: { x: rect.x, y: rect.y, w: rect.w, h: rect.h }, vw: view!.vw })
+        if (shot) {
+          pending[i].set(shot)
+          done++
+        }
+        taken.add(pending[i])
       }
+      // the first one is always dealt with (a failed crop must not loop), as are those that are not on the page
+      taken.add(first)
+      pending = pending.filter((p) => !taken.has(p) && !gone.has(p))
     }
   } finally {
     await sendToPage(tabId, { type: 'RGAA_SCROLL_RESTORE' }).catch(() => undefined)
@@ -161,8 +181,6 @@ export async function captureCrops(targets: ShotTarget[]): Promise<number> {
   return done
 }
 
-/** A small picture of each finding (see captureCrops). */
-export const captureShots = (list: FindingItem[]): Promise<number> => captureCrops(list.map((f) => ({ theme: f.theme, id: f.id, set: (url) => (f.shot = url) })))
 
 /**
  * Graphics that cannot be redrawn from their markup need a real picture: an inline SVG that draws from a sprite (<use>)
@@ -170,9 +188,16 @@ export const captureShots = (list: FindingItem[]): Promise<number> => captureCro
  */
 export const needsPicture = (el: { tag: string; thumb: string | null; shot?: string | null; present: boolean }): boolean => el.present && !el.shot && (el.tag === 'svg' || !el.thumb)
 
-/** Takes the pictures of the images that need one (see needsPicture). */
-export const captureImagePictures = (items: Item[]): Promise<number> =>
-  captureCrops(items.filter(needsPicture).slice(0, 40).map((el) => ({ theme: 1, id: el.id, set: (url) => (el.shot = url) })))
+/** The pictures of a scan, images and findings together so that they share screenshots. */
+export async function capturePreviews(items: Item[], findings: FindingItem[]): Promise<{ images: number; findings: number }> {
+  const out = { images: 0, findings: 0 }
+  const targets: ShotTarget[] = [
+    ...items.filter(needsPicture).slice(0, 40).map((el) => ({ theme: 1, id: el.id, set: (url: string) => { el.shot = url; out.images++ } })),
+    ...findings.slice(0, 50).map((f) => ({ theme: f.theme, id: f.id, set: (url: string) => { f.shot = url; out.findings++ } })),
+  ]
+  await captureCrops(targets)
+  return out
+}
 
 /** Evaluates an expression in the inspected page; '' when DevTools gives no usable string. */
 export function inspectedEval(expression: string): Promise<string> {
