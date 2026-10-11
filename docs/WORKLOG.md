@@ -5,6 +5,13 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 ## Current state (2026-10-11)
 
 - Branch `master`. Latest application change reviewed: `347f289` (Claude Code security fixes); latest implemented UX change: `02e485c`. Version 0.1.0. Licence AGPL-3.0-only (because of the Asqatasun-derived rules).
+- **Components review (theme 7, APG patterns)** shipped: every ARIA component (tabs, dialog, menu, disclosure / accordion,
+  details, combobox, listbox, slider, spinbutton, switch, checkbox, radio group, tree, tooltip, custom button, toolbar) is a
+  finding with the structural checks of its WAI-ARIA Authoring Practices pattern run by the script (7.1, pre-filled NC when
+  one fails) and the keyboard interaction as a checklist for the auditor (7.3). `src/content/scan-components.ts`,
+  `src/lib/apg-patterns.ts`, `src/panel/apg-view.ts`, `src/lib/i18n-fr-apg.ts`. 7.2, 7.4, 7.5 stay in the checklist.
+- **Owner decision (U6 of the newcomer review):** a pre-filled *décorative → 1.2 C* keeps counting as **C** in the rate and
+  the Excel (alt="" is a strong signal); checklist suggestions keep counting as NT until confirmed. No change made.
 - **Newcomer UX review** (Claude Code, `docs/ux-review-newcomer-2026-10-11.md`): three defects fixed in `e600848`
   (axe reported our own overlay as a 12.6 failure of the page; stale "URL not in the sample" banner after adding
   P01; English labels in the French Excel detail sheets), nine UX proposals, one decision for the owner (how an
@@ -81,6 +88,30 @@ after the single-page workflow and run-status tracking are reliable. These are p
 
 ## Handoff log (newest first)
 
+### 2026-10-11 — Claude Code — Components review: WAI-ARIA APG patterns checked per component (theme 7)
+- Did: theme 7 is now a scanned, finding-based theme (`SCANNED_THEMES` / `FINDING_THEMES` include 7). New
+  `src/content/scan-components.ts` (content script only: detects 17 pattern kinds by role or shape, runs structural checks,
+  emits `widget-<pattern>` findings with `data.checks` as JSON and `data.fails`; dialogs and tooltips are listed even when
+  hidden; the assistant's own layers are skipped). New `src/lib/apg-patterns.ts` (catalogue: pattern name, APG URL, wording
+  of each structural check id, keyboard checklist) and `src/panel/apg-view.ts` (the 7.1 card lists the checks ✓/✗ with
+  details, the 7.3 card lists the keys to try). `findings.ts`: criteria 7.1 and 7.3 per component, hints, suggestion
+  7.1 = NC when a structural check fails (no suggestion otherwise: the keyboard is untested). Filters: "Structure problem".
+  French in `i18n-fr-apg.ts`; README and THIRD-PARTY rows (APG is W3C material: linked, wording is ours).
+- Tests: `tests/scan-components.test.ts` (fixture `tests/fixtures/pages/components.html`, 24 components, every emitted check
+  id is in the catalogue and every catalogue text has French); content-parity replays theme 7 on every fixture (snapshots
+  updated: a new `scan theme 7` step, empty on the old fixtures); e2e fixture `e2e/site/index.html` gained a tablist and a
+  disclosure whose aria-controls target is missing; parity baseline updated (theme 7 screens, counts, menu label
+  "analyse + relecture" for 7, the new fixture markup in context blocks, axe `aria-required-attr` now applicable).
+- State: `npm run check` 183 unit tests, 670 texts / 1152 French / 0 missing, build, content script 0 imports;
+  `npm run test:e2e` 10 passed (after the baseline update). Screens checked in Chromium through the harness.
+  Not tested in real Firefox, not tested on a real site with real widgets (false positives possible on exotic markup:
+  menus without aria-haspopup trigger, accordions wrapped in extra divs).
+- Next: try it on a real site and tune the detectors; consider a "Composants" label instead of "Scripts" on the tab
+  (`THEME_LABEL` is official RGAA wording, left as is); the newcomer-review proposals U1–U5 remain.
+- For the other agent: `data.checks` is a JSON string by design (RawFinding.data only allows scalars). Do not translate the
+  check details (attribute values); the wording comes from the catalogue. Adding a pattern = scanner function + catalogue
+  entry + French; the unit test fails if a check id or a text is missing.
+
 ### 2026-10-11 — Claude Code — newcomer UX walkthrough, three fixes, APG answer
 - Did: walked the built panel as a first-time auditor (Chromium, 1280×900 and 1280×520, fixture site, French UI),
   opened the Excel and the HTML report. Wrote `docs/ux-review-newcomer-2026-10-11.md`. Fixed what was unambiguous:
@@ -89,7 +120,7 @@ after the single-page workflow and run-status tracking are reliable. These are p
   outcome labels and per-element facts). Tests: `tests/axe-run.test.ts`, smoke asserts the report never mentions
   `rgaa-assistant-overlay`. Commit `e600848`; parity baseline updated (one failing rule fewer everywhere, French labels).
 - State: `npm run check` 173 unit tests, 0 missing translations, build; `npm run test:e2e` 10 passed. Not tested in real Firefox.
-- Next: owner's decisions on U6 (unconfirmed per-element C counted as C today), then U1/U5 (height budget,
+- Next: owner's decisions on U6 (decided later the same day: keep C), then U1/U5 (height budget,
   work-remaining first), U2/U3 (one "next"), and whether to build the "Composants" (APG) element review.
 - For the other agent: the APG question is answered in section 4 of the review; do not start the components
   review without the owner's go. The parity baseline moved twice today (`0d33d15`, `e600848`): read the handoffs before updating it again.

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Composants ARIA</title>
+  </head>
+  <body>
+    <main>
+      <h1>Composants</h1>
+
+      <div role="tablist" aria-label="Rubriques">
+        <button type="button" role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">Horaires</button>
+        <button type="button" role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b" tabindex="-1">Accès</button>
+        <button type="button" role="tab" id="tab-c" aria-selected="false" aria-controls="panel-missing" tabindex="-1">Tarifs</button>
+      </div>
+      <div role="tabpanel" id="panel-a" aria-labelledby="tab-a">Ouvert de 9 h à 18 h.</div>
+      <div role="tabpanel" id="panel-b">Métro ligne 1.</div>
+
+      <button type="button" id="menu-btn" aria-haspopup="true" aria-expanded="false" aria-controls="menu-1">Actions</button>
+      <ul role="menu" id="menu-1" aria-labelledby="menu-btn">
+        <li role="menuitem" tabindex="-1">Copier</li>
+        <li role="menuitem" tabindex="-1">Coller</li>
+        <li><a href="#x">Pas un item</a></li>
+      </ul>
+
+      <div role="dialog" aria-modal="true" aria-labelledby="dlg-title" style="display: none">
+        <h2 id="dlg-title">Confirmer</h2>
+        <button type="button">Fermer</button>
+      </div>
+      <dialog><p>Sans nom ni bouton</p></dialog>
+
+      <button type="button" aria-expanded="false" aria-controls="disc-1">Détails</button>
+      <div id="disc-1" hidden>Le contenu.</div>
+      <span aria-expanded="maybe" aria-controls="nowhere">Mauvais disclosure</span>
+
+      <div class="accordion">
+        <h3><button type="button" aria-expanded="true" aria-controls="acc-1">Section 1</button></h3>
+        <div id="acc-1">Un</div>
+        <h3><button type="button" aria-expanded="false" aria-controls="acc-2">Section 2</button></h3>
+        <div id="acc-2" hidden>Deux</div>
+      </div>
+
+      <details><summary>Voir plus</summary><p>Caché.</p></details>
+
+      <label for="cb">Ville</label>
+      <input id="cb" role="combobox" aria-expanded="true" aria-controls="cb-list" aria-autocomplete="list" />
+      <ul role="listbox" id="cb-list"><li role="option" aria-selected="true">Paris</li><li role="option">Lyon</li></ul>
+
+      <ul role="listbox" aria-label="Couleurs"><li role="option" aria-selected="false">Rouge</li><li role="option" aria-selected="true">Bleu</li></ul>
+
+      <div role="slider" aria-label="Volume" aria-valuenow="5" aria-valuemin="0" aria-valuemax="10" tabindex="0"></div>
+      <div role="slider" aria-valuenow="50"></div>
+      <div role="spinbutton" aria-label="Quantité" aria-valuenow="2" aria-valuemin="1" tabindex="0"></div>
+
+      <div role="switch" aria-checked="true" aria-label="Notifications" tabindex="0"></div>
+      <div role="checkbox" aria-checked="mixed" tabindex="0">Tout sélectionner</div>
+      <div role="radiogroup" aria-label="Taille">
+        <div role="radio" aria-checked="true" tabindex="0">S</div>
+        <div role="radio" aria-checked="false" tabindex="-1">M</div>
+      </div>
+      <div><span role="radio" aria-checked="false">Hors groupe</span></div>
+
+      <ul role="tree" aria-label="Dossiers">
+        <li role="treeitem" aria-expanded="true" tabindex="0">Racine
+          <ul role="group"><li role="treeitem" tabindex="-1">Fichier</li></ul>
+        </li>
+        <li role="treeitem" tabindex="-1">Autre<ul role="group"><li role="treeitem" tabindex="-1">Sans aria-expanded</li></ul></li>
+      </ul>
+
+      <button type="button" aria-describedby="tip-1">Aide</button>
+      <span role="tooltip" id="tip-1" hidden>Explication</span>
+      <span role="tooltip" id="tip-2">Orphelin</span>
+
+      <span role="button" tabindex="0">Bouton maison</span>
+      <span role="button" aria-pressed="true"><img src="x.png" alt="" /></span>
+
+      <div role="toolbar" aria-label="Mise en forme">
+        <button type="button">Gras</button>
+        <button type="button" tabindex="-1">Italique</button>
+      </div>
+      <div role="toolbar"><button type="button">Seul</button></div>
+    </main>
+  </body>
+</html>

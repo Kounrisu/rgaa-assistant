@@ -104,7 +104,7 @@ function replay(html: string): unknown {
   const step = (name: string, message: Record<string, unknown>) => (log[name] = normalise(page.send(message)))
 
   step('highlight images', { type: 'RGAA_HIGHLIGHT_IMAGES', color: '#e11d48' })
-  for (const theme of [2, 3, 5, 6, 9, 11]) step(`scan theme ${theme}`, { type: 'RGAA_SCAN_THEME', theme, color: `#0000${theme.toString(16).padStart(2, '0')}` })
+  for (const theme of [2, 3, 5, 6, 7, 9, 11]) step(`scan theme ${theme}`, { type: 'RGAA_SCAN_THEME', theme, color: `#0000${theme.toString(16).padStart(2, '0')}` })
   step('rules run', { type: 'RGAA_RULES_RUN' })
   step('snapshot', { type: 'RGAA_SNAPSHOT' })
   log['overlay after scans'] = page.overlayHtml()
@@ -146,6 +146,6 @@ describe('content script parity', () => {
     it(`replies identically on ${file}`, async () => {
       const log = replay(readFileSync(pagesDir + file, 'utf8'))
       await expect(JSON.stringify(log, null, 2) + '\n').toMatchFileSnapshot(`./snapshots/content-parity/${file.replace(/\.html$/, '')}.json`)
-    })
+    }, 30_000) // a page with many components takes a few seconds in jsdom when the whole suite runs
   }
 })

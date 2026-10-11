@@ -37,6 +37,9 @@ export function tDyn(text: string): string {
     [/^table (\d+)×(\d+)$/, (m) => t('table {r}×{c}', { r: m[1], c: m[2] })],
     [/^(\d+) rows × (\d+) columns · (\d+) header cell\(s\)$/, (m) => t('{r} rows × {c} columns · {h} header cell(s)', { r: m[1], c: m[2], h: m[3] })],
     [/^<(\w+)> without name$/, (m) => t('<{tag}> without name', { tag: m[1] })],
+    [/^(\d+) structure problem\(s\)$/, (m) => t('{n} structure problem(s)', { n: m[1] })],
+    [/^(\d+) headers$/, (m) => t('{n} headers', { n: m[1] })],
+    [/^(\d+)\/(\d+) OK$/, (m) => t('{ok}/{total} OK', { ok: m[1], total: m[2] })],
   ]
   for (const [re, fn] of rules) {
     const m = re.exec(text)

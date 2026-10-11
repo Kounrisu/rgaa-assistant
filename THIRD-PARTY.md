@@ -31,6 +31,7 @@ Licences below were read from the packages or repositories on 2026-10-10. Nothin
 |---|---|---|---|---|
 | RGAA 4.1 criteria and tests (official French wording) | https://github.com/DISIC/accessibilite.numerique.gouv.fr (`RGAA/4.1/criteres.json`) | **Not confirmed**: the repository does not declare one in its metadata. It is public French government material; check the terms on the DINUM site before redistributing | `src/rgaa/rgaa-tests.json`, `src/lib/rgaa-theme1.json`, `scripts/classify-rgaa.py` | The automation classification (auto / semi / manual) and the notes in that file are ours |
 | RGAA official links | https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/ | n/a | Links only | Nothing copied |
+| WAI-ARIA Authoring Practices (APG) patterns | https://www.w3.org/WAI/ARIA/apg/patterns/ | W3C Document Licence (reference only) | `src/lib/apg-patterns.ts` links to each pattern | The structural checks and the keyboard checklist wording are ours, written from the patterns; nothing copied |
 
 ## Written by us (no third-party code)
 

@@ -40,6 +40,13 @@
         <input type="email" id="mail" name="mail" />
         <button type="submit">Envoyer</button>
       </form>
+      <div role="tablist" aria-label="Rubriques">
+        <button type="button" role="tab" id="tab-a" aria-selected="true" aria-controls="panel-a">Horaires</button>
+        <button type="button" role="tab" id="tab-b" aria-selected="false" aria-controls="panel-b" tabindex="-1">Accès</button>
+      </div>
+      <div role="tabpanel" id="panel-a" aria-labelledby="tab-a">Ouvert de 9 h à 18 h.</div>
+      <div role="tabpanel" id="panel-b" aria-labelledby="tab-b" hidden>Métro ligne 1.</div>
+      <button type="button" aria-expanded="false" aria-controls="plus-options">Plus d’options</button>
     </main>
     <footer><p>Pied de page</p></footer>
   </body>

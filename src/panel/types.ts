@@ -15,4 +15,4 @@ export type View = 'review' | 'page' | 'audit' | 'sample' | 'audits' | 'checks'
 
 export type FStatus = 'todo' | 'progress' | 'c' | 'nc'
 
-export type FindingFilter = 'all' | 'hidden' | 'link-skip' | 'field-nolabel' | 'field-placeholder' | 'table-nohead' | 'table-layout' | 'review' | 'contrast-fail' | 'contrast-unknown' | 'link-empty' | 'link-generic' | 'headings' | 'landmarks'
+export type FindingFilter = 'all' | 'hidden' | 'link-skip' | 'field-nolabel' | 'field-placeholder' | 'table-nohead' | 'table-layout' | 'review' | 'contrast-fail' | 'contrast-unknown' | 'link-empty' | 'link-generic' | 'headings' | 'landmarks' | 'widget-fail'
