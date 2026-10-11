@@ -1,3 +1,4 @@
+import { reviewContinue } from './review-controls'
 /**
  * The themes reviewed finding by finding (Frames, Colours, Tables, Links, Structure, Forms): list, filters, detail and criteria cards.
  */
@@ -224,5 +225,6 @@ export function findingCard(f: FindingItem, review: ImageReview, c: FindingCrite
     ...(review.auto && review.answers[c.id] !== undefined ? [h('p', { class: 'hint info prefill-note' }, t('Pre-filled from the page. Click your answer to confirm it, or change it.'))] : []),
     h('fieldset', {}, h('legend', { class: 'hint-line' }, t('Verdict for criterion {id}', { id: c.id })), h('div', { class: 'verdicts' }, ...verdict('c', t('Compliant')), ...verdict('nc', t('Non-compliant')), ...verdict('na', t('Not applicable')))),
   )
+  card.append(reviewContinue(`finding:${f.key}:${c.id}`))
   return card
 }

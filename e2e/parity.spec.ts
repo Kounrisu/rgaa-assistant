@@ -21,7 +21,7 @@ async function serialize(panel: Page): Promise<string> {
   const html = await panel.evaluate(() => {
     const parts: string[] = []
     for (const child of Array.from(document.body.children)) {
-      if (child.hasAttribute('hidden') || ['SCRIPT', 'DIALOG', 'INPUT'].includes(child.tagName)) continue
+      if (getComputedStyle(child).display === 'none' || child.hasAttribute('hidden') || ['SCRIPT', 'DIALOG', 'INPUT'].includes(child.tagName)) continue
       const clone = child.cloneNode(true) as HTMLElement
       // form state is a property, not an attribute: write it down
       const src = [child, ...Array.from(child.querySelectorAll('input, textarea, select'))] as HTMLInputElement[]
@@ -45,7 +45,8 @@ async function serialize(panel: Page): Promise<string> {
     .replace(/<span class="line">(\s*)\? /g, '<span class="line">$1')
     .replace(/<span class="text">\? /g, '<span class="text">')
     .replace(/\d{1,2} [\p{L}.]+,? \d{1,2}:\d{2}/gu, 'DATE HH:MM')
-    .replace(/\d{1,2}:\d{2}/g, 'HH:MM')
+    .replace(/(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{1,2},? \d{1,2}:\d{2}(?:\s?[AP]M)?/g, 'DATE HH:MM')
+    .replace(/\d{1,2}:\d{2}(?:\s?[AP]M)?/g, 'HH:MM')
     .replace(/\d{4}-\d{2}-\d{2}/g, 'YYYY-MM-DD')
     .replace(/></g, '>\n<')
 }
@@ -173,6 +174,7 @@ test('every screen of the panel matches the reviewed baseline', async ({ rig }) 
   await panel.locator('#audits-btn').click()
   await expect(panel.locator('#audits table')).toBeVisible()
   await shot('audits list')
+  await panel.locator('#page-work-btn').click()
   await panel.locator('#checks-btn').click()
   await shot('checks')
 

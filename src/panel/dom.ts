@@ -64,6 +64,13 @@ export function download(bytes: BlobPart, type: string, name: string): void {
  * (`dom.scanBtn`) instead of declaring its own constants.
  */
 export const dom = {
+  batchEl: $<HTMLDetailsElement>('batch-controls'),
+  auditBar: document.querySelector<HTMLElement>('.auditbar')!,
+  pageBar: document.querySelector<HTMLElement>('.pagebar')!,
+  auditNavigation: document.querySelector<HTMLElement>('.audit-navigation')!,
+  pageNavigation: document.querySelector<HTMLElement>('.page-navigation')!,
+  openPageBtn: $<HTMLButtonElement>('open-page-btn'),
+  pageWorkBtn: $<HTMLButtonElement>('page-work-btn'),
   reviewBtn: $<HTMLButtonElement>('review-btn'),
   scanBtn: $<HTMLButtonElement>('scan-btn'),
   clearBtn: $<HTMLButtonElement>('clear-btn'),

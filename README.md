@@ -23,7 +23,7 @@ confirms or changes every verdict.
 | 11 Forms | Every field with its accessible name, placeholder-only fields, autocomplete on personal fields |
 | 4, 8, 10, 12, 13 and the other criteria | Checklists with the official tests, pre-filled where a check can say something |
 
-**Automatic checks** (button “Contrôles automatiques”): scans every scannable theme, then runs
+**Automatic checks** (button “Contrôler automatiquement la page ouverte”): scans every scannable theme, then runs
 [axe-core](https://github.com/dequelabs/axe-core) (only the rules that map to an RGAA criterion), our own RGAA
 checks, rules adapted from [Asqatasun](https://github.com/Asqatasun/Asqatasun) (73 of its 99 RGAA 4 tests; 322 of
 328 of its own test pages agree, see `npm run check:asqatasun`) and a local HTML validation (html-validate) of the
@@ -44,11 +44,21 @@ accessibility statement). Print it to PDF from the browser.
 
 ## Use
 
-1. Open DevTools (F12) on a page, select the **RGAA Assistant** tab, and add the page to the sample (P01, P02…).
-2. Click **Contrôles automatiques**, or **Analyser** to scan only; then review each theme. Boxes on the page show
-   the elements; pre-filled answers carry the tool that suggested them.
-3. Do the manual checks, using the page tools of each theme.
-4. Open **Synthèse de l’audit** for the dashboard, the Excel export and the report.
+1. Open DevTools (F12), select **RGAA Assistant**, and register the pages in **Échantillon et suivi**.
+2. Open a registered page in the inspected browser tab. In **Évaluer une page**, click
+   **Contrôler automatiquement la page ouverte**. It scans the elements and runs the automatic engines;
+   **Actions de la page → Analyser / Réanalyser** only refreshes the detected elements (useful for popins).
+3. In **Évaluation**, answer each criterion and use **Suivant à évaluer** beside the decision to save and continue.
+   Answering never advances automatically. Page progress stays visible; theme bubbles keep `done/total` counts.
+4. Complete **Contrôles manuels** and inspect **Résultats de la page**. The sample dashboard tracks each page's
+   human decisions, remaining decisions in selected themes, suggestions, manual activities and automatic run status.
+5. For several pages, select their checkboxes in **Échantillon et suivi**, then **Contrôler les pages sélectionnées**.
+   This navigates the existing inspected tab through the URLs using the browser session. Keep DevTools open.
+   Pause after the current page and resume the remaining pages; failed pages retain their own error and can be
+   selected for a retry. Redirects to another URL require correcting/opening that page first. Closing DevTools
+   abandons the remaining queue; saved results remain, and an unfinished run is shown as interrupted.
+6. Use **Synthèse et exports** for the overall results, Excel grid and report. Completing automatic runs is never
+   completion of the RGAA audit: dynamic states and manual checks still require the auditor.
 
 ## Limits
 
@@ -83,7 +93,7 @@ review decisions fit at 480, 768 and 1280 pixels, that results work on image-fre
 persist. They run the real automatic engines against an empty title and then a corrected title: evidence must
 change while the human verdict and note survive the rerun. Tool disagreements remain visible until resolved.
 
-The Review button returns to the current theme. Progress, display tools and page reset actions are expandable;
+The Evaluation button returns to the current theme. Page progress stays visible; display tools and page reset actions are expandable;
 on compact panels the image list is expandable too. After an automatic run, use the review queue to open a
 suggested criterion directly. Manual checks come before the collapsed run history.
 
@@ -112,6 +122,7 @@ Firefox), then reload the page you inspect after reloading the extension.
 | `findings-view.ts`, `contrast-checker.ts`, `code-view.ts` | Themes 2, 3, 5, 6, 9, 11: list, chips, detail, cards; the contrast maths and checker card; highlighted code blocks. |
 | `checklist-view.ts` | The checklist themes: one card per criterion. |
 | `checks-view.ts`, `auto-checks.ts` | The Checks view; the automatic run (axe, RGAA rules, the Asqatasun-derived rules, HTML check). |
+| `review-navigation.ts`, `review-controls.ts`, `page-work.ts`, `batch-runner.ts`, `batch-view.ts` | Save-and-continue queue, page work dashboard, sequential selected-URL runs. |
 | `results-view.ts`, `audit-overview.ts`, `sample-view.ts`, `audits-view.ts`, `exports.ts` | Page results and sheet tables; audit dashboard; the sample of pages; the list of audits; Excel and HTML report. |
 | `chrome.ts` | Totals and their jumps, page bar, theme bar, address reminder, audit bar, empty screen. |
 | `router.ts` | `setView`, `renderAll`, `switchTo`, `removePage` and the resets. |

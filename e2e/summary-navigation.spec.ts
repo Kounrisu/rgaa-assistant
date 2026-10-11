@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { openRig, type Rig } from './harness'
+import { scanElements, openRig, type Rig } from './harness'
 import type { PageRecord } from '../src/lib/types'
 
 // Reopen a saved audit with known verdicts; clicks and destinations use the real built panel.
@@ -56,7 +56,7 @@ test('image status shortcuts select the relevant image or focus the test breakdo
   const rig = await openRig(context)
   const { panel } = rig
   await panel.locator('#empty-add-btn').click()
-  await panel.locator('#scan-btn').click()
+  await scanElements(panel)
   await expect(panel.locator('#save-state')).toContainText('Enregistré')
   const items = await panel.evaluate(() => {
     const key = Object.keys(localStorage).find((k) => k.startsWith('e2e-chrome-storage:rgaa-audit:'))!
@@ -88,7 +88,7 @@ test('finding totals jump to the failed criterion, not another failure on the fi
   const { panel } = rig
   await panel.locator('#empty-add-btn').click()
   await restorePage(rig, { themes: [11] })
-  await panel.locator('#scan-btn').click()
+  await scanElements(panel)
   await expect.poll(() => panel.evaluate(() => {
     const key = Object.keys(localStorage).find((k) => k.startsWith('e2e-chrome-storage:rgaa-audit:'))!
     return JSON.parse(localStorage.getItem(key)!).pages[0].findings.length

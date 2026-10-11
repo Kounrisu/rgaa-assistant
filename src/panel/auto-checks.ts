@@ -2,7 +2,7 @@
  * The automatic checks: capture and validate the page HTML, turn our RGAA rules into tool results, run axe + RGAA + Asqatasun-derived rules + HTML.
  */
 import type { PageRecord } from '../lib/types'
-import { sendToPage, inspectedTabId } from './page-bridge'
+import { sendToPage, inspectedTabId, inspectedUrl } from './page-bridge'
 import { packSnapshot } from '../lib/snapshot'
 import { mergeCoverage } from '../lib/scan-coverage'
 import { checkHtml } from '../lib/html-check'
@@ -17,7 +17,6 @@ import { dom, keepScroll, say } from './dom'
 import { sleep } from './helpers'
 import axeFrench from 'axe-core/locales/fr.json'
 import { normalizeUrl } from '../lib/audit-store'
-import { askConfirm } from './dialogs'
 import { pageLabel, persist } from './model'
 import { SCANNED_THEMES } from '../lib/themes'
 import { actions } from './actions'
@@ -25,6 +24,7 @@ import { actions } from './actions'
 /** The HTML of the page, captured now, kept in the audit and checked against the HTML specification (RGAA 8.2). */
 export async function captureAndCheckHtml(rec: PageRecord): Promise<void> {
   const snap = await sendToPage(inspectedTabId(), { type: 'RGAA_SNAPSHOT' })
+  if (normalizeUrl(snap.url) !== normalizeUrl(rec.url)) throw new Error(t('The browser changed page during the checks. Run them again on the registered URL.'))
   if (typeof snap.html !== 'string') throw new Error('no html')
   rec.snapshot = packSnapshot(snap.html, snap.url, snap.title)
   rec.scanCoverage = mergeCoverage(rec.scanCoverage, snap.coverage)
@@ -80,8 +80,8 @@ export function rulesToResults(url: string, findings: RuleFinding[]): { own: Too
   return { own: { tool: 'RGAA', url, violations: [], answers, incomplete: 0, passes: passedChecks.length, passedChecks }, asq }
 }
 
-export async function runAutoChecks(): Promise<void> {
-  if (!state.page || state.axeRunning) return
+export async function runAutoChecks(): Promise<'complete' | 'partial' | 'failed'> {
+  if (!state.page || state.axeRunning) return 'failed'
   const rec = state.page
   state.axeRunning = true
   dom.autoBtn.disabled = true
@@ -97,9 +97,9 @@ export async function runAutoChecks(): Promise<void> {
     if (!response || response.error) throw new Error(response?.error ?? 'no response')
     const results = fromAxe(response)
     if (results.url && rec.url && normalizeUrl(results.url) !== normalizeUrl(rec.url)) {
-      const ok = await askConfirm(t('The browser is on another page'), t('The browser is on {url}, but {label} is registered for {registered}. Apply them to {label} anyway?', { url: results.url, label: pageLabel(rec), registered: rec.url }), t('Apply anyway'))
-      if (!ok) return void say(t('Scan cancelled.'))
+      throw new Error(t('The browser changed page during the checks. Run them again on the registered URL.'))
     }
+    if (normalizeUrl(own.url) !== normalizeUrl(rec.url) || normalizeUrl(await inspectedUrl()) !== normalizeUrl(rec.url)) throw new Error(t('The browser changed page during the checks. Run them again on the registered URL.'))
     const split = rulesToResults(own.url, own.findings ?? [])
     const ownReport = applyToolResults(rec, split.own, { addThemes: true })
     // --- Asqatasun-derived: begin ---
@@ -108,19 +108,25 @@ export async function runAutoChecks(): Promise<void> {
     const report = applyToolResults(rec, results, { addThemes: true })
     step = 'html'
     await sleep(250)
+    let complete = true
     try {
       await captureAndCheckHtml(rec)
     } catch (err) {
+      complete = false
+      if (rec.automaticRun) rec.automaticRun.error = String((err as Error).message ?? err)
       console.error(err)
       say(t('Could not capture or check the HTML ({reason}).', { reason: String((err as Error)?.message ?? err) }))
     }
     persist()
     actions.renderAll()
     say(t('Automatic checks on {label}: {n} rule(s) failed, {set} verdict(s) pre-filled, {noted} element note(s). Confirm them in the themes.', { label: pageLabel(rec), n: results.violations.length + (own.findings ?? []).filter((f: RuleFinding) => RULES[f.key]?.status === 'nc').length, set: report.set + ownReport.set + asqReport.set, noted: report.noted + ownReport.noted + asqReport.noted }))
+    return complete ? 'complete' : 'partial'
   } catch (err) {
     const reason = `${step}: ${String((err as Error)?.message ?? err).replace(/^Error: /, '')}`
     say(t('Could not run the automatic checks ({reason}). Reload the page (F5) if you just reloaded the extension, check the extension may access this site, then try again.', { reason }))
     console.error(err)
+    if (rec.automaticRun) rec.automaticRun.error = reason
+    return 'failed'
   } finally {
     state.axeRunning = false
     dom.autoBtn.disabled = !state.page
@@ -130,15 +136,30 @@ export async function runAutoChecks(): Promise<void> {
 
 /** Everything at once: scan every theme that can be scanned, then axe, our RGAA checks, the Asqatasun-derived rules and the HTML check. */
 export async function runEverything(): Promise<void> {
-  if (!state.page || state.axeRunning) return
+  if (!state.page || state.runBusy) return
   const rec = state.page
-  const scannable = [...SCANNED_THEMES].filter((n) => !rec.themes.includes(n))
-  if (scannable.length) {
-    rec.themes = [...rec.themes, ...scannable].sort((a, b) => a - b)
+  state.runBusy = true
+  rec.automaticRun = { status: 'running', startedAt: Date.now(), url: rec.url }
+  persist()
+  actions.renderAll()
+  try {
+    const url = await inspectedUrl()
+    if (normalizeUrl(url) !== normalizeUrl(rec.url)) throw new Error(t('Open the registered page in the browser before running automatic checks.'))
+    if (!(await state.session.saveNow())) throw new Error(t('Save failed. Retry before running checks.'))
+    rec.themes = [...new Set([...rec.themes, ...SCANNED_THEMES])].sort((a, b) => a - b)
+    await actions.scan()
+    if (!state.lastScanOk || state.page !== rec) throw new Error(t('The page scan did not finish.'))
+    actions.setView('checks')
+    rec.automaticRun.status = await runAutoChecks()
+    if (rec.automaticRun.status === 'partial') say(t('Partial run — HTML check failed'))
+  } catch (err) {
+    rec.automaticRun.status = 'failed'
+    rec.automaticRun.error = String((err as Error).message ?? err)
+    say(rec.automaticRun.error)
+  } finally {
+    rec.automaticRun.finishedAt = Date.now()
+    state.runBusy = false
     persist()
+    actions.renderAll()
   }
-  await actions.scan()
-  if (!state.lastScanOk || state.page !== rec) return
-  actions.setView('checks')
-  await runAutoChecks()
 }

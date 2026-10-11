@@ -4,7 +4,7 @@
 import { type Lang, setLang, translateStatic, t } from '../lib/i18n'
 import { dom, say } from './dom'
 import { resetTheme, renderAll, switchTo, removePage, resetPage, setView } from './router'
-import { renderAuditBar, renderPageBar, renderStats, renderEmpty, showNavBanner, goToFirstOnPage } from './chrome'
+import { renderAuditBar, renderPageBar, renderStats, renderEmpty, showNavBanner } from './chrome'
 import { renderPageTools, resetPageTools } from './page-tools-ui'
 import { applyBoxes, goTo, sendToPage, inspectedTabId } from './page-bridge'
 import { addPage } from './sample-view'
@@ -12,6 +12,7 @@ import { state } from './state'
 import { scan } from './scan-flow'
 import { renderList, select } from './images-view'
 import { normalizeUrl } from '../lib/audit-store'
+import { actions } from './actions'
 import { runEverything } from './auto-checks'
 import { renameAudit, saveAuditToFile, importAuditFile } from './audits-view'
 
@@ -28,6 +29,8 @@ export function applyLanguage(lang: Lang): void {
 
 /** Registers every listener of the panel: its buttons, the keyboard, the page navigation, the extension messages. Called once, at start-up. */
 export function wireEvents(): void {
+  dom.openPageBtn.addEventListener('click', () => { if (state.page) goTo(state.page.url) })
+  dom.pageWorkBtn.addEventListener('click', () => setView('review'))
   dom.reviewBtn.addEventListener('click', () => setView('review'))
   document.getElementById('reset-theme-btn')!.addEventListener('click', () => {
     document.querySelector<HTMLDetailsElement>('.page-options')!.open = false
@@ -44,7 +47,7 @@ export function wireEvents(): void {
   dom.emptyAddBtn.addEventListener('click', () => void addPage(state.liveUrl))
   dom.emptyGoBtn.addEventListener('click', () => state.page && goTo(state.page.url))
   dom.sampleBtn.addEventListener('click', () => setView('sample'))
-  dom.scanBtn.addEventListener('click', scan)
+  dom.scanBtn.addEventListener('click', () => { document.querySelector<HTMLDetailsElement>('.page-options')!.open = false; void scan() })
   dom.rescanBtn.addEventListener('click', scan)
   chrome.runtime.onMessage.addListener((message) => {
     if (message?.type !== 'RGAA_NEW_IMAGES' || !state.scanCount) return
@@ -94,12 +97,13 @@ export function wireEvents(): void {
   })
   dom.resultsBtn.addEventListener('click', () => setView('page'))
   dom.auditBtn.addEventListener('click', () => setView('audit'))
-  dom.nextBtn.addEventListener('click', () => goToFirstOnPage('pending'))
+  dom.nextBtn.addEventListener('click', () => actions.nextReview())
   // Keyboard: n goes to the next element to review, j / k move between images (outside text fields).
   document.addEventListener('keydown', (event) => {
     const target = event.target as HTMLElement
     if (document.querySelector('dialog[open]') || target.isContentEditable || event.ctrlKey || event.metaKey || event.altKey) return
-    if (event.key === 'n' && !event.ctrlKey && !event.metaKey && !['TEXTAREA', 'INPUT', 'SELECT'].includes(target.tagName) && state.page && state.view === 'review') return void goToFirstOnPage('pending')
+    if (state.runBusy || state.batch?.running) return
+    if (event.key === 'n' && !event.ctrlKey && !event.metaKey && !['TEXTAREA', 'INPUT', 'SELECT'].includes(target.tagName) && state.page && state.view === 'review') return void actions.nextReview()
     if (['TEXTAREA', 'INPUT', 'SELECT'].includes(target.tagName) || state.view !== 'review' || state.theme !== 1 || !state.elements.length || state.selectedId === null) return
     const index = state.elements.findIndex((e) => e.id === state.selectedId)
     const next = event.key === 'j' ? index + 1 : event.key === 'k' ? index - 1 : -1

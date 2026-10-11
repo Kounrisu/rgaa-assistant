@@ -1,3 +1,4 @@
+import { pageWork } from './page-work'
 /**
  * The sample: the pages to audit (P01, P02...), their URLs, and the audit fields.
  */
@@ -54,11 +55,15 @@ export function renderSample(): void {
     h(
       'div',
       { class: 'results-head' },
-      h('div', {}, h('h2', {}, t('Audit pages sample')), h('p', { class: 'hint-line' }, t('Register each page and its URL here, then scan them one by one. P01, P02… follow this order.'))),
-      h('div', { class: 'nav' }, h('button', { type: 'button', onclick: () => actions.setView('review') }, t('← Back to review')), h('button', { type: 'button', onclick: () => actions.setView('audit') }, t('Audit pages overview')), h('button', { type: 'button', class: 'danger-btn', disabled: !state.audit.pages.length && !state.audit.meta.site && !state.audit.meta.auditor, title: t('Delete every page and the audit fields'), onclick: () => actions.resetAudit() }, t('Reset the whole audit'))),
+      h('div', {}, h('h2', {}, t('Sample and progress')), h('p', { class: 'hint-line' }, t('Follow the audit page by page: automatic suggestions, human decisions and manual activities.'))),
     ),
-    h('div', { class: 'sample-meta' }, field(t('Site'), 'site', t('Name of the site')), field(t('Auditor'), 'auditor', t('First name Last name')), field(t('Context'), 'context', t('Initial visit'))),
+    h('details', { class: 'sample-management' }, h('summary', {}, t('Audit details and settings')),
+      h('div', { class: 'sample-meta' }, field(t('Site'), 'site', t('Name of the site')), field(t('Auditor'), 'auditor', t('First name Last name')), field(t('Context'), 'context', t('Initial visit'))),
+      h('button', { type: 'button', class: 'danger-btn', disabled: !state.audit.pages.length && !state.audit.meta.site && !state.audit.meta.auditor, onclick: () => actions.resetAudit() }, t('Reset the whole audit'))),
   )
+
+  dom.sampleEl.append(dom.batchEl)
+  dom.sampleEl.append(h('div', { class: 'sample-work' }, ...state.audit.pages.map(pageWork)))
 
   const table = h('table', { class: 'results-table sample-table' })
   table.append(
@@ -109,7 +114,7 @@ export function renderSample(): void {
     )
   })
   table.append(body)
-  dom.sampleEl.append(h('div', { class: 'results-scroll' }, table))
+  dom.sampleEl.append(h('details', { class: 'sample-management' }, h('summary', {}, t('Edit page titles, URLs and themes')), h('div', { class: 'results-scroll' }, table)))
 
   const urlNew = h('input', { type: 'url', value: state.liveUrl, placeholder: 'https://…', 'aria-label': t('URL of the new page') })
   const titleNew = h('input', { type: 'text', placeholder: t('Title (optional)'), 'aria-label': t('Title of the new page') })
@@ -124,4 +129,5 @@ export function renderSample(): void {
       h('p', { class: 'hint-line' }, t('Adding a page does not scan it. Select it, open it in the browser, then click Scan.')),
     ),
   )
+  for (const child of dom.sampleEl.children) if (child !== dom.batchEl) (child as HTMLElement).inert = state.runBusy || Boolean(state.batch?.running)
 }

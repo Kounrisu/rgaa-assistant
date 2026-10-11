@@ -108,7 +108,17 @@ export interface ManualCheckAnswer {
   note: string
 }
 
+export interface AutomaticRun {
+  status: 'running' | 'complete' | 'partial' | 'failed'
+  startedAt: number
+  finishedAt?: number
+  url: string
+  error?: string
+}
+
 export interface PageRecord {
+  /** Latest full automatic run; absent on older audits (history is not proof of a complete run). */
+  automaticRun?: AutomaticRun
   /** What the last scans did not look at (frames, shadow roots) and where they cut a list. */
   scanCoverage?: import('./scan-coverage').ScanCoverage
   id: string
@@ -148,7 +158,7 @@ export interface AuditMeta {
 }
 
 export interface Audit {
-  version: 3
+  version: 4
   /** Stable identifier: the same audit keeps it through renames, file saves and re-imports. */
   id: string
   name: string

@@ -25,6 +25,9 @@ import { renderAuditsView } from './audits-view'
 import { addPage } from './sample-view'
 import { switchTo, removePage, resetPage, setView, renderAll, resetTheme, resetAudit } from './router'
 import { scan } from './scan-flow'
+import { runSelected } from './batch-runner'
+import { renderBatch } from './batch-view'
+import { nextReview } from './review-navigation'
 import { wireEvents } from './events'
 
 /**
@@ -32,6 +35,9 @@ import { wireEvents } from './events'
  * without a cycle, so it calls `actions.<name>()`. Add a function here when a module needs it that way.
  */
 const registry = {
+  nextReview,
+  runSelected,
+  renderBatch,
   renderThemeBar,
   renderStats,
   renderPageBar,
@@ -58,6 +64,8 @@ state.session = createAuditSession({
   getAudit: () => state.audit,
   setAudit: (next) => { state.audit = next },
   onActivated: () => {
+    state.batchSelection.clear()
+    state.batch = undefined
     state.scannedThisSession.clear()
     state.findingSel = null
     state.theme = 1

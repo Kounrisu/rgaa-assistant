@@ -1,10 +1,11 @@
+import { reviewContinue } from './review-controls'
 /**
  * The Images theme: the list with its filters, the detail of an image, the kind and criteria cards.
  */
 import { dom, h, keepScroll, tNodes, $ } from './dom'
 import type { Filter, Item } from './types'
 import { state } from './state'
-import { matches, visibleElements, altLabel, statusOf, reviewKey, STATUS_LABEL, reviewOf, nextToReview } from './review-state'
+import { matches, visibleElements, altLabel, statusOf, reviewKey, STATUS_LABEL, reviewOf } from './review-state'
 import { t } from '../lib/i18n'
 import { DETECTED_LABEL, detectedOf, suggestedKind, criteriaFor, type Criterion, hintFor, criterionUrl } from '../lib/rgaa'
 import { syncFilterBoxes, focusOnPage } from './page-bridge'
@@ -151,7 +152,6 @@ export function renderDetailNow(): void {
         h('button', { type: 'button', onclick: () => focusOnPage(el.id, true) }, t('Locate on page')),
         h('button', { type: 'button', disabled: index === 0, onclick: () => goto(-1) }, t('← Prev')),
         h('button', { type: 'button', disabled: index === state.elements.length - 1, onclick: () => goto(1) }, t('Next →')),
-        h('button', { type: 'button', class: 'next-review', disabled: !nextToReview(el), onclick: () => { const n = nextToReview(el); if (n) select(n.id, true) } }, t('Next to review ⇥')),
       ),
     ),
   )
@@ -304,6 +304,7 @@ export function renderKindPicker(el: Item, review: ImageReview): HTMLElement {
         t('Informative: carries content or a function (logo, photo that illustrates, icon in a button…). Decorative: pure ornament that adds nothing.'),
       ),
     ),
+    reviewContinue(`image:${el.key}:kind`),
   )
 }
 
@@ -361,6 +362,7 @@ export function criterionCard(el: Item, review: ImageReview, criterion: Criterio
       h('div', { class: 'verdicts' }, ...verdict('c', t('Compliant')), ...verdict('nc', t('Non-compliant')), ...verdict('na', t('Not applicable'))),
     ),
   )
+  card.append(reviewContinue(`image:${el.key}:${criterion.id}`))
   return card
 }
 

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { openRig } from './harness'
+import { scanElements, openRig } from './harness'
 
 async function storedPage(panel: Page) {
   return panel.evaluate(() => {
@@ -20,7 +20,7 @@ for (const width of [480, 768, 1280]) {
     const { panel, problems } = await openRig(context)
     await panel.setViewportSize({ width, height: 800 })
     await panel.locator('#empty-add-btn').click()
-    await panel.locator('#scan-btn').click()
+    await scanElements(panel)
     await expect(panel.locator('#progress')).toBeVisible()
     await expect(panel.locator('#page-summary .sum-pending')).toBeVisible()
     const choice = panel.locator('label[for="kind-1-informative"]')
