@@ -45,7 +45,7 @@ accessibility statement). Print it to PDF from the browser.
 ## Use
 
 1. Open DevTools (F12), select **RGAA Assistant**, and register the pages in **Échantillon et suivi**.
-2. Open a registered page in the inspected browser tab. In **Évaluer une page**, click
+2. Open a registered page in the inspected browser tab. In **Évaluation** in the top bar beside **Audits**, click
    **Contrôler automatiquement la page ouverte**. It scans the elements and runs the automatic engines;
    **Actions de la page → Analyser / Réanalyser** only refreshes the detected elements (useful for popins).
 3. In **Évaluation**, answer each criterion and use **Suivant à évaluer** beside the decision to save and continue.
