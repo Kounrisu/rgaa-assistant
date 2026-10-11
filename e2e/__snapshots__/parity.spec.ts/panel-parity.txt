@@ -2,14 +2,14 @@
 01 registered, not scanned                                             a9330d13c0 16129
 02 checks after the automatic run                                      dd029abf3a 46488
 03 checks, one problem noted                                           1deb07b717 46610
-04 images                                                              fd6e788a84 33210
-05 images, unnamed one selected (problem banner)                       d4ae58e4d4 33828
-06 images, applied from the problem banner                             cc1079bcb2 43211
-07 images, kind chosen                                                 0cd46f70ce 34787
-08 images, criterion answered                                          7a573e98a7 35103
-09 images, note typed                                                  37f1d7ebb3 35284
-10 images, filter to review                                            0fde00807d 33618
-11 images, next with the keyboard                                      37f1d7ebb3 35284
+04 images                                                              de20091a07 33210
+05 images, unnamed one selected (problem banner)                       c025308c59 33828
+06 images, applied from the problem banner                             02ad151b04 43211
+07 images, kind chosen                                                 2b0e435607 34775
+08 images, criterion answered                                          3f1e7b0010 35091
+09 images, note typed                                                  a16609c4ec 35272
+10 images, filter to review                                            8a270ca820 34709
+11 images, next with the keyboard                                      a16609c4ec 35272
 theme 2 Cadres 2/2                                                     d790fd611b 18625
 theme 3 Couleurs 0/3                                                   b2bf2c0f95 36618
 theme 3 Couleurs 0/3, contrast checker with black text                 b85a3a28cc 36136
@@ -53,25 +53,25 @@ theme 12 Navigation 0/11, suggestion confirmed                         f0bf67f2f
 theme 13 Consultation 0/12                                             3dda5139bd 43696
 theme 13 Consultation 0/12, checklist verdict clicked                  ef959257a5 43732
 theme 13 Consultation 0/12, suggestion confirmed                       62360659ab 43153
-totals: to review                                                      a4d440cc7e 43568
-next to review                                                         4dc48c70e4 61364
-page results                                                           af63172069 61345
-page results, sheet 1                                                  1a8fb8ff99 20491
-page results, sheet 2                                                  abd95156b9 49262
-page results, sheet 3                                                  73c3f749e5 16538
-page results, sheet 4                                                  6134b056ee 29711
-page results, sheet 5                                                  21c40714cf 19223
-audit overview                                                         030f98a00c 26813
-audit overview, sheet 1                                                5f24090cf0 19574
-audit overview, sheet 2                                                b64d161e2b 12594
-audit overview, sheet 3                                                76090aecbc 46366
-audit overview, sheet 4                                                0144a1f054 60141
-audit overview, sheet 5                                                24ba2963b0 47250
-audit overview, sheet 6                                                ded5d7937e 15621
-audit overview, sheet 7                                                f3dc738b0f 28794
-sample                                                                 49e0808113 14526
-audits list                                                            d07b3e2d80 10550
-checks                                                                 68f8fc5eb8 43475
-checks, English                                                        d8c6d0abb2 41896
-review, English                                                        efd154bef0 34819
+totals: to review                                                      61087a9873 43556
+next to review                                                         6f9598de11 42987
+page results                                                           57f353edac 61576
+page results, sheet 1                                                  7cf452eb5d 20722
+page results, sheet 2                                                  5ed1af44aa 49493
+page results, sheet 3                                                  ba34e8bcd5 16769
+page results, sheet 4                                                  a43cd48bab 29942
+page results, sheet 5                                                  7ba5805cbe 19454
+audit overview                                                         1bee764f31 27044
+audit overview, sheet 1                                                641fcb2513 19805
+audit overview, sheet 2                                                d6a089e0d7 12825
+audit overview, sheet 3                                                fb7e4a802c 46597
+audit overview, sheet 4                                                dd4336efe9 60372
+audit overview, sheet 5                                                7d2615fbfc 47481
+audit overview, sheet 6                                                b99907fba2 15852
+audit overview, sheet 7                                                a3c393b159 29025
+sample                                                                 24bc00e124 14757
+audits list                                                            0e52190694 10781
+checks                                                                 34c7e37b52 43706
+checks, English                                                        21d5e49002 42102
+review, English                                                        85d5369ac4 41250
 theme 3, English                                                       efd154bef0 34819

@@ -44,10 +44,16 @@ export function visibleElements(): Item[] {
   return state.elements.filter((el) => matches(el, state.filter))
 }
 
-/** Present on the page but not fully answered: no type chosen, or a criterion still unanswered. */
+/**
+ * Still needs a human: no type chosen, a criterion unanswered (even when another one is already NC: one failure does not
+ * finish the review of the other criteria), or answers pre-filled from the markup and not yet confirmed.
+ * Same rule as `boxStates` and `findingNeedsReview`.
+ */
 export function needsReview(el: Item): boolean {
-  const status = statusOf(el)
-  return status === 'todo' || status === 'progress'
+  const review = state.reviews[reviewKey(el)]
+  if (!review?.kind) return true
+  if (review.auto) return true
+  return criteriaFor(review.kind).some((c) => review.answers[c.id] === undefined)
 }
 
 export function matches(el: Item, f: Filter): boolean {
@@ -82,7 +88,7 @@ export function boxStates(themeNo: number): Record<number, string> {
   if (themeNo === 1) {
     for (const el of state.elements) {
       const status = statusOf(el)
-      const pending = status === 'todo' || status === 'progress' || Boolean(state.reviews[reviewKey(el)]?.auto)
+      const pending = needsReview(el)
       const detected = detectedOf(el)
       out[el.id] = !pending ? (status === 'nc' ? 'nc' : 'c') : detected === 'unnamed' ? 'error' : detected === 'ignored' ? 'ignored' : 'review'
     }
