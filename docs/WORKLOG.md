@@ -11,7 +11,7 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
   below the theme navigation and summary. One shared theme header replaces repeated headers inside each view.
 - **Actions in their context:** the Actions de la page dropdown is removed. Repérer / Actualiser les éléments and
   automatic checks are direct page actions; Suivant à évaluer sits beside the page summary. Page reset/removal stay
-  in the sample table, theme reset beside its heading, and the local coverage reference below the workspace.
+  in the sample table, theme reset beside its heading, and the local coverage reference in the top audit bar (available in every view).
   Évaluer la page stays in the audit header as a direct return; page modes stay beside the selected-page control.
 - **Consistent counter scope:** page summary covers all 106 criteria like its meter; theme summary covers that theme.
   Unselected themes count as untested, with direct results-row navigation that preserves selected themes. Partial
@@ -82,7 +82,7 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## In progress (claimed)
 
-- None. Approved toolbar corrections implemented and verified in `25afd1e`; smooth-scroll test fix in `86a96a7`.
+- None. Coverage-link follow-up implemented and verified in `4381d1e`.
 
 ## Next (suggested order; the owner decides)
 
@@ -117,6 +117,18 @@ preserve Claude’s scan, preview and manual-help changes.
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-11 — Codex — coverage reference in the top audit bar
+- Did: `4381d1e` moves Couverture RGAA beside Synthèse et exports in the audit header, available from every view.
+  Removed the footer and its review-only visibility wiring; updated README. Existing local destination and FR/EN labels preserved.
+- State: `npm run check` passes (189 unit tests, typecheck, 710 texts / 1245 French entries / 0 missing, build).
+  Full `npm run test:e2e`: **21 passed**, including 80-screen parity and 480/768/1280px responsive checks.
+  Read all distinct DOM changes against `/tmp/rgaa-bars-release.txt` before updating parity: only the relocated link/footer.
+  Inspected the 480px screenshot. Logs: `/tmp/rgaa-coverage-check.log`, `/tmp/rgaa-coverage-e2e-final.log`.
+- Not tested: real Firefox, real DevTools, Asqatasun downloaded fixtures (unchanged engines/content script).
+- Next: reload the extension and check the top-bar reference from evaluation, sample and summary in real DevTools.
+- For other tools: owner explicitly prefers coverage in the top bar; this supersedes the prior footer placement.
+  No dependencies, network calls, saved-data or verdict changes.
 
 ### 2026-10-11 — Codex — implement approved toolbar and counter corrections
 - Did: `25afd1e` on `codex/toolbar-clarity` implements the owner-approved review (`4c09ebf`). Visible labels identify
