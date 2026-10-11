@@ -50,8 +50,7 @@ export function renderChecklist(host: HTMLElement = dom.themeEl): void {
       h(
         'div',
         {},
-        h('h2', {}, FINDING_THEMES.has(state.theme) ? t('Other criteria of this theme') : `${def.number}. ${def.name}`),
-        ...(FINDING_THEMES.has(state.theme) ? [] : [h('div', { class: 'theme-summary', 'data-theme': String(state.theme), 'aria-label': t('Totals') })]),
+        ...(FINDING_THEMES.has(state.theme) ? [h('h3', {}, t('Other criteria of this theme'))] : []),
         h('p', { class: 'hint-line' }, FINDING_THEMES.has(state.theme) ? t('Criteria {ids} are not detectable by a script: check them on {url}.', { ids: def.criteria.filter((x) => !perFindingIds().includes(x.id)).map((x) => x.id).join(', '), url: rec.url }) : t('{n} criteria. Check them on {url} and answer each one. Nothing to scan for this theme.', { n: def.criteria.length, url: rec.url })),
       ),
     ),

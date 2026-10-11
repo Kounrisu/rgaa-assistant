@@ -110,6 +110,5 @@ export async function openRig(context: BrowserContext): Promise<Rig> {
 
 /** Element-only scans are a secondary page action, distinct from the full automatic run. */
 export async function scanElements(panel: Page): Promise<void> {
-  if (!(await panel.locator('#scan-btn').isVisible())) await panel.locator('.page-options > summary').click()
   await panel.locator('#scan-btn').click()
 }

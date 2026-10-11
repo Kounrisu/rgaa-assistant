@@ -3,7 +3,7 @@
  */
 import { type Lang, setLang, translateStatic, t } from '../lib/i18n'
 import { dom, say } from './dom'
-import { resetTheme, renderAll, switchTo, removePage, resetPage, setView } from './router'
+import { resetTheme, renderAll, switchTo, setView } from './router'
 import { renderAuditBar, renderPageBar, renderStats, renderEmpty, showNavBanner } from './chrome'
 import { renderPageTools, resetPageTools } from './page-tools-ui'
 import { applyBoxes, goTo, sendToPage, inspectedTabId } from './page-bridge'
@@ -35,18 +35,13 @@ export function wireEvents(): void {
     setView('review')
     dom.reviewBtn.focus()
   })
-  document.getElementById('reset-theme-btn')!.addEventListener('click', () => {
-    dom.pageOptions.open = false
-    void resetTheme()
-  })
+  dom.resetThemeBtn.addEventListener('click', () => void resetTheme())
 
   dom.pageSelect.addEventListener('change', () => switchTo(dom.pageSelect.value, true))
-  dom.deletePageBtn.addEventListener('click', () => removePage())
-  dom.resetPageBtn.addEventListener('click', () => resetPage())
   dom.emptyAddBtn.addEventListener('click', () => void addPage(state.liveUrl))
   dom.emptyGoBtn.addEventListener('click', () => state.page && goTo(state.page.url))
   dom.sampleBtn.addEventListener('click', () => setView('sample'))
-  dom.scanBtn.addEventListener('click', () => { dom.pageOptions.open = false; void scan() })
+  dom.scanBtn.addEventListener('click', () => { void scan() })
   dom.rescanBtn.addEventListener('click', scan)
   chrome.runtime.onMessage.addListener((message) => {
     if (message?.type !== 'RGAA_NEW_IMAGES' || !state.scanCount) return
@@ -96,7 +91,7 @@ export function wireEvents(): void {
   })
   dom.resultsBtn.addEventListener('click', () => setView('page'))
   dom.auditBtn.addEventListener('click', () => setView('audit'))
-  dom.nextBtn.addEventListener('click', () => { dom.pageOptions.open = false; void actions.nextReview() })
+  dom.nextBtn.addEventListener('click', () => { void actions.nextReview() })
   // Keyboard: n goes to the next element to review, j / k move between images (outside text fields).
   document.addEventListener('keydown', (event) => {
     const target = event.target as HTMLElement

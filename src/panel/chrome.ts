@@ -41,7 +41,9 @@ function matchesSummaryCriterion(c: CriterionResult, target: SummaryTarget): boo
   if (target === 'suggested') return c.outcome === 'pending' && Boolean(c.suggested)
   if (target === 'unconfirmed') return c.outcome === 'nc' && Boolean(c.unconfirmed)
   if (target === 'partial') return c.coverage === 'partial'
-  return c.outcome === target && !((target === 'c' || target === 'na') && c.coverage !== 'full')
+  // Partial positive answers still need review; never present them as fully compliant/NA.
+  const outcome = (c.outcome === 'c' || c.outcome === 'na') && c.coverage !== 'full' ? 'pending' : c.outcome
+  return outcome === target
 }
 
 /**
@@ -49,14 +51,14 @@ function matchesSummaryCriterion(c: CriterionResult, target: SummaryTarget): boo
  * not applicable, not tested. Each total jumps to the first element it stands for.
  */
 export function renderSummaries(): void {
-  for (const host of document.querySelectorAll<HTMLElement>('.theme-summary')) {
+  for (const host of document.querySelectorAll<HTMLElement>('.theme-summary[data-scope], .theme-summary[data-theme]')) {
     const pageScope = host.dataset.scope === 'page'
     const n = Number(host.dataset.theme)
     host.replaceChildren()
     if (!state.page) continue
     const all = pageInput(state.page).themes
-    // page scope: every criterion of the chosen themes; theme scope: that theme's criteria
-    const criteria = pageScope ? all.filter((t) => t.selected).flatMap((t) => t.criteria) : (all.find((x) => x.number === n)?.criteria ?? [])
+    // page scope: all 106 criteria, like the progress meter; theme scope: that theme's criteria
+    const criteria = pageScope ? all.flatMap((t) => t.criteria) : (all.find((x) => x.number === n)?.criteria ?? [])
     if (!pageScope && !all.find((x) => x.number === n)?.selected) continue
     if (!criteria.length) continue
     for (const [outcome, labelEn, cls] of OUTCOME_PILLS) {
@@ -83,43 +85,48 @@ export function renderSummaries(): void {
       ['unconfirmed', '{n} failure(s) to confirm', 'Failures found by a tool and not yet confirmed. They are counted as non-compliant, so the rate is provisional.'],
       ['partial', '{n} partly covered', 'Some tests of these criteria are not supported by this tool. The result counts, but only for the tests this tool can assess, so the rate stays provisional; a failure is always kept.'],
     ]
+    const qualifications = h('span', { class: 'summary-qualifications' }, h('span', { class: 'scope-label' }, t('To verify')))
     for (const [target, label, explanation] of extraPills) {
       const count = criteria.filter((c) => matchesSummaryCriterion(c, target)).length
       if (!count) continue
       const text = t(label, { n: count })
-      host.append(h('button', {
+      qualifications.append(h('button', {
         type: 'button', class: `pill warn-pill sum-${target}`,
         title: `${t('Go to the first one ({label})', { label: text })}. ${t(explanation)}`,
         onclick: () => goToSummary(pageScope ? null : n, target),
       }, text, h('span', { class: 'summary-arrow', 'aria-hidden': 'true' }, '→')))
     }
-    if (!pageScope && n === 1 && state.elements.length) {
-      const prefilled = state.elements.filter((e) => state.reviews[reviewKey(e)]?.auto).length
-      host.append(
-        h('span', { class: 'pill plain' }, t('{n} image(s)', { n: state.elements.length })),
-        ...(state.elements.some((e) => !e.present) ? [h('span', { class: 'pill plain' }, t('{n} on page now', { n: state.elements.filter((e) => e.present).length }))] : []),
-        ...(prefilled
-          ? [h('button', { type: 'button', class: 'pill plain', title: t('Show the images whose answer was pre-filled'), onclick: () => {
-            state.filter = 'prefilled'
-            renderFilters()
-            renderList()
-            const first = state.elements.find((e) => state.reviews[reviewKey(e)]?.auto)
-            if (first) { select(first.id, true); focusReviewTarget(dom.detailEl) }
-            void syncFilterBoxes()
-          } }, t('{n} pre-filled, to confirm', { n: prefilled }), h('span', { class: 'summary-arrow', 'aria-hidden': 'true' }, '→'))]
-          : []),
-      )
-    }
+    if (qualifications.children.length > 1) host.append(qualifications)
+  }
+  dom.imageInventoryEl.replaceChildren()
+  if (state.page && state.elements.length) {
+    const prefilled = state.elements.filter((e) => state.reviews[reviewKey(e)]?.auto).length
+    dom.imageInventoryEl.append(
+      h('span', { class: 'pill plain' }, t('{n} image(s)', { n: state.elements.length })),
+      ...(state.elements.some((e) => !e.present) ? [h('span', { class: 'pill plain' }, t('{n} on page now', { n: state.elements.filter((e) => e.present).length }))] : []),
+      ...(prefilled
+        ? [h('button', { type: 'button', class: 'pill plain', title: t('Show the images whose answer was pre-filled'), onclick: () => {
+          state.filter = 'prefilled'
+          renderFilters()
+          renderList()
+          const first = state.elements.find((e) => state.reviews[reviewKey(e)]?.auto)
+          if (first) { select(first.id, true); focusReviewTarget(dom.detailEl) }
+          void syncFilterBoxes()
+        } }, t('{n} pre-filled, to confirm', { n: prefilled }), h('span', { class: 'summary-arrow', 'aria-hidden': 'true' }, '→'))]
+        : []),
+    )
   }
 }
 
 /** Open the exact criterion counted by a status, and a relevant element when one exists. */
 function goToSummary(theme: number | null, target: SummaryTarget): void {
   if (!state.page) return
-  const themes = pageInput(state.page).themes.filter((t) => t.selected && (theme === null || t.number === theme))
+  const themes = pageInput(state.page).themes.filter((t) => theme === null || (t.selected && t.number === theme))
   for (const t of themes) {
     const criterion = t.criteria.find((c) => matchesSummaryCriterion(c, target))
     if (!criterion) continue
+    // Opening an unselected theme's result must not change the auditor's review scope.
+    if (!t.selected) return openGridAt(criterion.id)
     state.theme = t.number
     state.findingFilter = 'all'
     state.filter = 'all'
@@ -289,8 +296,8 @@ export function renderPageBar(): void {
   }
   dom.pageSelect.disabled = !state.audit.pages.length
   dom.pageToolsEl.hidden = !state.page
-  $('page-tools-disclosure').hidden = !state.page
-  ;($('reset-theme-btn') as HTMLButtonElement).disabled = !state.page
+  dom.resetThemeBtn.disabled = !state.page
+  dom.pageSummaryTitle.textContent = state.page ? t('Page summary — {label}', { label: pageLabel(state.page) }) : t('Page summary')
   dom.nextBtn.disabled = !state.page
   dom.progressEl.replaceChildren()
   $('page-progress').hidden = !state.page
@@ -305,15 +312,13 @@ export function renderPageBar(): void {
       h('span', { class: 'meter', role: 'img', 'aria-label': t('Progress of {label}', { label: pageLabel(state.page) }) }, ...[['c', count('c')], ['nc', count('nc')], ['na', count('na')]].map(([k, n]) => h('i', { class: String(k), style: `width:${(Number(n) / total) * 100}%` }))),
     )
   }
-  dom.deletePageBtn.disabled = !state.page
-  dom.resetPageBtn.disabled = !state.page
   const onLive = Boolean(state.page && state.liveUrl && normalizeUrl(state.page.url) === normalizeUrl(state.liveUrl))
   dom.openPageBtn.hidden = !state.page?.url || onLive
   dom.liveUrlEl.textContent = state.liveUrl ? t('Browser: {url}', { url: state.liveUrl }) : ''
   dom.liveUrlEl.title = state.liveUrl
   dom.liveUrlEl.className = `live-url${onLive ? ' same' : ''}`
   dom.scanBtn.disabled = !state.page
-  dom.scanBtn.textContent = state.page ? (state.scannedThisSession.has(state.page.id) ? t('Rescan {page}', { page: pageLabel(state.page) }) : t('Scan {page}', { page: pageLabel(state.page) })) : t('Scan')
+  dom.scanBtn.textContent = state.page ? (state.scannedThisSession.has(state.page.id) ? t('Refresh elements') : t('Find elements')) : t('Scan')
   dom.scanBtn.title = state.page
     ? t('Scan what the browser shows and merge the images into {page} (popins, tabs…)', { page: pageLabel(state.page) })
     : t('Add a page to the sample first')
@@ -461,6 +466,7 @@ export function renderThemeBar(): void {
     )
   }
   dom.themebarEl.append(
+    h('span', { class: 'scope-label' }, t('RGAA themes')),
     tabs,
     themesMenu(rec),
   )
@@ -483,15 +489,15 @@ export function renderEmpty(): void {
     const label = pageLabel(state.page)
     dom.emptyTitle.textContent = t('{label} is registered, not scanned yet', { label })
     dom.emptyText.textContent = onPage
-      ? t('The browser is on {url}. Click “Scan {label}” to list its images.', { url: state.page.url, label })
-      : t('Open {url} in the browser, then click “Scan {label}”.', { url: state.page.url, label })
+      ? t('The browser is on {url}. Find its elements to start evaluating them.', { url: state.page.url, label })
+      : t('Open {url} in the browser, then find its elements.', { url: state.page.url, label })
     dom.emptyGoBtn.textContent = t('Open {label} in the browser', { label })
   }
   const strong = (text: string) => h('strong', {}, text)
   $('empty-steps').replaceChildren(
     h('li', {}, ...tNodes('Register each page in {sample} (P01, P02…), with its URL.', { sample: strong(t('Audit pages sample')) })),
-    h('li', {}, ...tNodes('Select a page in the {page} list: the browser opens it. Click {scan}.', { page: strong(t('Page')), scan: strong(t('Scan')) })),
-    h('li', {}, ...tNodes('Open a popin or a tab and click {rescan}: its images join the same page.', { rescan: strong(t('Rescan')) })),
+    h('li', {}, ...tNodes('Select a page in the {page} list: the browser opens it. Click {scan}.', { page: strong(t('Page')), scan: strong(t('Find elements')) })),
+    h('li', {}, ...tNodes('Open a popin or a tab and click {rescan}: its images join the same page.', { rescan: strong(t('Refresh elements')) })),
   )
 }
 

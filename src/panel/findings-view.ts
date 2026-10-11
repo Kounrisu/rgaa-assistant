@@ -65,15 +65,12 @@ export function renderFindingsView(): void {
       h(
         'div',
         {},
-        h('h2', {}, `${def.number}. ${def.name}`),
         h('p', { class: 'hint-line' }, state.theme === 2 ? t('Every iframe / frame of the page, with its title.') : state.theme === 6 ? t('Every link of the page (identical links are grouped), with its name and destination. Links with no name or a generic text are boxed on the page.') : state.theme === 5 ? t('Every table of the page: data tables (with their header cells and title) and layout tables. Click one to find it on the page.') : state.theme === 11 ? t('Every form field of the page, with the name a screen reader would give it. Fields with no label, or only a placeholder, are boxed on the page.') : state.theme === 9 ? t('The outline of the page, like a headings map: headings with their level, and the landmarks, in reading order. Click one to find it on the page; skipped levels and missing areas are flagged.') : state.theme === 7 ? t('Every interface component that follows (or should follow) a WAI-ARIA Authoring Practices pattern: tabs, dialogs, menus, disclosures, comboboxes, sliders, custom buttons… The script checks the structure; you try the keyboard. Closed dialogs and menus are listed: open them, then rescan.') : t('Only the texts that fail or that a script cannot judge are numbered and boxed on the page. Criteria 3.1 and 3.3 need your eyes (below).')),
-        h('div', { class: 'theme-summary', 'data-theme': String(state.theme), 'aria-label': t('Totals') }),
       ),
-      h('div', { class: 'nav' }, dom.toolsEl),
     ),
   )
   if (!scanned) {
-    dom.themeEl.append(h('p', { class: 'hint-line' }, t('Not scanned yet. Open {url} in the browser and click “Scan {label}”.', { url: rec.url, label })))
+    dom.themeEl.append(h('p', { class: 'hint-line' }, t('Not scanned yet. Open {url} in the browser and find the elements.', { url: rec.url, label })))
   } else if (!list.length) {
     dom.themeEl.append(h('p', { class: 'hint-line' }, state.theme === 3 && passing ? t('No text with a contrast problem found: {summary}.', { summary: tDyn(passing.summary) }) : state.theme === 2 ? t('No frames found on the page at the last scan: criteria are not applicable.') : state.theme === 6 ? t('No links found on the page at the last scan: criteria are not applicable.') : state.theme === 9 ? t('No heading or landmark found on the page at the last scan.') : state.theme === 5 ? t('No table found on the page at the last scan: criteria are not applicable.') : state.theme === 11 ? t('No form field found on the page at the last scan: criteria are not applicable.') : state.theme === 7 ? t('No ARIA component found on the page at the last scan: 7.1 and 7.3 are not applicable to components. Scripts that change the page without a component (status messages, context changes) stay in the checklist below.') : t('No text colours found on the page at the last scan: criteria are not applicable.')))
   } else {

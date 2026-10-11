@@ -25,34 +25,29 @@ for (const width of [480, 768, 1280]) {
     await expect(panel.locator('#page-summary .sum-pending')).toBeVisible()
     const choice = panel.locator('label[for="kind-1-informative"]')
     await expect(choice).toBeVisible()
-    // Information is discoverable first; the auditor can then compact the view using the keyboard.
-    for (const selector of ['#page-tools-disclosure', '.theme-details', '#tools', '#image-list-disclosure']) {
-      await expect(panel.locator(selector)).toHaveAttribute('open', '')
-    }
+    // The default view is usable without opening menus or first collapsing its toolbars.
+    await expect(panel.locator('#display-tools')).toBeVisible()
+    await expect(panel.locator('#display-tools summary')).toHaveCount(0)
+    await expect(panel.locator('.page-options')).toHaveCount(0)
+    await expect(panel.locator('#image-list-disclosure')).toHaveAttribute('open', '')
+    const themeBottom = await panel.locator('#themebar').boundingBox()
+    const toolsBox = await panel.locator('#display-tools').boundingBox()
+    expect(toolsBox!.y).toBeGreaterThan(themeBottom!.y + themeBottom!.height)
     await panel.screenshot({ path: testInfo.outputPath(`expanded-${width}.png`), fullPage: false })
-    for (const selector of ['#page-tools-disclosure', '.theme-details', '#tools', ...(width <= 979 ? ['#image-list-disclosure'] : [])]) {
-      await panel.locator(`${selector} > summary`).focus()
-      await panel.keyboard.press('Enter')
-      await expect(panel.locator(selector)).not.toHaveAttribute('open', '')
-    }
-    await panel.evaluate(() => window.scrollTo(0, 0))
-    const box = await choice.boundingBox()
-    expect(box!.y + box!.height, 'the first decision fits after the auditor compacts the view').toBeLessThan(800)
     expect(await panel.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
-    await expect(panel.locator('#reset-page-btn')).not.toBeVisible()
-    // Page navigation follows the selected page in keyboard order; its action menu stays on screen.
+    // Tab from the page selector reaches its evaluation mode, and actions remain directly visible.
     await panel.locator('#page-select').focus()
     await panel.keyboard.press('Tab')
     await expect(panel.locator('#review-btn')).toBeFocused()
-    await panel.locator('.page-options > summary').click()
-    const menu = await panel.locator('.page-options .menu-content').boundingBox()
-    expect(menu!.x).toBeGreaterThanOrEqual(0)
-    expect(menu!.x + menu!.width).toBeLessThanOrEqual(width)
-    await panel.locator('.page-options > summary').click()
+    await expect(panel.locator('#scan-btn')).toBeVisible()
+    await expect(panel.locator('#next-btn')).toBeVisible()
+    await panel.locator('#boxes-btn').click()
+    await expect(panel.locator('#boxes-btn')).toHaveAttribute('aria-pressed', 'false')
+    await panel.locator('#boxes-btn').click()
+    await expect(panel.locator('#boxes-btn')).toHaveAttribute('aria-pressed', 'true')
     // The list remains available on narrow screens, including its review filters.
     if (width <= 979) {
       await expect(panel.locator('.compact-preview')).toBeVisible()
-      await panel.locator('#image-list-disclosure > summary').click()
       await expect(panel.locator('#element-list .item')).toHaveCount(3)
       await panel.locator('#image-list-disclosure > summary').click()
     }
@@ -64,9 +59,16 @@ for (const width of [480, 768, 1280]) {
       await expect(panel.locator('#image-list-disclosure')).not.toHaveAttribute('open', '')
     }
     await panel.screenshot({ path: testInfo.outputPath(`initial-${width}.png`) })
+    await choice.scrollIntoViewIfNeeded()
+    const box = await choice.boundingBox()
+    expect(box!.y).toBeGreaterThanOrEqual(0)
+    expect(box!.y + box!.height).toBeLessThanOrEqual(800)
     await choice.click()
     await panel.locator('label[for="crit-1-1.1-c"]').click()
     await expect.poll(async () => Object.values<any>((await storedPage(panel))?.reviews ?? {}).some((r) => r.answers['1.1'] === 'c')).toBe(true)
+    // Positive answers with partial coverage must not disappear from the status breakdown.
+    const total = await panel.locator('#page-summary > button > strong').evaluateAll((nodes) => nodes.reduce((n, node) => n + Number(node.textContent), 0))
+    expect(total).toBe(106)
     await panel.screenshot({ path: testInfo.outputPath(`review-${width}.png`), fullPage: false })
     expect(problems).toEqual([])
   })

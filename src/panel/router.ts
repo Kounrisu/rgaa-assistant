@@ -50,12 +50,12 @@ export function switchTo(id: string, navigate = false): void {
   const label = pageLabel(rec)
   if (navigate && !rec.url) {
     showNavBanner(state.liveUrl)
-    say(t('{label} has no address yet: open its page in the browser and click “Scan {label}”.', { label }))
+    say(t('{label} has no address yet: open its page in the browser and find its elements.', { label }))
   } else if (navigate && (!state.liveUrl || normalizeUrl(rec.url) !== normalizeUrl(state.liveUrl))) {
     goTo(rec.url)
-    say(t('Opening {label} in the browser. Click “Scan {label}” once it has loaded.', { label }))
+    say(t('Opening {label} in the browser. Find its elements once it has loaded.', { label }))
   } else {
-    say(rec.items.length ? t('Viewing {label}.', { label }) : t('{label} is registered but not scanned yet. Open it in the browser and click “Scan {label}”.', { label }))
+    say(rec.items.length ? t('Viewing {label}.', { label }) : t('{label} is registered but not scanned yet. Open it in the browser and find its elements.', { label }))
   }
 }
 
@@ -172,7 +172,7 @@ export function setView(next: View): void {
   if (next === 'sample') renderSample()
   if (next === 'audits') void renderAuditsView()
   if (next === 'checks') renderChecks()
-  for (const el of [dom.auditBar, dom.pageBar, dom.auditNavigation, dom.pageNavigation, dom.appEl, dom.themeEl, dom.checksEl, dom.themebarEl]) el.inert = state.runBusy || Boolean(state.batch?.running)
+  for (const el of [dom.auditBar, dom.pageBar, dom.auditNavigation, dom.pageNavigation, dom.appEl, dom.themeEl, dom.checksEl, dom.pageProgressEl, dom.themebarEl, dom.themeHeadEl, dom.displayToolsEl]) el.inert = state.runBusy || Boolean(state.batch?.running)
   renderBatch()
   renderAuditBar()
 }
@@ -194,8 +194,11 @@ export function updateTools(): void {
   setPageToolsTheme(state.theme)
   void applyBoxes()
   const reviewing = Boolean(state.page) && state.view === 'review'
-  dom.imagesHeadEl.hidden = !(reviewing && state.theme === 1)
-  // the toolbar belongs to the theme being shown: Images has its header, the other themes put it in theirs
-  if (state.theme === 1) dom.imagesHeadEl.append(dom.toolsEl)
+  dom.themeHeadEl.hidden = !reviewing
+  dom.displayToolsEl.hidden = !reviewing
+  dom.reviewReferenceEl.hidden = !reviewing
+  dom.themeSummaryEl.dataset.theme = String(state.theme)
+  dom.themeSummaryTitle.textContent = t('Theme summary — {name}', { name: t(THEME_LABEL[state.theme]) })
+  dom.resetThemeBtn.setAttribute('aria-label', t('Reset {name}', { name: t(THEME_LABEL[state.theme]) }))
   dom.toolsEl.hidden = !(reviewing && SCANNED_THEMES.has(state.theme))
 }
