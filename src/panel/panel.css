@@ -353,6 +353,8 @@ button.pill { border: 0; cursor: pointer; font: inherit; font-size: 12px; font-w
 .page-location { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; flex-basis: 100%; min-width: 0; }
 .pagebar select { max-width: 46ch; min-width: 18ch; padding: 5px 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; }
 .pagebar .primary, .ghost-btn { padding: 6px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+.pagebar .scan-btn { padding: 6px 12px; border: 1px solid var(--accent); border-radius: 8px; background: var(--surface); color: var(--accent); font-weight: 600; }
+.pagebar .scan-btn:disabled { border-color: var(--border); color: var(--muted); }
 .pagebar .primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
 .ghost-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .live-url { flex: 1; min-width: 12ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 12px; }

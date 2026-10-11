@@ -112,6 +112,15 @@ Keep page progress visible and preserve the owner's decorative-image counting de
 
 ## Handoff log (newest first)
 
+### 2026-10-11 — Claude Code — page scan button back beside the automatic checks
+- Did: `#scan-btn` ("Analyser P01" / "Réanalyser P01") moved out of the "Actions de la page" dropdown to sit right
+  before "Contrôler automatiquement la page ouverte" in `src/panel/panel.html`, with its own style (`.scan-btn`, outlined, so the
+  primary action stays the automatic run). Scan lists the elements to review (and adds what a popin or tab shows); the
+  automatic run does everything; they are two actions. Parity baseline updated: the only diff is the button's place and class.
+- State: `npm run check` 187 unit tests, 0 missing translations; `npm run test:e2e` 14 of 15 passed before the baseline update
+  (only the parity screen), all after. Checked on screen at 1280 and 480 px. Not tested in a real Firefox.
+- Next: unchanged.
+
 ### 2026-10-11 — Claude Code — "Repérer sur la page" in every element criterion card
 - Did: new `reviewActions(key, locate)` in `src/panel/review-controls.ts`: under every element-level criterion card (image
   kind card, image criteria, finding criteria in Frames, Colours, Tables, Links, Components, Structure, Forms) the buttons are now
