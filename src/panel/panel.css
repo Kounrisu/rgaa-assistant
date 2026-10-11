@@ -726,7 +726,6 @@ body:not([data-view='review']) .page-tools-disclosure { display: none; }
   .themebar { padding: 5px 10px; gap: 4px; }
   .theme-tabs { flex: 1; flex-wrap: nowrap; overflow-x: auto; }
   .theme-tab { flex: none; }
-  .theme-tab .tp { display: none; }
   .theme-head { padding: 6px 10px; gap: 6px; }
   .theme-head .hint-line { display: none; }
   .theme-head h2 { margin: 0; }

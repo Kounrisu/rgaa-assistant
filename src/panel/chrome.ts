@@ -352,6 +352,7 @@ export function renderThemeBar(): void {
           type: 'button',
           class: `theme-tab${done === total ? ' complete' : ''}`,
           'aria-pressed': String(n === state.theme),
+          'aria-label': `${n}. ${t(THEME_LABEL[n])}, ${t('{done}/{total} criteria answered', { done, total })}`,
           style: `--tc:${colorOf(n)}`,
           title: t('{n}. {name} (its boxes on the page use this colour)', { n, name: t(THEME_LABEL[n]) }),
           onclick: () => {
@@ -364,7 +365,7 @@ export function renderThemeBar(): void {
         },
         h('span', { class: 'tn' }, String(n)),
         ` ${t(THEME_LABEL[n])} `,
-        h('span', { class: 'tp' }, t('{done}/{total} criteria answered', { done, total })),
+        h('span', { class: 'tp' }, `${done}/${total}`),
       ),
     )
   }
