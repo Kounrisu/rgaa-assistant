@@ -1,4 +1,5 @@
 import { migrateEvidence } from './evidence'
+import { isNavigableUrl } from './url-safety'
 import type { Audit, AuditSummary, PageRecord } from './types'
 import { AuditFormatError, CURRENT_VERSION, MAX_IMPORT_BYTES, isRecord, readVersion, validateAudit } from './audit-validate'
 
@@ -143,8 +144,9 @@ export function migrate(audit: Audit): Audit {
   fill(a, 'meta', { site: '', auditor: '', context: 'Visite initiale' })
   for (const p of pages) {
     if (!isRecord(p)) continue
-    // an early bug saved the text "undefined" as the URL / title of a page
-    if (typeof p.url !== 'string' || !/^[a-z][a-z0-9+.-]*:/i.test(p.url)) p.url = ''
+    // an early bug saved the text "undefined" as the URL / title of a page; and a file can hold any string, e.g. `javascript:`,
+    // which the panel would send to the inspected tab: only http, https and file addresses are kept
+    if (!isNavigableUrl(p.url)) p.url = ''
     if (p.title === 'undefined') p.title = ''
     fill(p, 'title', '')
     fill(p, 'scanCount', 0)
@@ -341,5 +343,28 @@ export function auditFromFile(text: string): Audit {
   if (!isRecord(data) || data.format !== FILE_FORMAT || !isRecord(data.audit)) throw new AuditFormatError('not-audit')
   // the version of the file itself, then the one of the audit (parseAudit)
   if (data.version !== undefined && (typeof data.version !== 'number' || data.version > CURRENT_VERSION || data.version < 2)) throw new AuditFormatError('unsupported-version', 'version', String(data.version))
-  return parseAudit(data.audit)
+  return dropForeignPreviews(parseAudit(data.audit))
+}
+
+/**
+ * A file can list any preview address, and the panel loads previews: opening a tampered file would make requests to a
+ * server the auditor never visited. Previews stored as images (data:) stay; an address is kept only when it is on the
+ * same host as its page. They come back at the next scan.
+ */
+function dropForeignPreviews(audit: Audit): Audit {
+  const host = (url: string): string => {
+    try {
+      return new URL(url).hostname
+    } catch {
+      return ''
+    }
+  }
+  for (const page of audit.pages) {
+    const pageHost = host(page.url)
+    for (const item of page.items) {
+      if (typeof item.thumb !== 'string' || item.thumb.startsWith('data:')) continue
+      if (!pageHost || host(item.thumb) !== pageHost) item.thumb = null
+    }
+  }
+  return audit
 }

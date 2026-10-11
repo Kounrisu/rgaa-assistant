@@ -10,6 +10,7 @@ import { THEME_LABEL, SCANNED_THEMES, FINDING_THEMES } from '../lib/themes'
 import { visibleElements, findingMatches, boxStates } from './review-state'
 import type { FindingItem } from '../lib/types'
 import { sleep } from './helpers'
+import { isNavigableUrl } from '../lib/url-safety'
 
 export function inspectedTabId(): number {
   return chrome.devtools.inspectedWindow.tabId
@@ -73,6 +74,8 @@ export function pushStates(): void {
 
 export function goTo(url: string): void {
   if (!url) return // an empty address would only reload the current page
+  // an audit file can hold any string: `javascript:` would run in the page you are inspecting
+  if (!isNavigableUrl(url)) return void say(t('This address cannot be opened: only http, https and file addresses are.'))
   chrome.devtools.inspectedWindow.eval(`location.href = ${JSON.stringify(url)}`)
 }
 

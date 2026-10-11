@@ -23,4 +23,5 @@ export const FR_PERSIST: Record<string, string> = {
   'Not saved! Retry, or save to a file now.': 'Non enregistré ! Réessayez, ou enregistrez dans un fichier maintenant.',
   'Not saved: browser storage full or unavailable ({error}). Retry, or save to a file now.':
     'Non enregistré : stockage du navigateur plein ou indisponible ({error}). Réessayez, ou enregistrez dans un fichier maintenant.',
+  'This address cannot be opened: only http, https and file addresses are.': 'Cette adresse ne peut pas être ouverte : seules les adresses http, https et file le peuvent.',
 }

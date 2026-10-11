@@ -1,6 +1,7 @@
 import { auditStats, isProvisional, levelStats, rateOf, type Counts, type PageInput } from './audit-sheet'
 import { getLang, t } from './i18n'
 import { MANUAL_CHECKS } from './manual-checks'
+import { dataImage } from './url-safety'
 import { coverageLines } from './scan-coverage'
 import { CRITERION_LEVEL } from './themes'
 import type { Audit, PageRecord } from './types'
@@ -44,15 +45,17 @@ function nonCompliances(page: PageRecord, input: PageInput): string {
       const items: string[] = []
       for (const ref of c.ncRefs ?? []) {
         const finding = page.findings.find((f) => f.theme === theme.number && f.id === ref.id)
-        const shot = finding?.shot && finding.shot.length < 40000 ? `<img class="shot" src="${finding.shot}" alt="">` : ''
+        const shotSrc = dataImage(finding?.shot)
+        const shot = shotSrc && shotSrc.length < 40000 ? `<img class="shot" src="${esc(shotSrc)}" alt="">` : ''
         items.push(`<li>${shot}<b>#${ref.id}</b> ${esc(ref.label)}${ref.note ? ` — ${nl(ref.note)}` : ''}</li>`)
       }
       for (const test of c.tests.filter((x) => x.nc.length)) {
         const thumbs = test.nc
           .slice(0, 6)
           .map((id) => page.items.find((i) => i.id === id)?.thumb)
+          .map((src) => dataImage(src))
           .filter((src): src is string => Boolean(src && src.length < 40000))
-          .map((src) => `<img class="shot" src="${src}" alt="">`)
+          .map((src) => `<img class="shot" src="${esc(src)}" alt="">`)
           .join('')
         items.push(`<li>${thumbs}<b>${esc(test.id)}</b> — ${test.nc.map((n) => `#${n}`).join(', ')}${test.reason ? ` — ${esc(test.reason)}` : ''}</li>`)
       }
