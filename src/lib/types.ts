@@ -33,6 +33,11 @@ export interface ImageElementInfo {
   /** The closest meaningful parent (a, button, figure, picture…), with the image flagged by data-rgaa-target. */
   contextHtml: string
   deterministic: Record<string, boolean>
+  /**
+   * A picture of the element as the page shows it (cropped from a screenshot), for graphics that cannot be redrawn from
+   * their markup: inline SVG using a sprite or the page's CSS, CSS background icons. Kept across rescans; absent for plain <img>.
+   */
+  shot?: string | null
 }
 
 export type ImageKind = 'informative' | 'decorative'

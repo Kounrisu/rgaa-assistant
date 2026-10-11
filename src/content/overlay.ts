@@ -260,7 +260,7 @@ let savedScroll: { x: number; y: number } | null = null
 
 /** Scrolls a finding's element to the middle of the screen (instantly) and reports where it is, so the panel can photograph it. */
 export function locateTheme(theme: number, id: number): LocatedElement | null {
-  const el = themeOverlays.get(theme)?.items.get(id)?.els[0]
+  const el = theme === 1 ? boxes.get(id)?.img : themeOverlays.get(theme)?.items.get(id)?.els[0]
   if (!el) return null
   if (!savedScroll) savedScroll = { x: window.scrollX, y: window.scrollY }
   el.scrollIntoView({ block: 'center', inline: 'center', behavior: 'instant' as ScrollBehavior })

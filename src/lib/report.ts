@@ -1,7 +1,7 @@
 import { auditStats, isProvisional, levelStats, rateOf, type Counts, type PageInput } from './audit-sheet'
 import { getLang, t } from './i18n'
 import { MANUAL_CHECKS } from './manual-checks'
-import { dataImage } from './url-safety'
+import { dataImage, previewOf } from './url-safety'
 import { coverageLines } from './scan-coverage'
 import { CRITERION_LEVEL } from './themes'
 import type { Audit, PageRecord } from './types'
@@ -52,7 +52,7 @@ function nonCompliances(page: PageRecord, input: PageInput): string {
       for (const test of c.tests.filter((x) => x.nc.length)) {
         const thumbs = test.nc
           .slice(0, 6)
-          .map((id) => page.items.find((i) => i.id === id)?.thumb)
+          .map((id) => { const it = page.items.find((i) => i.id === id); return it ? previewOf(it) : null })
           .map((src) => dataImage(src))
           .filter((src): src is string => Boolean(src && src.length < 40000))
           .map((src) => `<img class="shot" src="${esc(src)}" alt="">`)

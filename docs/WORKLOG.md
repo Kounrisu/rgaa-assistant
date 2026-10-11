@@ -112,6 +112,25 @@ Keep page progress visible and preserve the owner's decorative-image counting de
 
 ## Handoff log (newest first)
 
+### 2026-10-11 — Claude Code — a real picture of the element for icons that cannot be redrawn
+- Why: the owner saw no icon even on the pink preview background. Reproduced: an inline SVG that draws from a sprite
+  (`<use href="#id">`) or from the page's CSS was redrawn alone from its markup (empty / wrong colours), and an icon set as a CSS
+  background had no preview at all. The Excel thumbnail (white background) and the stored audit (`compact()` drops big inline
+  thumbs) had the same blind spot.
+- Did: `ImageElementInfo.shot` (a PNG cropped from a screenshot of the tab, kept across rescans like finding shots).
+  The scan photographs every present image that `needsPicture` (inline `svg`, or no thumbnail): `captureImagePictures` in
+  `src/panel/page-bridge.ts` (the old findings capture is now the generic `captureCrops`, which also hides the boxes of every
+  theme, not only 1 to 3, and enlarges small icons up to 4x with less padding). The content script locates image boxes
+  (`locateTheme(1, id)`). `previewOf(el)` (`src/lib/url-safety.ts`) = the picture when it is a base64 image, else the thumbnail; used by the
+  list, the preview, the compact preview, the Excel grid and the HTML report. Opening a file drops any `shot` (images and
+  findings) that is not a base64 image. Plain `<img>` keep their address, and the background choice from the previous entry
+  still helps with transparent PNG/SVG files.
+- Tests: `e2e/image-pictures.spec.ts` (sprite icon and CSS-background icon get a PNG picture, stored in the audit, kept after reload
+  and rescan), `tests/security.test.ts` (previewOf, hostile `shot` dropped). `npm run check` 189 unit tests, 708 texts / 1209
+  French / 0 missing; `npm run test:e2e` 17 passed. Not tested in a real Firefox: the capture uses the same tab screenshot as
+  the findings previews; if the extension may not access the site, the scan says so and keeps the redrawn thumbnail.
+- Note: ignored images (aria-hidden, alt="") are shown at 55 % opacity in the list on purpose.
+
 ### 2026-10-11 — Claude Code — opening a file over the same audit (work on two computers)
 - Did: the owner works on several computers: save to file on one, open it on the other and replace the original. That already
   worked (same audit id → "replace or import as a copy"), but the prompt only showed the browser's date. `importAuditFile`
