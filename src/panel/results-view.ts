@@ -101,7 +101,7 @@ export function renderResults(): void {
     h(
       'div',
       { class: 'results-summary' },
-      h('div', { class: 'rate' }, h('strong', {}, stat.rate === null ? '—' : `${stat.rate}%`), ...(stat.rate !== null && isProvisional(stat.counts) ? [h('span', { class: 'pill warn-pill', title: provisionalHelp() }, t('provisional'))] : []), h('span', {}, t('accessibility rate of {label} (C ÷ (C + NC), themes {themes})', { label: pageLabel(state.page), themes: stat.themes.join(', ') }))),
+      h('div', { class: `rate${stat.rate !== null && isProvisional(stat.counts) ? ' provisional' : '' }` }, ...(stat.rate !== null && isProvisional(stat.counts) ? [h('span', { class: 'pill warn-pill', title: provisionalHelp() }, t('provisional'))] : []), h('strong', {}, stat.rate === null ? '—' : `${stat.rate}%`), h('span', {}, t('accessibility rate of {label} (C ÷ (C + NC), themes {themes})', { label: pageLabel(state.page), themes: stat.themes.join(', ') }))),
       pill('c', t('{n} compliant', { n: stat.counts.C })),
       pill('nc', t('{n} non-compliant', { n: stat.counts.NC })),
       pill('na', t('{n} not applicable', { n: stat.counts.NA })),

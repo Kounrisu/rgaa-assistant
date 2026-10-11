@@ -147,6 +147,7 @@ export function renderDetailNow(): void {
         `${t('Image #{id}', { id: el.id })} `,
         h('span', { class: `result ${statusOf(el)}`, id: 'result-badge' }, t(STATUS_LABEL[statusOf(el)])),
         h('span', { class: 'hint-line' }, `  ${index + 1} / ${state.elements.length}`),
+        h('span', { class: 'hint-line criteria-progress', id: 'criteria-progress' }, criteriaProgressText(el)),
       ),
       h(
         'div',
@@ -369,6 +370,16 @@ export function criterionCard(el: Item, review: ImageReview, criterion: Criterio
   return card
 }
 
+/** “3/7 criteria answered · next: 1.3”: what is left for this image, visible without scrolling to the cards. Empty before the type is chosen. */
+export function criteriaProgressText(el: Item): string {
+  const review = state.reviews[reviewKey(el)]
+  if (!review?.kind) return ''
+  const list = criteriaFor(review.kind)
+  const open = list.find((c) => review.answers[c.id] === undefined)
+  const done = list.length - list.filter((c) => review.answers[c.id] === undefined).length
+  return open ? t('{done}/{total} criteria answered · next: {id}', { done, total: list.length, id: open.id }) : t('{done}/{total} criteria answered', { done, total: list.length })
+}
+
 export function refreshAll(): void {
   const badge = document.getElementById('result-badge')
   const current = state.elements.find((e) => e.id === state.selectedId)
@@ -376,6 +387,8 @@ export function refreshAll(): void {
     badge.className = `result ${statusOf(current)}`
     badge.textContent = t(STATUS_LABEL[statusOf(current)])
   }
+  const progress = document.getElementById('criteria-progress')
+  if (progress && current) progress.textContent = criteriaProgressText(current)
   actions.renderStats()
   refreshListState()
   renderFilters()

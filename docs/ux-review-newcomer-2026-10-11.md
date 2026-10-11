@@ -132,3 +132,20 @@ Short answer: **only the markup validity part, not the patterns themselves.**
 Screenshots and the exported files of this walkthrough were kept in a temporary folder (not in the repository);
 the walkthrough script was a throwaway Playwright spec (deleted). The fixed defects have tests:
 `tests/axe-run.test.ts`, `tests/panel-review-state.test.ts`, the smoke assertion in `e2e/smoke.spec.ts`.
+
+## 7. Re-audit and re-evaluation of the proposals (later the same day, on `13dbec8`)
+
+Codex's workflow rework (audit / page scope, explicit "Suivant à évaluer", page progress, sections open by default) and
+my own fixes changed the picture. Each proposal, re-checked on the built panel at 1280×900, 1280×520 and 480 px:
+
+| # | Proposal | Verdict | What was done |
+|---|---|---|---|
+| U1 | Height budget | **Still valid, partly done** | The browser address moved to the row of the page selector and its navigation (one row saved; the narrow layout is unchanged); the display-tools label that repeated its own heading is hidden. The rest is the owner's choice (sections open by default) and stays. |
+| U2 | One "next" | **Resolved by Codex** | "Suivant à évaluer" beside every decision, "Suiv. →" is the next image in the list, "Relire le prochain élément en attente" starts the review of the automatic results: three different jobs with clear names. No change. |
+| U3 | Criteria left per image | **Done** | The image header says "1/6 critères répondus · prochain : 1.3" and updates as you answer. |
+| U4 | pré-rempli vs suggestion | **Declined for now** | A rename touches ~15 texts in both languages and the pills already say "à confirmer" beside each one. Revisit with the owner. |
+| U5 | Work remaining before the rate | **Done (modestly)** | The page results show the "provisoire" label before the number, and the number is muted while provisional. The pills with what remains sit above, on every page screen. |
+| U6 | Unconfirmed per-element C | **Owner decision: keep C** | Recorded in the WORKLOG. |
+| U7 | Land on what to confirm after a run | **Resolved by Codex** | The landing screen leads with "Relire les résultats automatiques" and a primary button. No change. |
+| U8 | Manual checks: how to | **Done** | Every one of the 18 manual checks has a "Comment faire :" line (keys to press, which page tool helps, what to look for), in French and English. They were already grouped by what you do (keyboard, zoom, screen reader, content). |
+| U9 | Small things | **Left** | The three counters of different natures and the save pill wording are unchanged: low value next to the rest. |
