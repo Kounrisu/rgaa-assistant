@@ -7,10 +7,11 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 - Branch `codex/audit-workflow`. Implemented the owner's approved workflow in `29eb344` on top of Claude's
   `51c1b1e` component work and `11fb2aa` UX verification. Version 0.1.0; saved audit format is now **v4**, with explicit
   migration from v3 and continued support for v2. Licence AGPL-3.0-only.
-- **Audit/page scope separated:** audit-wide Échantillon et suivi / Synthèse et exports; page-level
-  Évaluation / Contrôles manuels / Résultats de la page now sit in the top bar beside Audits and stay accessible
-  from global views. The redundant Évaluer une page action is removed. Audit-wide views hide page actions and progress;
-  page progress stays visible in the page workspace. Compact theme `done/total` bubbles are unchanged.
+- **Navigation correction pending (owner clarification):** `0f1dec8` put the wrong group in the top bar.
+  The intended hierarchy is audit name + Échantillon et suivi + Synthèse et exports at the top; selected page +
+  Évaluation / Contrôles manuels / Résultats de la page in the page area below. The current implementation still has
+  page modes in the top bar; the latest analysis below supersedes the previous placement instructions.
+  Page progress stays visible in the page workspace. Compact theme `done/total` bubbles are unchanged.
 - **Page-work dashboard:** progress, pending decisions in selected themes, suggested criteria, manual activity counts,
   last activity and latest automatic run outcome per page, with direct evaluation/manual/results/open actions.
   Metadata and sample editing are disclosures; the duplicate automatic-run button is removed. Element-only scanning
@@ -71,12 +72,13 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## In progress (claimed)
 
-- None. Codex top-bar navigation correction complete in `0f1dec8`.
+- None. Corrected navigation analysis recorded; runtime changes remain to be implemented.
 
 ## Next (suggested order; the owner decides)
 
-The approved navigation, page-work dashboard, explicit next-review controls and selected-page automatic runs are
-implemented, with the requested top-bar page navigation corrected in `0f1dec8`. Next priority: verify the actual extension in Firefox/DevTools and collect feedback on a real audit.
+Correct the navigation scope per the owner's latest clarification: audit-wide views in the top bar and page modes
+in the selected-page header. The dashboard, explicit next-review controls and selected-page runs are implemented.
+Then verify the actual extension in Firefox/DevTools and collect feedback on a real audit.
 Keep page progress visible and preserve the owner's decorative-image counting decision.
 
 1. **Real Firefox test pass** by the owner: reload the extension, F5 on a real page, “Contrôler automatiquement la page ouverte”; report crashes (which step, which page), the save pill, the unsaved-work dialog, the layout. In narrow DevTools, check that page progress stays visible and each nonzero status count opens the expected item, including keyboard activation and focus; check French and English.
@@ -103,6 +105,31 @@ Keep page progress visible and preserve the owner's decorative-image counting de
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-11 — Codex — corrected navigation analysis after owner clarification
+- Finding: the preceding `0f1dec8` placement reversed the owner's intended hierarchy. Its tests verified that mistaken
+  placement, so their passing result does not validate the UX. This entry supersedes the previous instruction to keep
+  page modes beside Audits. This session is analysis/documentation only; no application changes.
+- Recommended audit header: brand/audit name, Échantillon et suivi, Synthèse et exports; save status and utilities
+  (Audits, file open/save, language) at the right. Remove the standalone audit-navigation row.
+- Recommended page header: selected page (Pxx + title), then Évaluation / Contrôles manuels / Résultats de la page.
+  Keep its registered URL and inspected-page match status visible nearby. On wide layouts the selector and views
+  share a row; narrow layouts wrap within the same page area and preserve the same reading/tab order.
+- Page actions: one explicit Contrôler automatiquement la page ouverte action, beside the page context with latest
+  run state. This starts a run; Contrôles manuels opens human activities. Keep Page actions secondary, followed by
+  visible page progress, then themes and evaluation content. Do not force all page actions onto one crowded line.
+- Global views: hide page work controls on Échantillon et suivi / Synthèse et exports / Audits. Enter a specific page
+  through its existing dashboard Continue evaluation/manual/results actions. Preserve the existing Back to review
+  links in summary/audits; make the selected-page destination explicit when refining their labels.
+- Tests needed for implementation: assert sample/summary belong to the audit header and page modes belong beside
+  the page selector; preserve selected page and answers when navigating; verify return from global views, keyboard
+  focus, no overflow and reachable decisions at 480/768/1280px. Read parity DOM changes before updating its baseline.
+- Checks: repository and current navigation code inspected; working tree initially clean at `0233685`.
+  `npm run check` passed (187 unit tests, typecheck, 700 texts / 1194 French entries / 0 missing, build).
+  No browser or real Firefox/DevTools test in this analysis session; the last 14 browser tests cover the previous
+  implementation. No saved-model or automatic-verdict changes proposed.
+- Next: implement this corrected hierarchy. For Claude/other tools: follow this clarification, not the preceding
+  top-bar page-mode recommendation; do not restore a generic duplicate Évaluer une page button in the audit header.
 
 ### 2026-10-11 — Codex — put page modes beside Audits
 - Did: `0f1dec8` moves Évaluation / Contrôles manuels / Résultats de la page into the top audit bar immediately
