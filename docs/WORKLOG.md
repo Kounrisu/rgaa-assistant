@@ -4,7 +4,11 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## Current state (2026-10-11)
 
-- Branch `master`. Latest application change reviewed: `347f289` (Claude Code security fixes); latest implemented UX change: `02e485c`. Version 0.1.0. Licence AGPL-3.0-only (because of the Asqatasun-derived rules).
+- Branch `master`. Latest application change reviewed: `51c1b1e` (ARIA component review); visible-progress UX: `02e485c`; image-queue completeness fix: `0d33d15`. Version 0.1.0. Licence AGPL-3.0-only (because of the Asqatasun-derived rules).
+- Owner-requested UX recheck on `51c1b1e`: the queue fix is verified in the built panel, but audit/page navigation separation,
+  an overall page-work dashboard, clearer automatic-run actions, unified inline next navigation and batch checks remain
+  unimplemented. Latest `npm run check`: 183 tests, typecheck, 670 texts / 1152 French entries / 0 missing, build pass.
+  Targeted Chromium walkthrough passed; full E2E suite was not rerun in this documentation-only recheck.
 - **Components review (theme 7, APG patterns)** shipped: every ARIA component (tabs, dialog, menu, disclosure / accordion,
   details, combobox, listbox, slider, spinbutton, switch, checkbox, radio group, tree, tooltip, custom button, toolbar) is a
   finding with the structural checks of its WAI-ARIA Authoring Practices pattern run by the script (7.1, pre-filled NC when
@@ -55,9 +59,10 @@ Nothing claimed. Add a line here before starting anything bigger than a small fi
 
 ## Next (suggested order; the owner decides)
 
-UX recommendation from the owner's latest request: first fix review-queue completeness (NC is not the same as fully reviewed),
-then separate audit/page navigation and extend the sample into a page-progress dashboard. Add multi-page automatic checks
-after the single-page workflow and run-status tracking are reliable. These are proposals, not implemented changes.
+Image review-queue completeness is fixed and verified. The outstanding UX work is to separate audit/page navigation,
+extend the sample into a page-progress dashboard, clarify automatic-run actions and provide consistent next-review controls
+beside decisions. Keep page progress visible, per the owner's explicit preference. Add multi-page automatic checks after
+the single-page workflow and run-status tracking are reliable. These remaining changes are not implemented.
 
 1. **Real Firefox test pass** by the owner: reload the extension, F5 on a real page, “Contrôles automatiques”; report crashes (which step, which page), the save pill, the unsaved-work dialog, the layout. In narrow DevTools, check that page progress stays visible and each nonzero status count opens the expected item, including keyboard activation and focus; check French and English.
 2. **Per-test results** (as Asqatasun stores them: pass / fail / need more info / not applicable per test, with the elements). Needs a data-model addition + migration; also lets the auditor confirm the Images tests the tool cannot assess (image maps, CAPTCHAs), which today leave criteria “partly covered”.
@@ -87,6 +92,33 @@ after the single-page workflow and run-status tracking are reliable. These are p
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-11 — Codex — verify Claude changes against the owner's UX concerns
+- Reviewed `51c1b1e` and changes since `d116a3d`. Repository was clean before review. Application code unchanged;
+  this entry and the current-state/backlog corrections are the only edits.
+- Verified fixed: `0d33d15` keeps image #1 in “À relire” after choosing informative and answering 1.1 NC while five
+  criteria remain unanswered. Claude also shipped separate overlay/banner/export fixes (`e600848`) and component checks
+  (`51c1b1e`); those do not implement the requested workflow reorganization.
+- Verified missing in the rebuilt UI: “Échantillon de pages” / “Synthèse de l’audit” still share the same navigation row
+  with “Relire” / “Contrôles” / “Résultats de la page”. Page scan controls/progress remain on the sample screen; its title
+  starts at y≈441 in a 480×800 viewport. The sample columns remain Page/Title/URL/Themes/Images/Scans/Actions, with no
+  per-page review/manual-work/run-status dashboard. Synthesis remains ordered around compliance tables/charts.
+- Verified missing: “Contrôles” still opens a mixed manual/automatic screen; both “Contrôles automatiques” in the page bar
+  and “Lancer les contrôles automatiques” in that screen are visible and run the same operation. The generic labels are
+  unchanged. Runners still target the inspected tab; no selected-URL batch runner exists.
+- Verified partial next flow: the queue predicate is fixed, but from image #2 the page-level “Prochain à relire” returns
+  to unresolved image #1. The separate image next button has a different ordering. Form finding details and checklist
+  criteria have zero inline next buttons; no common answer-and-continue flow was added.
+- Documentation discrepancy: section 3 of `docs/ux-review-newcomer-2026-10-11.md` explicitly labels U1–U9 as proposals,
+  not fixes. U1 proposes collapsing progress/pills, contrary to the owner's earlier instruction to show progress without
+  a dropdown. Preserve that preference when reducing header height. Respect the separately recorded owner decision about
+  prefilled decorative-image C counting; this recheck does not reopen it.
+- State: `npm run check` passed (183 unit tests, typecheck, 0 missing translations, build). Local Chromium walkthrough
+  exercised image verdict/filter/next, sample, overview, duplicate run controls, a real fixture automatic run, form and
+  checklist views; no console errors. Evidence JSON and screenshot: `/tmp/rgaa-ux-recheck-51c1b1e` (temporary).
+  Full E2E and Asqatasun suites not rerun; real Firefox/DevTools and screen-reader interaction not tested. Server stopped.
+- Next / for other tools: address the outstanding workflow requests directly; passing existing tests and adding APG
+  coverage do not demonstrate that navigation/progress/next UX requirements were implemented. No push performed.
 
 ### 2026-10-11 — Claude Code — Components review: WAI-ARIA APG patterns checked per component (theme 7)
 - Did: theme 7 is now a scanned, finding-based theme (`SCANNED_THEMES` / `FINDING_THEMES` include 7). New
