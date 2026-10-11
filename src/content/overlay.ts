@@ -304,19 +304,21 @@ export function relabelTheme(theme: number, map: { from: number; to: number }[])
   overlay.focused = null
 }
 
-/** The panel owns the numbering per audited page: rename the boxes (and keep ids stable) to match. */
+/**
+ * The panel owns the displayed numbers per audit. Rename the live boxes, never the DOM registry:
+ * a hidden element may still hold a registry ID equal to a newly assigned audit number.
+ * Keeping these namespaces separate prevents collisions when that element returns on a rescan.
+ */
 export function relabel(map: { from: number; to: number }[]): void {
   const next = new Map<number, { img: Element; box: HTMLElement }>()
   for (const { from, to } of map) {
     const entry = boxes.get(from)
     if (!entry) continue
     next.set(to, entry)
-    ids.registry.set(entry.img, to)
     entry.box.dataset.id = String(to)
     entry.box.dataset.state = imageStates[to] ?? ''
     refreshLabel(entry.box)
     styleBox(entry.box, false)
-    ids.next = Math.max(ids.next, to + 1)
   }
   boxes.clear()
   for (const [id, entry] of next) boxes.set(id, entry)
@@ -391,7 +393,7 @@ export function clearTheme(theme: number): void {
   themeOverlays.delete(theme)
 }
 
-// Ids stay stable across rescans so answers survive popins opening and closing.
+// Internal DOM IDs stay unique across rescans, independently of the displayed audit numbers.
 export const ids = { registry: new WeakMap<Element, number>(), next: 1 }
 
 /** The panel's overlay options: alt text next to the boxes, the focus tint, and which theme's boxes are shown. */
