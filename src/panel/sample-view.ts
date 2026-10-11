@@ -8,7 +8,7 @@ import { findPage, createPage, normalizeUrl } from '../lib/audit-store'
 import { pageLabel, adoptSite, loadPage, persist, nextPageLabel } from './model'
 import { inspectedTitle } from './page-bridge'
 import type { PageRecord, Audit } from '../lib/types'
-import { renderPageBar, themesMenu } from './chrome'
+import { renderPageBar, themesMenu, showNavBanner } from './chrome'
 import { actions } from './actions'
 
 /** Registers a page of the sample without scanning it. */
@@ -26,6 +26,8 @@ export async function addPage(url: string, title?: string): Promise<void> {
   persist()
   actions.setView(state.view === 'sample' ? 'sample' : 'review')
   actions.renderAll()
+  // the "this URL is not in the sample yet" banner is about this very page: re-evaluate it now, not at the next tab event
+  if (state.liveUrl) showNavBanner(state.liveUrl)
   say(t('{label} registered. It is not scanned yet: open it in the browser and click “Scan {label}”.', { label: pageLabel(rec) }))
 }
 

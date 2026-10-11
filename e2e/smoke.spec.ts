@@ -132,6 +132,8 @@ test('scan, review, save, reload, export, save to file and reopen', async ({ rig
     const html = readFileSync(await savedFile(download), 'utf8')
     expect(html).toContain(AUDIT_NAME)
     expect(html.toLowerCase()).toMatch(/provisoire/)
+    // the assistant's own boxes and tool layers are never reported as findings of the page
+    expect(html).not.toContain('rgaa-assistant-overlay')
   })
 
   let rgaaFile = ''
