@@ -67,6 +67,40 @@ describe('mergeScan: a scan joins the images already known', () => {
     expect(state.elements).toHaveLength(3)
   })
 
+  it('keeps a unique unchanged image and its review when siblings/context change, including after reopening', () => {
+    mergeScan([info(1)])
+    const key = state.elements[0].key
+    state.reviews[key] = { kind: 'informative', answers: { '1.1': 'c' }, note: 'Auditor note' }
+    const changedContext = info(17, { ...info(1), id: 17, contextHtml: '<p>New sibling<img id="1"></p>' })
+    expect(mergeScan([info(2), changedContext])).toEqual({ added: 1, map: [{ from: 2, to: 2 }, { from: 17, to: 1 }] })
+    expect(state.elements).toHaveLength(2)
+    expect(state.elements[0]).toMatchObject({ id: 1, key, present: true, contextHtml: changedContext.contextHtml })
+    // Reopen using only the persisted record: matching needs no session cache.
+    rec = JSON.parse(JSON.stringify(rec))
+    state.page = rec
+    state.elements = rec.items
+    state.reviews = rec.reviews
+    expect(mergeScan([changedContext, info(2)]).added).toBe(0)
+    expect(state.reviews[key]).toEqual({ kind: 'informative', answers: { '1.1': 'c' }, note: 'Auditor note' })
+  })
+
+  it('does not guess between duplicate images whose contexts changed', () => {
+    const a = info(1)
+    const b = { ...a, id: 2, contextHtml: '<aside><img id="1"></aside>' }
+    mergeScan([a, b])
+    const oldKeys = state.elements.map(el => el.key)
+    state.reviews[oldKeys[0]] = { answers: { '1.1': 'nc' }, note: 'First only' }
+    expect(mergeScan([{ ...a, contextHtml: '<section><img id="1"></section>' }]).added).toBe(1)
+    expect(state.elements.filter(el => el.present).map(el => el.id)).toEqual([3])
+    expect(state.reviews[oldKeys[0]].note).toBe('First only')
+  })
+
+  it('does not reuse a context-only match when the image markup or link destination changed', () => {
+    mergeScan([info(1)])
+    expect(mergeScan([info(1, { html: '<img id="1" alt="Changed">', contextHtml: '<p>Changed</p>' })]).added).toBe(1)
+    expect(mergeScan([info(1, { linkHref: '/another', contextHtml: '<a href="/another"><img id="1"></a>' })]).added).toBe(1)
+  })
+
   it('pre-fills as decorative (1.2 compliant) an image hidden from assistive tech with no name, and only that', () => {
     mergeScan([
       info(1, { alt: '', accessibleName: null, ignoredBy: 'aria-hidden="true"' }),

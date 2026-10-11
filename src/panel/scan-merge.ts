@@ -109,17 +109,39 @@ export function mergeScan(found: ImageElementInfo[]): { added: number; map: { fr
   const rec = state.page!
   state.scanCount++
   const byKey = new Map(state.elements.map((el) => [el.key, el]))
+  // Surrounding text/siblings are evidence, but can change without replacing the image.
+  // Fall back only for a unique, unchanged image (including its link destination).
+  // Never guess between identical images or transfer an answer after its markup changes.
+  const identity = (el: ImageElementInfo) => JSON.stringify([el.type, el.src, el.html, el.linkHref])
+  const oldByIdentity = new Map<string, Item[]>()
+  for (const el of state.elements) {
+    const key = identity(el)
+    oldByIdentity.set(key, [...(oldByIdentity.get(key) ?? []), el])
+  }
+  const counts = new Map<string, number>()
+  for (const el of found) counts.set(identity(el), (counts.get(identity(el)) ?? 0) + 1)
   const seen = new Set<string>()
   const occurrences = new Map<string, number>()
-  const map: { from: number; to: number }[] = []
-  let added = 0
-  for (const info of found) {
+  const keys = found.map(info => {
     const base = keyOf(info)
     const n = occurrences.get(base) ?? 0
     occurrences.set(base, n + 1)
-    const key = n ? `${base}~${n}` : base
+    return n ? `${base}~${n}` : base
+  })
+  const reserved = new Set(keys.filter(key => byKey.has(key)))
+  const map: { from: number; to: number }[] = []
+  let added = 0
+  for (const [index, info] of found.entries()) {
+    let key = keys[index]
+    let existing = byKey.get(key)
+    if (!existing) {
+      const candidates = oldByIdentity.get(identity(info)) ?? []
+      if (counts.get(identity(info)) === 1 && candidates.length === 1 && !reserved.has(candidates[0].key) && !seen.has(candidates[0].key)) {
+        existing = candidates[0]
+        key = existing.key // keep the review storage key and its human answers
+      }
+    }
     seen.add(key)
-    const existing = byKey.get(key)
     if (existing) {
       Object.assign(existing, info, { id: existing.id, key, present: true, scan: existing.scan })
       map.push({ from: info.id, to: existing.id })

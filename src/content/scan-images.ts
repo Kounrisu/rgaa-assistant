@@ -118,7 +118,7 @@ function ownHtmlFor(el: Element): string {
 
 function contextHtmlFor(el: Element): string {
   const context = el.closest('a, button, figure, picture') ?? el.parentElement ?? el
-  const clone = cloneWithTarget(context, el, 'script, style, noscript')
+  const clone = cloneWithTarget(context, el, `script, style, noscript, [id^="${OVERLAY_ID}"]`)
   clone.querySelectorAll('svg').forEach(trimSvg)
   const html = clone.outerHTML
   return html.length > MAX_HTML ? html.slice(0, MAX_HTML) + ' …' : html
