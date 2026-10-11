@@ -70,7 +70,6 @@ export const dom = {
   auditNavigation: document.querySelector<HTMLElement>('.audit-navigation')!,
   pageNavigation: document.querySelector<HTMLElement>('.page-navigation')!,
   openPageBtn: $<HTMLButtonElement>('open-page-btn'),
-  pageWorkBtn: $<HTMLButtonElement>('page-work-btn'),
   reviewBtn: $<HTMLButtonElement>('review-btn'),
   scanBtn: $<HTMLButtonElement>('scan-btn'),
   clearBtn: $<HTMLButtonElement>('clear-btn'),

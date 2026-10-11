@@ -144,7 +144,6 @@ export function setView(next: View): void {
   if (state.batch?.running) next = 'sample'
   state.view = next
   document.body.dataset.view = next
-  dom.pageWorkBtn.setAttribute('aria-pressed', String(['review', 'page', 'checks'].includes(next)))
   dom.reviewBtn.setAttribute('aria-pressed', String(next === 'review'))
   dom.resultsEl.hidden = next !== 'page'
   dom.auditEl.hidden = next !== 'audit'

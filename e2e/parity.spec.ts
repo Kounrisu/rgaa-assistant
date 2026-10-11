@@ -174,7 +174,6 @@ test('every screen of the panel matches the reviewed baseline', async ({ rig }) 
   await panel.locator('#audits-btn').click()
   await expect(panel.locator('#audits table')).toBeVisible()
   await shot('audits list')
-  await panel.locator('#page-work-btn').click()
   await panel.locator('#checks-btn').click()
   await shot('checks')
 

@@ -15,6 +15,11 @@
       <button id="save-retry-btn" type="button" class="pill error-retry" hidden></button>
       <span id="backup-state" class="pill muted"></span>
       <span class="spacer"></span>
+      <nav class="page-navigation" aria-label="Current page workflow" data-i18n-attrs="aria-label">
+        <button id="review-btn" type="button" aria-pressed="true" data-i18n>Evaluation</button>
+        <button id="checks-btn" type="button" aria-pressed="false" disabled data-i18n>Manual checks</button>
+        <button id="results-btn" type="button" disabled aria-pressed="false" data-i18n>Page results</button>
+      </nav>
       <button id="audits-btn" type="button" aria-pressed="false" data-i18n>Audits</button>
       <button id="open-file-btn" type="button" title="Reopen an audit saved earlier in a .rgaa.json file, to carry on" data-i18n data-i18n-attrs="title">Open file</button>
       <button id="save-file-btn" type="button" title="Download the whole audit as a .rgaa.json file, to keep or to reopen later" data-i18n data-i18n-attrs="title">Save file</button>
@@ -27,14 +32,8 @@
     <nav class="audit-navigation" aria-label="Audit workflow" data-i18n-attrs="aria-label">
       <button id="sample-btn" type="button" aria-pressed="false" data-i18n>Sample and progress</button>
       <button id="audit-btn" type="button" disabled aria-pressed="false" data-i18n>Summary and exports</button>
-      <button id="page-work-btn" type="button" data-i18n>Page workspace</button>
     </nav>
     <p id="status" role="status" class="status top-status"></p>
-    <nav class="page-navigation" aria-label="Current page workflow" data-i18n-attrs="aria-label">
-      <button id="review-btn" type="button" aria-pressed="true" data-i18n>Evaluation</button>
-      <button id="checks-btn" type="button" aria-pressed="false" disabled data-i18n>Manual checks</button>
-      <button id="results-btn" type="button" disabled aria-pressed="false" data-i18n>Page results</button>
-    </nav>
 
     <div class="pagebar">
       <label for="page-select" data-i18n>Page</label>

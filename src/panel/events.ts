@@ -30,7 +30,6 @@ export function applyLanguage(lang: Lang): void {
 /** Registers every listener of the panel: its buttons, the keyboard, the page navigation, the extension messages. Called once, at start-up. */
 export function wireEvents(): void {
   dom.openPageBtn.addEventListener('click', () => { if (state.page) goTo(state.page.url) })
-  dom.pageWorkBtn.addEventListener('click', () => setView('review'))
   dom.reviewBtn.addEventListener('click', () => setView('review'))
   document.getElementById('reset-theme-btn')!.addEventListener('click', () => {
     document.querySelector<HTMLDetailsElement>('.page-options')!.open = false
