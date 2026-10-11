@@ -121,6 +121,11 @@ The panel modules have no import cycle: a module never imports one that depends 
 cover the pure parts, and `e2e/parity.spec.ts` snapshots every screen of a seeded audit so a refactoring can prove the
 panel did not change.
 
+## Working on it (people and coding agents)
+
+`AGENTS.md` has the rules and invariants for anyone who edits the code (including AI coding tools), and `docs/WORKLOG.md`
+is the living status, backlog, open decisions and handoff log: read it first, update it last.
+
 ## License
 
 Distributed under the **GNU Affero General Public License v3.0** (AGPL-3.0-only), see [LICENSE](LICENSE).
