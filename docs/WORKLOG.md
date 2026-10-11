@@ -33,8 +33,11 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
   page, resume remaining pages, per-page failures and retry by selection. An already open URL keeps its dynamic state.
   Status/date/error persist; older audits do not invent complete run status. Closing DevTools loses the remaining queue;
   any saved running status is displayed as interrupted. A changed URL requires another run.
-- Latest `npm run check`: **189 tests**, typecheck, **710 texts / 1245 French entries / 0 missing**, build pass.
-  Latest full `npm run test:e2e`: **21 passed**, including the reviewed **80-screen** parity baseline, 480/768/1280 layouts,
+- **Image numbers on rescan (`7bd2e60`):** exclude assistant overlays from captured image context; retain the number and
+  review key of a unique unchanged image when surrounding HTML changes. Newly found images receive new numbers.
+  Ambiguous matches/changed markup are not guessed; historical duplicate records are not merged or deleted.
+- Latest `npm run check`: **192 tests**, typecheck, **710 texts / 1245 French entries / 0 missing**, build pass.
+  Latest full `npm run test:e2e`: **22 passed**, including the reviewed **80-screen** parity baseline, 480/768/1280 layouts,
   sequential runs/pause/resume, engine failure/retry, source-URL isolation and keyboard continuation. Built content script:
   **0 module imports**. Real Firefox/DevTools still untested.
 - **Components review (theme 7, APG patterns)** shipped: every ARIA component (tabs, dialog, menu, disclosure / accordion,
@@ -82,7 +85,7 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## In progress (claimed)
 
-- None. Coverage-link follow-up implemented and verified in `4381d1e`.
+- None. Image rescan numbering fix implemented and verified in `7bd2e60`.
 
 ## Next (suggested order; the owner decides)
 
@@ -91,7 +94,7 @@ Next verify the actual extension in Firefox/DevTools and collect feedback on a r
 return from Échantillon et suivi and the initially expanded sections (collapse them, answer, navigate away and back).
 Keep page progress visible and preserve the owner's decorative-image counting decision.
 Toolbar follow-up: check the new labels, full-page status links and visible display tools in real Firefox/DevTools;
-preserve Claude’s scan, preview and manual-help changes.
+preserve Claude’s scan, preview and manual-help changes. Also confirm image numbers/answers survive rescans on the owner’s real site.
 
 1. **Real Firefox test pass** by the owner: reload the extension, F5 on a real page, “Contrôler automatiquement la page ouverte”; report crashes (which step, which page), the save pill, the unsaved-work dialog, the layout. In narrow DevTools, check that page progress stays visible and each nonzero status count opens the expected item, including keyboard activation and focus; check French and English.
 2. **Per-test results** (as Asqatasun stores them: pass / fail / need more info / not applicable per test, with the elements). Needs a data-model addition + migration; also lets the auditor confirm the Images tests the tool cannot assess (image maps, CAPTCHAs), which today leave criteria “partly covered”.
@@ -117,6 +120,25 @@ preserve Claude’s scan, preview and manual-help changes.
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-11 — Codex — stable image numbering on rescans
+- Did: `7bd2e60` excludes assistant overlay markup from image context. Before the fix, answering a body-level image
+  changed its overlay state, changed its fingerprint and made the next scan duplicate/renumber the same image.
+  `mergeScan` also falls back to a unique unchanged image (type/source/own markup/link destination) when surrounding
+  content changes, preserving its existing key, number and human answers. Exact matches reserve their records first.
+- Regression: the built-app test failed before the fix even on an unchanged-page rescan after answering (one image
+  became two records). It now checks answer preservation, unchanged rescans, insertion before the original image,
+  changed nearby text, panel reopening and overlay/list numbering. Three unit tests cover persisted-record matching,
+  ambiguous duplicates and changed markup/link destinations.
+- State: `npm run check` passes: **192 unit tests**, typecheck, **710 texts / 1245 French entries / 0 missing**, build.
+  Full `npm run test:e2e`: **22 passed**, including unchanged 80-screen panel parity. Built content script: **0 imports**.
+  Reviewed two content parity fixture diffs before accepting: only the assistant overlay removed from contextHtml.
+  Logs: `/tmp/rgaa-numbering-before-awaited.log`, `/tmp/rgaa-numbering-check-final.log`, `/tmp/rgaa-numbering-e2e.log`.
+- Not tested: real Firefox/DevTools, downloaded Asqatasun fixtures. No new network calls/dependencies or saved-data model changes.
+- Next: owner should answer an image and rescan on the real page, checking its number in both the list and overlay.
+- For other tools: existing ambiguous duplicate records are intentionally not merged/deleted; preserve human answers.
+  This is conservative matching, not a guarantee of identity when image markup itself changes or duplicate images
+  cannot be distinguished. The attachment showed only the header; the defect above was independently reproduced.
 
 ### 2026-10-11 — Codex — coverage reference in the top audit bar
 - Did: `4381d1e` moves Couverture RGAA beside Synthèse et exports in the audit header, available from every view.
