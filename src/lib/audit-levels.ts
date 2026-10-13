@@ -22,4 +22,13 @@ export function levelCriteria(level: AuditLevel | undefined): Set<string> | null
   if (!level || level === 'complet') return null
   return new Set(level === 'rapide' ? RAPIDE_CRITERIA : [...RAPIDE_CRITERIA, ...COMPLEMENTAIRE_CRITERIA])
 }
+/**
+ * The level of the audit being worked on. The review screens (which criteria an image, a link or a form is asked) read it here, so that
+ * a quick or complementary audit asks exactly its criteria. The panel sets it each time it draws; the default (complete) asks everything.
+ */
+let activeLevel: AuditLevel | undefined
+export const setActiveLevel = (level: AuditLevel | undefined): void => { activeLevel = level }
+export const inActiveLevel = (id: string): boolean => inLevel(activeLevel, id)
+export const activeLevelIsPartial = (): boolean => Boolean(activeLevel) && activeLevel !== 'complet'
+
 export const inLevel = (level: AuditLevel | undefined, id: string): boolean => levelCriteria(level)?.has(id) ?? true

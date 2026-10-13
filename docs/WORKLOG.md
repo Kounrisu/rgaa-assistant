@@ -125,6 +125,16 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Handoff log (newest first)
 
+### 2026-10-13 — Claude Code — audit type, second half: the review screens ask exactly the criteria of the level
+- Did: `setActiveLevel` / `inActiveLevel` in `src/lib/audit-levels.ts` (set by `renderAll`, `setView`, `pageInput`); `criteriaFor` (images) and `findingCriteriaOf`
+  (links, forms, tables…) filter on it, so cards, progress text, review status and the "next" queue follow the level; checklist themes list only in-level criteria;
+  `review-queue.ts` skips out-of-level checklist criteria; a theme with no criterion in the level shows a note and a dashed "—" tab; contrast findings stop asking
+  for review when 3.2 is out of level; an image whose criteria are all out of level is "not reviewed", not "compliant".
+- State: `npm run check` 221 tests, 0 missing; e2e 36 passed (`e2e/audit-level.spec.ts` checks rapide 8.3/8.4/8.5, complementaire adds 8.2/8.6/8.10, complet 10 cards);
+  parity unchanged (complete audit). Not tested: real Firefox.
+- Note: the active level is a module variable set at each render, not state in `Audit`; a new code path that asks criteria before any render must call `setActiveLevel` first.
+- Not done: the Images "kind" question is still asked in every level (needed for 1.1); the Excel grid still lists all 106 rows (out-of-level ones show NT).
+
 ### 2026-10-13 — Claude Code — LLM round trip, part 1: the audit pack and the answers reader (route A: zip given to a chat)
 - Did: `src/lib/audit-pack.ts` (pure: audit -> zip with README, manifest, criteria, per-page elements.jsonl with cleaned code and picture files, answers-template.jsonl;
   respects the audit type), `src/lib/audit-answers.ts` (strict JSONL reader, nothing applied), button « Exporter pour analyse (LLM) » in the audit overview

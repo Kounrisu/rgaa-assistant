@@ -17,12 +17,14 @@ import type { PageRecord } from '../lib/types'
 import { askConfirm } from './dialogs'
 import { FINDING_THEMES, themeByNumber, THEME_LABEL, THEMES, SCANNED_THEMES } from '../lib/themes'
 import type { View } from './types'
+import { setActiveLevel } from '../lib/audit-levels'
 import { renderThemeView } from './findings-view'
 import { renderAuditsView } from './audits-view'
 import { renderChecks } from './checks-view'
 import { setPageToolsTheme } from './page-tools-ui'
 
 export function renderAll(): void {
+  setActiveLevel(state.audit.meta.level)
   normalizeTheme() // a render never changes the state itself
   renderPageBar()
   renderThemeBar()
@@ -141,6 +143,7 @@ export async function resetAudit(): Promise<void> {
 }
 
 export function setView(next: View): void {
+  setActiveLevel(state.audit.meta.level)
   if (state.batch?.running) next = 'sample'
   state.view = next
   document.body.dataset.view = next

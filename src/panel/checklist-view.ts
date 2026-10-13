@@ -4,6 +4,7 @@ import { reviewContinue } from './review-controls'
  */
 import { findingCriterionIds } from '../lib/findings'
 import { IMAGE_CRITERION_IDS } from '../lib/rgaa'
+import { inActiveLevel } from '../lib/audit-levels'
 import { state } from './state'
 import type { ChecklistAnswer, ChecklistVerdict } from '../lib/types'
 import { h, dom } from './dom'
@@ -55,13 +56,13 @@ export function renderChecklist(host: HTMLElement = dom.themeEl): void {
         'div',
         {},
         ...(perElementTheme() ? [h('h3', {}, t('Other criteria of this theme'))] : []),
-        h('p', { class: 'hint-line' }, perElementTheme() ? t('Criteria {ids} are not detectable by a script: check them on {url}.', { ids: def.criteria.filter((x) => !perFindingIds().includes(x.id)).map((x) => x.id).join(', '), url: rec.url }) : t('{n} criteria. Check them on {url} and answer each one. Nothing to scan for this theme.', { n: def.criteria.length, url: rec.url })),
+        h('p', { class: 'hint-line' }, perElementTheme() ? t('Criteria {ids} are not detectable by a script: check them on {url}.', { ids: def.criteria.filter((x) => !perFindingIds().includes(x.id) && inActiveLevel(x.id)).map((x) => x.id).join(', '), url: rec.url }) : t('{n} criteria. Check them on {url} and answer each one. Nothing to scan for this theme.', { n: def.criteria.filter((x) => inActiveLevel(x.id)).length, url: rec.url })),
       ),
     ),
   )
   const list = h('div', { class: 'checklist' })
   const perFinding = perFindingIds()
-  for (const c of def.criteria.filter((x) => !perFinding.includes(x.id))) {
+  for (const c of def.criteria.filter((x) => !perFinding.includes(x.id) && inActiveLevel(x.id))) {
     const answer = (rec.checklist[c.id] ??= { note: '' })
     const outcome = result.criteria.find((x) => x.id === c.id)?.outcome
     const card = h('div', { class: 'card criterion', 'data-state': answer.verdict ?? '', id: `crit-card-${c.id}` })

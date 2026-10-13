@@ -13,6 +13,7 @@ import { FINDING_THEMES, themeByNumber } from '../lib/themes'
 import { renderChecklist } from './checklist-view'
 import { tDyn } from './helpers'
 import { syncFilterBoxes, focusFinding } from './page-bridge'
+import { inActiveLevel } from '../lib/audit-levels'
 import { findingCriterionIds, findingCriteriaOf, type FindingCriterion, hintForFinding, FINDING_CRITERIA } from '../lib/findings'
 import { contrastChecker } from './contrast-checker'
 import { codeBlock } from './code-view'
@@ -46,7 +47,8 @@ export function updateFindingChips(): void {
 export function renderThemeView(): void {
   keepScroll(dom.themeEl, () => {
     dom.themeEl.replaceChildren()
-    if (FINDING_THEMES.has(state.theme)) renderFindingsView()
+    if (!(themeByNumber(state.theme)?.criteria ?? []).some((c) => inActiveLevel(c.id))) dom.themeEl.append(h('p', { class: 'hint-line out-of-level-note' }, t('No criterion of this theme belongs to the chosen audit type. Change the type in Sample and progress to audit it.')))
+    else if (FINDING_THEMES.has(state.theme)) renderFindingsView()
     else if (state.theme === 1) renderImagesRest()
     else renderChecklist()
     actions.renderSummaries()
@@ -58,7 +60,7 @@ export function renderThemeView(): void {
  * (answered by the scan), so the auditor sees the blocks are done and why.
  */
 function notApplicableBlock(theme: number): HTMLElement {
-  const criteria = FINDING_CRITERIA[theme] ?? []
+  const criteria = (FINDING_CRITERIA[theme] ?? []).filter((c) => inActiveLevel(c.id))
   return h(
     'ul',
     { class: 'na-list', 'aria-label': t('Criteria not applicable: nothing found on the page') },
@@ -213,7 +215,7 @@ export function renderFindingsView(): void {
     const f = list.find((x) => x.id === state.findingSel)
     dom.themeEl.append(h('div', { class: 'finding-layout' }, h('nav', { class: 'finding-pane', 'aria-label': t('{name} findings', { name: def.name }) }, chips, ...(state.theme === 3 && passing ? [h('p', { class: 'hint-line' }, t('Not listed — {summary} pass.', { summary: tDyn(passing.summary) }))] : []), listEl2), f ? findingDetail(f) : h('p', { class: 'hint-line' }, t('Nothing in this category.'))))
   }
-  if ((themeByNumber(state.theme)?.criteria ?? []).some((c) => !findingCriterionIds(state.theme).includes(c.id))) {
+  if ((themeByNumber(state.theme)?.criteria ?? []).some((c) => !findingCriterionIds(state.theme).includes(c.id) && inActiveLevel(c.id))) {
     const rest = h('div', { class: 'theme-rest' })
     renderChecklist(rest)
     dom.themeEl.append(rest)
