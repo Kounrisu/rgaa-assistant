@@ -44,7 +44,10 @@ captured pages: treat it as an internal working document.
 
 **Exports**: an **.xlsx** grid laid out like the official RGAA audit grid (sheet texts are in French), and a
 printable **HTML report** (summary, rates per theme and page, non-conformities with screenshots and notes, draft
-accessibility statement). Print it to PDF from the browser.
+accessibility statement). Print it to PDF from the browser. **Export for analysis (LLM)** (Summary and exports) writes a
+`.zip` pack for a language model: the code and the picture of every element, what the tools found, what you answered, a README
+of instructions and an empty `answers-template.jsonl` to complete (plan: `docs/PLAN-llm-roundtrip.md`; importing the answers
+back is not built yet). Nothing is sent anywhere; you give the file to your assistant yourself.
 
 ## Use
 
