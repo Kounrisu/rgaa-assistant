@@ -66,4 +66,7 @@ export const FR_TODO: Record<string, string> = {
   'The 25 essential criteria (WCAG level A) on a sample of 3 to 5 pages: a first overview. No compliance rate, no statement.': 'Les 25 critères essentiels (WCAG niveau A) sur un échantillon de 3 à 5 pages : un premier état des lieux. Pas de taux de conformité, pas de déclaration.',
   'The 25 quick-audit criteria plus the next 25, so 50 criteria, on the same small sample. No compliance rate, no statement.': 'Les 25 critères de l’audit rapide plus les 25 suivants, soit 50 critères, sur le même petit échantillon. Pas de taux de conformité, pas de déclaration.',
   '{level} ({n} criteria): these figures cover only those criteria. They are not an RGAA compliance rate and do not support an accessibility statement.': '{level} ({n} critères) : ces chiffres ne portent que sur ces critères. Ce n’est pas un taux de conformité RGAA et il ne permet pas de déclaration d’accessibilité.',
+  'None of the criteria of this kind of image belongs to the chosen audit type.': 'Aucun critère de ce type d’image n’appartient au type d’audit choisi.',
+  'no criterion in this audit type': 'aucun critère dans ce type d’audit',
+  'No criterion of this theme belongs to the chosen audit type. Change the type in Sample and progress to audit it.': 'Aucun critère de cette thématique n’appartient au type d’audit choisi. Changez le type dans Échantillon et suivi pour l’auditer.',
 }

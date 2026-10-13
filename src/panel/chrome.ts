@@ -490,9 +490,9 @@ export function renderThemeBar(): void {
         'button',
         {
           type: 'button',
-          class: `theme-tab${done === total ? ' complete' : ''}`,
+          class: `theme-tab${total === 0 ? ' out-of-level' : done === total ? ' complete' : ''}`,
           'aria-pressed': String(n === state.theme),
-          'aria-label': `${n}. ${t(THEME_LABEL[n])}, ${t('{done}/{total} criteria answered', { done, total })}`,
+          'aria-label': `${n}. ${t(THEME_LABEL[n])}, ${total === 0 ? t('no criterion in this audit type') : t('{done}/{total} criteria answered', { done, total })}`,
           style: `--tc:${colorOf(n)}`,
           title: t('{n}. {name} (its boxes on the page use this colour)', { n, name: t(THEME_LABEL[n]) }),
           onclick: () => {
@@ -505,7 +505,7 @@ export function renderThemeBar(): void {
         },
         h('span', { class: 'tn' }, String(n)),
         ` ${t(THEME_LABEL[n])} `,
-        h('span', { class: 'tp' }, `${done}/${total}`),
+        h('span', { class: 'tp' }, total === 0 ? '—' : `${done}/${total}`),
       ),
     )
   }

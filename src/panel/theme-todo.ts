@@ -6,6 +6,7 @@ import type { CriterionResult, ThemeResult } from '../lib/results'
 import { themeTodo, type TodoItem, type TodoReason } from '../lib/theme-todo'
 import { confirm as confirmVerdict } from '../lib/evidence'
 import { IMAGE_CRITERION_IDS } from '../lib/rgaa'
+import { inActiveLevel } from '../lib/audit-levels'
 import { findingCriterionIds } from '../lib/findings'
 import { FINDING_THEMES, SCANNED_THEMES, themeByNumber } from '../lib/themes'
 import { t } from '../lib/i18n'
@@ -44,7 +45,7 @@ let lastOpened = ''
 /** The criteria of this theme no single element answers (what a “nothing here” button can record). */
 function pageLevelIds(theme: number): string[] {
   const perElement = theme === 1 ? IMAGE_CRITERION_IDS : findingCriterionIds(theme)
-  return (themeByNumber(theme)?.criteria ?? []).map((c) => c.id).filter((id) => !perElement.includes(id))
+  return (themeByNumber(theme)?.criteria ?? []).map((c) => c.id).filter((id) => !perElement.includes(id) && inActiveLevel(id))
 }
 
 /** The open criteria a human could simply mark not applicable because the page has nothing for this theme. */

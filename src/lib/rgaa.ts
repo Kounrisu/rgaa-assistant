@@ -1,5 +1,6 @@
 import { t } from './i18n'
 import type { Detected, ImageElementInfo, ImageKind } from './types'
+import { inActiveLevel } from './audit-levels'
 
 export interface Criterion {
   id: string
@@ -111,7 +112,7 @@ export const CRITERIA: Criterion[] = [
 export const IMAGE_CRITERION_IDS: string[] = CRITERIA.map((c) => c.id)
 
 export function criteriaFor(kind: ImageKind | undefined): Criterion[] {
-  return kind ? CRITERIA.filter((c) => c.appliesTo.includes(kind)) : []
+  return kind ? CRITERIA.filter((c) => c.appliesTo.includes(kind) && inActiveLevel(c.id)) : []
 }
 
 export type HintTone = 'ok' | 'warn' | 'info'

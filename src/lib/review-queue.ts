@@ -1,5 +1,6 @@
 import type { PageRecord } from './types'
 import { criteriaFor, IMAGE_CRITERION_IDS } from './rgaa'
+import { inActiveLevel } from './audit-levels'
 import { findingCriteriaOf, findingCriterionIds } from './findings'
 import { themeByNumber } from './themes'
 
@@ -23,7 +24,7 @@ export function reviewQueue(page: PageRecord): ReviewTarget[] {
       }
       // the questions no image answers (1.4, 1.5) close the Images page
       for (const c of themeByNumber(1)?.criteria ?? []) {
-        if (IMAGE_CRITERION_IDS.includes(c.id)) continue
+        if (IMAGE_CRITERION_IDS.includes(c.id) || !inActiveLevel(c.id)) continue
         out.push({ key: `criterion:${c.id}`, theme, kind: 'criterion', group: `chk-${c.id}`, pending: !page.checklist[c.id]?.verdict })
       }
       continue
@@ -33,7 +34,7 @@ export function reviewQueue(page: PageRecord): ReviewTarget[] {
       for (const c of findingCriteriaOf(item)) out.push({ key: `finding:${item.key}:${c.id}`, theme, kind: 'finding', itemId: item.id, group: `fnd-${item.id}-${c.id}`, pending: Boolean(r?.auto) || r?.answers[c.id] === undefined })
     }
     for (const c of themeByNumber(theme)?.criteria ?? []) {
-      if (findingCriterionIds(theme).includes(c.id)) continue
+      if (findingCriterionIds(theme).includes(c.id) || !inActiveLevel(c.id)) continue
       out.push({ key: `criterion:${c.id}`, theme, kind: 'criterion', group: `chk-${c.id}`, pending: !page.checklist[c.id]?.verdict })
     }
   }

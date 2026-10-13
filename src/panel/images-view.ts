@@ -321,7 +321,7 @@ export function renderCriteria(el: Item, review: ImageReview, host: HTMLElement)
   host.replaceChildren()
   const applicable = criteriaFor(review.kind)
   if (!applicable.length) {
-    host.append(h('p', { class: 'hint-line' }, t('Choose informative or decorative to see the RGAA criteria that apply.')))
+    host.append(h('p', { class: 'hint-line' }, review.kind ? t('None of the criteria of this kind of image belongs to the chosen audit type.') : t('Choose informative or decorative to see the RGAA criteria that apply.')))
     return
   }
   for (const criterion of applicable) host.append(criterionCard(el, review, criterion))

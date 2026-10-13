@@ -855,3 +855,5 @@ body[data-view="audits"] :is(.pagebar,.page-progress,#display-tools,#nav-banner,
 .audit-level { margin: 8px 0; }
 .audit-level legend { font-weight: 700; padding: 0 4px; }
 .level-options { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
+
+.theme-tab.out-of-level { opacity: .6; border-style: dashed; }

@@ -7,6 +7,7 @@ import type { ImageReview, FindingItem } from '../lib/types'
 import { state } from './state'
 import { criteriaFor, detectedOf } from '../lib/rgaa'
 import { t } from '../lib/i18n'
+import { inActiveLevel } from '../lib/audit-levels'
 import { findingCriteriaOf } from '../lib/findings'
 
 export const reviewKey = (el: Item) => el.key
@@ -20,6 +21,7 @@ export function statusOf(el: Item): Status {
   if (!review?.kind) return 'todo'
   const applicable = criteriaFor(review.kind)
   const answers = applicable.map((c) => review.answers[c.id])
+  if (!applicable.length) return 'todo' // none of its criteria belongs to this audit type
   if (answers.includes('nc')) return 'nc'
   if (answers.some((a) => a === undefined)) return 'progress'
   return 'c'
@@ -126,6 +128,7 @@ export function findingNeedsReview(f: FindingItem): boolean {
   const r = state.page?.findingReviews[f.key]
   if (f.theme === 3) {
     if (f.type !== 'contrast-fail' && f.type !== 'contrast-unknown') return false
+    if (!inActiveLevel('3.2')) return false
     return !(r && r.answers['3.2'] !== undefined && !r.auto)
   }
   // a link with a usable name is pre-filled compliant and does not ask for attention; empty or generic ones do
