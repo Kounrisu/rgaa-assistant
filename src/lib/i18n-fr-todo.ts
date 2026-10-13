@@ -55,4 +55,15 @@ export const FR_TODO: Record<string, string> = {
   'Until you confirm them they do not count: a criterion is confirmed only when all its images are.':
     'Tant que vous ne les confirmez pas, elles ne comptent pas : un critère n’est confirmé que lorsque toutes ses images le sont.',
   'Look at them': 'Les regarder',
+  'Complete audit': 'Audit complet',
+  'Quick audit': 'Audit rapide',
+  'Complementary audit': 'Audit complémentaire',
+  'Type of audit': 'Type d’audit',
+  'Audit type: {level}.': 'Type d’audit : {level}.',
+  'Complete audit: all the criteria. Change it in Sample and progress.': 'Audit complet : tous les critères. À modifier dans Échantillon et suivi.',
+  'Partial audit: no compliance rate. Change the type in Sample and progress.': 'Audit partiel : pas de taux de conformité. Le type se change dans Échantillon et suivi.',
+  'All 106 criteria. The only level that gives a compliance rate and supports an accessibility statement.': 'Les 106 critères. Seul niveau qui donne un taux de conformité et permet une déclaration d’accessibilité.',
+  'The 25 essential criteria (WCAG level A) on a sample of 3 to 5 pages: a first overview. No compliance rate, no statement.': 'Les 25 critères essentiels (WCAG niveau A) sur un échantillon de 3 à 5 pages : un premier état des lieux. Pas de taux de conformité, pas de déclaration.',
+  'The 25 quick-audit criteria plus the next 25, so 50 criteria, on the same small sample. No compliance rate, no statement.': 'Les 25 critères de l’audit rapide plus les 25 suivants, soit 50 critères, sur le même petit échantillon. Pas de taux de conformité, pas de déclaration.',
+  '{level} ({n} criteria): these figures cover only those criteria. They are not an RGAA compliance rate and do not support an accessibility statement.': '{level} ({n} critères) : ces chiffres ne portent que sur ces critères. Ce n’est pas un taux de conformité RGAA et il ne permet pas de déclaration d’accessibilité.',
 }

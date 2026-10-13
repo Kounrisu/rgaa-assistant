@@ -4,6 +4,7 @@
 import { h, dom } from './dom'
 import { t } from '../lib/i18n'
 import { state } from './state'
+import { LEVEL_COUNT, LEVEL_LABEL } from '../lib/audit-levels'
 import type { Sheet } from '../lib/xlsx'
 import { select } from './images-view'
 import { pageInput, pageLabel } from './model'
@@ -75,6 +76,13 @@ export function appendWithImageLinks(cell: HTMLElement, text: string): void {
   }
 }
 
+/** A partial audit level says so wherever a rate is shown: it covers its criteria only and is not a compliance rate. */
+export function levelNote(): HTMLElement | null {
+  const level = state.audit.meta.level
+  if (!level || level === 'complet') return null
+  return h('p', { class: 'hint warn level-note' }, t('{level} ({n} criteria): these figures cover only those criteria. They are not an RGAA compliance rate and do not support an accessibility statement.', { level: t(LEVEL_LABEL[level]), n: LEVEL_COUNT[level] }))
+}
+
 /** Why a rate is marked provisional, and how criteria with unconfirmed or partial results are counted. */
 export const provisionalHelp = (): string =>
   t('Provisional rate: some criteria are still to test, are only partly covered by this tool, or rest on an automatic answer you have not confirmed. A criterion judged on only part of its tests keeps its result but keeps the rate provisional; a suggested compliance counts as to review until you confirm it; a failure is always kept.')
@@ -98,6 +106,7 @@ export function renderResults(): void {
         h('button', { type: 'button', class: 'primary', onclick: () => void exportWorkbook([input], auditSheets([input], state.audit.meta), `grille-rgaa-${slugOf(state.audit.meta.site || state.audit.name)}-${pageLabel(state.page!)}.xlsx`) }, t('Export this page (.xlsx)')),
       ),
     ),
+    ...(levelNote() ? [levelNote()!] : []),
     h(
       'div',
       { class: 'results-summary' },

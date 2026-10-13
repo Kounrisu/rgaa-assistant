@@ -1,3 +1,4 @@
+import { levelCriteria, type AuditLevel } from './audit-levels'
 import { t as tr } from './i18n'
 import theme1 from './rgaa-theme1.json'
 import { THEMES } from './themes'
@@ -282,6 +283,7 @@ export function computeThemes(
   selected: number[],
   checklist: Record<string, ChecklistAnswer>,
   fi: FindingInputs = { findings: [], reviews: {}, scannedThemes: [] },
+  level?: AuditLevel,
 ): { themes: ThemeResult[]; images: Theme1Results } {
   const imageResults = computeTheme1(images, reviewOf)
   const themes = THEMES.map((theme): ThemeResult => {
@@ -318,5 +320,7 @@ export function computeThemes(
       }),
     }
   })
-  return { themes, images: imageResults }
+  // a partial audit level counts only its own criteria (the other ones stay answerable but are outside its progress and rate)
+  const scope = levelCriteria(level)
+  return { themes: scope ? themes.map((t) => ({ ...t, criteria: t.criteria.filter((c) => scope.has(c.id)) })) : themes, images: imageResults }
 }
