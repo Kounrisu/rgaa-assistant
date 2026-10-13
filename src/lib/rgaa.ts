@@ -107,6 +107,9 @@ export const CRITERIA: Criterion[] = [
   },
 ]
 
+/** The Images criteria answered image by image. The others (1.4, 1.5: CAPTCHAs and test images) are page-level questions at the end of the Images page. */
+export const IMAGE_CRITERION_IDS: string[] = CRITERIA.map((c) => c.id)
+
 export function criteriaFor(kind: ImageKind | undefined): Criterion[] {
   return kind ? CRITERIA.filter((c) => c.appliesTo.includes(kind)) : []
 }

@@ -31,7 +31,7 @@ export const themeByNumber = (n: number): ThemeDef | undefined => THEMES.find((t
 export const SCANNED_THEMES = new Set([1, 2, 3, 5, 6, 7, 9, 11])
 /** Themes reviewed finding by finding (like images, but simpler). */
 export const FINDING_THEMES = new Set([2, 3, 5, 6, 7, 9, 11])
-export const DEFAULT_THEMES = [1]
+export const DEFAULT_THEMES = Array.from({ length: 13 }, (_, i) => i + 1)
 
 /** Short, French-free tab labels. */
 export const THEME_LABEL: Record<number, string> = {

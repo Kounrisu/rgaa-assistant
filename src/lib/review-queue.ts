@@ -1,5 +1,5 @@
 import type { PageRecord } from './types'
-import { criteriaFor } from './rgaa'
+import { criteriaFor, IMAGE_CRITERION_IDS } from './rgaa'
 import { findingCriteriaOf, findingCriterionIds } from './findings'
 import { themeByNumber } from './themes'
 
@@ -20,6 +20,11 @@ export function reviewQueue(page: PageRecord): ReviewTarget[] {
         const r = page.reviews[item.key]
         out.push({ key: `image:${item.key}:kind`, theme, kind: 'image', itemId: item.id, group: `kind-${item.id}`, pending: !r?.kind })
         for (const c of r?.kind ? criteriaFor(r.kind) : []) out.push({ key: `image:${item.key}:${c.id}`, theme, kind: 'image', itemId: item.id, group: `crit-${item.id}-${c.id}`, pending: Boolean(r?.auto) || r?.answers[c.id] === undefined })
+      }
+      // the questions no image answers (1.4, 1.5) close the Images page
+      for (const c of themeByNumber(1)?.criteria ?? []) {
+        if (IMAGE_CRITERION_IDS.includes(c.id)) continue
+        out.push({ key: `criterion:${c.id}`, theme, kind: 'criterion', group: `chk-${c.id}`, pending: !page.checklist[c.id]?.verdict })
       }
       continue
     }

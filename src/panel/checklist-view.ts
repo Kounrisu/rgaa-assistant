@@ -3,6 +3,7 @@ import { reviewContinue } from './review-controls'
  * The checklist themes: one card per official criterion, with a verdict, the tools' hints and a note.
  */
 import { findingCriterionIds } from '../lib/findings'
+import { IMAGE_CRITERION_IDS } from '../lib/rgaa'
 import { state } from './state'
 import type { ChecklistAnswer, ChecklistVerdict } from '../lib/types'
 import { h, dom } from './dom'
@@ -13,8 +14,11 @@ import { confirm as confirmVerdict, evidenceConflicts as evidenceConflictsOf } f
 import { actions } from './actions'
 
 /** Checklist themes: one card per official criterion with a verdict and a note. */
+/** Themes reviewed element by element (images, frames, colours, tables…): their checklist only holds the criteria no element can answer. */
+export const perElementTheme = (): boolean => state.theme === 1 || FINDING_THEMES.has(state.theme)
+
 export function perFindingIds(): string[] {
-  return findingCriterionIds(state.theme)
+  return state.theme === 1 ? IMAGE_CRITERION_IDS : findingCriterionIds(state.theme)
 }
 
 /** What the automatic checks found for a criterion (or that none covers it, once they have been run on the page). */
@@ -50,13 +54,13 @@ export function renderChecklist(host: HTMLElement = dom.themeEl): void {
       h(
         'div',
         {},
-        ...(FINDING_THEMES.has(state.theme) ? [h('h3', {}, t('Other criteria of this theme'))] : []),
-        h('p', { class: 'hint-line' }, FINDING_THEMES.has(state.theme) ? t('Criteria {ids} are not detectable by a script: check them on {url}.', { ids: def.criteria.filter((x) => !perFindingIds().includes(x.id)).map((x) => x.id).join(', '), url: rec.url }) : t('{n} criteria. Check them on {url} and answer each one. Nothing to scan for this theme.', { n: def.criteria.length, url: rec.url })),
+        ...(perElementTheme() ? [h('h3', {}, t('Other criteria of this theme'))] : []),
+        h('p', { class: 'hint-line' }, perElementTheme() ? t('Criteria {ids} are not detectable by a script: check them on {url}.', { ids: def.criteria.filter((x) => !perFindingIds().includes(x.id)).map((x) => x.id).join(', '), url: rec.url }) : t('{n} criteria. Check them on {url} and answer each one. Nothing to scan for this theme.', { n: def.criteria.length, url: rec.url })),
       ),
     ),
   )
   const list = h('div', { class: 'checklist' })
-  const perFinding = findingCriterionIds(state.theme)
+  const perFinding = perFindingIds()
   for (const c of def.criteria.filter((x) => !perFinding.includes(x.id))) {
     const answer = (rec.checklist[c.id] ??= { note: '' })
     const outcome = result.criteria.find((x) => x.id === c.id)?.outcome

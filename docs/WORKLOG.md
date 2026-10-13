@@ -125,6 +125,32 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Handoff log (newest first)
 
+### 2026-10-13 — Claude Code — how to finish a theme, 13 themes by default, icon fonts, confirmed failures
+- Owner's points and what was done:
+  1. **13 themes by default** (`ALL_THEMES` in `src/lib/audit-store.ts`; a page can still narrow them in the "Thématiques" menu). A scan now covers every scannable theme, so Tables/Links/Forms
+     get their boxes at once (the boxes of a theme are only shown while that theme is open: by design). Migrated old pages keep `[1]`.
+  2. **"6/9 on Images, no idea how to reach 9/9"**: new `#theme-todo` line in the theme header (`src/panel/theme-todo.ts`, pure logic in `src/lib/theme-todo.ts`): "Reste à faire dans
+     cette thématique : N critères", one button per open criterion with its reason (to answer / suggestion to confirm / failure to confirm / to confirm / partial coverage), "Aller au premier / au suivant", and a
+     green "Thématique terminée" when nothing is left. The jumps reuse the same destinations as the totals (`openCriterion` extracted from `goToSummary` in `chrome.ts`).
+  3. **"3 à couverture partielle" no longer leads to the grid**: it opens a card at the end of the Images page (`partialSection` in `findings-view.ts`) that lists the tests the tool does not assess
+     (server-side image maps, canvas fallback, conciseness, detailed-description references), with a box "J'ai vérifié ces tests à la main" (`ChecklistAnswer.manualTests`, validated, lifts the partial coverage of that criterion
+     in `computeThemes`) and "Critère à couverture partielle suivant". With no image at all on the page those tests are vacuous (coverage full).
+  4. **Questions no image answers (1.4, 1.5: CAPTCHAs/test images) closed the Images page**: they are checklist cards at its end (`IMAGE_CRITERION_IDS` in `rgaa.ts`, theme view shown for theme 1, review queue, summary jumps) and
+     their answers count (computeThemes). The other element themes already had their "other criteria" at the end.
+  5. **Nothing here (no multimedia, no form…)**: in the todo line, "Rien à vérifier ici sur cette page : marquer les N critères ouverts non applicables" (checklist themes, or a scanned element theme with no element), with a confirm dialog;
+     only criteria with no confirmed answer change. (No "NT" button: not tested is simply "no answer yet"; "Réinitialiser cette thématique" clears.)
+  6. **"I answer à relire / à confirmer and nothing updates"**: reproduced. A criterion stayed "échec à confirmer" while ANY of its images was still pre-filled, so confirming the failing image changed nothing. Rule now
+     (`results.ts`): a failure the auditor confirmed is a confirmed failure whatever other images are still pre-filled (the pill goes down at once). A suggested C still needs every image confirmed (use "Confirmer les N images pré-remplies").
+  7. **Icon fonts** (a span/i whose glyph comes from a font) were not detected: `src/content/scan-images.ts` now lists them with the images (`icon-font (span)`; private-use glyph in the element or in `::before`/`::after`, or a Material Icons
+     ligature; class/tag candidates only, 800 max) and the role="img" tests cover them (`normalisedType`). They get a picture like other graphics. Not testable in jsdom (no pseudo-element styles): covered by `e2e/icon-fonts.spec.ts`.
+  8. **Empty themes and "detected by scripts"**: a scanned element theme with nothing found (no iframe, table, field…) now lists its element criteria as answered "Non applicable — rien trouvé à la dernière
+     analyse" (`notApplicableBlock` in `findings-view.ts`; they already counted as NA). Checklist criteria where the automatic run found nothing to verify and suggests "non applicable" (multimedia…) get one button in the
+     todo line: "confirmer les N suggestions « non applicable »" (`confirmNaSuggestions` in `theme-todo.ts`, with a dialog). Only NA suggestions are bulk-confirmable: a suggested "compliant" still needs a look.
+- Tests: `tests/theme-todo.test.ts`, `tests/results.test.ts`, `e2e/theme-completion.spec.ts`, `e2e/icon-fonts.spec.ts`; `e2e/harness.ts` `scanElements` now waits for the scan to end; summary/review-queue tests updated (partial coverage opens its card; 1.4 reachable);
+  parity baseline updated (read: partial cards and 1.4/1.5 cards at the end of Images, todo line, counts). `npm run check` 211 unit tests, 755 texts / 1295 French / 0 missing; `npm run test:e2e` 30 passed.
+- NOT tested in a real Firefox. Icon-font detection is a heuristic (classes + glyph): tell me the page if an icon is missed or a text is taken for one.
+- For the other agent: Images now renders `#theme-view` (the end of the page); the `releases/` zip is older than this work.
+
 ### 2026-10-13 — Claude Code — audit styles (the Stylus sheets), integrated
 - Owner's decision (reverses the earlier "Stylus stays separate" entry): the 19 sheets are **bundled** (no re-import of the JSON) and the auditor
   chooses how to work: apply them from the panel, theme by theme, or keep using Stylus and have the panel only name the sheets of the theme.

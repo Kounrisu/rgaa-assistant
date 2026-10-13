@@ -1,7 +1,7 @@
 export interface ImageElementInfo {
   id: number
   tag: string
-  /** img, svg, canvas, input-image, area, object, embed, or "role-img (div)". */
+  /** img, svg, canvas, input-image, area, object, embed, "role-img (div)", or "icon-font (span)" (an icon drawn by a font). */
   type: string
   /** Real URL (img, input, object, embed); null for inline graphics. */
   src: string | null
@@ -83,6 +83,11 @@ export interface ChecklistAnswer {
   suggested?: ChecklistVerdict
   /** Name of the tool behind `suggested` (axe…); cleared when the auditor answers. */
   source?: string
+  /**
+   * Images only: the auditor checked by hand the tests of this criterion that the tool does not assess (server-side image maps, a canvas
+   * fallback, the conciseness of an alternative…). It lifts the “partial coverage” of the criterion; it is never set by a tool.
+   */
+  manualTests?: boolean
   /** What the automatic checks found for this criterion, by tool, at the last run. */
   autoResults?: Record<string, { result: 'pass' | 'fail'; rules: string[]; /** What was seen (e.g. the doctype found). */ details?: string[] }>
 }

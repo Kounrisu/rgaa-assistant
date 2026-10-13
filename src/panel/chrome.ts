@@ -1,7 +1,7 @@
 /**
  * The frame around the views: totals and their jumps, page bar, theme bar and its menu, address reminder, audit bar, empty screen.
  */
-import type { CriterionResult, Outcome } from '../lib/results'
+import type { CriterionResult, Outcome, ThemeResult } from '../lib/results'
 import { state } from './state'
 import { pageInput, pageLabel, adoptSite, persist, nextPageLabel, normalizeTheme } from './model'
 import { t, getLang } from '../lib/i18n'
@@ -18,8 +18,10 @@ import type { PageRecord, ImageReview } from '../lib/types'
 import { colorOf } from '../lib/theme-colors'
 import { auditTitle, timeOf } from './helpers'
 import { actions } from './actions'
-import { criteriaFor } from '../lib/rgaa'
+import { focusReviewTarget } from './focus-target'
+import { criteriaFor, IMAGE_CRITERION_IDS } from '../lib/rgaa'
 import { askConfirm } from './dialogs'
+import { renderThemeTodo } from './theme-todo'
 
 /** Kept as the single entry point the rest of the panel calls after any answer. */
 export function renderStats(): void {
@@ -53,6 +55,7 @@ function matchesSummaryCriterion(c: CriterionResult, target: SummaryTarget): boo
  * not applicable, not tested. Each total jumps to the first element it stands for.
  */
 export function renderSummaries(): void {
+  renderThemeTodo(dom.themeTodoEl, { open: openCriterion })
   for (const host of document.querySelectorAll<HTMLElement>('.theme-summary[data-scope], .theme-summary[data-theme]')) {
     const pageScope = host.dataset.scope === 'page'
     const n = Number(host.dataset.theme)
@@ -147,64 +150,71 @@ function goToSummary(theme: number | null, target: SummaryTarget): void {
   for (const t of themes) {
     const criterion = t.criteria.find((c) => matchesSummaryCriterion(c, target))
     if (!criterion) continue
-    // Opening an unselected theme's result must not change the auditor's review scope.
-    if (!t.selected) return openGridAt(criterion.id)
-    state.theme = t.number
-    state.findingFilter = 'all'
-    state.filter = 'all'
-    renderThemeBar()
-    // Unsupported/partial criteria need their test breakdown, including tests with no element.
-    if (target === 'partial' || target === 'unassessed') return openGridAt(criterion.id)
-    actions.setView('review')
-    const card = dom.themeEl.querySelector<HTMLElement>(`[id="crit-card-${criterion.id}"]`)
-    if (t.number !== 1 && card) return focusReviewTarget(card)
-
-    const matchesAnswer = (review: ImageReview | undefined) => {
-      const answer = review?.answers[criterion.id]
-      if (target === 'pending' || target === 'suggested') return answer === undefined || Boolean(review?.auto)
-      if (target === 'unconfirmed') return answer === 'nc' && Boolean(review?.auto)
-      return answer === target
-    }
-    if (t.number === 1) {
-      const ids = new Set(criterion.tests.flatMap((test) => target === 'nc' || target === 'unconfirmed' ? test.nc : test.imageIds))
-      const image = state.elements.find((e) => {
-        const review = state.reviews[reviewKey(e)]
-        return ids.has(e.id) && (!review?.kind || criteriaFor(review.kind).some((c) => c.id === criterion.id)) && matchesAnswer(review)
-      })
-      if (image) {
-        renderFilters()
-        renderList()
-        select(image.id, true)
-        const input = dom.detailEl.querySelector(`[name="crit-${image.id}-${criterion.id}"]`)
-        focusReviewTarget(input?.closest<HTMLElement>('.criterion') ?? dom.detailEl)
-        void syncFilterBoxes()
-        return
-      }
-    } else if (FINDING_THEMES.has(t.number)) {
-      const finding = state.page.findings.find((f) => f.theme === t.number && f.type !== 'contrast-ok' && findingCriteriaOf(f).some((c) => c.id === criterion.id) && matchesAnswer(state.page!.findingReviews[f.key]))
-      if (finding) {
-        state.findingSel = finding.id
-        renderThemeView()
-        const input = dom.themeEl.querySelector(`[name="fnd-${finding.id}-${criterion.id}"]`)
-        focusReviewTarget(input?.closest<HTMLElement>('.criterion') ?? dom.themeEl)
-        void focusFinding(finding, true)
-        void syncFilterBoxes()
-        return
-      }
-    }
-    return openGridAt(criterion.id)
+    return openCriterion(t, criterion, target)
   }
 }
 
-/** A jump moves keyboard focus as well as the viewport. */
-function focusReviewTarget(target: HTMLElement): void {
-  const input = target.querySelector<HTMLElement>('input[type="radio"]:checked') ?? target.querySelector<HTMLElement>('input[type="radio"]')
-  if (!input) target.tabIndex = -1
-  ;(input ?? target).focus({ preventScroll: true })
-  target.scrollIntoView({ block: 'center' })
-  target.classList.add('flash')
-  setTimeout(() => target.classList.remove('flash'), 1800)
+/** Opens one criterion of a theme where the auditor answers it, and the element it stands for when there is one. */
+export function openCriterion(t: ThemeResult, criterion: CriterionResult, target: SummaryTarget): void {
+  if (!state.page) return
+  // Opening an unselected theme's result must not change the auditor's review scope.
+  if (!t.selected) return openGridAt(criterion.id)
+  state.theme = t.number
+  state.findingFilter = 'all'
+  state.filter = 'all'
+  renderThemeBar()
+  // A criterion of a theme that is not part of the audit: its tests are in the grid.
+  if (target === 'unassessed') return openGridAt(criterion.id)
+  actions.setView('review')
+  // Partial coverage: the tests the tool does not assess, and the box to tick once you checked them by hand, are at the end of the Images page.
+  if (target === 'partial') return openPartialCard(criterion.id)
+  const card = dom.themeEl.querySelector<HTMLElement>(`[id="crit-card-${criterion.id}"]`)
+  // a checklist card: the whole page's criteria of a checklist theme, and the questions no single image answers (Images 1.4, 1.5)
+  if (card && (t.number !== 1 || !IMAGE_CRITERION_IDS.includes(criterion.id))) return focusReviewTarget(card)
+
+  const matchesAnswer = (review: ImageReview | undefined) => {
+    const answer = review?.answers[criterion.id]
+    if (target === 'pending' || target === 'suggested') return answer === undefined || Boolean(review?.auto)
+    if (target === 'unconfirmed') return answer === 'nc' && Boolean(review?.auto)
+    return answer === target
+  }
+  if (t.number === 1) {
+    const ids = new Set(criterion.tests.flatMap((test) => target === 'nc' || target === 'unconfirmed' ? test.nc : test.imageIds))
+    const image = state.elements.find((e) => {
+      const review = state.reviews[reviewKey(e)]
+      return ids.has(e.id) && (!review?.kind || criteriaFor(review.kind).some((c) => c.id === criterion.id)) && matchesAnswer(review)
+    })
+    if (image) {
+      renderFilters()
+      renderList()
+      select(image.id, true)
+      const input = dom.detailEl.querySelector(`[name="crit-${image.id}-${criterion.id}"]`)
+      focusReviewTarget(input?.closest<HTMLElement>('.criterion') ?? dom.detailEl)
+      void syncFilterBoxes()
+      return
+    }
+  } else if (FINDING_THEMES.has(t.number)) {
+    const finding = state.page.findings.find((f) => f.theme === t.number && f.type !== 'contrast-ok' && findingCriteriaOf(f).some((c) => c.id === criterion.id) && matchesAnswer(state.page!.findingReviews[f.key]))
+    if (finding) {
+      state.findingSel = finding.id
+      renderThemeView()
+      const input = dom.themeEl.querySelector(`[name="fnd-${finding.id}-${criterion.id}"]`)
+      focusReviewTarget(input?.closest<HTMLElement>('.criterion') ?? dom.themeEl)
+      void focusFinding(finding, true)
+      void syncFilterBoxes()
+      return
+    }
+  }
+  return openGridAt(criterion.id)
 }
+
+/** Goes to the card that explains a partly covered criterion (what the tool does not assess, what to check by hand). */
+export function openPartialCard(criterionId: string): void {
+  const card = dom.themeEl.querySelector<HTMLElement>(`[id="partial-card-${criterionId}"]`)
+  if (card) focusReviewTarget(card)
+  else openGridAt(criterionId)
+}
+
 
 /** Review navigation includes failed suggestions that still need a human decision. */
 export const matchesReviewOutcome = (criterion: CriterionResult, outcome: Outcome): boolean =>
@@ -218,8 +228,8 @@ export function firstThemeWith(outcome: Outcome): number | null {
     if (!t.criteria.some((c) => matchesReviewOutcome(c, outcome))) continue
     if (outcome === 'pending') {
       // a theme that was never scanned has criteria "to review" but no element to go to
-      const perFinding = findingCriterionIds(t.number)
-      const pendingCards = t.criteria.some((c) => matchesReviewOutcome(c, 'pending') && !perFinding.includes(c.id) && t.number !== 1)
+      const perFinding = t.number === 1 ? IMAGE_CRITERION_IDS : findingCriterionIds(t.number)
+      const pendingCards = t.criteria.some((c) => matchesReviewOutcome(c, 'pending') && !perFinding.includes(c.id))
       const hasElement =
         t.number === 1 ? state.elements.some((e) => needsReview(e)) : FINDING_THEMES.has(t.number) ? rec.findings.some((f) => f.theme === t.number && findingNeedsReview(f)) : false
       if (!hasElement && !pendingCards) continue

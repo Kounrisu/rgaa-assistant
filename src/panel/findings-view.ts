@@ -4,7 +4,7 @@ import { reviewActions } from './review-controls'
  */
 import type { FindingItem, ImageReview, Verdict } from '../lib/types'
 import { state } from './state'
-import { persist, pageLabel } from './model'
+import { persist, pageLabel, pageInput } from './model'
 import { say, dom, keepScroll, h } from './dom'
 import { t } from '../lib/i18n'
 import { listedFindings, findingMatches, findingStatus, findingFails, STATUS_LABEL, findingReview } from './review-state'
@@ -13,11 +13,13 @@ import { FINDING_THEMES, themeByNumber } from '../lib/themes'
 import { renderChecklist } from './checklist-view'
 import { tDyn } from './helpers'
 import { syncFilterBoxes, focusFinding } from './page-bridge'
-import { findingCriterionIds, findingCriteriaOf, type FindingCriterion, hintForFinding } from '../lib/findings'
+import { findingCriterionIds, findingCriteriaOf, type FindingCriterion, hintForFinding, FINDING_CRITERIA } from '../lib/findings'
 import { contrastChecker } from './contrast-checker'
 import { codeBlock } from './code-view'
 import { actions } from './actions'
 import { apgBlocks } from './apg-view'
+import type { CriterionResult } from '../lib/results'
+import { focusReviewTarget } from './focus-target'
 import { apgPattern } from '../lib/apg-patterns'
 
 export function removeFinding(f: FindingItem): void {
@@ -45,9 +47,79 @@ export function renderThemeView(): void {
   keepScroll(dom.themeEl, () => {
     dom.themeEl.replaceChildren()
     if (FINDING_THEMES.has(state.theme)) renderFindingsView()
+    else if (state.theme === 1) renderImagesRest()
     else renderChecklist()
     actions.renderSummaries()
   })
+}
+
+/**
+ * A theme the scan found nothing in (no frame, no table, no form field…): its element criteria are not applicable, shown as such
+ * (answered by the scan), so the auditor sees the blocks are done and why.
+ */
+function notApplicableBlock(theme: number): HTMLElement {
+  const criteria = FINDING_CRITERIA[theme] ?? []
+  return h(
+    'ul',
+    { class: 'na-list', 'aria-label': t('Criteria not applicable: nothing found on the page') },
+    ...criteria.map((c) => h('li', { class: 'na-row' }, h('strong', {}, `RGAA ${c.id}`), ` ${t(c.question)} `, h('span', { class: 'result na' }, t('Not applicable')), ` — ${t('nothing found at the last scan')}`)),
+  )
+}
+
+/** The end of the Images page: the questions no single image answers (1.4, 1.5), like the end of every other element theme. */
+function renderImagesRest(): void {
+  const rec = state.page
+  if (!rec) return
+  const result = pageInput(rec).themes.find((x) => x.number === 1)
+  const partial = (result?.criteria ?? []).filter((c) => c.coverage === 'partial' || (rec.checklist[c.id]?.manualTests && c.tests.some((x) => x.outcome === 'unassessed')))
+  if (partial.length) dom.themeEl.append(partialSection(partial))
+  const rest = h('div', { class: 'theme-rest' })
+  renderChecklist(rest)
+  dom.themeEl.append(rest)
+}
+
+/**
+ * Partly covered criteria: some tests of the criterion are not assessed by this tool (server-side image maps, a canvas fallback, whether an
+ * alternative is concise…). Each card says which and what to look at; ticking “checked by hand” lifts the partial coverage of the criterion.
+ */
+function partialSection(criteria: CriterionResult[]): HTMLElement {
+  const rec = state.page!
+  const open = (c: CriterionResult) => !rec.checklist[c.id]?.manualTests
+  const section = h('section', { class: 'partial-section' }, h('h3', {}, t('Partly covered criteria')), h('p', { class: 'hint-line' }, t('The verdict of these criteria counts, but only for the tests this tool can assess. Check the others by hand on the page, then tick the box: the criterion is then fully covered. If one of them fails, answer Non-compliant on the image concerned and say why in its note.')))
+  for (const c of criteria) {
+    const answer = (rec.checklist[c.id] ??= { note: '' })
+    const missing = c.tests.filter((x) => x.outcome === 'unassessed')
+    const card = h('div', { class: 'card criterion partial-card', id: `partial-card-${c.id}`, 'data-open': String(open(c)), 'data-state': answer.manualTests ? 'c' : '' })
+    const next = () => {
+      const cards = Array.from(dom.themeEl.querySelectorAll<HTMLElement>('.partial-card[data-open="true"]'))
+      const target = cards[(cards.indexOf(card) + 1) % cards.length] ?? cards[0]
+      if (target) focusReviewTarget(target)
+    }
+    card.append(
+      h('div', { class: 'criterion-head' }, h('span', { class: 'crit-id' }, `RGAA ${c.id}`), h('span', { class: 'badge manual' }, t('Partial coverage')), h('a', { class: 'crit-link', href: `https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/#${c.id}`, target: '_blank', rel: 'noreferrer' }, t('Official tests ↗'))),
+      h('p', { class: 'question' }, c.title.replace(/`/g, '')),
+      h('p', { class: 'hint info' }, t('{n} of the {total} tests of this criterion are not assessed by this tool:', { n: missing.length, total: c.tests.length })),
+      h('ul', { class: 'checks' }, ...missing.map((x) => h('li', {}, h('strong', {}, `${x.id} `), x.text.replace(/`/g, ''), h('em', {}, ` — ${x.reason}`)))),
+      h(
+        'label',
+        { class: 'manual-tests' },
+        h('input', {
+          type: 'checkbox',
+          checked: Boolean(answer.manualTests),
+          onchange: (e: Event) => {
+            answer.manualTests = (e.target as HTMLInputElement).checked
+            persist()
+            actions.renderAll()
+            say(answer.manualTests ? t('RGAA {id}: the tests the tool does not assess are checked by hand.', { id: c.id }) : t('RGAA {id}: back to partial coverage.', { id: c.id }))
+          },
+        }),
+        ` ${t('I checked these tests by hand')}`,
+      ),
+      ...(open(c) && criteria.filter(open).length > 1 ? [h('button', { type: 'button', class: 'ghost-btn', onclick: next }, t('Next partly covered criterion'))] : []),
+    )
+    section.append(card)
+  }
+  return section
 }
 
 export function renderFindingsView(): void {
@@ -72,6 +144,7 @@ export function renderFindingsView(): void {
   if (!scanned) {
     dom.themeEl.append(h('p', { class: 'hint-line' }, t('Not scanned yet. Open {url} in the browser and find the elements.', { url: rec.url, label })))
   } else if (!list.length) {
+    dom.themeEl.append(notApplicableBlock(state.theme))
     dom.themeEl.append(h('p', { class: 'hint-line' }, state.theme === 3 && passing ? t('No text with a contrast problem found: {summary}.', { summary: tDyn(passing.summary) }) : state.theme === 2 ? t('No frames found on the page at the last scan: criteria are not applicable.') : state.theme === 6 ? t('No links found on the page at the last scan: criteria are not applicable.') : state.theme === 9 ? t('No heading or landmark found on the page at the last scan.') : state.theme === 5 ? t('No table found on the page at the last scan: criteria are not applicable.') : state.theme === 11 ? t('No form field found on the page at the last scan: criteria are not applicable.') : state.theme === 7 ? t('No ARIA component found on the page at the last scan: 7.1 and 7.3 are not applicable to components. Scripts that change the page without a component (status messages, context changes) stay in the checklist below.') : t('No text colours found on the page at the last scan: criteria are not applicable.')))
   } else {
     const options: [FindingFilter, string][] =

@@ -97,6 +97,7 @@ function checklistAnswer(v: unknown, path: string): void {
   optional(v.verdict, verdict, `${path}.verdict`)
   str(v.note, `${path}.note`)
   optional(v.source, str, `${path}.source`)
+  optional(v.manualTests, bool, `${path}.manualTests`)
   optional(
     v.autoResults,
     (r, p) =>
