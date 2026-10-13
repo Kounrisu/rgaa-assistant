@@ -125,6 +125,15 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Handoff log (newest first)
 
+### 2026-10-13 — Claude Code — the panel passes axe (light and dark), first accessibility pass (UX plan WP8, started)
+- Did: ran axe (WCAG 2.x A/AA + best practice) on every main view: 4 failing rules at first (colour contrast near misses 4.2-4.35:1 on pills/outcomes, theme tabs white on amber/lime/cyan, no `<main>`
+  landmark, `region`, a button whose accessible name did not contain its visible text, two empty table headers) and dark theme (white on the light purple accent). Fixed: palette (`--ok`, `--warn`, `--na`,
+  theme colours in `theme-colors.ts` all >= 4.5:1 with white), `--on-accent` for the dark theme, `<main id="main-content">` around the page content (the old `<main id="app">` is a `<div>`),
+  reset-theme aria-label starts with the visible text, header cells named, coverage page colours. New `e2e/panel-a11y.spec.ts`: zero violations in Images, Sample, Audit overview, Page results,
+  Manual checks, Links, Forms, Mandatory elements, light and dark, and the coverage page. Parity serializer now walks `<main>`'s children.
+- State: `npm run check` 221 tests; e2e 38 passed; parity updated (theme colours, th text, aria-label). Not done: manual keyboard / focus-order review, 200% zoom / 320 px reflow, forced-colors,
+  screen reader test, target size 24 px check, the element-review screens with every card state, the dialogs. axe finds about a third of WCAG issues: this is not an RGAA audit of the app.
+
 ### 2026-10-13 — Claude Code — RGAA coverage page by audit type
 - Did: the coverage page (`src/rgaa/rgaa.ts`, opened by "Couverture RGAA ↗" in the audit bar) has an audit-type selector (complet 106 / rapide 25 / complémentaire 50), one-line explanation,
   and its summary, themes, criteria and filters follow it (same `inLevel` lists). The panel's link carries the current type (`?level=`), the page keeps it in the URL.

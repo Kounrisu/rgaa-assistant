@@ -71,7 +71,7 @@ export function miniTable(caption: string, headers: string[], rows: (string | nu
   const table = h('table', { class: `results-table mini ${cls}` })
   table.append(
     h('caption', {}, caption),
-    h('thead', {}, h('tr', {}, ...headers.map((t) => h('th', { scope: 'col' }, t)))),
+    h('thead', {}, h('tr', {}, ...headers.map((name) => h('th', { scope: 'col' }, name || h('span', { class: 'sr-only' }, t('Level')))))),
     h('tbody', {}, ...rows.map((r) => h('tr', {}, ...r.map((cell, i) => (i === 0 ? h('th', { scope: 'row' }, cell as string) : h('td', {}, cell as string)))))),
   )
   return table
@@ -112,7 +112,7 @@ export function dashboard(inputs: PageInput[]): HTMLElement {
         'table',
         { class: 'results-table mini pages-result' },
         h('caption', {}, t('Results per page')),
-        h('thead', {}, h('tr', {}, ...['', 'Page', 'C', 'NC', 'NA', '% C'].map((name) => h('th', { scope: 'col' }, t(name))))),
+        h('thead', {}, h('tr', {}, ...['Page', 'Title', 'C', 'NC', 'NA', '% C'].map((name) => h('th', { scope: 'col' }, t(name))))),
         h(
           'tbody',
           {},

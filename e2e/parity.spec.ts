@@ -20,7 +20,9 @@ const test = base.extend<{ rig: Rig }>({
 async function serialize(panel: Page): Promise<string> {
   const html = await panel.evaluate(() => {
     const parts: string[] = []
-    for (const child of Array.from(document.body.children)) {
+    // the content sits in <main>: walk its children like the body's, so a hidden view stays out of the snapshot
+    const top = Array.from(document.body.children).flatMap((c) => (c.tagName === 'MAIN' ? Array.from(c.children) : [c]))
+    for (const child of top) {
       if (getComputedStyle(child).display === 'none' || child.hasAttribute('hidden') || ['SCRIPT', 'DIALOG', 'INPUT'].includes(child.tagName)) continue
       const clone = child.cloneNode(true) as HTMLElement
       // form state is a property, not an attribute: write it down
