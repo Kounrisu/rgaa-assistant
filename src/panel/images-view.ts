@@ -285,7 +285,7 @@ export function renderKindPicker(el: Item, review: ImageReview): HTMLElement {
       id: `${name}-${value}`,
       value,
       checked: review.kind === value,
-      onchange: () => {
+      onclick: () => {
         review.kind = value
         review.auto = false
         saveReviews()
