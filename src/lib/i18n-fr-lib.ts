@@ -130,7 +130,7 @@ export const FR_LIB: Record<string, string> = {
   /* ---- coverage page (src/rgaa) ---- */
   'RGAA 4.1 — what can be automated?': 'RGAA 4.1 : que peut-on automatiser ?',
   'RGAA 4.1 — Test automation coverage': 'RGAA 4.1 : couverture de l’automatisation des tests',
-  'Every test of the 13 themes, classified as': 'Chaque test des 13 thématiques, classé comme',
+  'Every test of the chosen audit type, classified as': 'Chaque test du type d’audit choisi, classé comme',
   automatic: 'automatique',
   'semi-automatic': 'semi-automatique',
   or: 'ou',
