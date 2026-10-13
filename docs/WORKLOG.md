@@ -125,6 +125,12 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Handoff log (newest first)
 
+### 2026-10-13 — Claude Code — UX plan for a simpler audit (plan only)
+- Did: wrote `docs/UX-PLAN-simpler-audit.md`: 10 work packages (one "next", stepper, height budget, keyboard answers, one vocabulary, in-context help, toasts, the panel passes its own axe, optional guided mode), acceptance tests, order, split between agents, 5 owner decisions. No code changed.
+- State: based on reading code and earlier reviews, no new screenshots; first step is to capture the "before" at 1280x520 and 480x800.
+- Next: owner answers section 6 of the plan; then WP5 (vocabulary) and WP1-3 on one branch.
+- For the other agent: claim a package in "In progress" before touching panel.html/panel.css.
+
 ### 2026-10-13 — Claude Code — how to finish a theme, 13 themes by default, icon fonts, confirmed failures
 - Owner's points and what was done:
   1. **13 themes by default** (`ALL_THEMES` in `src/lib/audit-store.ts`; a page can still narrow them in the "Thématiques" menu). A scan now covers every scannable theme, so Tables/Links/Forms
