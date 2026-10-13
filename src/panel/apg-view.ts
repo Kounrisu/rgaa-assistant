@@ -4,7 +4,7 @@
  */
 import type { FindingItem } from '../lib/types'
 import { apgPattern, parseChecks } from '../lib/apg-patterns'
-import { h } from './dom'
+import { h, newTabNote } from './dom'
 import { t } from '../lib/i18n'
 import { tDyn } from './helpers'
 
@@ -12,7 +12,7 @@ import { tDyn } from './helpers'
 export function apgBlocks(f: FindingItem, criterionId: string): HTMLElement[] {
   const pattern = f.type.startsWith('widget-') ? apgPattern(f.type) : undefined
   if (!pattern) return []
-  const link = h('a', { class: 'crit-link', href: pattern.url, target: '_blank', rel: 'noreferrer' }, t('APG pattern “{name}” ↗', { name: t(pattern.name) }))
+  const link = h('a', { class: 'crit-link', href: pattern.url, target: '_blank', rel: 'noreferrer' }, t('APG pattern “{name}” ↗', { name: t(pattern.name) }), newTabNote())
   if (criterionId === '7.1') {
     const checks = parseChecks(f.data.checks)
     return [

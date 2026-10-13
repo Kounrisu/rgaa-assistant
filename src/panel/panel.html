@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="panel.css" />
   </head>
   <body>
+    <a class="skip-link" href="#main-content" data-i18n>Skip to main content</a>
     <div class="auditbar" role="region" aria-label="Current audit" data-i18n-attrs="aria-label">
       <h1 class="brand-inline">RGAA Assistant</h1>
       <span class="auditbar-sep" aria-hidden="true">›</span>
@@ -18,7 +19,7 @@
         <button id="sample-btn" type="button" aria-pressed="false" data-i18n>Sample and progress</button>
         <button id="audit-btn" type="button" disabled aria-pressed="false" data-i18n>Summary and exports</button>
       </nav>
-      <a id="coverage-link" class="link-btn coverage-reference" href="../rgaa/rgaa.html" target="_blank" rel="noreferrer" data-i18n>RGAA coverage ↗</a>
+      <a id="coverage-link" class="link-btn coverage-reference" href="../rgaa/rgaa.html" target="_blank" rel="noreferrer"><span data-i18n>RGAA coverage ↗</span><span class="sr-only" data-i18n> (opens in a new tab)</span></a>
       <span class="spacer"></span>
       <span id="save-state" class="pill" role="status" aria-live="polite"></span>
       <button id="save-retry-btn" type="button" class="pill error-retry" hidden></button>
@@ -32,7 +33,7 @@
       </div>
     </div>
 
-    <main id="main-content">
+    <main id="main-content" tabindex="-1">
     <p id="status" role="status" class="status top-status"></p>
 
     <div class="pagebar">
