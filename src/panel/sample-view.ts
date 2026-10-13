@@ -9,9 +9,10 @@ import { t } from '../lib/i18n'
 import { findPage, createPage, normalizeUrl } from '../lib/audit-store'
 import { pageLabel, adoptSite, loadPage, persist, nextPageLabel } from './model'
 import { inspectedTitle } from './page-bridge'
-import type { PageRecord, Audit } from '../lib/types'
+import type { PageRecord } from '../lib/types'
 import { renderPageBar, themesMenu, showNavBanner } from './chrome'
 import { actions } from './actions'
+import { AUDIT_LEVELS, LEVEL_COUNT, LEVEL_LABEL, type AuditLevel } from '../lib/audit-levels'
 
 /** Registers a page of the sample without scanning it. */
 export async function addPage(url: string, title?: string): Promise<void> {
@@ -45,14 +46,36 @@ export function movePage(rec: PageRecord, dir: -1 | 1): void {
 /** The sample: which URL is page 1, page 2… Editable, and where pages are registered before scanning. */
 export function renderSample(): void {
   dom.sampleEl.replaceChildren()
-  const field = (label: string, key: keyof Audit['meta'], placeholder: string) =>
+  const field = (label: string, key: 'site' | 'auditor' | 'context', placeholder: string) =>
     h(
       'label',
       { class: 'field' },
       h('span', {}, label),
       h('input', { type: 'text', value: state.audit.meta[key], placeholder, oninput: (e: Event) => { state.audit.meta[key] = (e.target as HTMLInputElement).value; persist() } }),
     )
+  const level: AuditLevel = state.audit.meta.level ?? 'complet'
+  const levelHelp: Record<AuditLevel, string> = {
+    complet: 'All 106 criteria. The only level that gives a compliance rate and supports an accessibility statement.',
+    rapide: 'The 25 essential criteria (WCAG level A) on a sample of 3 to 5 pages: a first overview. No compliance rate, no statement.',
+    complementaire: 'The 25 quick-audit criteria plus the next 25, so 50 criteria, on the same small sample. No compliance rate, no statement.',
+  }
   dom.sampleEl.append(
+    h(
+      'fieldset',
+      { class: 'card audit-level' },
+      h('legend', {}, t('Type of audit')),
+      h('div', { class: 'level-options' }, ...AUDIT_LEVELS.map((value) => [
+        h('input', { type: 'radio', name: 'audit-level', id: `audit-level-${value}`, value, checked: level === value, onchange: () => {
+          if (value === 'complet') delete state.audit.meta.level
+          else state.audit.meta.level = value
+          persist()
+          actions.renderAll()
+          say(t('Audit type: {level}.', { level: `${t(LEVEL_LABEL[value])} (${LEVEL_COUNT[value]})` }))
+        } }),
+        h('label', { for: `audit-level-${value}` }, `${t(LEVEL_LABEL[value])} (${t('{n} criteria', { n: LEVEL_COUNT[value] })})`),
+      ]).flat()),
+      h('p', { class: 'hint-line' }, t(levelHelp[level])),
+    ),
     h(
       'div',
       { class: 'results-head' },

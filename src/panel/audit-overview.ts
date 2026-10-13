@@ -4,7 +4,7 @@
 import { h, dom } from './dom'
 import { t } from '../lib/i18n'
 import { pct2, type Counts, rateExact, type PageInput, auditStats, levelStats, isProvisional, auditSheets } from '../lib/audit-sheet'
-import { provisionalHelp, tabsFor, sheetTable } from './results-view'
+import { provisionalHelp, tabsFor, sheetTable, levelNote } from './results-view'
 import { state } from './state'
 import { pageLabel, allPageInputs } from './model'
 import { exportWorkbook, openReport } from './exports'
@@ -86,6 +86,8 @@ export function dashboard(inputs: PageInput[]): HTMLElement {
   const tone = (rate: number | null) => (rate === null ? 'none' : rate >= 100 ? 'full' : rate >= 75 ? 'good' : rate >= 50 ? 'mid' : 'low')
 
   const wrap = h('div', { class: 'dash2' })
+  const note = levelNote()
+  if (note) wrap.append(note)
   wrap.append(
     h(
       'section',

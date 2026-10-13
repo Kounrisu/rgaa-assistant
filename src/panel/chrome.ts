@@ -21,6 +21,7 @@ import { actions } from './actions'
 import { focusReviewTarget } from './focus-target'
 import { criteriaFor, IMAGE_CRITERION_IDS } from '../lib/rgaa'
 import { askConfirm } from './dialogs'
+import { LEVEL_COUNT, LEVEL_LABEL } from '../lib/audit-levels'
 import { renderThemeTodo } from './theme-todo'
 
 /** Kept as the single entry point the rest of the panel calls after any answer. */
@@ -548,6 +549,10 @@ export function renderEmpty(): void {
 export function renderAuditBar(): void {
   dom.auditNameBtn.textContent = auditTitle(state.audit)
   dom.auditNameBtn.title = t('Rename this audit')
+  const level = state.audit.meta.level ?? 'complet'
+  dom.auditLevelEl.textContent = `${t(LEVEL_LABEL[level])} · ${t('{n} criteria', { n: LEVEL_COUNT[level] })}`
+  dom.auditLevelEl.className = `pill level-pill level-${level}`
+  dom.auditLevelEl.title = level === 'complet' ? t('Complete audit: all the criteria. Change it in Sample and progress.') : t('Partial audit: no compliance rate. Change the type in Sample and progress.')
   const { saveState, savedAt, blocked, lastError } = state.session
   dom.saveStateEl.className = `pill ${saveState === 'saved' ? '' : saveState}`
   dom.saveStateEl.textContent =

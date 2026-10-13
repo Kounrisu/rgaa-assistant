@@ -121,6 +121,7 @@ export const dom = {
   checksBtn: $<HTMLButtonElement>('checks-btn'),
   autoBtn: $<HTMLButtonElement>('auto-btn'),
   auditNameBtn: $<HTMLButtonElement>('audit-name-btn'),
+  auditLevelEl: $('audit-level'),
   saveStateEl: $('save-state'),
   saveRetryBtn: $<HTMLButtonElement>('save-retry-btn'),
   backupStateEl: $('backup-state'),

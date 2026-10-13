@@ -236,7 +236,10 @@ export function validateAudit(v: unknown): asserts v is Audit {
   num(v.updatedAt, 'updatedAt')
   optional(v.exportedAt, num, 'exportedAt')
   if (!isRecord(v.meta)) bad('meta', 'an object is expected')
-  else for (const k of ['site', 'auditor', 'context']) str(v.meta[k], `meta.${k}`)
+  else {
+    for (const k of ['site', 'auditor', 'context']) str(v.meta[k], `meta.${k}`)
+    if (v.meta.level !== undefined && !['rapide', 'complementaire', 'complet'].includes(v.meta.level as string)) bad('meta.level', 'rapide, complementaire or complet is expected')
+  }
   array(v.pages, 'pages', page, MAX_PAGES)
   const ids = new Set<string>()
   for (const p of v.pages as Rec[]) {

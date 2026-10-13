@@ -165,6 +165,8 @@ export interface AuditMeta {
   site: string
   auditor: string
   context: string
+  /** Which DINUM audit level this audit covers; absent = the complete audit. */
+  level?: import('./audit-levels').AuditLevel
 }
 
 export interface Audit {

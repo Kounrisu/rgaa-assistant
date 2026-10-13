@@ -4,6 +4,7 @@ import type { Thumb } from './thumbs'
 import { previewOf } from './url-safety'
 import { buildXlsx, type CellInput, type Sheet } from './xlsx'
 import { findingCriteriaOf } from './findings'
+import type { AuditLevel } from './audit-levels'
 import { tFr } from './i18n'
 import { MANUAL_CHECKS } from './manual-checks'
 import type { AuditMeta, ChecklistAnswer, Detected, FindingItem, ImageElementInfo, ImageReview, ManualCheckAnswer } from './types'
@@ -203,6 +204,14 @@ export function levelStats(stats: AuditStats): LevelStats {
 /* Sheets                                                              */
 /* ------------------------------------------------------------------ */
 
+/** Written in the grid: a partial audit says so, and gives no compliance rate. */
+export const levelFr = (level: AuditLevel | undefined): string =>
+  level === 'rapide'
+    ? 'Audit rapide (25 critères) : audit partiel, pas de taux de conformité RGAA'
+    : level === 'complementaire'
+      ? 'Audit complémentaire (50 critères) : audit partiel, pas de taux de conformité RGAA'
+      : 'Audit complet (106 critères)'
+
 export function sampleSheet(pages: PageInput[], meta: AuditMeta): Sheet {
   return {
     name: 'Échantillon',
@@ -214,6 +223,7 @@ export function sampleSheet(pages: PageInput[], meta: AuditMeta): Sheet {
       [{ v: 'Auditeur ou auditrice', s: 'head' }, meta.auditor],
       [{ v: 'Contexte', s: 'head' }, meta.context],
       [{ v: 'Site', s: 'head' }, meta.site],
+      [{ v: 'Type d’audit', s: 'head' }, levelFr(meta.level)],
       [],
       head(['N° page', 'Titre de la page', 'URL', 'Thématiques auditées']),
       ...pages.map((p) => [p.label, { v: p.pageTitle, s: 'wrap' as const }, { v: p.pageUrl, s: 'wrap' as const }, p.themes.filter((t) => t.selected).map((t) => t.number).join(', ')]),

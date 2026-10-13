@@ -125,6 +125,17 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Handoff log (newest first)
 
+### 2026-10-13 — Claude Code — audit type (rapide / complémentaire / complet), plan for the LLM round-trip
+- Did: audit type chosen in Échantillon et suivi (`meta.level`, optional, no migration; validator updated), shown as a pill next to the audit name (`#audit-level`).
+  A partial level keeps only its criteria in `computeThemes` (progress, "Reste à faire", rates, Excel rows follow); notes "not a compliance rate" in page results and
+  overview; "Type d'audit" row in the Excel Échantillon sheet. Lists in `src/lib/audit-levels.ts` and `docs/audit-levels-ara.md` (**to verify against the DINUM pages**).
+  Plan for exporting a pack for an LLM and importing answers back: `docs/PLAN-llm-roundtrip.md` (plan only).
+- State: `npm run check` 214 tests, 0 missing translations; e2e 34 incl. `e2e/audit-level.spec.ts`; parity baseline updated after reading the diff (level pill + type fieldset).
+  Not tested: real Firefox.
+- Known limit: element reviews (images, links, forms) still ask every criterion of their kind; only counts, todo, rates and exports follow the level.
+  Cards of criteria outside the level are still shown in checklists, without a tag yet.
+- Next: owner checks the two criteria lists; then hide/tag out-of-level criteria in the review cards and the review queue; start L1-L3 of the LLM plan.
+
 ### 2026-10-13 — Claude Code — UX plan for a simpler audit (plan only)
 - Did: wrote `docs/UX-PLAN-simpler-audit.md`: 10 work packages (one "next", stepper, height budget, keyboard answers, one vocabulary, in-context help, toasts, the panel passes its own axe, optional guided mode), acceptance tests, order, split between agents, 5 owner decisions. No code changed.
 - State: based on reading code and earlier reviews, no new screenshots; first step is to capture the "before" at 1280x520 and 480x800.

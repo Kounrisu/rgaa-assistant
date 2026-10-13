@@ -848,3 +848,10 @@ body[data-view="audits"] :is(.pagebar,.page-progress,#display-tools,#nav-banner,
 .prefilled-block { margin: 8px 0; padding: 8px 10px; border: 1px solid var(--border); border-left: 4px solid var(--accent, #1f3a8a); border-radius: var(--radius); background: var(--surface); }
 .prefilled-block p { margin: 0 0 6px; }
 .prefilled-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.level-pill { font-weight: 600; white-space: nowrap; }
+.level-pill.level-rapide, .level-pill.level-complementaire { background: #fff3cd; color: #5c4400; border-color: #e0b84a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .level-pill.level-rapide, :root:not([data-theme="light"]) .level-pill.level-complementaire { background: #4a3a05; color: #ffe8a3; border-color: #8a6d12; } }
+.audit-level { margin: 8px 0; }
+.audit-level legend { font-weight: 700; padding: 0 4px; }
+.level-options { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
