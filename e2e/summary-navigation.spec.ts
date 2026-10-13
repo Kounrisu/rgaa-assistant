@@ -75,11 +75,15 @@ test('image status shortcuts select the relevant image or focus the test breakdo
   // 1.1 already fails; the first pending criterion is 1.2, whose first undecided image is #3.
   await panel.locator('#page-summary .sum-pending').click()
   await expect(panel.locator(`[id="kind-${items[2].id}-informative"]`)).toBeFocused()
-  for (const [status, criterion] of [['partial', '1.1'], ['unassessed', '1.4']]) {
-    await panel.locator(`#page-summary .sum-${status}`).click()
-    await expect(panel.locator('#results')).toBeVisible()
-    await expect(panel.locator(`tr[data-crit="${criterion}"]`).first()).toBeFocused()
-  }
+  // partial coverage: not the grid, but the card that says which tests the tool does not assess and what to check by hand
+  await panel.locator('#page-summary .sum-partial').click()
+  await expect(panel.locator('#results')).toBeHidden()
+  const card = panel.locator('[id="partial-card-1.1"]')
+  await expect(card).toBeFocused()
+  await expect(card).toContainText('1.1.4')
+  // the criteria no image answers (1.4) are checklist cards at the end of the Images page
+  await panel.locator('#theme-todo .todo-chip[data-crit="1.4"]').click()
+  await expect(panel.locator('input[name="chk-1.4"]').first()).toBeFocused()
   expect(rig.problems).toEqual([])
 })
 

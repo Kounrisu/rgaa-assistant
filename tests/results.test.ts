@@ -93,3 +93,14 @@ describe('counts and provisional rates', () => {
     expect(isProvisional({ C: 1, NC: 1, NA: 0, NT: 0, partial: 0, suggested: 0, unconfirmed: 0 })).toBe(false)
   })
 })
+
+describe('icon fonts are images for the RGAA', () => {
+  it('normalisedType: an icon font is covered by the tests written for role="img"', async () => {
+    const { normalisedType } = await import('../src/lib/results')
+    const el = (type: string) => ({ type }) as ImageElementInfo
+    expect(normalisedType(el('icon-font (span)'))).toBe('role-img')
+    expect(normalisedType(el('icon-font (i)'))).toBe('role-img')
+    expect(normalisedType(el('role-img (svg)'))).toBe('svg')
+    expect(normalisedType(el('img'))).toBe('img')
+  })
+})

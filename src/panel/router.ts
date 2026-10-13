@@ -156,7 +156,7 @@ export function setView(next: View): void {
   const imagesTheme = state.theme === 1
   dom.appEl.hidden = next !== 'review' || !imagesTheme || !state.elements.length
   dom.emptyEl.hidden = next !== 'review' || !imagesTheme || state.elements.length > 0
-  dom.themeEl.hidden = next !== 'review' || imagesTheme
+  dom.themeEl.hidden = next !== 'review'
   dom.themebarEl.hidden = !state.page || next !== 'review'
   updateTools()
   dom.resultsBtn.setAttribute('aria-pressed', String(next === 'page'))
@@ -165,7 +165,7 @@ export function setView(next: View): void {
   if (next === 'review') {
     renderSummaries()
     renderEmpty()
-    if (!imagesTheme) renderThemeView()
+    renderThemeView()
   }
   if (next === 'page') renderResults()
   if (next === 'audit') renderAudit()

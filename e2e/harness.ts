@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import type { BrowserContext, Page } from '@playwright/test'
+import { expect, type BrowserContext, type Page } from '@playwright/test'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const read = (...parts: string[]) => readFileSync(join(root, ...parts), 'utf8')
@@ -125,4 +125,6 @@ export async function openRig(context: BrowserContext): Promise<Rig> {
 /** Element-only scans are a secondary page action, distinct from the full automatic run. */
 export async function scanElements(panel: Page): Promise<void> {
   await panel.locator('#scan-btn').click()
+  // a page has every theme by default: the scan (elements, then the previews) takes a moment; wait until it is over
+  await expect(panel.locator('#status')).not.toContainText('Analyse en cours', { timeout: 60_000 })
 }

@@ -64,6 +64,7 @@ function svgTitleFor(el: Element): string | null {
 
 function typeOf(el: Element): string {
   const tag = el.tagName.toLowerCase()
+  if (iconFonts.has(el) && el.getAttribute('role') !== 'img') return `icon-font (${tag})`
   if (tag === 'input') return 'input-image'
   if (tag !== 'img' && el.getAttribute('role') === 'img') return `role-img (${tag})`
   return tag
@@ -133,13 +134,47 @@ function deterministicChecksFor(el: Element, alt: string | null, src: string | n
   }
 }
 
-/** Elements to audit: no nested duplicates inside an svg, each element once. */
+/**
+ * Icon fonts: an icon drawn as a character of a font (a private-use glyph in the element, in its ::before / ::after, or a ligature word of
+ * Material Icons) is an image for the RGAA although it is a plain span or i. They are listed with the images and reviewed the same way.
+ */
+const ICON_FONT_CANDIDATES = 'i, span, em, b, [class*="icon" i], [class*="fa-"], [class*="glyph" i], [class*="material" i], [class*="mdi" i], [data-icon]'
+const PRIVATE_USE = /^[\uE000-\uF8FF\u{F0000}-\u{FFFFD}\u{100000}-\u{10FFFD}]$/u
+const MAX_ICON_CANDIDATES = 800
+/** The elements recognised as icon fonts by the last scan (their type says so). */
+const iconFonts = new WeakSet<Element>()
+
+function isIconFont(el: Element): boolean {
+  const text = (el.textContent ?? '').trim()
+  if (text && [...text].length === 1 && PRIVATE_USE.test(text)) return true
+  for (const pseudo of ['::before', '::after']) {
+    const raw = getComputedStyle(el, pseudo).content
+    if (!raw || raw === 'none' || raw === 'normal' || raw.length < 3) continue
+    const glyph = raw.slice(1, -1)
+    if (raw.startsWith('"') && [...glyph].length === 1 && PRIVATE_USE.test(glyph)) return true
+  }
+  // ligature icon fonts: the text is a word the font draws as a glyph
+  return /material[ -]?(icons|symbols)/i.test(getComputedStyle(el).fontFamily) && /^[a-z0-9_]{2,40}$/.test(text)
+}
+
+function findIconFonts(known: Set<Element>): Element[] {
+  const out: Element[] = []
+  let looked = 0
+  for (const el of Array.from(document.querySelectorAll(ICON_FONT_CANDIDATES))) {
+    if (known.has(el) || el.closest(`[id^="${OVERLAY_ID}"]`) || el.closest('svg') || el.children.length || (el.textContent ?? '').length > 40) continue
+    if (++looked > MAX_ICON_CANDIDATES) break
+    if (isIconFont(el)) out.push(el)
+  }
+  return out
+}
+
+/** Elements to audit: no nested duplicates inside an svg, each element once; the icon fonts come in document order with the others. */
 function findCandidates(): Candidate[] {
-  const all = Array.from(document.querySelectorAll(IMAGE_SELECTOR))
-  return all.filter((el) => {
-    const parentSvg = el.parentElement?.closest('svg')
-    return !parentSvg
-  })
+  const all = Array.from(document.querySelectorAll(IMAGE_SELECTOR)).filter((el) => !el.parentElement?.closest('svg'))
+  const icons = findIconFonts(new Set(all))
+  for (const el of icons) iconFonts.add(el)
+  if (!icons.length) return all
+  return [...all, ...icons].sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1))
 }
 
 function rectFor(el: Element): DOMRect {

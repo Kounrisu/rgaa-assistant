@@ -13,7 +13,7 @@ confirms or changes every verdict.
 
 | Theme | How it is audited |
 |---|---|
-| 1 Images | Every image is listed and boxed on the page; informative / decorative, one verdict per criterion |
+| 1 Images | Every image (including icon fonts: a span or i whose glyph comes from a font) is listed and boxed on the page; informative / decorative, one verdict per criterion; the questions no image answers (1.4, 1.5) and the tests the tool does not assess (to check by hand) close the page |
 | 2 Frames | Every `iframe` / `frame`, with its title |
 | 3 Colours | Text contrast findings (computed ratio, picker with magnifier for the unknown ones); 3.1 and 3.3 by hand |
 | 5 Tables | Every table (data / layout), header cells and titles; criteria 5.3 to 5.8 per table |

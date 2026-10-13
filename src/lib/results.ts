@@ -54,6 +54,8 @@ const SCOPE: Record<string, Scope> = {
 
 /** Collapses "role-img (svg)" etc. onto the element the RGAA test is written for. */
 export function normalisedType(el: ImageElementInfo): string {
+  // an icon font is an image drawn by a font (a span or i): the tests written for role="img" cover it
+  if (/^icon-font \(\w+\)$/.test(el.type)) return 'role-img'
   const m = /^role-img \((\w+)\)$/.exec(el.type)
   if (!m) return el.type
   return ['svg', 'canvas', 'object', 'embed', 'img'].includes(m[1]) ? m[1] : 'role-img'
@@ -139,6 +141,7 @@ function testOutcome(
   let pending = 0
   let compliant = 0
   let unconfirmed = false
+  let humanNc = false // a failure the auditor confirmed
   for (const el of inScope) {
     const review = reviewOf(el)
     if (!review?.kind) {
@@ -151,12 +154,16 @@ function testOutcome(
     else {
       answered.push(el.id)
       if (review.auto) unconfirmed = true
-      if (verdict === 'nc') nc.push(el.id)
+      if (verdict === 'nc') {
+        nc.push(el.id)
+        if (!review.auto) humanNc = true
+      }
       if (verdict === 'c') compliant++
     }
   }
   const imageIds = inScope.map((e) => e.id)
-  if (nc.length) return { outcome: 'nc', reason: tr('{n} non-compliant image(s).', { n: nc.length }), imageIds, nc, scope, unconfirmed }
+  // A failure the auditor confirmed is a confirmed failure, whatever other images are still pre-filled (they cannot make it compliant).
+  if (nc.length) return { outcome: 'nc', reason: tr('{n} non-compliant image(s).', { n: nc.length }), imageIds, nc, scope, unconfirmed: humanNc ? false : unconfirmed }
   if (pending) return { outcome: 'pending', reason: tr('{n} image(s) still to review.', { n: pending }), imageIds, nc, scope }
   if (compliant) return { outcome: 'c', reason: tr('{n} image(s) checked.', { n: compliant }), imageIds, nc, scope, unconfirmed }
   return { outcome: 'na', reason: tr('No image of this kind concerned by the test.'), imageIds, nc, scope }
@@ -232,16 +239,20 @@ function findingOutcome(theme: number, criterion: string, input: FindingInputs):
   let pending = 0
   let compliant = 0
   let unconfirmed = false
+  let humanNc = false
   const ncRefs: { id: number; label: string; note: string }[] = []
   for (const f of list) {
     const verdict = input.reviews[f.key]?.answers[criterion]
     if (verdict && input.reviews[f.key]?.auto) unconfirmed = true
     if (!verdict) pending++
-    else if (verdict === 'nc') ncRefs.push({ id: f.id, label: f.label, note: input.reviews[f.key]?.note?.trim() ?? '' })
-    else if (verdict === 'c') compliant++
+    else if (verdict === 'nc') {
+      ncRefs.push({ id: f.id, label: f.label, note: input.reviews[f.key]?.note?.trim() ?? '' })
+      if (!input.reviews[f.key]?.auto) humanNc = true
+    } else if (verdict === 'c') compliant++
   }
   const flag = unconfirmed ? { unconfirmed } : {}
-  if (ncRefs.length) return { outcome: 'nc', ncRefs, ...flag }
+  // a failure the auditor confirmed is a confirmed failure, whatever other elements are still pre-filled
+  if (ncRefs.length) return { outcome: 'nc', ncRefs, ...(humanNc ? {} : flag) }
   if (pending) return { outcome: 'pending' }
   return { outcome: compliant ? 'c' : 'na', ...flag }
 }
@@ -284,9 +295,14 @@ export function computeThemes(
         criteria: imageResults.criteria.map((c) =>
           !isSelected
             ? { id: c.id, title: c.title, outcome: 'unassessed' as Outcome, tests: [], coverage: 'none' as Coverage }
-            : !fi.scannedThemes.includes(1) && c.outcome === 'na'
-            ? { ...c, outcome: 'pending' as Outcome }
-            : c,
+            : // no per-image question exists for it (1.4, 1.5): the auditor answers it for the page, like a checklist criterion
+              c.tests.length && c.tests.every((x) => x.outcome === 'unassessed')
+              ? { ...c, ...checklistOutcome(checklist[c.id]), coverage: 'full' as Coverage }
+              : !fi.scannedThemes.includes(1) && c.outcome === 'na'
+                ? { ...c, outcome: 'pending' as Outcome }
+                : c.coverage === 'partial' && (checklist[c.id]?.manualTests || images.length === 0)
+                  ? { ...c, coverage: 'full' as Coverage } // checked by hand by the auditor, or nothing on the page for those tests to apply to
+                  : c,
         ),
       }
     }

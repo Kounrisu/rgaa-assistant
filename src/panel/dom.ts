@@ -98,6 +98,7 @@ export const dom = {
   resetThemeBtn: $<HTMLButtonElement>('reset-theme-btn'),
   pageSummaryTitle: $('page-summary-title'),
   themeSummaryTitle: $('theme-summary-title'),
+  themeTodoEl: $('theme-todo'),
   themeSummaryEl: $('theme-summary'),
   imageInventoryEl: $('image-inventory'),
   displayToolsEl: $('display-tools'),

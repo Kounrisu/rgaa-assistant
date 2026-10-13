@@ -46,6 +46,9 @@ export function findPage(audit: Audit, url: string): PageRecord | undefined {
   return audit.pages.find((p) => normalizeUrl(p.url) === wanted)
 }
 
+/** The 13 RGAA themes. */
+export const ALL_THEMES: number[] = Array.from({ length: 13 }, (_, i) => i + 1)
+
 export function createPage(audit: Audit, url: string, title: string): PageRecord {
   let n = audit.pages.length + 1
   while (audit.pages.some((p) => p.id === `P${String(n).padStart(2, '0')}`)) n++
@@ -58,7 +61,7 @@ export function createPage(audit: Audit, url: string, title: string): PageRecord
     updatedAt: Date.now(),
     items: [],
     reviews: {},
-    themes: [1],
+    themes: ALL_THEMES, // every RGAA theme: an audit covers the whole referential (a page can still narrow them down)
     checklist: {},
     findings: [],
     findingReviews: {},

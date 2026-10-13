@@ -1,0 +1,35 @@
+/** French texts of “what is left in this theme” (`theme-todo.ts`), the partly covered criteria (findings-view.ts) and the page-level Images questions. */
+export const FR_TODO: Record<string, string> = {
+  'to answer': 'à répondre',
+  'suggestion to confirm': 'suggestion à confirmer',
+  'failure to confirm': 'échec à confirmer',
+  'to confirm': 'à confirmer',
+  'partial coverage': 'couverture partielle',
+  'Theme finished: every criterion is confirmed and fully covered.': 'Thématique terminée : tous les critères sont confirmés et entièrement couverts.',
+  'Left to do in this theme: {n} criteria': 'Reste à faire dans cette thématique : {n} critère(s)',
+  'Go to the first': 'Aller au premier',
+  'Go to the next one': 'Aller au suivant',
+  'Open criteria of this theme': 'Critères ouverts de cette thématique',
+  'Nothing to check here on this page: mark the {n} open criteria not applicable': 'Rien à vérifier ici sur cette page : marquer les {n} critères ouverts non applicables',
+  'Mark these criteria not applicable?': 'Marquer ces critères non applicables ?',
+  '{n} criteria of this theme have no answer yet ({ids}). They will be recorded as Not applicable: your decision, because there is nothing to check here on this page. Criteria you already answered do not change.':
+    '{n} critères de cette thématique n’ont pas encore de réponse ({ids}). Ils seront enregistrés Non applicables : c’est votre décision, car il n’y a rien à vérifier ici sur cette page. Les critères déjà répondus ne changent pas.',
+  'Mark {n} not applicable': 'Marquer {n} non applicable(s)',
+  '{n} criteria recorded as not applicable.': '{n} critère(s) enregistré(s) non applicable(s).',
+  'Partly covered criteria': 'Critères à couverture partielle',
+  'The verdict of these criteria counts, but only for the tests this tool can assess. Check the others by hand on the page, then tick the box: the criterion is then fully covered. If one of them fails, answer Non-compliant on the image concerned and say why in its note.':
+    'Le verdict de ces critères compte, mais seulement pour les tests que l’outil sait évaluer. Vérifiez les autres à la main sur la page, puis cochez la case : le critère est alors entièrement couvert. Si l’un d’eux échoue, répondez Non conforme sur l’image concernée et dites pourquoi dans sa note.',
+  'Partial coverage': 'Couverture partielle',
+  '{n} of the {total} tests of this criterion are not assessed by this tool:': '{n} des {total} tests de ce critère ne sont pas évalués par cet outil :',
+  'I checked these tests by hand': 'J’ai vérifié ces tests à la main',
+  'Next partly covered criterion': 'Critère à couverture partielle suivant',
+  'RGAA {id}: the tests the tool does not assess are checked by hand.': 'RGAA {id} : les tests que l’outil n’évalue pas sont vérifiés à la main.',
+  'RGAA {id}: back to partial coverage.': 'RGAA {id} : retour à la couverture partielle.',
+  'Confirm the “not applicable” suggestions?': 'Confirmer les suggestions « non applicable » ?',
+  'The checks found nothing to verify for {n} criteria of this theme ({ids}) and suggest Not applicable. You confirm that this is right: look at the page if you are not sure.':
+    'Les contrôles n’ont rien trouvé à vérifier pour {n} critères de cette thématique ({ids}) et suggèrent Non applicable. Vous confirmez que c’est juste : regardez la page en cas de doute.',
+  '{n} criteria confirmed as not applicable.': '{n} critère(s) confirmé(s) non applicable(s).',
+  'The checks found nothing to verify: confirm the {n} “not applicable” suggestions': 'Les contrôles n’ont rien trouvé à vérifier : confirmer les {n} suggestions « non applicable »',
+  'Criteria not applicable: nothing found on the page': 'Critères non applicables : rien trouvé sur la page',
+  'nothing found at the last scan': 'rien trouvé à la dernière analyse',
+}
