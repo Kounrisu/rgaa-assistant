@@ -10,7 +10,8 @@ import { findPage } from '../lib/audit-store'
 import { createAuditSession } from './audit-session'
 import type { ContentMessage } from '../lib/messages'
 import { getLang, setLang, t, translateStatic } from '../lib/i18n'
-import { initPageTools } from './page-tools-ui'
+import { initPageTools, refreshPageTools } from './page-tools-ui'
+import { initAuditStyles } from './audit-styles-ui'
 import { auditTitle, auditFileName } from './helpers'
 import { download, dom, say } from './dom'
 import { state } from './state'
@@ -88,6 +89,7 @@ async function init(): Promise<void> {
   setLang(getLang())
   translateStatic()
   initPageTools(dom.pageToolsEl, { send: (payload) => sendToPage(inspectedTabId(), payload as Extract<ContentMessage, { type: 'RGAA_TOOL' }>), say })
+  initAuditStyles({ apply: (m) => chrome.runtime.sendMessage({ type: 'RGAA_STYLE', tabId: inspectedTabId(), ...m }), say, refresh: refreshPageTools })
   const loaded = await state.session.loadInitial()
   const firstUrl = state.audit.pages.find((p) => p.url)?.url
   if (loaded && !state.audit.meta.site.trim() && firstUrl) {

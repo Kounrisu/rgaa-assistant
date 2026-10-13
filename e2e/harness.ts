@@ -68,6 +68,20 @@ export async function openRig(context: BrowserContext): Promise<Rig> {
         return dispatch(message.payload)
       case 'RGAA_TAB_INFO':
         return { url: site.url(), title: await site.title() }
+      case 'RGAA_STYLE':
+        // the real background injects the CSS with scripting.insertCSS (not available here): a <style> element stands in for it
+        await site.evaluate(
+          ([id, css, on]) => {
+            document.querySelectorAll(`style[data-e2e-style="${id}"]`).forEach((n) => n.remove())
+            if (!on) return
+            const style = document.createElement('style')
+            style.dataset.e2eStyle = String(id)
+            style.textContent = String(css)
+            document.head.append(style)
+          },
+          [message.id, message.css, message.on],
+        )
+        return { ok: true }
       case 'RGAA_CAPTURE':
         return { dataUrl: `data:image/png;base64,${(await site.screenshot({ type: 'png' })).toString('base64')}` }
       case 'RGAA_AXE':

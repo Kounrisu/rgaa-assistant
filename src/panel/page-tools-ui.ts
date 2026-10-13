@@ -1,4 +1,5 @@
 import { t } from '../lib/i18n'
+import { auditStylesMenu, resetAuditStyles, setAuditStylesTheme, stylusHint } from './audit-styles-ui'
 
 /**
  * The "page tools" bar: switches that change what the page shows so manual checks are easier
@@ -56,6 +57,7 @@ export function renderPageTools(): void {
     host!.append(button)
   }
   relevant.forEach(add)
+  setAuditStylesTheme(currentTheme)
   if (others.length) {
     const more = document.createElement('button')
     more.type = 'button'
@@ -69,7 +71,13 @@ export function renderPageTools(): void {
     host.append(more)
     if (showAll) others.forEach(add)
   }
+  host.append(auditStylesMenu())
+  const hint = stylusHint()
+  if (hint) host.append(hint)
 }
+
+/** Redraws the bar (the audit styles menu changed). */
+export const refreshPageTools = (): void => renderPageTools()
 
 /** The theme being shown: the bar leads with the tools that belong to it. */
 export function setPageToolsTheme(theme: number): void {
@@ -94,6 +102,7 @@ async function toggle(tool: Tool): Promise<void> {
 /** The page was reloaded or changed: every tool is off again. */
 export function resetPageTools(): void {
   on.clear()
+  resetAuditStyles()
   renderPageTools()
 }
 

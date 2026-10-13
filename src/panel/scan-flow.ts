@@ -13,6 +13,7 @@ import { switchTo, setView, renderAll } from './router'
 import { colorOf } from '../lib/theme-colors'
 import { mergeCoverage } from '../lib/scan-coverage'
 import { mergeScan, mergeFindings } from './scan-merge'
+import { switchAuditStylesOff } from './audit-styles-ui'
 import { listedFindings } from './review-state'
 
 export async function scan(): Promise<void> {
@@ -21,6 +22,8 @@ export async function scan(): Promise<void> {
   const scannable = state.page.themes.filter((n) => SCANNED_THEMES.has(n))
   if (!scannable.length) return void say(t('None of the selected themes can be scanned: they are checklists. Select Images, Frames or Colours to scan.'))
   say(t('Scanning…'))
+  // an audit style changes how the page looks (revealed hidden content, forced layout): the scan must see the page as it is
+  const stylesOff = await switchAuditStylesOff()
   try {
     const [url, title] = await Promise.all([inspectedUrl(), inspectedTitle()])
     state.liveUrl = url
@@ -46,6 +49,7 @@ export async function scan(): Promise<void> {
     if (!rec.title && title) rec.title = title
 
     const parts: string[] = []
+    if (stylesOff) parts.push(t('{n} audit style(s) switched off first', { n: stylesOff }))
     const first = state.scanCount === 0
     const selectedKey = state.elements.find((e) => e.id === state.selectedId)?.key
     if (rec.themes.includes(1)) {

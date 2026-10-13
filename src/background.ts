@@ -34,6 +34,16 @@ chrome.runtime.onMessage.addListener((message: BackgroundMessage, sender, sendRe
         .then(() => chrome.tabs.sendMessage(message.tabId, { type: 'RGAA_AXE_RUN', locale: message.locale ?? null, rules: message.rules ?? null }))
         .then(sendResponse, (err) => sendResponse({ error: String(err) }))
       return true
+    // Audit styles (the Stylus-like sheets): the CSS is injected as a user style so its !important wins over the page's, and a
+    // sheet is removed with the same text it was added with. Only the inspected tab, only the top document.
+    case 'RGAA_STYLE': {
+      const injection = { target: { tabId: message.tabId }, css: message.css, origin: 'USER' as const }
+      void (message.on ? chrome.scripting.insertCSS(injection) : chrome.scripting.removeCSS(injection)).then(
+        () => sendResponse({ ok: true }),
+        (err) => sendResponse({ error: String(err) }),
+      )
+      return true
+    }
     case 'RGAA_RELAY':
       chrome.tabs
         .sendMessage(message.tabId, message.payload)

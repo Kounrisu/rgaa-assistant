@@ -810,3 +810,17 @@ body[data-view="audits"] :is(.pagebar,.page-progress,#display-tools,#nav-banner,
 .item[aria-current='true'] .num::before { content: '▶ '; font-size: 11px; }
 .item:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; box-shadow: 0 0 0 5px var(--surface); z-index: 1; position: relative; }
 .item[aria-current='true']:focus-visible { box-shadow: inset 0 0 0 2px var(--tc, var(--accent)), 0 0 0 5px var(--surface); }
+
+/* Audit styles menu (the Stylus sheets), in the page tools bar */
+.styles-menu { position: relative; }
+.styles-menu > .styles-toggle { cursor: pointer; padding: 5px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+.styles-menu > .styles-toggle[aria-expanded='true'] { background: var(--accent-soft); border-color: var(--accent); }
+.styles-menu .styles-content[hidden] { display: none; }
+.styles-menu .styles-content { position: absolute; left: 0; z-index: 30; margin-top: 4px; width: min(560px, 92vw); max-height: 65vh; overflow-y: auto; padding: 10px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 8px 24px rgba(0, 0, 0, .18); }
+.styles-menu fieldset { margin: 8px 0 0; padding: 0; border: 0; }
+.styles-menu legend { padding: 0; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.styles-menu .style-row { display: flex; align-items: center; gap: 6px; padding: 3px 4px; border-radius: 6px; cursor: pointer; }
+.styles-menu .style-row:hover { background: var(--surface-2); }
+.styles-menu .styles-mode { padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.styles-menu .menu-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); }
+.styles-hint { align-self: center; padding: 3px 8px; border: 1px dashed var(--border); border-radius: 6px; font-size: 12px; color: var(--muted); }

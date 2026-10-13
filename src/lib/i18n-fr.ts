@@ -7,6 +7,7 @@ import { FR_PERSIST } from './i18n-fr-persist'
 import { FR_SCAN } from './i18n-fr-scan'
 import { FR_APG } from './i18n-fr-apg'
 import { FR_MANUAL } from './i18n-fr-manual'
+import { FR_STYLES } from './i18n-fr-styles'
 
 /** French texts, keyed by the English text used in the code. */
 export const FR: Record<string, string> = {
@@ -19,5 +20,6 @@ export const FR: Record<string, string> = {
   ...FR_SCAN,
   ...FR_APG,
   ...FR_MANUAL,
+  ...FR_STYLES,
   // audit bar and audits screen are in i18n-fr-panel.ts
 }
