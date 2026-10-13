@@ -23,6 +23,10 @@ confirms or changes every verdict.
 | 11 Forms | Every field with its accessible name, placeholder-only fields, autocomplete on personal fields |
 | 4, 8, 10, 12, 13 and the other criteria | Checklists with the official tests, pre-filled where a check can say something |
 
+**Audit styles** (page tools, “Styles d’audit”): the 19 CSS sheets used with Stylus (images, links, headings, tables, ARIA roles, landmarks…),
+applied from the panel one by one with the sheets of the theme being reviewed first, or, if you prefer to keep using Stylus, just named theme by theme
+(same names as in Stylus). Every sheet is switched off before a scan, because a sheet changes how the page looks.
+
 **Automatic checks** (button “Contrôler automatiquement la page ouverte”): scans every scannable theme, then runs
 [axe-core](https://github.com/dequelabs/axe-core) (only the rules that map to an RGAA criterion), our own RGAA
 checks, rules adapted from [Asqatasun](https://github.com/Asqatasun/Asqatasun) (73 of its 99 RGAA 4 tests; 322 of

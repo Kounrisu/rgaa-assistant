@@ -61,7 +61,17 @@ export interface RelayMessage {
   payload: unknown
 }
 
-export type BackgroundMessage = SaveMessage | DeleteMessage | CaptureMessage | TabInfoMessage | AxeMessage | RelayMessage
+/** Applies (on) or removes (off) a style sheet of the audit styles on the inspected tab. Extension-injected CSS: the page's CSP cannot block it. */
+export interface StyleMessage {
+  type: 'RGAA_STYLE'
+  tabId: number
+  id: string
+  css: string
+  on: boolean
+}
+export type StyleResponse = { ok: true } | { ok?: false; error: string }
+
+export type BackgroundMessage = SaveMessage | DeleteMessage | CaptureMessage | TabInfoMessage | AxeMessage | RelayMessage | StyleMessage
 
 /* Content script: what the panel (through the background relay) asks the page, and what the page answers.
  * Only types are exported from here (erased at build time): the content script must stay one self-contained script,

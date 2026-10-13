@@ -109,7 +109,7 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 ## Open decisions (owner)
 
 - **AI**: access (copy-paste / cloud API with own key / local model / company endpoint), first tasks, what may be sent — all undecided. Principles agreed for any design: suggestions only (never a verdict), opt-in, payload shown before any call, minimal data (no cookies, no full pages, nothing from logged-in sessions), traceable (model, prompt version, date), provider-neutral, measured against the owner's own past audits before being trusted. Safe order if approved: provider interface + copy-paste mode + payload preview + stored AI suggestions; relevance judgements from text; explain-and-fix and report drafting; optional API/local; images last with consent.
-- **Access42 JSON file / Stylus**: the owner will provide the file later; do not start before seeing it.
+- **Stylus sheets**: provided by the owner and integrated (see the 2026-10-13 handoff): applied from the panel or only named for Stylus users.
 - **Project licence**: AGPL-3.0 now; removing the Asqatasun-derived code is the precondition for relicensing (`NOTICE.md`).
 - **RGAA data licence** (DINUM): terms to confirm before redistributing. **Ownership/employment** of the tool if used at Banque de France: for the owner to check.
 
@@ -123,6 +123,32 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-13 — Claude Code — audit styles (the Stylus sheets), integrated
+- Owner's decision (reverses the earlier "Stylus stays separate" entry): the 19 sheets are **bundled** (no re-import of the JSON) and the auditor
+  chooses how to work: apply them from the panel, theme by theme, or keep using Stylus and have the panel only name the sheets of the theme.
+- Did: `src/lib/audit-styles-data.ts` (the sheets, verbatim from the owner's Stylus export, `String.raw` so `\A` survives; site-specific styles and the
+  duplicate of the text-spacing tool left out), `src/lib/audit-styles.ts` (by theme), `src/panel/audit-styles-ui.ts` (the "Styles d'audit" menu in the page
+  tools bar: a choice between "Appliquer ici" and "J'utilise Stylus", the sheets of the current theme first, a "Stylus : 06.Liens" hint in Stylus mode,
+  mode kept in `localStorage`), a `RGAA_STYLE` message handled in `src/background.ts` (`scripting.insertCSS` / `removeCSS`, origin USER, so the page's CSP
+  cannot block it and its !important wins), `scan()` switches every sheet off first (a sheet changes what the scan sees) and says so, reset when the page
+  reloads. THIRD-PARTY.md row (supplied by the owner; licence to be confirmed by the owner) and README.
+- Tests: `tests/audit-styles.test.ts` (19 sheets, names, themes, `\A` kept, no network, by theme), `e2e/audit-styles.spec.ts` (the rig stands in for the
+  background with a `<style>` element: apply, remove, switched off before a scan, Stylus mode, remembered). `npm run check` 205 unit tests, 737 texts / 1272 French / 0 missing; `npm run test:e2e` 26 passed (parity baseline updated: the menu adds the sheet list to every screen's tools bar). The menu is a button + panel, not `<details>`, because Codex's review-workflow test requires the display tools area to have no collapsible `summary`.
+- NOT tested: `scripting.insertCSS` with `origin: 'USER'` in a real Firefox/Chrome (only the stand-in ran), nor the look of every sheet on a real site.
+  The sheets add a fixed counter box and shift the page by 200 px: the boxes of the scan are not meant to be used at the same time.
+
+### 2026-10-13 — Claude Code — Stylus: decision recorded, nothing built
+- The owner shared the Stylus export (19 audit sheets, `.json`) and asked for an independent use of Stylus. Decision (owner): **option 1,
+  Stylus stays a separate tool; the app does not apply or bundle those sheets.** A partial implementation (an "Audit styles" menu, a
+  background `insertCSS` message, a Stylus-export importer with a CSS sanitizer, the 19 sheets bundled) was started before the owner
+  answered; it was never committed and has been discarded. Nothing in the application changed.
+- Things to know if this comes back: (1) the sheets change how the page looks (`display:block !important`, hidden elements revealed), so with a sheet
+  on, the scan sees a different page (visibility, boxes, previews): switch Stylus sheets off before "Analyser" / the automatic run;
+  (2) the sheets are the owner's: do not copy them into the repository without the owner's decision on ownership and licence (decided later: bundled);
+  (3) if an importer is ever built: read the file at runtime, apply through the background (`scripting.insertCSS`, origin USER, CSP-proof), strip `@import`,
+  `url()` that is not a `data:` image, and `image-set()`/`src()`; skip site-specific sections.
+- State: no code change; working tree clean. Not tested in a real Firefox.
 
 ### 2026-10-11 — Claude Code — Colours: "introuvable" texts were never dropped
 - Why: the owner saw many Colours findings marked "Introuvable" (not found at the last scan). `mergeFindings` drops a gone finding that no
@@ -681,7 +707,7 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
   workflow redesign and a theme-tab accessibility tweak had been made by the owner's other tool (ChatGPT pair coding); both were
   checked (`npm run check`, `npm run test:e2e`) and committed as `9a3abb8` and `197aa7b`.
 - State: all checks above pass on `197aa7b`; not tried in a real Firefox.
-- Next: see “Next”. Waiting on the owner for the real-Firefox report and the AI / Access42 decisions.
+- Next: see “Next”. Waiting on the owner for the real-Firefox report and the AI decision.
 - For the other agent: add your entry above this one. If you edit `src/panel/**` run `npm run test:e2e` and read any parity diff before updating the baseline.
 
 ### 2026-10-10 — Claude Code (with sub-agents on isolated branches) — big build day
