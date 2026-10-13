@@ -8,6 +8,12 @@
  * kept as written apart from the formatting and one comment whose accents were damaged in the export. The site-specific styles of that
  * export (a billing tool, a project tracker, a test) and a duplicate of the "Text spacing" page tool are not included. Written with
  * `String.raw` so the CSS escapes (`\A` = a new line in a generated text) stay as they are.
+ *
+ * UPDATING THESE SHEETS LATER: this is a copy. A change made in Stylus does not reach it. For now, hand the changed sheet (or a new Stylus
+ * export, `.json`) to whoever maintains the project and have it pasted here, keeping the Stylus name, the theme(s) and `String.raw`;
+ * `tests/audit-styles.test.ts` lists the expected names and counts, update it with the sheet. If the sheets change often, add back an
+ * "Import a Stylus file" button instead: read the export, apply the same strictness as before (no `@import`, no `url()` that is not a
+ * `data:` image, skip site-specific sections), keep the result in `chrome.storage.local`.
  */
 export interface BundledSheet {
   /** Stable id. */

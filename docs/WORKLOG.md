@@ -110,6 +110,7 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 - **AI**: access (copy-paste / cloud API with own key / local model / company endpoint), first tasks, what may be sent — all undecided. Principles agreed for any design: suggestions only (never a verdict), opt-in, payload shown before any call, minimal data (no cookies, no full pages, nothing from logged-in sessions), traceable (model, prompt version, date), provider-neutral, measured against the owner's own past audits before being trusted. Safe order if approved: provider interface + copy-paste mode + payload preview + stored AI suggestions; relevance judgements from text; explain-and-fix and report drafting; optional API/local; images last with consent.
 - **Stylus sheets**: provided by the owner and integrated (see the 2026-10-13 handoff): applied from the panel or only named for Stylus users.
+  Updating them: the app's copy (`src/lib/audit-styles-data.ts`) does not follow Stylus; send the changed sheet or a new Stylus export to be pasted there (instructions in the file header). If it happens often, add an "Importer un fichier Stylus" button.
 - **Project licence**: AGPL-3.0 now; removing the Asqatasun-derived code is the precondition for relicensing (`NOTICE.md`).
 - **RGAA data licence** (DINUM): terms to confirm before redistributing. **Ownership/employment** of the tool if used at Banque de France: for the owner to check.
 
