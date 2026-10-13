@@ -1,7 +1,7 @@
 :root {
   color-scheme: light dark;
   --bg: #f6f7fb; --surface: #ffffff; --surface-2: #f0f2f8; --border: #dfe3ee; --text: #171a26; --muted: #5d6478; --accent: #4f46e5;
-  --auto: #15803d; --auto-soft: #dcf5e4; --semi: #a16207; --semi-soft: #fdf0c8; --manual: #be123c; --manual-soft: #fde2e8;
+  --auto: #166534; --auto-soft: #dcf5e4; --semi: #854d0e; --semi-soft: #fdf0c8; --manual: #be123c; --manual-soft: #fde2e8;
 }
 @media (prefers-color-scheme: dark) {
   :root {

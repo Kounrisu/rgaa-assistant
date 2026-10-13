@@ -32,6 +32,7 @@
       </div>
     </div>
 
+    <main id="main-content">
     <p id="status" role="status" class="status top-status"></p>
 
     <div class="pagebar">
@@ -91,7 +92,7 @@
       </div>
     </section>
 
-    <main id="app" class="layout" hidden>
+    <div id="app" class="layout" hidden>
       <details id="image-list-disclosure" class="list-pane" open aria-label="Images found on the page" data-i18n-attrs="aria-label">
         <summary data-i18n>Images on this page</summary>
         <div id="image-inventory" class="theme-summary element-inventory" aria-label="Images found on the page" data-i18n-attrs="aria-label"></div>
@@ -109,7 +110,7 @@
         <ol id="element-list"></ol>
       </details>
       <section id="detail" class="detail-pane" aria-label="Image details" data-i18n-attrs="aria-label"></section>
-    </main>
+    </div>
 
     <section id="theme-view" class="results" aria-label="Theme checklist" data-i18n-attrs="aria-label" hidden></section>
 
@@ -131,6 +132,8 @@
       <ol id="empty-steps"></ol>
     </section>
 
+
+    </main>
 
     <!-- DevTools panels cannot show the browser's confirm() popup, so confirmations live here -->
     <dialog id="confirm-dialog" class="confirm" aria-labelledby="confirm-title">

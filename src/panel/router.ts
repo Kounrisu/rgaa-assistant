@@ -201,6 +201,6 @@ export function updateTools(): void {
   dom.displayToolsEl.hidden = !reviewing
   dom.themeSummaryEl.dataset.theme = String(state.theme)
   dom.themeSummaryTitle.textContent = themeSummaryHeading(state.theme)
-  dom.resetThemeBtn.setAttribute('aria-label', t('Reset {name}', { name: t(THEME_LABEL[state.theme]) }))
+  dom.resetThemeBtn.setAttribute('aria-label', `${t('Reset current theme')} — ${t(THEME_LABEL[state.theme])}`)
   dom.toolsEl.hidden = !(reviewing && SCANNED_THEMES.has(state.theme))
 }
