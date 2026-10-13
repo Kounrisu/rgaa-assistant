@@ -115,3 +115,19 @@ test('links: pre-filled answers keep the theme at 0 until you confirm them, and 
   await expect(panel.locator('#theme-summary-title')).not.toContainText(' 0/2')
   expect(rig.problems).toEqual([])
 })
+
+test('clicking the answer an image was pre-filled with confirms it (the radio is already checked)', async ({ rig }) => {
+  test.setTimeout(120_000)
+  const { panel } = rig
+  await panel.locator('#empty-add-btn').click()
+  await scanElements(panel)
+  const all = panel.locator('.confirm-all')
+  await expect(all).toBeVisible()
+  const before = Number(/\d+/.exec((await all.textContent()) ?? '')?.[0])
+  // the image is selected; its kind radio is already checked because the scan pre-filled it
+  const checked = panel.locator('input[id^="kind-"]:checked').first()
+  await panel.locator(`label[for="${await checked.getAttribute('id')}"]`).click()
+  const after = (await all.count()) ? Number(/\d+/.exec((await all.textContent()) ?? '')?.[0]) : 0
+  expect(after).toBe(before - 1)
+  expect(rig.problems).toEqual([])
+})
