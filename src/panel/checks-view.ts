@@ -5,7 +5,7 @@ import { runLabel } from './page-work'
  */
 import type { PageRecord } from '../lib/types'
 import { MANUAL_CHECKS, MANUAL_GROUPS } from '../lib/manual-checks'
-import { h, dom, keepScroll, download, say } from './dom'
+import { h, dom, keepScroll, download, say, newTabNote } from './dom'
 import { t } from '../lib/i18n'
 import { coverageLines } from '../lib/scan-coverage'
 import { state } from './state'
@@ -84,7 +84,7 @@ export function renderChecks(): void {
           { class: 'check-row', 'data-state': answer?.state ?? '' },
           h('p', { class: 'question' }, t(c.text)),
           h('p', { class: 'hint-line how' }, h('strong', {}, `${t('How to check:')} `), t(c.how)),
-          h('p', { class: 'hint-line' }, t('Feeds RGAA'), ' ', ...c.criteria.flatMap((id, i) => [i ? ', ' : '', h('a', { href: criterionUrl(id), target: '_blank', rel: 'noreferrer' }, id)])),
+          h('p', { class: 'hint-line' }, t('Feeds RGAA'), ' ', ...c.criteria.flatMap((id, i) => [i ? ', ' : '', h('a', { href: criterionUrl(id), target: '_blank', rel: 'noreferrer' }, id, newTabNote())])),
           h('div', { class: 'verdicts' }, ...radio('todo', t('To do')), ...radio('ok', t('Checked, OK')), ...radio('issue', t('Problem found'))),
           answer?.state === 'issue'
             ? h('textarea', {

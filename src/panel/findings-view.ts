@@ -5,7 +5,7 @@ import { reviewActions } from './review-controls'
 import type { FindingItem, ImageReview, Verdict } from '../lib/types'
 import { state } from './state'
 import { persist, pageLabel, pageInput } from './model'
-import { say, dom, keepScroll, h } from './dom'
+import { say, dom, keepScroll, h, newTabNote } from './dom'
 import { t } from '../lib/i18n'
 import { listedFindings, findingMatches, findingStatus, findingFails, STATUS_LABEL, findingReview } from './review-state'
 import type { FindingFilter } from './types'
@@ -98,7 +98,7 @@ function partialSection(criteria: CriterionResult[]): HTMLElement {
       if (target) focusReviewTarget(target)
     }
     card.append(
-      h('div', { class: 'criterion-head' }, h('span', { class: 'crit-id' }, `RGAA ${c.id}`), h('span', { class: 'badge manual' }, t('Partial coverage')), h('a', { class: 'crit-link', href: `https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/#${c.id}`, target: '_blank', rel: 'noreferrer' }, t('Official tests ↗'))),
+      h('div', { class: 'criterion-head' }, h('span', { class: 'crit-id' }, `RGAA ${c.id}`), h('span', { class: 'badge manual' }, t('Partial coverage')), h('a', { class: 'crit-link', href: `https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/#${c.id}`, target: '_blank', rel: 'noreferrer' }, t('Official tests ↗'), newTabNote())),
       h('p', { class: 'question' }, c.title.replace(/`/g, '')),
       h('p', { class: 'hint info' }, t('{n} of the {total} tests of this criterion are not assessed by this tool:', { n: missing.length, total: c.tests.length })),
       h('ul', { class: 'checks' }, ...missing.map((x) => h('li', {}, h('strong', {}, `${x.id} `), x.text.replace(/`/g, ''), h('em', {}, ` — ${x.reason}`)))),
@@ -291,7 +291,7 @@ export function findingCard(f: FindingItem, review: ImageReview, c: FindingCrite
     h('label', { for: `${group}-${value}` }, text),
   ]
   card.append(
-    h('div', { class: 'criterion-head' }, h('span', { class: 'crit-id' }, `RGAA ${c.id}`), h('span', { class: 'level' }, t('Level {level}', { level: c.level })), h('a', { class: 'crit-link', href: `https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/#${c.id}`, target: '_blank', rel: 'noreferrer' }, t('Official tests ↗'))),
+    h('div', { class: 'criterion-head' }, h('span', { class: 'crit-id' }, `RGAA ${c.id}`), h('span', { class: 'level' }, t('Level {level}', { level: c.level })), h('a', { class: 'crit-link', href: `https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/#${c.id}`, target: '_blank', rel: 'noreferrer' }, t('Official tests ↗'), newTabNote())),
     h('p', { class: 'question' }, t(c.question)),
     h('ul', { class: 'checks' }, ...c.checks.map((x) => h('li', {}, t(x)))),
     ...(hint ? [h('p', { class: `hint ${hint.tone}` }, hint.text)] : []),

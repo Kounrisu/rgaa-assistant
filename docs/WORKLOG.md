@@ -125,6 +125,16 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Handoff log (newest first)
 
+### 2026-10-13 — Claude Code — RGAA self-audit, skip link and new-tab notices
+- Did: self-audit in `docs/RGAA-SELF-AUDIT-2026-10-13.md`. Fixed: skip link to the main content on the panel and the coverage page (12.7);
+  hidden "(opens in a new tab)" text on every `target="_blank"` link (13.2, helper `newTabNote()` in `dom.ts`); `prefers-reduced-motion` and
+  `forced-colors` rules; coverage page `lang="fr"` by default. French in `i18n-fr-a11y.ts`. Parity baseline updated (every screen gains the skip link).
+- State: `npm run check` passes (221 unit tests, 0 missing translations); `panel-a11y` axe e2e passes. Full e2e: all pass except two tests that were already
+  flaky before this change (`audit-level` "asks exactly its criteria" failed 3 of 5 runs on the untouched code too; parity screen
+  "theme 9 Structure 0/4, checklist verdict clicked" gives a different hash on each run, 2 screens already differed from the baseline before this change).
+- Not tested: keyboard walk-through, 400 % zoom and text spacing (items 3, 5, 8 of the audit), screen reader, real Firefox/DevTools.
+- Next: those untested items; make the two flaky tests deterministic.
+
 ### 2026-10-13 — Claude Code — the panel passes axe (light and dark), first accessibility pass (UX plan WP8, started)
 - Did: ran axe (WCAG 2.x A/AA + best practice) on every main view: 4 failing rules at first (colour contrast near misses 4.2-4.35:1 on pills/outcomes, theme tabs white on amber/lime/cyan, no `<main>`
   landmark, `region`, a button whose accessible name did not contain its visible text, two empty table headers) and dark theme (white on the light purple accent). Fixed: palette (`--ok`, `--warn`, `--na`,

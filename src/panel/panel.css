@@ -862,3 +862,9 @@ body[data-view="audits"] :is(.pagebar,.page-progress,#display-tools,#nav-banner,
 /* numbers in theme colours stay readable on the tinted selection (>= 4.5:1) */
 .item .num { color: color-mix(in srgb, var(--tc) 65%, black); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .item .num { color: color-mix(in srgb, var(--tc) 50%, white); } }
+
+.skip-link { position: absolute; left: 8px; top: -100px; z-index: 100; padding: 8px 14px; border-radius: 8px; background: var(--surface); color: var(--text); border: 2px solid var(--accent); font-weight: 600; text-decoration: none; }
+.skip-link:focus { top: 8px; }
+#main-content:focus { outline: none; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }
+@media (forced-colors: active) { .meter, .progress .meter { border: 1px solid CanvasText; } .meter i { background: Highlight; forced-color-adjust: none; } }

@@ -7,7 +7,7 @@ import { IMAGE_CRITERION_IDS } from '../lib/rgaa'
 import { inActiveLevel } from '../lib/audit-levels'
 import { state } from './state'
 import type { ChecklistAnswer, ChecklistVerdict } from '../lib/types'
-import { h, dom } from './dom'
+import { h, dom, newTabNote } from './dom'
 import { t } from '../lib/i18n'
 import { themeByNumber, FINDING_THEMES } from '../lib/themes'
 import { pageInput, persist } from './model'
@@ -95,7 +95,7 @@ export function renderChecklist(host: HTMLElement = dom.themeEl): void {
         { class: 'criterion-head' },
         h('span', { class: 'crit-id' }, `RGAA ${c.id}`),
         h('span', { class: `badge ${c.automation}` }, autoLabel[c.automation]),
-        h('a', { class: 'crit-link', href: `https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/#${c.id}`, target: '_blank', rel: 'noreferrer' }, t('Official tests ↗')),
+        h('a', { class: 'crit-link', href: `https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/#${c.id}`, target: '_blank', rel: 'noreferrer' }, t('Official tests ↗'), newTabNote()),
       ),
       h('p', { class: 'question' }, c.title.replace(/`/g, '')),
       h('p', { class: 'hint info' }, c.note),

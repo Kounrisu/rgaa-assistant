@@ -23,6 +23,9 @@ export function h<K extends keyof HTMLElementTagNameMap>(
   return node
 }
 
+/** Hidden text that tells assistive technology a link opens a new tab (RGAA 13.2). Append it inside the link. */
+export const newTabNote = (): HTMLElement => h('span', { class: 'sr-only' }, ' ', t('(opens in a new tab)'))
+
 /** Like t(), but each `{name}` is replaced by a node (a <strong>, a link…) instead of text. */
 export function tNodes(en: string, nodes: Record<string, Child>): Child[] {
   return t(en)
