@@ -7,7 +7,7 @@ import { themeTodo, type TodoItem, type TodoReason } from '../lib/theme-todo'
 import { confirm as confirmVerdict } from '../lib/evidence'
 import { IMAGE_CRITERION_IDS } from '../lib/rgaa'
 import { findingCriterionIds } from '../lib/findings'
-import { SCANNED_THEMES, themeByNumber } from '../lib/themes'
+import { FINDING_THEMES, SCANNED_THEMES, themeByNumber } from '../lib/themes'
 import { t } from '../lib/i18n'
 import { state } from './state'
 import { h, say } from './dom'
@@ -89,6 +89,28 @@ async function confirmNaSuggestions(ids: string[]): Promise<void> {
   say(t('{n} criteria confirmed as not applicable.', { n: ids.length }))
 }
 
+/** Elements of a finding theme (links, forms…) whose answers the scan pre-filled and nobody confirmed: the reason a criterion stays “to confirm”. */
+function prefilledFindingKeys(theme: number): string[] {
+  const rec = state.page
+  if (!rec || !FINDING_THEMES.has(theme)) return []
+  return rec.findings.filter((f) => f.theme === theme && rec.findingReviews[f.key]?.auto && Object.keys(rec.findingReviews[f.key].answers).length).map((f) => f.key)
+}
+
+async function confirmPrefilledFindings(keys: string[]): Promise<void> {
+  const rec = state.page
+  if (!rec || !keys.length) return
+  const yes = await askConfirm(
+    t('Confirm the pre-filled answers?'),
+    t('You confirm the {n} answers the scan pre-filled from the markup in this theme. Look at the ones that matter first (a link name can be present and still meaningless). Answers you change yourself are not affected.', { n: keys.length }),
+    t('Confirm {n}', { n: keys.length }),
+  )
+  if (!yes) return
+  for (const k of keys) rec.findingReviews[k].auto = false
+  persist()
+  actions.renderAll()
+  say(t('{n} pre-filled answers confirmed.', { n: keys.length }))
+}
+
 export function renderThemeTodo(host: HTMLElement, deps: TodoDeps): void {
   host.replaceChildren()
   const rec = state.page
@@ -129,6 +151,10 @@ export function renderThemeTodo(host: HTMLElement, deps: TodoDeps): void {
       ),
     ),
   )
+  const prefilled = prefilledFindingKeys(state.theme)
+  if (prefilled.length) {
+    host.append(h('p', { class: 'todo-na' }, t('{n} element(s) of this theme still hold the answer the scan pre-filled; a criterion is confirmed only when all of its elements are.', { n: prefilled.length }), ' ', h('button', { type: 'button', class: 'ghost-btn todo-prefilled-confirm', onclick: () => void confirmPrefilledFindings(prefilled) }, t('Confirm the {n} pre-filled answers', { n: prefilled.length }))))
+  }
   const detected = naSuggestionIds(theme)
   if (detected.length) {
     host.append(h('p', { class: 'todo-na' }, h('button', { type: 'button', class: 'ghost-btn todo-na-confirm', onclick: () => void confirmNaSuggestions(detected) }, t('The checks found nothing to verify: confirm the {n} “not applicable” suggestions', { n: detected.length }))))

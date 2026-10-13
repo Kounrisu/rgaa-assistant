@@ -99,3 +99,19 @@ test('a theme with nothing on the page shows its criteria as not applicable, and
   await expect(panel.locator('#theme-todo .todo-na-confirm')).toHaveCount(0)
   await expect.poll(async () => Number(/\d+/.exec((await panel.locator('#theme-summary .sum-na').textContent()) ?? '')![0])).toBe(naBefore + n)
 })
+
+test('links: pre-filled answers keep the theme at 0 until you confirm them, and one button does it', async ({ rig }) => {
+  test.setTimeout(120_000)
+  const { panel } = rig
+  await panel.locator('#empty-add-btn').click()
+  await scanElements(panel)
+  await panel.locator('.theme-tab', { hasText: 'Liens' }).click()
+  const btn = panel.locator('#theme-todo .todo-prefilled-confirm')
+  await expect(btn).toBeVisible()
+  await expect(panel.locator('#theme-todo .todo-na').first()).toContainText('pré-remplie')
+  await btn.click()
+  await panel.locator('#confirm-ok').click()
+  await expect(btn).toHaveCount(0)
+  await expect(panel.locator('#theme-summary-title')).not.toContainText(' 0/2')
+  expect(rig.problems).toEqual([])
+})

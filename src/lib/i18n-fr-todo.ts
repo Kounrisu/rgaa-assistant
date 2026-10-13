@@ -32,4 +32,11 @@ export const FR_TODO: Record<string, string> = {
   'The checks found nothing to verify: confirm the {n} “not applicable” suggestions': 'Les contrôles n’ont rien trouvé à vérifier : confirmer les {n} suggestions « non applicable »',
   'Criteria not applicable: nothing found on the page': 'Critères non applicables : rien trouvé sur la page',
   'nothing found at the last scan': 'rien trouvé à la dernière analyse',
+  'Confirm the pre-filled answers?': 'Confirmer les réponses pré-remplies ?',
+  'You confirm the {n} answers the scan pre-filled from the markup in this theme. Look at the ones that matter first (a link name can be present and still meaningless). Answers you change yourself are not affected.':
+    'Vous confirmez les {n} réponses que l’analyse a pré-remplies d’après le code dans cette thématique. Regardez d’abord celles qui comptent (un nom de lien peut exister sans avoir de sens). Les réponses que vous avez modifiées vous-même ne changent pas.',
+  '{n} pre-filled answers confirmed.': '{n} réponses pré-remplies confirmées.',
+  '{n} element(s) of this theme still hold the answer the scan pre-filled; a criterion is confirmed only when all of its elements are.':
+    '{n} élément(s) de cette thématique gardent la réponse pré-remplie par l’analyse ; un critère n’est confirmé que lorsque tous ses éléments le sont.',
+  'Confirm the {n} pre-filled answers': 'Confirmer les {n} réponse(s) pré-remplie(s)',
 }
