@@ -39,4 +39,20 @@ export const FR_TODO: Record<string, string> = {
   '{n} element(s) of this theme still hold the answer the scan pre-filled; a criterion is confirmed only when all of its elements are.':
     '{n} élément(s) de cette thématique gardent la réponse pré-remplie par l’analyse ; un critère n’est confirmé que lorsque tous ses éléments le sont.',
   'Confirm the {n} pre-filled answers': 'Confirmer les {n} réponse(s) pré-remplie(s)',
+  'Decorative / hidden from assistive technologies': 'Décoratives / masquées aux technologies d’assistance',
+  'With a text alternative': 'Avec une alternative textuelle',
+  'Without any name (failure)': 'Sans aucun nom (échec)',
+  'Confirm': 'Confirmer',
+  'Confirm these pre-filled images?': 'Confirmer ces images pré-remplies ?',
+  'These images are hidden from assistive technologies (alt="", aria-hidden, role="presentation"): the scan pre-filled them as decorative, 1.2 compliant. You confirm that they really are decorative.':
+    'Ces images sont masquées aux technologies d’assistance (alt="", aria-hidden, role="presentation") : l’analyse les a pré-remplies comme décoratives, 1.2 conforme. Vous confirmez qu’elles sont bien décoratives.',
+  'These images have a text alternative: the scan pre-filled 1.1 compliant. This does not judge whether the text is relevant (1.3): that stays yours.':
+    'Ces images ont une alternative textuelle : l’analyse a pré-rempli 1.1 conforme. Cela ne juge pas la pertinence du texte (1.3) : elle reste à vous.',
+  'Nothing names these images and they are not hidden: the scan pre-filled a failure (1.1 non-compliant). You confirm each is really a failure: look at them first.':
+    'Rien ne nomme ces images et elles ne sont pas masquées : l’analyse a pré-rempli un échec (1.1 non conforme). Vous confirmez que chacune est bien un échec : regardez-les d’abord.',
+  '{n} images. Look at them first with the “Pre-filled” filter.': '{n} images. Regardez-les d’abord avec le filtre « Pré-rempli ».',
+  '{n} images hold an answer pre-filled by the scan.': '{n} images portent une réponse pré-remplie par l’analyse.',
+  'Until you confirm them they do not count: a criterion is confirmed only when all its images are.':
+    'Tant que vous ne les confirmez pas, elles ne comptent pas : un critère n’est confirmé que lorsque toutes ses images le sont.',
+  'Look at them': 'Les regarder',
 }

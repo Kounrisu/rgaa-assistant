@@ -14,6 +14,11 @@ import { h, say } from './dom'
 import { pageInput, persist } from './model'
 import { actions } from './actions'
 import { askConfirm } from './dialogs'
+import { reviewKey } from './review-state'
+import { renderFilters, renderList, select } from './images-view'
+import { syncFilterBoxes } from './page-bridge'
+import { focusReviewTarget } from './focus-target'
+import { dom } from './dom'
 
 export type TodoTarget = 'pending' | 'suggested' | 'unconfirmed' | 'partial'
 
@@ -111,6 +116,74 @@ async function confirmPrefilledFindings(keys: string[]): Promise<void> {
   say(t('{n} pre-filled answers confirmed.', { n: keys.length }))
 }
 
+type PrefilledGroup = 'ignored' | 'named' | 'nameless'
+
+/** The images whose answer the scan pre-filled and nobody confirmed, by what the scan found: hidden from assistive tech, named, or nameless (a failure). */
+function prefilledImages(): Record<PrefilledGroup, string[]> {
+  const out: Record<PrefilledGroup, string[]> = { ignored: [], named: [], nameless: [] }
+  for (const el of state.elements) {
+    const key = reviewKey(el)
+    const review = state.reviews[key]
+    if (!review?.auto) continue
+    out[review.kind === 'decorative' ? 'ignored' : review.answers['1.1'] === 'nc' ? 'nameless' : 'named'].push(key)
+  }
+  return out
+}
+
+const GROUP_TEXT: Record<PrefilledGroup, { label: string; ask: string }> = {
+  ignored: {
+    label: 'Decorative / hidden from assistive technologies',
+    ask: 'These images are hidden from assistive technologies (alt="", aria-hidden, role="presentation"): the scan pre-filled them as decorative, 1.2 compliant. You confirm that they really are decorative.',
+  },
+  named: {
+    label: 'With a text alternative',
+    ask: 'These images have a text alternative: the scan pre-filled 1.1 compliant. This does not judge whether the text is relevant (1.3): that stays yours.',
+  },
+  nameless: {
+    label: 'Without any name (failure)',
+    ask: 'Nothing names these images and they are not hidden: the scan pre-filled a failure (1.1 non-compliant). You confirm each is really a failure: look at them first.',
+  },
+}
+
+async function confirmPrefilledImageGroup(group: PrefilledGroup, keys: string[]): Promise<void> {
+  if (!keys.length) return
+  const yes = await askConfirm(t('Confirm these pre-filled images?'), `${t(GROUP_TEXT[group].ask)}\n\n${t('{n} images. Look at them first with the “Pre-filled” filter.', { n: keys.length })}`, t('Confirm {n}', { n: keys.length }))
+  if (!yes) return
+  for (const k of keys) state.reviews[k].auto = false
+  persist()
+  actions.renderAll()
+  say(t('{n} pre-filled images confirmed.', { n: keys.length }))
+}
+
+function showPrefilledImages(): void {
+  state.filter = 'prefilled'
+  renderFilters()
+  renderList()
+  const first = state.elements.find((e) => state.reviews[reviewKey(e)]?.auto)
+  if (first) { select(first.id, true); focusReviewTarget(dom.detailEl) }
+  void syncFilterBoxes()
+}
+
+/** Images theme: one clear place to validate the pre-filled images, by kind. */
+function prefilledImagesBlock(): HTMLElement | null {
+  const groups = prefilledImages()
+  const total = groups.ignored.length + groups.named.length + groups.nameless.length
+  if (!total) return null
+  return h(
+    'div',
+    { class: 'prefilled-block' },
+    h('p', {}, h('strong', {}, t('{n} images hold an answer pre-filled by the scan.', { n: total })), ' ', t('Until you confirm them they do not count: a criterion is confirmed only when all its images are.')),
+    h(
+      'div',
+      { class: 'prefilled-actions' },
+      h('button', { type: 'button', class: 'ghost-btn', onclick: showPrefilledImages }, t('Look at them')),
+      ...(['ignored', 'named', 'nameless'] as PrefilledGroup[]).filter((g) => groups[g].length).map((g) =>
+        h('button', { type: 'button', class: `primary prefilled-confirm prefilled-${g}`, onclick: () => void confirmPrefilledImageGroup(g, groups[g]) }, `${t('Confirm')}: ${t(GROUP_TEXT[g].label)} (${groups[g].length})`),
+      ),
+    ),
+  )
+}
+
 export function renderThemeTodo(host: HTMLElement, deps: TodoDeps): void {
   host.replaceChildren()
   const rec = state.page
@@ -151,6 +224,8 @@ export function renderThemeTodo(host: HTMLElement, deps: TodoDeps): void {
       ),
     ),
   )
+  const imagesBlock = state.theme === 1 ? prefilledImagesBlock() : null
+  if (imagesBlock) host.append(imagesBlock)
   const prefilled = prefilledFindingKeys(state.theme)
   if (prefilled.length) {
     host.append(h('p', { class: 'todo-na' }, t('{n} element(s) of this theme still hold the answer the scan pre-filled; a criterion is confirmed only when all of its elements are.', { n: prefilled.length }), ' ', h('button', { type: 'button', class: 'ghost-btn todo-prefilled-confirm', onclick: () => void confirmPrefilledFindings(prefilled) }, t('Confirm the {n} pre-filled answers', { n: prefilled.length }))))
