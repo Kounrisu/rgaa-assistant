@@ -131,3 +131,23 @@ test('clicking the answer an image was pre-filled with confirms it (the radio is
   expect(after).toBe(before - 1)
   expect(rig.problems).toEqual([])
 })
+
+test('Images: one block to validate the pre-filled images by kind, placed with what is left to do', async ({ rig }) => {
+  test.setTimeout(120_000)
+  const { panel } = rig
+  await panel.locator('#empty-add-btn').click()
+  await scanElements(panel)
+  const block = panel.locator('#theme-todo .prefilled-block')
+  await expect(block).toBeVisible()
+  await expect(block).toContainText('pré-remplie')
+  const buttons = block.locator('.prefilled-confirm')
+  expect(await buttons.count()).toBeGreaterThan(0)
+  // confirm every group: the block goes away and no image is pre-filled any more
+  while (await buttons.count()) {
+    await buttons.first().click()
+    await panel.locator('#confirm-ok').click()
+  }
+  await expect(block).toHaveCount(0)
+  await expect(panel.locator('.confirm-all')).toHaveCount(0)
+  expect(rig.problems).toEqual([])
+})

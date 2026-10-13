@@ -2,14 +2,14 @@
 01 registered, not scanned                                             0d0e5efed0 39044
 02 checks after the automatic run                                      db891b8752 49496
 03 checks, one problem noted                                           47a75a90e4 49618
-04 images                                                              78ec90cb52 70205
-05 images, unnamed one selected (problem banner)                       56b846e396 70825
-06 images, applied from the problem banner                             eb597d8f57 69043
-07 images, kind chosen                                                 a76b05ee3d 59255
-08 images, criterion answered                                          a7ed6bd15b 59022
-09 images, note typed                                                  4166655bda 59231
-10 images, filter to review                                            376bc10f7f 58654
-11 images, next with the keyboard                                      9597688722 59231
+04 images                                                              feb0783f5c 70949
+05 images, unnamed one selected (problem banner)                       9fb67b48b2 71569
+06 images, applied from the problem banner                             1673e6e775 69665
+07 images, kind chosen                                                 2fb52d6894 59750
+08 images, criterion answered                                          ebf853e17f 59517
+09 images, note typed                                                  40a57e848c 59726
+10 images, filter to review                                            10f4dadb57 59149
+11 images, next with the keyboard                                      0bf31d6657 59726
 theme 2 Cadres 2/2                                                     afd2a12c7a 23273
 theme 3 Couleurs 0/3                                                   cb2fc7a618 45828
 theme 3 Couleurs 0/3, contrast checker with black text                 67f857ae4f 45249
@@ -56,8 +56,8 @@ theme 12 Navigation 0/11, suggestion confirmed                         0d05e4133
 theme 13 Consultation 0/12                                             936295dda4 54398
 theme 13 Consultation 0/12, checklist verdict clicked                  9de02664f8 54186
 theme 13 Consultation 0/12, suggestion confirmed                       06767dc05d 53216
-totals: to review                                                      b535a282dd 68791
-next to review                                                         6a58393a48 59245
+totals: to review                                                      fffa11c739 69286
+next to review                                                         7b33cbf14c 59740
 page results                                                           385fab814c 59865
 page results, sheet 1                                                  03cefa1ec0 19241
 page results, sheet 2                                                  39574965d2 47959
@@ -76,5 +76,5 @@ sample                                                                 63f1c04c0
 audits list                                                            3e071246fc 4122
 checks                                                                 dd249ccfa2 45830
 checks, English                                                        cb5dd74d3e 43782
-review, English                                                        21133d5985 57431
+review, English                                                        360f393bad 57883
 theme 3, English                                                       92b32d4a35 43547

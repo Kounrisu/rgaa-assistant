@@ -844,3 +844,7 @@ body[data-view="audits"] :is(.pagebar,.page-progress,#display-tools,#nav-banner,
 /* Element criteria of a theme the scan found nothing in: shown as answered "not applicable" */
 .na-list { list-style: none; margin: 10px 0; padding: 0; display: grid; gap: 6px; }
 .na-row { padding: 8px 10px; border: 1px solid var(--border); border-left: 4px solid var(--na, #94a3b8); border-radius: 8px; background: var(--surface); font-size: 13px; }
+
+.prefilled-block { margin: 8px 0; padding: 8px 10px; border: 1px solid var(--border); border-left: 4px solid var(--accent, #1f3a8a); border-radius: var(--radius); background: var(--surface); }
+.prefilled-block p { margin: 0 0 6px; }
+.prefilled-actions { display: flex; flex-wrap: wrap; gap: 6px; }
