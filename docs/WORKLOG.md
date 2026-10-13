@@ -125,6 +125,15 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Handoff log (newest first)
 
+### 2026-10-13 — Claude Code — LLM round trip, part 1: the audit pack and the answers reader (route A: zip given to a chat)
+- Did: `src/lib/audit-pack.ts` (pure: audit -> zip with README, manifest, criteria, per-page elements.jsonl with cleaned code and picture files, answers-template.jsonl;
+  respects the audit type), `src/lib/audit-answers.ts` (strict JSONL reader, nothing applied), button « Exporter pour analyse (LLM) » in the audit overview
+  (`exportAuditPack` in `exports.ts`: summary dialog, with/without pictures), `i18n-fr-pack.ts`, tests `tests/audit-pack.test.ts`, `e2e/audit-pack.spec.ts`.
+- State: `npm run check` 220 tests, 0 missing; e2e 35 (the new spec waits for the element pictures, which arrive after the scan); parity baseline updated (one new button).
+  Not tested: real Firefox, a real assistant reading a pack (the README prompt is untested), a pack from a real 4 MB audit.
+- Not built (plan L3b, L4, L5): Excel answers template, the import with preview/merge, `source: 'llm'` provenance, report section. Nothing is applied from an answers file yet.
+- Next: try a pack with a chat assistant on a small audit, adjust the README prompt, then build the import (merge, suggestions only).
+
 ### 2026-10-13 — Claude Code — audit type (rapide / complémentaire / complet), plan for the LLM round-trip
 - Did: audit type chosen in Échantillon et suivi (`meta.level`, optional, no migration; validator updated), shown as a pill next to the audit name (`#audit-level`).
   A partial level keeps only its criteria in `computeThemes` (progress, "Reste à faire", rates, Excel rows follow); notes "not a compliance rate" in page results and

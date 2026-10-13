@@ -7,7 +7,7 @@ import { pct2, type Counts, rateExact, type PageInput, auditStats, levelStats, i
 import { provisionalHelp, tabsFor, sheetTable, levelNote } from './results-view'
 import { state } from './state'
 import { pageLabel, allPageInputs } from './model'
-import { exportWorkbook, openReport } from './exports'
+import { exportWorkbook, openReport, exportAuditPack } from './exports'
 import { slugOf } from './helpers'
 import { actions } from './actions'
 
@@ -186,6 +186,7 @@ export function renderAudit(): void {
         h('button', { type: 'button', class: 'primary', onclick: () => void exportWorkbook(inputs, auditSheets(inputs, state.audit.meta), `grille-rgaa-${slugOf(state.audit.meta.site || state.audit.name)}.xlsx`) }, t('Export Excel (all pages)')),
         h('button', { type: 'button', class: 'primary', title: t('One printable page with the summary, the non-conformities and a draft accessibility statement'), onclick: () => openReport(false) }, t('Open the report')),
         h('button', { type: 'button', onclick: () => openReport(true) }, t('Download the report (HTML)')),
+        h('button', { type: 'button', title: t('A zip with the code, pictures and evidence of every element and an answers file to complete, to give to a language model'), onclick: () => void exportAuditPack() }, t('Export for analysis (LLM)')),
       ),
     ),
   )
