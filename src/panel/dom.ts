@@ -122,6 +122,7 @@ export const dom = {
   autoBtn: $<HTMLButtonElement>('auto-btn'),
   auditNameBtn: $<HTMLButtonElement>('audit-name-btn'),
   auditLevelEl: $('audit-level'),
+  coverageLink: $<HTMLAnchorElement>('coverage-link'),
   saveStateEl: $('save-state'),
   saveRetryBtn: $<HTMLButtonElement>('save-retry-btn'),
   backupStateEl: $('backup-state'),

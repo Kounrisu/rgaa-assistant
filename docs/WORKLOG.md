@@ -125,6 +125,12 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Handoff log (newest first)
 
+### 2026-10-13 — Claude Code — RGAA coverage page by audit type
+- Did: the coverage page (`src/rgaa/rgaa.ts`, opened by "Couverture RGAA ↗" in the audit bar) has an audit-type selector (complet 106 / rapide 25 / complémentaire 50), one-line explanation,
+  and its summary, themes, criteria and filters follow it (same `inLevel` lists). The panel's link carries the current type (`?level=`), the page keeps it in the URL.
+  Shared text `LEVEL_HELP` in `audit-levels.ts`. Test in `e2e/audit-level.spec.ts`.
+- State: `npm run check` 221 tests, 0 missing; e2e 37 passed; parity: only the link id changed. Not tested: real Firefox.
+
 ### 2026-10-13 — Claude Code — audit type, second half: the review screens ask exactly the criteria of the level
 - Did: `setActiveLevel` / `inActiveLevel` in `src/lib/audit-levels.ts` (set by `renderAll`, `setView`, `pageInput`); `criteriaFor` (images) and `findingCriteriaOf`
   (links, forms, tables…) filter on it, so cards, progress text, review status and the "next" queue follow the level; checklist themes list only in-level criteria;

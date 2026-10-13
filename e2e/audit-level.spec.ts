@@ -70,3 +70,26 @@ test('a quick or complementary audit asks exactly its criteria, in every kind of
   expect((await cardIds()).length).toBe(10)
   expect(rig.problems).toEqual([])
 })
+
+test('the RGAA coverage page speaks about the chosen audit type, and the panel link carries it', async ({ context }) => {
+  const rig = await openRig(context)
+  const { panel } = rig
+  await panel.locator('#empty-add-btn').click()
+  await expect(panel.locator('#coverage-link')).toHaveAttribute('href', '../rgaa/rgaa.html')
+  await panel.locator('#sample-btn').click()
+  await panel.locator('label[for="audit-level-rapide"]').click()
+  await expect(panel.locator('#coverage-link')).toHaveAttribute('href', '../rgaa/rgaa.html?level=rapide')
+
+  const page = await context.newPage()
+  await page.goto('http://127.0.0.1:4173/src/rgaa/rgaa.html?level=rapide')
+  await page.evaluate(() => localStorage.setItem('rgaa-lang', 'fr'))
+  await page.reload()
+  await expect(page.locator('#scope button[aria-pressed="true"]')).toContainText('Audit rapide (25)')
+  await expect(page.locator('#summary .stat').first()).toContainText('25 critères')
+  await page.locator('#scope button', { hasText: 'Audit complémentaire' }).click()
+  await expect(page.locator('#summary .stat').first()).toContainText('50 critères')
+  await expect(page).toHaveURL(/level=complementaire/)
+  await page.locator('#scope button', { hasText: 'Audit complet' }).click()
+  await expect(page.locator('#summary .stat').first()).toContainText('106 critères')
+  expect(rig.problems).toEqual([])
+})

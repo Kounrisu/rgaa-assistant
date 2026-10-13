@@ -1,5 +1,6 @@
 import data from './rgaa-tests.json'
 import { CRITERIA } from '../lib/rgaa'
+import { AUDIT_LEVELS, LEVEL_COUNT, LEVEL_HELP, LEVEL_LABEL, inLevel, type AuditLevel } from '../lib/audit-levels'
 import { getLang, setLang, t, translateStatic, type Lang } from '../lib/i18n'
 
 type Level = 'auto' | 'semi' | 'manual'
@@ -15,6 +16,13 @@ const OFFICIAL = 'https://accessibilite.numerique.gouv.fr/methode/criteres-et-te
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T
 let level: Level | 'all' = 'all'
+/** Which audit type the page speaks about: complete (106), quick (25) or complementary (50). Chosen in the page, or passed by the panel (?level=). */
+let scope: AuditLevel = ((): AuditLevel => {
+  const asked = new URLSearchParams(location.search).get('level')
+  return AUDIT_LEVELS.find((l) => l === asked) ?? 'complet'
+})()
+const scoped = (): ThemeRow[] =>
+  topics.map((th) => ({ ...th, criteria: th.criteria.filter((c) => inLevel(scope, c.id)) })).filter((th) => th.criteria.length)
 let query = ''
 let allOpen = false
 
@@ -50,11 +58,12 @@ function bar(c: Record<Level, number>): HTMLElement {
 }
 
 function renderSummary(): void {
-  const all = topics.flatMap((t) => t.criteria.flatMap((c) => c.tests))
+  const themes = scoped()
+  const all = themes.flatMap((t) => t.criteria.flatMap((c) => c.tests))
   const c = count(all)
   const host = $('summary')
   host.replaceChildren()
-  host.append(el('div', 'stat', el('div', 'n', String(all.length)), el('div', 'l', t('tests in {criteria} criteria, {themes} themes', { criteria: topics.reduce((n, th) => n + th.criteria.length, 0), themes: topics.length }))))
+  host.append(el('div', 'stat', el('div', 'n', String(all.length)), el('div', 'l', t('tests in {criteria} criteria, {themes} themes', { criteria: themes.reduce((n, th) => n + th.criteria.length, 0), themes: themes.length }))))
   for (const l of LEVELS) {
     host.append(el('div', `stat ${l}`, el('div', 'n', `${c[l]}`), el('div', 'l', `${labelOf(l)} · ${Math.round((c[l] / all.length) * 100)}%`)))
   }
@@ -72,7 +81,7 @@ function render(): void {
   const host = $('themes')
   host.replaceChildren()
   let shown = 0
-  for (const theme of topics) {
+  for (const theme of scoped()) {
     const criteria = theme.criteria
       .map((c) => ({ c, tests: c.tests.filter((t) => matches(t, c, theme)) }))
       .filter((x) => x.tests.length)
@@ -122,6 +131,26 @@ function render(): void {
   $('count').textContent = shown ? t('{n} test(s) shown. Official wording: {url}', { n: shown, url: OFFICIAL }) : t('No test matches this filter.')
 }
 
+function renderScope(): void {
+  const host = $('scope')
+  host.replaceChildren()
+  for (const value of AUDIT_LEVELS) {
+    const b = el('button', 'chip', `${t(LEVEL_LABEL[value])} (${LEVEL_COUNT[value]})`)
+    b.type = 'button'
+    b.setAttribute('aria-pressed', String(scope === value))
+    b.addEventListener('click', () => {
+      scope = value
+      const url = new URL(location.href)
+      if (value === 'complet') url.searchParams.delete('level')
+      else url.searchParams.set('level', value)
+      history.replaceState(null, '', url)
+      renderAll()
+    })
+    host.append(b)
+  }
+  $('scope-help').textContent = t(LEVEL_HELP[scope])
+}
+
 function renderFilters(): void {
   const host = $('filters')
   host.replaceChildren()
@@ -152,6 +181,7 @@ $('toggle').addEventListener('click', () => {
 function renderAll(): void {
   translateStatic()
   $('toggle').textContent = allOpen ? t('Collapse all') : t('Expand all')
+  renderScope()
   renderSummary()
   renderFilters()
   render()
