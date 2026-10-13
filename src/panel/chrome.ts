@@ -551,6 +551,7 @@ export function renderAuditBar(): void {
   dom.auditNameBtn.title = t('Rename this audit')
   const level = state.audit.meta.level ?? 'complet'
   dom.auditLevelEl.textContent = `${t(LEVEL_LABEL[level])} · ${t('{n} criteria', { n: LEVEL_COUNT[level] })}`
+  dom.coverageLink.href = level === 'complet' ? '../rgaa/rgaa.html' : `../rgaa/rgaa.html?level=${level}`
   dom.auditLevelEl.className = `pill level-pill level-${level}`
   dom.auditLevelEl.title = level === 'complet' ? t('Complete audit: all the criteria. Change it in Sample and progress.') : t('Partial audit: no compliance rate. Change the type in Sample and progress.')
   const { saveState, savedAt, blocked, lastError } = state.session

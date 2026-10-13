@@ -12,7 +12,7 @@ import { inspectedTitle } from './page-bridge'
 import type { PageRecord } from '../lib/types'
 import { renderPageBar, themesMenu, showNavBanner } from './chrome'
 import { actions } from './actions'
-import { AUDIT_LEVELS, LEVEL_COUNT, LEVEL_LABEL, type AuditLevel } from '../lib/audit-levels'
+import { AUDIT_LEVELS, LEVEL_COUNT, LEVEL_HELP, LEVEL_LABEL, type AuditLevel } from '../lib/audit-levels'
 
 /** Registers a page of the sample without scanning it. */
 export async function addPage(url: string, title?: string): Promise<void> {
@@ -54,11 +54,6 @@ export function renderSample(): void {
       h('input', { type: 'text', value: state.audit.meta[key], placeholder, oninput: (e: Event) => { state.audit.meta[key] = (e.target as HTMLInputElement).value; persist() } }),
     )
   const level: AuditLevel = state.audit.meta.level ?? 'complet'
-  const levelHelp: Record<AuditLevel, string> = {
-    complet: 'All 106 criteria. The only level that gives a compliance rate and supports an accessibility statement.',
-    rapide: 'The 25 essential criteria (WCAG level A) on a sample of 3 to 5 pages: a first overview. No compliance rate, no statement.',
-    complementaire: 'The 25 quick-audit criteria plus the next 25, so 50 criteria, on the same small sample. No compliance rate, no statement.',
-  }
   dom.sampleEl.append(
     h(
       'fieldset',
@@ -74,7 +69,7 @@ export function renderSample(): void {
         } }),
         h('label', { for: `audit-level-${value}` }, `${t(LEVEL_LABEL[value])} (${t('{n} criteria', { n: LEVEL_COUNT[value] })})`),
       ]).flat()),
-      h('p', { class: 'hint-line' }, t(levelHelp[level])),
+      h('p', { class: 'hint-line' }, t(LEVEL_HELP[level])),
     ),
     h(
       'div',

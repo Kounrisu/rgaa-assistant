@@ -15,6 +15,12 @@ export const LEVEL_LABEL: Record<AuditLevel, string> = {
   rapide: 'Quick audit',
   complementaire: 'Complementary audit',
 }
+/** One sentence per level (English key; shown in the sample settings and on the coverage page). */
+export const LEVEL_HELP: Record<AuditLevel, string> = {
+  complet: 'All 106 criteria. The only level that gives a compliance rate and supports an accessibility statement.',
+  rapide: 'The 25 essential criteria (WCAG level A) on a sample of 3 to 5 pages: a first overview. No compliance rate, no statement.',
+  complementaire: 'The 25 quick-audit criteria plus the next 25, so 50 criteria, on the same small sample. No compliance rate, no statement.',
+}
 export const LEVEL_COUNT: Record<AuditLevel, number> = { complet: 106, rapide: 25, complementaire: 50 }
 
 /** The criteria of a level; `null` = every criterion. The complementary audit continues the quick one: it covers both lists. */

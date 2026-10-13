@@ -74,3 +74,6 @@ ul.tests { list-style: none; margin: 0; padding: 0 12px 12px; }
 @media (max-width: 600px) { .test { grid-template-columns: auto 1fr; } .test .badge { grid-column: 2; justify-self: start; } }
 .lang { display: flex; gap: 6px; margin: 0 0 12px; }
 .lang .ghost[aria-pressed="true"] { background: var(--text); color: var(--surface); }
+
+.scope { margin: 12px 0 4px; }
+.scope-help { margin: 4px 0 8px; max-width: 70ch; }

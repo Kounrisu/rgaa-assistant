@@ -69,4 +69,5 @@ export const FR_TODO: Record<string, string> = {
   'None of the criteria of this kind of image belongs to the chosen audit type.': 'Aucun critère de ce type d’image n’appartient au type d’audit choisi.',
   'no criterion in this audit type': 'aucun critère dans ce type d’audit',
   'No criterion of this theme belongs to the chosen audit type. Change the type in Sample and progress to audit it.': 'Aucun critère de cette thématique n’appartient au type d’audit choisi. Changez le type dans Échantillon et suivi pour l’auditer.',
+  'Audit type': 'Type d’audit',
 }
