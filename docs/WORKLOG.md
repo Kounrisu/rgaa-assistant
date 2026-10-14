@@ -125,6 +125,11 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Handoff log (newest first)
 
+### 2026-10-14 — Claude Code — Reading view uses axe for accessible names; audited-tab banner fixed
+- Did: the reading view loads the axe engine into the tab (`RGAA_AXE_LOAD`) and takes accessible names from `axe.commons.text.accessibleText` (spec-based); the dialog says which engine gave the names, with a simplified fallback if axe cannot load.
+  Fixed my earlier audited-tab banner: a DevTools page has no `chrome.tabs`, so it never updated. The background now listens to tab/window events and sends `RGAA_TAB_EVENT`; "Show the audited tab" goes through `RGAA_TAB_SHOW`.
+- State: `npm run check` passes; `npm run test:e2e` 39 passed, parity regenerated (the "checks" screens show the page snapshot size, which follows the content script bundle size: a known coupling). NOT tested: real Firefox/Chrome DevTools (tab events, banner, axe names on real pages).
+
 ### 2026-10-14 — Claude Code — Reading view (screen-reader style transcript of tables and of the page)
 - Did: "Table reading" (theme 5) and "Page reading" (theme 9) open a dialog with what a screen reader would say: each table cell with the header cells that name it (scope, headers attribute, th position, rowspan/colspan), the page in reading order (landmarks, headings, lists, links, buttons, fields, images). Problems are marked on their line (no header, headers pointing to a missing id, no table title, empty heading or skipped level, nameless link/button/field, image with no alt). `src/content/transcript.ts`, `src/panel/reading-view.ts`, message `RGAA_TRANSCRIPT`. A simplified accessible-name computation, not the browser's full algorithm. It helps spot bad coding; it gives no verdict.
 - State: `npm run check` passes; `npm run test:e2e` 39 passed with the parity baseline regenerated. NOT tested: real Firefox/DevTools.

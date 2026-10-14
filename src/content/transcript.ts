@@ -15,6 +15,8 @@ export interface TranscriptBlock {
 export interface TranscriptResult {
   blocks: TranscriptBlock[]
   truncated: boolean
+  /** Where the accessible names come from: the axe engine (follows the accname spec) or our simplified fallback. */
+  engine: 'axe' | 'simplified'
 }
 
 const squash = (value: string | null | undefined): string => (value ?? '').replace(/\s+/g, ' ').trim()
@@ -27,8 +29,46 @@ const isHidden = (el: Element): boolean => {
   return style.display === 'none' || style.visibility === 'hidden'
 }
 
-/** The accessible name, simplified: aria-labelledby, aria-label, label, alt, content, title. */
+type AxeApi = { setup?: (root?: Node) => unknown; teardown?: () => void; commons?: { text?: { accessibleText?: (el: Element, context?: object) => string } } }
+let axeName: ((el: Element) => string) | null = null
+
+/** The axe engine (loaded into the tab by the background just before) computes names by the spec; without it we fall back. */
+function withAxe<T>(work: () => T): { value: T; engine: 'axe' | 'simplified' } {
+  const axe = (globalThis as unknown as { axe?: AxeApi }).axe
+  const accessibleText = axe?.commons?.text?.accessibleText
+  if (axe?.setup && accessibleText) {
+    try {
+      axe.setup(document.documentElement)
+      axeName = (el) => accessibleText(el, {})
+      const value = work()
+      return { value, engine: 'axe' }
+    } catch {
+      // fall through to the simplified computation
+    } finally {
+      axeName = null
+      try {
+        axe.teardown?.()
+      } catch {
+        // nothing to clean
+      }
+    }
+  }
+  return { value: work(), engine: 'simplified' }
+}
+
+/** The accessible name: the axe engine when available, else a simplified version (aria-labelledby, aria-label, label, alt, content, title). */
 function nameOf(el: Element): string {
+  if (axeName) {
+    try {
+      return squash(axeName(el))
+    } catch {
+      // this element only: use the simplified computation below
+    }
+  }
+  return simpleNameOf(el)
+}
+
+function simpleNameOf(el: Element): string {
   const by = el.getAttribute('aria-labelledby')
   if (by) {
     const text = squash(by.split(/\s+/).map((id) => document.getElementById(id)?.textContent ?? '').join(' '))
@@ -59,7 +99,7 @@ const SKIP = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE', 'HEAD'])
 const LANDMARK: Record<string, string> = { HEADER: 'banner', NAV: 'navigation', MAIN: 'main', ASIDE: 'complementary', FOOTER: 'contentinfo', FORM: 'form' }
 const ROLE_LANDMARKS = new Set(['banner', 'navigation', 'main', 'complementary', 'contentinfo', 'search', 'form', 'region'])
 
-export function pageTranscript(): TranscriptResult {
+function buildPage(): { blocks: TranscriptBlock[]; truncated: boolean } {
   const lines: TranscriptLine[] = []
   let buffer = ''
   let previousLevel = 0
@@ -177,6 +217,11 @@ export function pageTranscript(): TranscriptResult {
   return { blocks: [{ title: squash(document.title) || 'Page', lines }], truncated }
 }
 
+export function pageTranscript(): TranscriptResult {
+  const { value, engine } = withAxe(buildPage)
+  return { ...value, engine }
+}
+
 /* ------------------------------------------------------------------ */
 /* Tables                                                               */
 /* ------------------------------------------------------------------ */
@@ -286,8 +331,13 @@ function tableBlock(table: HTMLTableElement, index: number): TranscriptBlock {
   return { title, lines }
 }
 
-export function tableTranscript(): TranscriptResult {
+function buildTables(): { blocks: TranscriptBlock[]; truncated: boolean } {
   const tables = Array.from(document.querySelectorAll('table')).filter((t) => !isHidden(t) && !t.closest('[id^="rgaa-assistant-overlay"]'))
   const blocks = tables.slice(0, 40).map((t, i) => tableBlock(t, i))
   return { blocks: blocks.length ? blocks : [{ title: 'Tables', lines: [{ text: 'No table on this page.' }] }], truncated: tables.length > 40 }
+}
+
+export function tableTranscript(): TranscriptResult {
+  const { value, engine } = withAxe(buildTables)
+  return { ...value, engine }
 }

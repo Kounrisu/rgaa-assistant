@@ -90,8 +90,9 @@ describe('the background page', () => {
     storage = new FakeStorage()
     const api = fakeTabs(tabs).api
     installChrome(storage, {
-      runtime: { onMessage: { addListener: (fn: Listener) => { listener = fn } } },
-      tabs: { get: api.get, query: api.query, captureVisibleTab: api.captureVisibleTab },
+      runtime: { onMessage: { addListener: (fn: Listener) => { listener = fn } }, sendMessage: async () => undefined },
+      windows: { onFocusChanged: { addListener: () => undefined } },
+      tabs: { get: api.get, query: api.query, captureVisibleTab: api.captureVisibleTab, onActivated: { addListener: () => undefined }, onUpdated: { addListener: () => undefined } },
     })
     vi.resetModules()
     await import('../src/background')

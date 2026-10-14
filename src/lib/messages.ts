@@ -73,7 +73,25 @@ export interface StyleMessage {
 }
 export type StyleResponse = { ok: true } | { ok?: false; error: string }
 
-export type BackgroundMessage = SaveMessage | DeleteMessage | CaptureMessage | TabInfoMessage | AxeMessage | RelayMessage | StyleMessage
+/** Loads the axe engine into the tab (for its accessible-name computation) without running it. */
+export interface AxeLoadMessage {
+  type: 'RGAA_AXE_LOAD'
+  tabId: number
+}
+
+/** Brings the inspected tab (and its window) to the front. */
+export interface TabShowMessage {
+  type: 'RGAA_TAB_SHOW'
+  tabId: number
+}
+
+/** Sent by the background to the panels when a tab or window focus change may have changed which tab is in front. */
+export interface TabEventMessage {
+  type: 'RGAA_TAB_EVENT'
+  tabId?: number
+}
+
+export type BackgroundMessage = SaveMessage | DeleteMessage | CaptureMessage | TabInfoMessage | AxeMessage | AxeLoadMessage | TabShowMessage | RelayMessage | StyleMessage
 
 /* Content script: what the panel (through the background relay) asks the page, and what the page answers.
  * Only types are exported from here (erased at build time): the content script must stay one self-contained script,

@@ -92,6 +92,12 @@ export async function openRig(context: BrowserContext): Promise<Rig> {
           axeInjected = true
         }
         return dispatch({ type: 'RGAA_AXE_RUN', locale: message.locale ?? null, rules: message.rules ?? null })
+      case 'RGAA_AXE_LOAD':
+        if (!axeInjected) {
+          await site.addScriptTag({ path: join(root, 'dist', 'axe.min.js') })
+          axeInjected = true
+        }
+        return { ok: true }
       case 'RGAA_NEW_IMAGES':
         return undefined
       default:
