@@ -45,6 +45,8 @@ export interface TabInfoMessage {
 export interface TabInfoResponse {
   url: string
   title: string
+  /** Is this the tab in front in its window? Absent when unknown. */
+  active?: boolean
 }
 
 export interface AxeMessage {

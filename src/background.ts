@@ -24,7 +24,7 @@ chrome.runtime.onMessage.addListener((message: BackgroundMessage, sender, sendRe
     case 'RGAA_TAB_INFO':
       chrome.tabs
         .get(message.tabId)
-        .then((tab): TabInfoResponse => ({ url: tab.url ?? '', title: tab.title ?? '' }), (): TabInfoResponse => ({ url: '', title: '' }))
+        .then((tab): TabInfoResponse => ({ url: tab.url ?? '', title: tab.title ?? '', active: tab.active }), (): TabInfoResponse => ({ url: '', title: '' }))
         .then(sendResponse)
       return true
     // Automatic checks: the axe engine is injected into the page only when asked, then run there.

@@ -215,6 +215,12 @@ export async function tabInfo(): Promise<{ url: string; title: string }> {
   return { url: typeof info?.url === 'string' ? info.url : '', title: typeof info?.title === 'string' ? info.title : '' }
 }
 
+/** The inspected tab with its title and whether it is the one in front (null when the browser does not say). */
+export async function inspectedTab(): Promise<{ url: string; title: string; active: boolean | null }> {
+  const info: TabInfoResponse | null = await chrome.runtime.sendMessage({ type: 'RGAA_TAB_INFO', tabId: inspectedTabId() }).catch(() => null)
+  return { url: typeof info?.url === 'string' ? info.url : '', title: typeof info?.title === 'string' ? info.title : '', active: typeof info?.active === 'boolean' ? info.active : null }
+}
+
 export async function inspectedUrl(): Promise<string> {
   const url = await inspectedEval('location.href')
   return /^https?:|^file:/i.test(url) ? url : (await tabInfo()).url

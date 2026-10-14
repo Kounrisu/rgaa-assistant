@@ -96,3 +96,56 @@ export function askChoice(title: string, text: string, choices: Choice[]): Promi
     dom.choiceDialog.showModal()
   })
 }
+
+export interface PickItem {
+  id: number
+  label: string
+  detail?: string
+}
+
+/**
+ * A confirmation that lists what will be affected, each line a checked checkbox: untick what must stay.
+ * Returns the ids left ticked, or null when cancelled (or when nothing is ticked).
+ */
+export function askPick(title: string, text: string, items: PickItem[], okLabel: string): Promise<number[] | null> {
+  return new Promise((resolve) => {
+    const list = $('pick-list')
+    const ok = $<HTMLButtonElement>('pick-ok')
+    const form = $<HTMLFormElement>('pick-form')
+    const cancel = $('pick-cancel')
+    $('pick-title').textContent = title
+    $('pick-text').textContent = text
+    list.replaceChildren()
+    const boxes = items.map((item) => {
+      const box = h('input', { type: 'checkbox', checked: 'true', 'data-id': String(item.id), onchange: refresh }) as HTMLInputElement
+      box.checked = true
+      list.append(h('li', {}, h('label', {}, box, h('span', { class: 'pick-label' }, item.label), item.detail ? h('span', { class: 'pick-detail' }, item.detail) : null)))
+      return box
+    })
+    function refresh(): void {
+      const n = boxes.filter((b) => b.checked).length
+      ok.disabled = n === 0
+      ok.textContent = `${okLabel} (${n})`
+    }
+    refresh()
+    const finish = (value: number[] | null) => {
+      form.removeEventListener('submit', onSubmit)
+      cancel.removeEventListener('click', onNo)
+      dom.pickDialog.removeEventListener('cancel', onNo)
+      if (dom.pickDialog.open) dom.pickDialog.close()
+      resolve(value)
+    }
+    const onSubmit = (e: Event) => {
+      e.preventDefault()
+      finish(boxes.filter((b) => b.checked).map((b) => Number(b.dataset.id)))
+    }
+    const onNo = (e: Event) => {
+      e.preventDefault()
+      finish(null)
+    }
+    form.addEventListener('submit', onSubmit)
+    cancel.addEventListener('click', onNo)
+    dom.pickDialog.addEventListener('cancel', onNo)
+    dom.pickDialog.showModal()
+  })
+}

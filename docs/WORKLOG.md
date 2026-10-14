@@ -125,6 +125,14 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Handoff log (newest first)
 
+### 2026-10-14 — Claude Code — remove absent images; audited-tab indicator
+- Did: Images theme: "Remove absent images…" (end of the filter chips, current page only) opens a popin with one ticked checkbox per image no longer on the page; the ticked ones and their answers/notes are deleted (`src/panel/images-view.ts`, `askPick` in `dialogs.ts`).
+  Audited tab: DevTools belong to one tab, nothing said so. New `src/panel/inspected-tab.ts`: a chip "Audited tab: title" beside the address, and a warning banner with "Show the audited tab" when another tab is in front (undocked DevTools / second window). `RGAA_TAB_INFO` now also returns `active`. No new permission.
+- State: `npm run check` passes (221 tests, 0 missing translations); `npm run test:e2e` 38 passed. The parity baseline was regenerated: the chip is on every screen, and it also absorbs a drift that already existed on `master` (themes 6 and 9, audit overview sheet 2, sample), cause not investigated.
+  NOT tested: real Firefox/DevTools (tab events, banner, focusing the window); the stand-in has no tab events, so the banner is untested.
+- Next: test the banner in real Chrome and Firefox with DevTools undocked; an e2e test for the remove popin.
+- For the other agent: the shell default is Node 10; use Node 22 (`~/.nvm/versions/node/v22.16.0/bin`).
+
 ### 2026-10-13 — Claude Code — the panel passes axe (light and dark), first accessibility pass (UX plan WP8, started)
 - Did: ran axe (WCAG 2.x A/AA + best practice) on every main view: 4 failing rules at first (colour contrast near misses 4.2-4.35:1 on pills/outcomes, theme tabs white on amber/lime/cyan, no `<main>`
   landmark, `region`, a button whose accessible name did not contain its visible text, two empty table headers) and dark theme (white on the light purple accent). Fixed: palette (`--ok`, `--warn`, `--na`,

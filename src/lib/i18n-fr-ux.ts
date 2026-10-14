@@ -1,5 +1,14 @@
 /** French for the texts added with the UX tools (hidden content, page tools, report, guided audit). Key = the English text. */
 export const FR_UX: Record<string, string> = {
+  'Audited tab: {title}': 'Onglet audité : {title}',
+  'This panel audits the browser tab “{title}” ({url}), whichever tab is in front.': 'Ce panneau audite l’onglet « {title} » ({url}), quel que soit l’onglet affiché.',
+  'Another tab is in front. This panel audits the tab “{title}”, not the one you are looking at.': 'Un autre onglet est affiché. Ce panneau audite l’onglet « {title} », pas celui que vous regardez.',
+  'Show the audited tab': 'Afficher l’onglet audité',
+  'Remove the images that are not on the page': 'Supprimer les images absentes de la page',
+  'These images were seen in an earlier scan but are no longer on the page. Their answers and notes are deleted with them. Untick the ones to keep.': 'Ces images ont été vues lors d’une analyse précédente mais ne sont plus sur la page. Leurs réponses et notes sont supprimées avec elles. Décochez celles à conserver.',
+  'has answers': 'avec réponses',
+  'Remove absent images…': 'Supprimer les images absentes…',
+  'Delete the images seen in an earlier scan that are no longer on the page': 'Supprime les images vues lors d’une analyse précédente et qui ne sont plus sur la page',
   'Suggestions and conflicts ({n})': 'Suggestions et contradictions ({n})',
   'Suggested: {verdict}': 'Suggestion : {verdict}',
   'Review': 'Relire',

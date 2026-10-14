@@ -862,3 +862,14 @@ body[data-view="audits"] :is(.pagebar,.page-progress,#display-tools,#nav-banner,
 /* numbers in theme colours stay readable on the tinted selection (>= 4.5:1) */
 .item .num { color: color-mix(in srgb, var(--tc) 65%, black); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .item .num { color: color-mix(in srgb, var(--tc) 50%, white); } }
+
+.pick-list { list-style: none; margin: 0 0 14px; padding: 0; max-height: 50vh; overflow: auto; border: 1px solid var(--border); border-radius: 8px; }
+.pick-list li + li { border-top: 1px solid var(--border); }
+.pick-list label { display: flex; gap: 8px; align-items: baseline; padding: 6px 10px; cursor: pointer; }
+.pick-list .pick-label { font-weight: 600; overflow-wrap: anywhere; }
+.pick-list .pick-detail { color: var(--muted); font-size: 12px; margin-left: auto; white-space: nowrap; }
+.pick-list ~ .confirm-actions button:disabled { opacity: .5; cursor: not-allowed; }
+.remove-absent { margin-left: auto; }
+
+.inspected-tab { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 1px 8px; border: 1px solid var(--border); border-radius: 999px; font-size: 12px; background: var(--surface-2); color: var(--text); }
+.inspected-tab.behind { border-color: var(--warn); color: var(--warn); font-weight: 600; }
