@@ -8,6 +8,7 @@ import { takeSnapshot } from './snapshot'
 import { runAxe } from './axe-run'
 import { endPick, startPick } from './picker'
 import { resetTools, runTool } from './page-tools'
+import { structurePreview } from './structure-view'
 import { computeCoverage, resetCuts } from './scan-coverage'
 
 // Reloading the extension leaves the previous copy of this script, and the boxes it drew, in the page.
@@ -43,6 +44,8 @@ chrome.runtime.onMessage.addListener((message: ContentMessage, _sender, sendResp
       return respond(message.type, takeSnapshot())
     case 'RGAA_TOOL':
       return respond(message.type, runTool(message.tool, Boolean(message.on), repositionBoxes))
+    case 'RGAA_STRUCTURE':
+      return respond(message.type, structurePreview())
     case 'RGAA_TOOLS_RESET':
       resetTools(repositionBoxes)
       return respond(message.type, { ok: true })

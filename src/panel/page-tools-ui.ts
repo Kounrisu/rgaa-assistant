@@ -1,11 +1,12 @@
 import { t } from '../lib/i18n'
+import { showStructure, type StructureData } from './structure-preview'
 import { auditStylesMenu, resetAuditStyles, setAuditStylesTheme, stylusHint } from './audit-styles-ui'
 
 /**
  * The "page tools" bar: switches that change what the page shows so manual checks are easier
  * (hidden content, table structure, tab order, styles off, text spacing, languages).
  */
-type Tool = 'reveal' | 'tables' | 'taborder' | 'nocss' | 'spacing' | 'lang'
+type Tool = 'reveal' | 'tables' | 'taborder' | 'nocss' | 'spacing' | 'lang' | 'headings' | 'loosetext'
 
 /** The RGAA themes where each tool belongs: it is the one to reach for while checking those criteria. */
 const TOOL_THEMES: Record<Tool, number[]> = {
@@ -15,6 +16,8 @@ const TOOL_THEMES: Record<Tool, number[]> = {
   nocss: [5, 9, 10],
   spacing: [10],
   lang: [8],
+  headings: [9],
+  loosetext: [9, 10],
 }
 
 const TOOLS: { id: Tool; label: string; title: string }[] = [
@@ -23,11 +26,15 @@ const TOOLS: { id: Tool; label: string; title: string }[] = [
   { id: 'taborder', label: 'Tab order', title: 'Number the focusable elements in the order the Tab key visits them, with a line between them. Red: positive tabindex; magenta: visually hidden (RGAA 12.8).' },
   { id: 'nocss', label: 'Styles off', title: 'Turn the style sheets off to check that the information stays understandable and in a logical order (RGAA 10.3).' },
   { id: 'spacing', label: 'Text spacing', title: 'Apply the text spacing of the test: line 1.5, letters 0.12 em, words 0.16 em, paragraphs 2 em, to check nothing is lost (RGAA 10.12).' },
+  { id: 'headings', label: 'Headings map', title: 'Badge every heading on the page with its level (H1 to H6), like a headings map. Red: a skipped level or an empty heading (RGAA 9.1).' },
+  { id: 'loosetext', label: 'Loose text', title: 'Box the texts that sit in a plain div or span with no paragraph, heading, list item, link, button or label around them (RGAA 9.3).' },
   { id: 'lang', label: 'Languages', title: 'Show the lang attribute of the page and of every element that changes the language (RGAA 8.3, 8.7).' },
 ]
 
 interface Deps {
   send: (payload: unknown) => Promise<{ count?: number } | undefined>
+  /** Asks the page for its structure (the rebuilt copy shown in the preview). */
+  structure: () => Promise<StructureData | undefined>
   say: (message: string) => void
 }
 
@@ -57,6 +64,14 @@ export function renderPageTools(): void {
     host!.append(button)
   }
   relevant.forEach(add)
+  if (currentTheme === 9) {
+    const preview = document.createElement('button')
+    preview.type = 'button'
+    preview.textContent = t('Structure preview')
+    preview.title = t('The page rebuilt from its HTML structure only (headings, paragraphs, lists, tables, landmarks), to see whether it makes sense without the design.')
+    preview.addEventListener('click', () => void openPreview())
+    host.append(preview)
+  }
   setAuditStylesTheme(currentTheme)
   if (others.length) {
     const more = document.createElement('button')
@@ -94,6 +109,16 @@ async function toggle(tool: Tool): Promise<void> {
     else on.delete(tool)
     renderPageTools()
     if (next && typeof result?.count === 'number') deps!.say(t('{n} element(s) affected by “{tool}”.', { n: result.count, tool: t(TOOLS.find((x) => x.id === tool)!.label) }))
+  } catch {
+    deps!.say(t('Could not reach the page. Reload the tab and try again.'))
+  }
+}
+
+async function openPreview(): Promise<void> {
+  try {
+    const data = await deps!.structure()
+    if (!data) throw new Error('no answer')
+    await showStructure(data)
   } catch {
     deps!.say(t('Could not reach the page. Reload the tab and try again.'))
   }

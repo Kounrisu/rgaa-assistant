@@ -7,10 +7,10 @@
 const OVERLAY_PREFIX = 'rgaa-assistant-overlay'
 const TOOLS_ID = `${OVERLAY_PREFIX}-tools`
 
-export type ToolName = 'reveal' | 'tables' | 'taborder' | 'nocss' | 'spacing' | 'lang'
+export type ToolName = 'reveal' | 'tables' | 'taborder' | 'nocss' | 'spacing' | 'lang' | 'headings' | 'loosetext'
 
 /** What a bounding box of the page (in the page's own coordinates) says about where to draw. */
-const pageRect = (el: Element) => {
+const pageRect = (el: { getBoundingClientRect(): DOMRect }) => {
   const r = el.getBoundingClientRect()
   return { left: r.left + window.scrollX, top: r.top + window.scrollY, width: r.width, height: r.height }
 }
@@ -117,7 +117,7 @@ function dropLayer(name: string): void {
   document.getElementById(TOOLS_ID)?.querySelector(`[data-tool="${name}"]`)?.remove()
 }
 
-function badge(layer: HTMLElement, el: Element, text: string, color: string, outline = true): void {
+function badge(layer: HTMLElement, el: { getBoundingClientRect(): DOMRect }, text: string, color: string, outline = true): void {
   const r = pageRect(el)
   if (!r.width && !r.height) return
   const box = document.createElement('div')
@@ -266,6 +266,77 @@ function drawLang(): number {
 }
 
 /* ------------------------------------------------------------------ */
+/* Headings map and loose text (theme 9)                                */
+/* ------------------------------------------------------------------ */
+
+export function headingLevel(el: Element): number {
+  const m = /^H([1-6])$/.exec(el.tagName)
+  if (m) return Number(m[1])
+  const aria = Number(el.getAttribute('aria-level'))
+  return aria >= 1 && aria <= 6 ? aria : 2
+}
+
+export const isHeading = (el: Element): boolean => /^H[1-6]$/.test(el.tagName) || el.getAttribute('role') === 'heading'
+
+const LEVEL_COLORS = ['#1d4ed8', '#0f766e', '#7c3aed', '#b45309', '#be185d', '#475569']
+
+function drawHeadings(): number {
+  const layer = toolLayer('headings')
+  let previous = 0
+  let n = 0
+  for (const el of Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6, [role="heading"]')).slice(0, 400)) {
+    if (mine(el) || !el.getClientRects().length) continue
+    n++
+    const level = headingLevel(el)
+    const skipped = level > previous + 1
+    const empty = !(el.textContent ?? '').trim()
+    const text = (el.textContent ?? '').replace(/\s+/g, ' ').trim()
+    badge(layer, el, `H${level}${skipped ? ` ✕ skips from H${previous || 'none'}` : ''}${empty ? ' ✕ empty' : ` · ${text.slice(0, 50)}`}`, skipped || empty ? '#dc2626' : LEVEL_COLORS[level - 1])
+    previous = level
+  }
+  return n
+}
+
+/** Elements that give a text its meaning: a text inside one of them is not “loose”. */
+const TEXT_CONTEXT = new Set(['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'DT', 'DD', 'TD', 'TH', 'CAPTION', 'FIGCAPTION', 'A', 'BUTTON', 'LABEL', 'LEGEND', 'SUMMARY', 'OPTION', 'BLOCKQUOTE', 'PRE', 'CITE', 'Q', 'ADDRESS', 'TIME', 'CODE', 'OUTPUT', 'TEXTAREA', 'SELECT', 'DATALIST', 'SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE', 'TITLE', 'SVG', 'MATH', 'OBJECT', 'IFRAME', 'DIALOG'])
+const ROLE_CONTEXT = new Set(['heading', 'button', 'link', 'listitem', 'cell', 'gridcell', 'columnheader', 'rowheader', 'tab', 'menuitem', 'option', 'treeitem', 'caption', 'term', 'definition', 'paragraph', 'alert', 'status', 'tooltip', 'checkbox', 'radio', 'switch', 'textbox', 'img'])
+
+/** Text nodes that sit in a plain div / span / section… with no paragraph, heading, list item, link, button or label around them. */
+export function looseTextNodes(): Text[] {
+  const found: Text[] = []
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
+  for (let node = walker.nextNode(); node && found.length < 400; node = walker.nextNode()) {
+    const text = node as Text
+    if (!(text.data ?? '').trim()) continue
+    const owner = text.parentElement
+    let contextual = false
+    for (let el = owner; el; el = el.parentElement) {
+      if (TEXT_CONTEXT.has(el.tagName.toUpperCase()) || ROLE_CONTEXT.has((el.getAttribute('role') ?? '').toLowerCase()) || mine(el)) {
+        contextual = true
+        break
+      }
+    }
+    if (contextual || !owner) continue
+    const range = document.createRange()
+    range.selectNodeContents(text)
+    if (!range.getClientRects().length) continue
+    found.push(text)
+  }
+  return found
+}
+
+function drawLoose(): number {
+  const layer = toolLayer('loosetext')
+  const nodes = looseTextNodes()
+  for (const node of nodes) {
+    const range = document.createRange()
+    range.selectNodeContents(node)
+    badge(layer, range, `<${node.parentElement!.tagName.toLowerCase()}> loose text`, '#ea580c')
+  }
+  return nodes.length
+}
+
+/* ------------------------------------------------------------------ */
 /* Switch                                                               */
 /* ------------------------------------------------------------------ */
 
@@ -276,6 +347,8 @@ export function refreshTools(): void {
   if (active.has('tables')) drawTables()
   if (active.has('taborder')) drawTabOrder()
   if (active.has('lang')) drawLang()
+  if (active.has('headings')) drawHeadings()
+  if (active.has('loosetext')) drawLoose()
 }
 
 export function runTool(tool: ToolName, on: boolean, afterLayout: () => void): { ok: boolean; count?: number } {
@@ -309,6 +382,14 @@ export function runTool(tool: ToolName, on: boolean, afterLayout: () => void): {
     case 'lang':
       if (on) count = drawLang()
       else dropLayer('lang')
+      break
+    case 'headings':
+      if (on) count = drawHeadings()
+      else dropLayer('headings')
+      break
+    case 'loosetext':
+      if (on) count = drawLoose()
+      else dropLayer('loosetext')
       break
   }
   return { ok: true, count }

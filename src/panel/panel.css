@@ -873,3 +873,6 @@ body[data-view="audits"] :is(.pagebar,.page-progress,#display-tools,#nav-banner,
 
 .inspected-tab { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 1px 8px; border: 1px solid var(--border); border-radius: 999px; font-size: 12px; background: var(--surface-2); color: var(--text); }
 .inspected-tab.behind { border-color: var(--warn); color: var(--warn); font-weight: 600; }
+
+dialog.structure-dialog { width: min(900px, 96vw); }
+#structure-frame { width: 100%; height: min(64vh, 640px); border: 1px solid var(--border); border-radius: 8px; background: #fff; margin-bottom: 12px; }

@@ -131,6 +131,7 @@ export type ContentMessage =
   | { type: 'RGAA_SNAPSHOT' }
   | { type: 'RGAA_TOOL'; tool: ToolName; on: boolean }
   | { type: 'RGAA_TOOLS_RESET' }
+  | { type: 'RGAA_STRUCTURE' }
 
 export type ContentMessageType = ContentMessage['type']
 
@@ -183,6 +184,7 @@ export interface ContentResponses {
   RGAA_SNAPSHOT: { url: string; title: string; html: string; coverage: ScanCoverage }
   RGAA_TOOL: { ok: boolean; count?: number }
   RGAA_TOOLS_RESET: OkResponse
+  RGAA_STRUCTURE: { title: string; lang: string; html: string; headings: number; loose: number; truncated: boolean }
 }
 
 /** The answer to a given message. */

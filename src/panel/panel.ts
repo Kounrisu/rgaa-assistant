@@ -89,7 +89,7 @@ state.session = createAuditSession({
 async function init(): Promise<void> {
   setLang(getLang())
   translateStatic()
-  initPageTools(dom.pageToolsEl, { send: (payload) => sendToPage(inspectedTabId(), payload as Extract<ContentMessage, { type: 'RGAA_TOOL' }>), say })
+  initPageTools(dom.pageToolsEl, { send: (payload) => sendToPage(inspectedTabId(), payload as Extract<ContentMessage, { type: 'RGAA_TOOL' }>), structure: () => sendToPage(inspectedTabId(), { type: 'RGAA_STRUCTURE' }), say })
   initAuditStyles({ apply: (m) => chrome.runtime.sendMessage({ type: 'RGAA_STYLE', tabId: inspectedTabId(), ...m }), say, refresh: refreshPageTools })
   const loaded = await state.session.loadInitial()
   const firstUrl = state.audit.pages.find((p) => p.url)?.url
