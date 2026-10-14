@@ -33,6 +33,21 @@ export interface Rig {
  */
 export async function openRig(context: BrowserContext): Promise<Rig> {
   const problems: string[] = []
+  // The reading page is opened by the panel in a tab of its own: give it the storage stand-in (the same localStorage keys as the panel's).
+  await context.addInitScript(() => {
+    if (!location.pathname.includes('/reading/')) return
+    const PREFIX = 'e2e-chrome-storage:'
+    ;(window as unknown as { chrome: unknown }).chrome = {
+      storage: {
+        local: {
+          get: async (key: string) => {
+            const raw = localStorage.getItem(PREFIX + key)
+            return raw === null ? {} : { [key]: JSON.parse(raw) }
+          },
+        },
+      },
+    }
+  })
   const site = await context.newPage()
   const panel = await context.newPage()
   for (const [name, page] of [['site', site], ['panel', panel]] as const) {

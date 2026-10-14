@@ -27,7 +27,7 @@ export default defineConfig({
     rollupOptions: {
       // The panel page is only referenced from JS (chrome.devtools.panels.create),
       // so it must be listed as an extra entry to be emitted.
-      input: { panel: 'src/panel/panel.html', rgaa: 'src/rgaa/rgaa.html' },
+      input: { panel: 'src/panel/panel.html', rgaa: 'src/rgaa/rgaa.html', reading: 'src/reading/reading.html' },
     },
   },
 })

@@ -1,10 +1,7 @@
 /**
- * “Structure preview”: the page rebuilt from its HTML structure only, in a sandboxed frame (no script, no network),
+ * “Structure preview”: the page rebuilt from its HTML structure only, shown in a sandboxed frame (no script, no network)
  * to judge by eye whether headings, paragraphs, lists, tables and landmarks tell the story of the page.
  */
-import { $ } from './dom'
-import { t } from '../lib/i18n'
-
 export interface StructureData {
   title: string
   lang: string
@@ -32,27 +29,8 @@ table{border-collapse:collapse;margin:1em 0;font-family:system-ui,sans-serif;fon
 .loose{background:#ffedd5;border-bottom:2px solid #ea580c}
 `
 
-export function showStructure(data: StructureData): Promise<void> {
-  return new Promise((resolve) => {
-    const dialog = $<HTMLDialogElement>('structure-dialog')
-    const frame = $<HTMLIFrameElement>('structure-frame')
-    const close = $('structure-close')
-    $('structure-summary').textContent = [
-      t('{n} heading(s)', { n: data.headings }),
-      data.loose ? t('{n} loose text(s) in orange: no paragraph, heading, list item, link or button around them', { n: data.loose }) : t('no loose text'),
-      data.truncated ? t('very long page: the end is cut') : '',
-    ].filter(Boolean).join(' · ')
-    const lang = data.lang.replace(/[^a-zA-Z-]/g, '').slice(0, 12)
-    frame.srcdoc = `<!doctype html><html${lang ? ` lang="${lang}"` : ''}><head><meta charset="utf-8"><title></title><style>${STYLE}</style></head><body>${data.html}</body></html>`
-    const finish = () => {
-      close.removeEventListener('click', finish)
-      dialog.removeEventListener('close', finish)
-      if (dialog.open) dialog.close()
-      frame.srcdoc = ''
-      resolve()
-    }
-    close.addEventListener('click', finish)
-    dialog.addEventListener('close', finish)
-    dialog.showModal()
-  })
+/** The sandboxed document shown in the frame of the reading page. */
+export function structureDocument(data: StructureData): string {
+  const lang = data.lang.replace(/[^a-zA-Z-]/g, '').slice(0, 12)
+  return `<!doctype html><html${lang ? ` lang="${lang}"` : ''}><head><meta charset="utf-8"><title></title><style>${STYLE}</style></head><body>${data.html}</body></html>`
 }

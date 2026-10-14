@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title data-i18n>Reading of the audited page</title>
+    <link rel="stylesheet" href="reading.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="wrap">
+        <h1 id="title"></h1>
+        <p id="source" class="lead"></p>
+        <p id="summary" class="summary-line"></p>
+        <label id="only-wrap" class="only" hidden><input id="only" type="checkbox" /> <span data-i18n>Show only the lines marked ⚠</span></label>
+      </div>
+    </header>
+    <main class="wrap">
+      <p id="empty" hidden data-i18n>Nothing to show yet. Open a reading from the RGAA Assistant panel (Structure or Tables theme).</p>
+      <div id="body"></div>
+      <iframe id="frame" title="Page rebuilt from its HTML structure only" sandbox="" data-i18n-attrs="title" hidden></iframe>
+    </main>
+    <script type="module" src="reading.ts"></script>
+  </body>
+</html>
