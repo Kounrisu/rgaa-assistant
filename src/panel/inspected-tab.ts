@@ -2,42 +2,31 @@
  * Which browser tab this DevTools panel audits. DevTools belong to ONE tab: when another tab is in front (DevTools
  * undocked, or a second window), nothing on screen says the panel still audits the first one. This shows the audited
  * tab's title, and a banner with a way back when it is not the tab in front.
+ * A DevTools page cannot use chrome.tabs: the background answers (RGAA_TAB_INFO) and tells us when something changed.
  */
 import { $ } from './dom'
 import { t } from '../lib/i18n'
 import { inspectedTab, inspectedTabId } from './page-bridge'
 import { hostName } from './helpers'
 
-const chip = () => $('inspected-tab')
-let lastTitle = ''
-
 export async function refreshInspectedTab(): Promise<void> {
   const tab = await inspectedTab()
-  if (!tab.url && !tab.title) return void (chip().hidden = true)
-  lastTitle = tab.title || hostName(tab.url) || tab.url
-  const el = chip()
+  const el = $('inspected-tab')
+  if (!tab.url && !tab.title) return void (el.hidden = true)
+  const title = tab.title || hostName(tab.url) || tab.url
   el.hidden = false
-  el.textContent = t('Audited tab: {title}', { title: lastTitle })
-  el.title = t('This panel audits the browser tab “{title}” ({url}), whichever tab is in front.', { title: lastTitle, url: tab.url })
+  el.textContent = t('Audited tab: {title}', { title })
+  el.title = t('This panel audits the browser tab “{title}” ({url}), whichever tab is in front.', { title, url: tab.url })
   el.classList.toggle('behind', tab.active === false)
-  const banner = $('tab-banner')
-  banner.hidden = tab.active !== false
-  $('tab-banner-text').textContent = t('Another tab is in front. This panel audits the tab “{title}”, not the one you are looking at.', { title: lastTitle })
+  $('tab-banner').hidden = tab.active !== false
+  $('tab-banner-text').textContent = t('Another tab is in front. This panel audits the tab “{title}”, not the one you are looking at.', { title })
 }
 
-/** Keeps the chip and the banner up to date; does nothing where the browser gives no tab events. */
+/** Keeps the chip and the banner up to date. */
 export function watchInspectedTab(): void {
-  $('tab-banner-btn').addEventListener('click', async () => {
-    try {
-      const tab = await chrome.tabs.update(inspectedTabId(), { active: true })
-      if (tab?.windowId !== undefined) await chrome.windows.update(tab.windowId, { focused: true })
-    } catch {
-      // the tab was closed: the chip will say so on the next refresh
-    }
+  $('tab-banner-btn').addEventListener('click', () => void chrome.runtime.sendMessage({ type: 'RGAA_TAB_SHOW', tabId: inspectedTabId() }).catch(() => undefined))
+  chrome.runtime.onMessage.addListener((message) => {
+    if (message?.type === 'RGAA_TAB_EVENT') void refreshInspectedTab()
   })
   void refreshInspectedTab()
-  if (!chrome.tabs?.onActivated) return
-  chrome.tabs.onActivated.addListener(() => void refreshInspectedTab())
-  chrome.tabs.onUpdated?.addListener((id) => { if (id === inspectedTabId()) void refreshInspectedTab() })
-  chrome.windows?.onFocusChanged?.addListener(() => void refreshInspectedTab())
 }

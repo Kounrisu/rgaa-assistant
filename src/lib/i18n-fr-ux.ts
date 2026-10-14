@@ -1,5 +1,7 @@
 /** French for the texts added with the UX tools (hidden content, page tools, report, guided audit). Key = the English text. */
 export const FR_UX: Record<string, string> = {
+  'names computed by the axe engine': 'noms calculés par le moteur axe',
+  'names computed in a simplified way (axe not available)': 'noms calculés de façon simplifiée (axe indisponible)',
   'Table reading': 'Lecture des tableaux',
   'Page reading': 'Lecture de la page',
   'What a screen reader would say about each table: every cell with the header cells that name it. Cells with no header, wrong headers attributes and missing titles are marked.': 'Ce qu’un lecteur d’écran dirait de chaque tableau : chaque cellule avec les cellules d’en-tête qui la nomment. Les cellules sans en-tête, les attributs headers erronés et les titres manquants sont signalés.',

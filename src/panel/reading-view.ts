@@ -12,7 +12,7 @@ export function showReading(title: string, data: TranscriptResult): Promise<void
     const close = $('reading-close')
     const problems = data.blocks.reduce((n, b) => n + b.lines.filter((l) => l.warn).length, 0)
     $('reading-title').textContent = title
-    $('reading-summary').textContent = [problems ? t('{n} line(s) marked ⚠: a problem to look at', { n: problems }) : t('No problem marked'), data.truncated ? t('very long page: the end is cut') : ''].filter(Boolean).join(' · ')
+    $('reading-summary').textContent = [problems ? t('{n} line(s) marked ⚠: a problem to look at', { n: problems }) : t('No problem marked'), data.engine === 'axe' ? t('names computed by the axe engine') : t('names computed in a simplified way (axe not available)'), data.truncated ? t('very long page: the end is cut') : ''].filter(Boolean).join(' · ')
     const body = $('reading-body')
     body.replaceChildren(
       ...data.blocks.flatMap((block) => [

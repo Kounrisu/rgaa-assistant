@@ -34,6 +34,19 @@ chrome.runtime.onMessage.addListener((message: BackgroundMessage, sender, sendRe
         .then(() => chrome.tabs.sendMessage(message.tabId, { type: 'RGAA_AXE_RUN', locale: message.locale ?? null, rules: message.rules ?? null }))
         .then(sendResponse, (err) => sendResponse({ error: String(err) }))
       return true
+    // The axe engine, loaded only so the reading view can use its accessible-name computation.
+    case 'RGAA_AXE_LOAD':
+      chrome.scripting
+        .executeScript({ target: { tabId: message.tabId }, files: ['axe.min.js'] })
+        .then(() => sendResponse({ ok: true }), (err) => sendResponse({ error: String(err) }))
+      return true
+    // “Show the audited tab”: the panel cannot use chrome.tabs itself.
+    case 'RGAA_TAB_SHOW':
+      chrome.tabs
+        .update(message.tabId, { active: true })
+        .then((tab) => (tab?.windowId !== undefined ? chrome.windows.update(tab.windowId, { focused: true }) : undefined))
+        .then(() => sendResponse({ ok: true }), (err) => sendResponse({ error: String(err) }))
+      return true
     // Audit styles (the Stylus-like sheets): the CSS is injected as a user style so its !important wins over the page's, and a
     // sheet is removed with the same text it was added with. Only the inspected tab, only the top document.
     case 'RGAA_STYLE': {
@@ -53,3 +66,11 @@ chrome.runtime.onMessage.addListener((message: BackgroundMessage, sender, sendRe
       return undefined
   }
 })
+
+// The panels cannot use chrome.tabs: tell them when the tab in front may have changed (they ask again which one it is).
+const tellPanels = (tabId?: number): void => void chrome.runtime.sendMessage({ type: 'RGAA_TAB_EVENT', tabId }).catch(() => undefined)
+chrome.tabs.onActivated.addListener((info) => tellPanels(info.tabId))
+chrome.tabs.onUpdated.addListener((tabId, change) => {
+  if (change.title !== undefined || change.url !== undefined) tellPanels(tabId)
+})
+chrome.windows.onFocusChanged.addListener(() => tellPanels())
