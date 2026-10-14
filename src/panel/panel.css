@@ -874,12 +874,4 @@ body[data-view="audits"] :is(.pagebar,.page-progress,#display-tools,#nav-banner,
 .inspected-tab { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 1px 8px; border: 1px solid var(--border); border-radius: 999px; font-size: 12px; background: var(--surface-2); color: var(--text); }
 .inspected-tab.behind { border-color: var(--warn); color: var(--warn); font-weight: 600; }
 
-dialog.structure-dialog { width: min(900px, 96vw); }
-#structure-frame { width: 100%; height: min(64vh, 640px); border: 1px solid var(--border); border-radius: 8px; background: #fff; margin-bottom: 12px; }
 
-.reading-body { max-height: min(60vh, 600px); overflow: auto; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 8px; padding: 4px 12px; }
-.reading-body h3 { font-size: 14px; margin: 12px 0 4px; }
-.reading-body ol { margin: 0 0 8px; padding-left: 28px; font: 13px/1.5 ui-monospace, monospace; }
-.reading-body li { overflow-wrap: anywhere; }
-.reading-body li.warn { color: var(--bad); font-weight: 600; }
-.reading-body li.warn::marker { content: '⚠ '; }

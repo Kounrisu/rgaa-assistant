@@ -27,15 +27,12 @@ test('structure tools: headings map, loose text and structure preview', async ({
   await bar.getByRole('button', { name: 'Texte isolé' }).click()
   await expect.poll(() => site.evaluate(() => document.querySelectorAll('[data-tool="loosetext"] > div').length)).toBeGreaterThanOrEqual(1)
 
-  await bar.getByRole('button', { name: 'Aperçu de la structure' }).click()
-  const dialog = panel.locator('#structure-dialog')
-  await expect(dialog).toBeVisible()
-  const frame = panel.frameLocator('#structure-frame')
+  const [view] = await Promise.all([panel.waitForEvent('popup'), bar.getByRole('button', { name: 'Aperçu de la structure' }).click()])
+  const frame = view.frameLocator('#frame')
   await expect(frame.locator('h1')).toContainText('Bienvenue')
   await expect(frame.locator('.loose', { hasText: 'Texte isolé dans une div' })).toHaveCount(1)
   await expect(frame.locator('script')).toHaveCount(0)
-  await panel.locator('#structure-close').click()
-  await expect(dialog).toBeHidden()
+  await view.close()
 })
 
 test('reading view: tables and page transcripts mark what a screen reader cannot tie together', async ({ rig }) => {
@@ -52,20 +49,17 @@ test('reading view: tables and page transcripts mark what a screen reader cannot
   })
 
   await panel.locator('.theme-tab', { hasText: 'Tableaux' }).click()
-  await panel.locator('#page-tools').getByRole('button', { name: 'Lecture des tableaux' }).click()
-  const dialog = panel.locator('#reading-dialog')
-  await expect(dialog).toBeVisible()
+  const [tables] = await Promise.all([panel.waitForEvent('popup'), panel.locator('#page-tools').getByRole('button', { name: 'Lecture des tableaux' }).click()])
+  const dialog = tables.locator('body')
   await expect(dialog.locator('li', { hasText: 'Offre: Basique' })).toHaveCount(1)
   await expect(dialog.locator('li', { hasText: 'Prix: 5 €' })).toHaveCount(1)
   await expect(dialog.locator('li.warn', { hasText: 'No header cell' })).toHaveCount(2) // the test page's own table and the bad one
-  await panel.locator('#reading-close').click()
-  await expect(dialog).toBeHidden()
+  await tables.close()
 
   await panel.locator('.theme-tab', { hasText: 'Structure' }).click()
-  await panel.locator('#page-tools').getByRole('button', { name: 'Lecture de la page' }).click()
-  await expect(dialog).toBeVisible()
-  await expect(dialog.locator('li', { hasText: 'Heading level 1: Bienvenue' })).toHaveCount(1)
-  await panel.locator('#reading-close').click()
+  const [reading] = await Promise.all([panel.waitForEvent('popup'), panel.locator('#page-tools').getByRole('button', { name: 'Lecture de la page' }).click()])
+  await expect(reading.locator('li', { hasText: 'Heading level 1: Bienvenue' })).toHaveCount(1)
+  await reading.close()
 })
 
 test('table tool: a visually hidden caption is shown, and put back when the tool is off', async ({ rig }) => {

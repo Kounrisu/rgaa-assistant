@@ -125,6 +125,10 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Handoff log (newest first)
 
+### 2026-10-14 — Claude Code — Page reading, table reading and structure preview open in a browser tab
+- Did: the three views no longer use small popins: the panel stores the result (`chrome.storage.local`, key `rgaa-view-data`) and opens `src/reading/reading.html` in a tab (like the RGAA coverage page): full-width transcript with a "show only the lines marked ⚠" filter, or a full-height sandboxed frame for the structure preview. New: `src/reading/*`, `src/panel/open-view.ts`; removed: `reading-view.ts` and the two dialogs; new rollup entry `reading` in `vite.config.ts`. The e2e harness gives the reading page a storage stand-in.
+- State: `npm run check` passes; e2e passes with parity regenerated. NOT tested: real Firefox/Chrome (opening the tab from DevTools, storage hand-over).
+
 ### 2026-10-14 — Claude Code — Table tool unhides visually hidden captions
 - Did: the Tables page tool is now "Caption and scope" (fr "Titre et scope"): a visually hidden `<caption>` is shown while the tool is on and put back when it is off (before, `caption` was not in the reveal candidates); the badge says "(was hidden)". Scope, id and `headers` badges unchanged. `src/content/page-tools.ts`, e2e test in `structure-tools.spec.ts`.
 - State: `npm run check` passes; e2e passes with parity regenerated. NOT tested: real Firefox/DevTools.

@@ -1,5 +1,8 @@
 /** French for the texts added with the UX tools (hidden content, page tools, report, guided audit). Key = the English text. */
 export const FR_UX: Record<string, string> = {
+  'Reading of the audited page': 'Lecture de la page auditée',
+  'Show only the lines marked ⚠': 'Afficher seulement les lignes marquées ⚠',
+  'Nothing to show yet. Open a reading from the RGAA Assistant panel (Structure or Tables theme).': 'Rien à afficher pour l’instant. Ouvrez une lecture depuis le panneau RGAA Assistant (thématique Structure ou Tableaux).',
   'Caption and scope': 'Titre et scope',
   'On every table: its caption (shown even when it is visually hidden, or flagged as missing), and on every header cell its scope, id and the headers attributes of the cells (RGAA 5.4 to 5.7).': 'Sur chaque tableau : son titre (caption), affiché même s’il est masqué visuellement, ou signalé comme absent ; sur chaque cellule d’en-tête son scope, son id et les attributs headers des cellules (RGAA 5.4 à 5.7).',
   'names computed by the axe engine': 'noms calculés par le moteur axe',

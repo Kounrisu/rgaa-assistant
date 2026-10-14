@@ -1,7 +1,8 @@
 import { t } from '../lib/i18n'
-import { showReading } from './reading-view'
+import { openView } from './open-view'
+import { getLang } from '../lib/i18n'
 import type { TranscriptResult } from '../content/transcript'
-import { showStructure, type StructureData } from './structure-preview'
+import type { StructureData } from './structure-preview'
 import { auditStylesMenu, resetAuditStyles, setAuditStylesTheme, stylusHint } from './audit-styles-ui'
 
 /**
@@ -132,7 +133,7 @@ async function openReading(scope: 'page' | 'tables'): Promise<void> {
   try {
     const data = await deps!.transcript(scope)
     if (!data) throw new Error('no answer')
-    await showReading(scope === 'tables' ? t('Table reading') : t('Page reading'), data)
+    await openView({ kind: 'reading', title: scope === 'tables' ? t('Table reading') : t('Page reading'), result: data }, getLang())
   } catch {
     deps!.say(t('Could not reach the page. Reload the tab and try again.'))
   }
@@ -142,7 +143,7 @@ async function openPreview(): Promise<void> {
   try {
     const data = await deps!.structure()
     if (!data) throw new Error('no answer')
-    await showStructure(data)
+    await openView({ kind: 'structure', title: t('Structure preview'), result: data }, getLang())
   } catch {
     deps!.say(t('Could not reach the page. Reload the tab and try again.'))
   }
