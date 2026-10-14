@@ -24,7 +24,7 @@ const TOOL_THEMES: Record<Tool, number[]> = {
 
 const TOOLS: { id: Tool; label: string; title: string }[] = [
   { id: 'reveal', label: 'Hidden content', title: 'Show what is visually hidden but read by screen readers (hidden tables, skip links…), outlined in magenta. Switch off to put it back.' },
-  { id: 'tables', label: 'Tables', title: 'On every table: its caption (or the lack of one), and on every header cell its scope, id and the headers attributes of the cells (RGAA 5.4 to 5.7).' },
+  { id: 'tables', label: 'Caption and scope', title: 'On every table: its caption (shown even when it is visually hidden, or flagged as missing), and on every header cell its scope, id and the headers attributes of the cells (RGAA 5.4 to 5.7).' },
   { id: 'taborder', label: 'Tab order', title: 'Number the focusable elements in the order the Tab key visits them, with a line between them. Red: positive tabindex; magenta: visually hidden (RGAA 12.8).' },
   { id: 'nocss', label: 'Styles off', title: 'Turn the style sheets off to check that the information stays understandable and in a logical order (RGAA 10.3).' },
   { id: 'spacing', label: 'Text spacing', title: 'Apply the text spacing of the test: line 1.5, letters 0.12 em, words 0.16 em, paragraphs 2 em, to check nothing is lost (RGAA 10.12).' },
