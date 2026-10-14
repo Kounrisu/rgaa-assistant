@@ -135,6 +135,7 @@ export const dom = {
   langEnBtn: $<HTMLButtonElement>('lang-en'),
   textDialog: $<HTMLDialogElement>('text-dialog'),
   choiceDialog: $<HTMLDialogElement>('choice-dialog'),
+  pickDialog: $<HTMLDialogElement>('pick-dialog'),
 }
 
 /** Writes a message in the status line at the top of the panel. */

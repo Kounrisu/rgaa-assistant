@@ -17,6 +17,7 @@ import { saveReviews } from './model'
 import type { ImageReview, ImageKind, Verdict } from '../lib/types'
 import { testIdFor } from '../lib/results'
 import { actions } from './actions'
+import { askPick } from './dialogs'
 
 export function renderFilters(): void {
   dom.filtersEl.replaceChildren()
@@ -54,6 +55,38 @@ export function renderFilters(): void {
       ),
     )
   }
+  if (state.elements.some((e) => !e.present)) {
+    dom.filtersEl.append(h('button', { type: 'button', class: 'remove-absent', title: t('Delete the images seen in an earlier scan that are no longer on the page'), onclick: () => void removeAbsent() }, t('Remove absent images…')))
+  }
+}
+
+/** Removes the images no longer on the page, after a popin where each one is a ticked checkbox (untick to keep it). */
+async function removeAbsent(): Promise<void> {
+  const gone = state.elements.filter((e) => !e.present)
+  if (!gone.length) return
+  const answered = (e: Item) => {
+    const r = state.reviews[reviewKey(e)]
+    return Boolean(r && (r.kind || Object.keys(r.answers).length || r.note.trim()))
+  }
+  const picked = await askPick(
+    t('Remove the images that are not on the page'),
+    t('These images were seen in an earlier scan but are no longer on the page. Their answers and notes are deleted with them. Untick the ones to keep.'),
+    gone.map((e) => ({ id: e.id, label: `#${e.id} ${e.type} — ${altLabel(e).text}`, detail: answered(e) ? t('has answers') : '' })),
+    t('Remove'),
+  )
+  if (!picked?.length) return
+  const drop = new Set(picked)
+  for (let i = state.elements.length - 1; i >= 0; i--) {
+    const e = state.elements[i]
+    if (e.present || !drop.has(e.id)) continue
+    delete state.reviews[reviewKey(e)]
+    if (state.reviewCursor?.key === e.key) state.reviewCursor = undefined
+    state.elements.splice(i, 1)
+  }
+  if (!state.elements.some((e) => e.id === state.selectedId)) state.selectedId = state.elements[0]?.id ?? null
+  if (state.filter === 'gone' && !state.elements.some((e) => !e.present)) state.filter = 'all'
+  saveReviews()
+  actions.renderAll()
 }
 
 export function renderList(): void {

@@ -46,6 +46,7 @@
         <button id="results-btn" type="button" disabled aria-pressed="false" data-i18n>Page results</button>
       </nav>
       <div class="page-location">
+        <span id="inspected-tab" class="inspected-tab" hidden></span>
         <span id="live-url" class="live-url"></span>
         <button id="open-page-btn" type="button" hidden data-i18n>Open registered page</button>
       </div>
@@ -64,6 +65,10 @@
       <div id="page-summary" class="theme-summary page-totals" data-scope="page" aria-label="Criteria of the whole page" data-i18n-attrs="aria-label"></div>
     </section>
     <nav id="themebar" class="themebar" aria-label="RGAA themes" data-i18n-attrs="aria-label" hidden></nav>
+    <div id="tab-banner" class="banner" role="status" hidden>
+      <span id="tab-banner-text"></span>
+      <button id="tab-banner-btn" type="button" data-i18n>Show the audited tab</button>
+    </div>
     <div id="nav-banner" class="banner" role="status" hidden>
       <span id="nav-banner-text"></span>
       <button id="nav-banner-btn" type="button"></button>
@@ -152,6 +157,18 @@
         <h2 id="choice-title"></h2>
         <p id="choice-text"></p>
         <div class="confirm-actions" id="choice-actions"></div>
+      </form>
+    </dialog>
+
+    <dialog id="pick-dialog" class="confirm" aria-labelledby="pick-title">
+      <form method="dialog" id="pick-form">
+        <h2 id="pick-title"></h2>
+        <p id="pick-text"></p>
+        <ul id="pick-list" class="pick-list"></ul>
+        <div class="confirm-actions">
+          <button id="pick-cancel" type="button" autofocus data-i18n>Cancel</button>
+          <button id="pick-ok" type="submit" class="danger-solid"></button>
+        </div>
       </form>
     </dialog>
 

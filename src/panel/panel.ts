@@ -30,6 +30,7 @@ import { runSelected } from './batch-runner'
 import { renderBatch } from './batch-view'
 import { nextReview } from './review-navigation'
 import { wireEvents } from './events'
+import { watchInspectedTab } from './inspected-tab'
 
 /**
  * The functions the other modules call "upwards" (see actions.ts): a module that is below them cannot import them
@@ -101,6 +102,7 @@ async function init(): Promise<void> {
   renderAll()
   renderAuditBar()
   if (state.liveUrl) showNavBanner(state.liveUrl)
+  watchInspectedTab()
   if (loaded) say(t('Audit “{name}” opened: {n} page(s).', { name: auditTitle(state.audit), n: state.audit.pages.length }))
 }
 
