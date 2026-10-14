@@ -160,6 +160,17 @@
       </form>
     </dialog>
 
+    <dialog id="structure-dialog" class="confirm structure-dialog" aria-labelledby="structure-title">
+      <form method="dialog" id="structure-form">
+        <h2 id="structure-title" data-i18n>Structure of the page</h2>
+        <p id="structure-summary"></p>
+        <iframe id="structure-frame" title="Page rebuilt from its HTML structure only" sandbox="" data-i18n-attrs="title"></iframe>
+        <div class="confirm-actions">
+          <button id="structure-close" type="button" class="primary" autofocus data-i18n>Close</button>
+        </div>
+      </form>
+    </dialog>
+
     <dialog id="pick-dialog" class="confirm" aria-labelledby="pick-title">
       <form method="dialog" id="pick-form">
         <h2 id="pick-title"></h2>

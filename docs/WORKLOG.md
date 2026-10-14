@@ -125,6 +125,12 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Handoff log (newest first)
 
+### 2026-10-14 — Claude Code — Structure tools (headings map, loose text, structure preview); Locate on page made robust
+- Did: theme 9 page tools: "Headings map" (H1-H6 badges on the page, red when a level is skipped or the heading is empty), "Loose text" (boxes around text in a plain div/span with no p, heading, li, link, button, label around it; `looseTextNodes` in `src/content/page-tools.ts`), and "Structure preview" (the page rebuilt from its HTML structure, loose text in orange, shown in a sandboxed frame: `src/content/structure-view.ts`, `src/panel/structure-preview.ts`, message `RGAA_STRUCTURE`).
+  "Locate on page": when the box is missing from the page (reload, boxes removed) the panel rescans once and retries; an unreachable page now says so instead of failing silently (`focusOnPage`). The e2e harness ignores errors from sandboxed frames (the stand-in cannot run in the preview frame).
+- State: `npm run check` passes; `npm run test:e2e` 38 passed with the parity baseline regenerated for the new buttons. NOT tested: real Firefox/DevTools; the exact real-site cause of "Locate on page" / navigation between images not working was not reproduced (the existing test passes), only the likely cases are handled.
+- Next: reproduce the navigation failure on the user's real page (ask for the URL / console errors); the questions on recording (HTML/CSS/JS snapshots around an action, focus trail, for an LLM) and on a screen-reader style transcript of tables/elements are answered in chat as proposals, not built.
+
 ### 2026-10-14 — Claude Code — remove absent images; audited-tab indicator
 - Did: Images theme: "Remove absent images…" (end of the filter chips, current page only) opens a popin with one ticked checkbox per image no longer on the page; the ticked ones and their answers/notes are deleted (`src/panel/images-view.ts`, `askPick` in `dialogs.ts`).
   Audited tab: DevTools belong to one tab, nothing said so. New `src/panel/inspected-tab.ts`: a chip "Audited tab: title" beside the address, and a warning banner with "Show the audited tab" when another tab is in front (undocked DevTools / second window). `RGAA_TAB_INFO` now also returns `active`. No new permission.

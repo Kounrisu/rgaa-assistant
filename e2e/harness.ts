@@ -36,8 +36,10 @@ export async function openRig(context: BrowserContext): Promise<Rig> {
   const site = await context.newPage()
   const panel = await context.newPage()
   for (const [name, page] of [['site', site], ['panel', panel]] as const) {
-    page.on('console', (m) => m.type() === 'error' && problems.push(`[${name}] console.error: ${m.text()}`))
-    page.on('pageerror', (e) => problems.push(`[${name}] uncaught: ${e.message}`))
+    // The structure preview is a sandboxed frame (no script, no storage): the test stand-in injected into every frame cannot run there, which is expected.
+    const inSandbox = (text: string) => /sandboxed/.test(text)
+    page.on('console', (m) => m.type() === 'error' && !inSandbox(m.text()) && problems.push(`[${name}] console.error: ${m.text()}`))
+    page.on('pageerror', (e) => !inSandbox(e.message) && problems.push(`[${name}] uncaught: ${e.message}`))
     // nothing may leave the loopback: an external request is a bug of the test or of the app
     page.on('request', (r) => {
       if (!/^(http:\/\/127\.0\.0\.1|data:|blob:|about:)/.test(r.url())) problems.push(`[${name}] external request: ${r.url()}`)

@@ -1,5 +1,18 @@
 /** French for the texts added with the UX tools (hidden content, page tools, report, guided audit). Key = the English text. */
 export const FR_UX: Record<string, string> = {
+  'Structure of the page': 'Structure de la page',
+  'Page rebuilt from its HTML structure only': 'Page reconstruite à partir de sa seule structure HTML',
+  'Structure preview': 'Aperçu de la structure',
+  'The page rebuilt from its HTML structure only (headings, paragraphs, lists, tables, landmarks), to see whether it makes sense without the design.': 'La page reconstruite à partir de sa seule structure HTML (titres, paragraphes, listes, tableaux, repères), pour voir si elle garde du sens sans la mise en forme.',
+  '{n} heading(s)': '{n} titre(s)',
+  '{n} loose text(s) in orange: no paragraph, heading, list item, link or button around them': '{n} texte(s) isolé(s) en orange : ni paragraphe, ni titre, ni élément de liste, ni lien, ni bouton autour',
+  'no loose text': 'aucun texte isolé',
+  'very long page: the end is cut': 'page très longue : la fin est coupée',
+  'Headings map': 'Carte des titres',
+  'Badge every heading on the page with its level (H1 to H6), like a headings map. Red: a skipped level or an empty heading (RGAA 9.1).': 'Affiche sur la page le niveau (H1 à H6) de chaque titre, comme une carte des titres. Rouge : niveau sauté ou titre vide (RGAA 9.1).',
+  'Loose text': 'Texte isolé',
+  'Box the texts that sit in a plain div or span with no paragraph, heading, list item, link, button or label around them (RGAA 9.3).': 'Encadre les textes placés dans une simple div ou span, sans paragraphe, titre, élément de liste, lien, bouton ni étiquette autour (RGAA 9.3).',
+  'Close': 'Fermer',
   'Audited tab: {title}': 'Onglet audité : {title}',
   'This panel audits the browser tab “{title}” ({url}), whichever tab is in front.': 'Ce panneau audite l’onglet « {title} » ({url}), quel que soit l’onglet affiché.',
   'Another tab is in front. This panel audits the tab “{title}”, not the one you are looking at.': 'Un autre onglet est affiché. Ce panneau audite l’onglet « {title} », pas celui que vous regardez.',

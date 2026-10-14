@@ -2,6 +2,7 @@
  * Everything that talks to the inspected tab: the typed messages to the content script, the boxes on the page (show, hide, colour code),
  * its address and title, the small pictures of the findings.
  */
+import { actions } from './actions'
 import type { ContentMessage, ContentResponse, CaptureResponse, TabInfoResponse } from '../lib/messages'
 import { state } from './state'
 import { say, dom } from './dom'
@@ -28,12 +29,26 @@ export const focusOnPage = async (id: number, scroll: boolean, themeNo = 1) => {
     state.boxesOn[themeNo] = true
     await applyBoxes()
   }
-  return sendToPage(inspectedTabId(), { type: 'RGAA_FOCUS_IMAGE', id, scroll, theme: themeNo })
-    .then((response) => {
-      if (response?.ok === false && scroll) say(t('This image is not on the page right now (popin closed?). Reopen it, then click Rescan.'))
-    })
-    .catch(console.error)
+  const ask = () => sendToPage(inspectedTabId(), { type: 'RGAA_FOCUS_IMAGE', id, scroll, theme: themeNo })
+  try {
+    let response = await ask()
+    // The boxes are gone from the page (page reloaded, boxes removed, extension reloaded): draw them again, once, then retry.
+    if (response?.ok === false && scroll && themeNo === 1 && !rescanning && state.page && state.elements.some((e) => e.id === id && e.present)) {
+      rescanning = true
+      try {
+        await actions.scan()
+      } finally {
+        rescanning = false
+      }
+      response = await ask()
+    }
+    if (response?.ok === false && scroll) say(t('This image is not on the page right now (popin closed?). Reopen it, then click Rescan.'))
+  } catch {
+    if (scroll) say(t('Could not reach the page. Reload the tab and try again.'))
+  }
 }
+
+let rescanning = false
 
 /** Only the theme you are in shows boxes on the page, and only if its own toggle is on. */
 export async function applyBoxes(): Promise<void> {
