@@ -1,5 +1,11 @@
 /** French for the texts added with the UX tools (hidden content, page tools, report, guided audit). Key = the English text. */
 export const FR_UX: Record<string, string> = {
+  'Table reading': 'Lecture des tableaux',
+  'Page reading': 'Lecture de la page',
+  'What a screen reader would say about each table: every cell with the header cells that name it. Cells with no header, wrong headers attributes and missing titles are marked.': 'Ce qu’un lecteur d’écran dirait de chaque tableau : chaque cellule avec les cellules d’en-tête qui la nomment. Les cellules sans en-tête, les attributs headers erronés et les titres manquants sont signalés.',
+  'What a screen reader would say about the page, in reading order: landmarks, headings, lists, links, buttons, fields and images. Missing names and skipped heading levels are marked.': 'Ce qu’un lecteur d’écran dirait de la page, dans l’ordre de lecture : repères, titres, listes, liens, boutons, champs et images. Les noms manquants et les niveaux de titre sautés sont signalés.',
+  '{n} line(s) marked ⚠: a problem to look at': '{n} ligne(s) marquée(s) ⚠ : un problème à examiner',
+  'No problem marked': 'Aucun problème signalé',
   'Structure of the page': 'Structure de la page',
   'Page rebuilt from its HTML structure only': 'Page reconstruite à partir de sa seule structure HTML',
   'Structure preview': 'Aperçu de la structure',

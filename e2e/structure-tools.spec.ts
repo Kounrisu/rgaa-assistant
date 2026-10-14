@@ -37,3 +37,33 @@ test('structure tools: headings map, loose text and structure preview', async ({
   await panel.locator('#structure-close').click()
   await expect(dialog).toBeHidden()
 })
+
+test('reading view: tables and page transcripts mark what a screen reader cannot tie together', async ({ rig }) => {
+  test.setTimeout(120_000)
+  const { panel, site } = rig
+  await panel.locator('#empty-add-btn').click()
+  await scanElements(panel)
+  await panel.locator('.themebar .themes-menu summary').click()
+  await panel.locator('.themebar .menu-actions button').first().click()
+  await site.evaluate(() => {
+    const wrap = document.createElement('div')
+    wrap.innerHTML = '<table id="t-good"><caption>Tarifs</caption><tr><th scope="col">Offre</th><th scope="col">Prix</th></tr><tr><td>Basique</td><td>5 €</td></tr></table><table id="t-bad"><tr><td>A</td><td headers="nope">B</td></tr></table>'
+    document.body.prepend(wrap)
+  })
+
+  await panel.locator('.theme-tab', { hasText: 'Tableaux' }).click()
+  await panel.locator('#page-tools').getByRole('button', { name: 'Lecture des tableaux' }).click()
+  const dialog = panel.locator('#reading-dialog')
+  await expect(dialog).toBeVisible()
+  await expect(dialog.locator('li', { hasText: 'Offre: Basique' })).toHaveCount(1)
+  await expect(dialog.locator('li', { hasText: 'Prix: 5 €' })).toHaveCount(1)
+  await expect(dialog.locator('li.warn', { hasText: 'No header cell' })).toHaveCount(2) // the test page's own table and the bad one
+  await panel.locator('#reading-close').click()
+  await expect(dialog).toBeHidden()
+
+  await panel.locator('.theme-tab', { hasText: 'Structure' }).click()
+  await panel.locator('#page-tools').getByRole('button', { name: 'Lecture de la page' }).click()
+  await expect(dialog).toBeVisible()
+  await expect(dialog.locator('li', { hasText: 'Heading level 1: Bienvenue' })).toHaveCount(1)
+  await panel.locator('#reading-close').click()
+})
