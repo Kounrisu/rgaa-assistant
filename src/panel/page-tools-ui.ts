@@ -1,4 +1,6 @@
 import { t } from '../lib/i18n'
+import { showReading } from './reading-view'
+import type { TranscriptResult } from '../content/transcript'
 import { showStructure, type StructureData } from './structure-preview'
 import { auditStylesMenu, resetAuditStyles, setAuditStylesTheme, stylusHint } from './audit-styles-ui'
 
@@ -35,6 +37,8 @@ interface Deps {
   send: (payload: unknown) => Promise<{ count?: number } | undefined>
   /** Asks the page for its structure (the rebuilt copy shown in the preview). */
   structure: () => Promise<StructureData | undefined>
+  /** Asks the page for the transcript of the page or of its tables. */
+  transcript: (scope: 'page' | 'tables') => Promise<TranscriptResult | undefined>
   say: (message: string) => void
 }
 
@@ -64,6 +68,16 @@ export function renderPageTools(): void {
     host!.append(button)
   }
   relevant.forEach(add)
+  if (currentTheme === 5 || currentTheme === 9) {
+    const reading = document.createElement('button')
+    reading.type = 'button'
+    reading.textContent = currentTheme === 5 ? t('Table reading') : t('Page reading')
+    reading.title = currentTheme === 5
+      ? t('What a screen reader would say about each table: every cell with the header cells that name it. Cells with no header, wrong headers attributes and missing titles are marked.')
+      : t('What a screen reader would say about the page, in reading order: landmarks, headings, lists, links, buttons, fields and images. Missing names and skipped heading levels are marked.')
+    reading.addEventListener('click', () => void openReading(currentTheme === 5 ? 'tables' : 'page'))
+    host.append(reading)
+  }
   if (currentTheme === 9) {
     const preview = document.createElement('button')
     preview.type = 'button'
@@ -109,6 +123,16 @@ async function toggle(tool: Tool): Promise<void> {
     else on.delete(tool)
     renderPageTools()
     if (next && typeof result?.count === 'number') deps!.say(t('{n} element(s) affected by “{tool}”.', { n: result.count, tool: t(TOOLS.find((x) => x.id === tool)!.label) }))
+  } catch {
+    deps!.say(t('Could not reach the page. Reload the tab and try again.'))
+  }
+}
+
+async function openReading(scope: 'page' | 'tables'): Promise<void> {
+  try {
+    const data = await deps!.transcript(scope)
+    if (!data) throw new Error('no answer')
+    await showReading(scope === 'tables' ? t('Table reading') : t('Page reading'), data)
   } catch {
     deps!.say(t('Could not reach the page. Reload the tab and try again.'))
   }

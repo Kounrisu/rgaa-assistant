@@ -132,6 +132,7 @@ export type ContentMessage =
   | { type: 'RGAA_TOOL'; tool: ToolName; on: boolean }
   | { type: 'RGAA_TOOLS_RESET' }
   | { type: 'RGAA_STRUCTURE' }
+  | { type: 'RGAA_TRANSCRIPT'; scope: 'page' | 'tables' }
 
 export type ContentMessageType = ContentMessage['type']
 
@@ -184,6 +185,7 @@ export interface ContentResponses {
   RGAA_SNAPSHOT: { url: string; title: string; html: string; coverage: ScanCoverage }
   RGAA_TOOL: { ok: boolean; count?: number }
   RGAA_TOOLS_RESET: OkResponse
+  RGAA_TRANSCRIPT: import('../content/transcript').TranscriptResult
   RGAA_STRUCTURE: { title: string; lang: string; html: string; headings: number; loose: number; truncated: boolean }
 }
 

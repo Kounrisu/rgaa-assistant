@@ -125,6 +125,11 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Handoff log (newest first)
 
+### 2026-10-14 — Claude Code — Reading view (screen-reader style transcript of tables and of the page)
+- Did: "Table reading" (theme 5) and "Page reading" (theme 9) open a dialog with what a screen reader would say: each table cell with the header cells that name it (scope, headers attribute, th position, rowspan/colspan), the page in reading order (landmarks, headings, lists, links, buttons, fields, images). Problems are marked on their line (no header, headers pointing to a missing id, no table title, empty heading or skipped level, nameless link/button/field, image with no alt). `src/content/transcript.ts`, `src/panel/reading-view.ts`, message `RGAA_TRANSCRIPT`. A simplified accessible-name computation, not the browser's full algorithm. It helps spot bad coding; it gives no verdict.
+- State: `npm run check` passes; `npm run test:e2e` 39 passed with the parity baseline regenerated. NOT tested: real Firefox/DevTools.
+- Next: recording of HTML/CSS/JS around an action (explicitly postponed by the owner); a reading view per selected element.
+
 ### 2026-10-14 — Claude Code — Structure tools (headings map, loose text, structure preview); Locate on page made robust
 - Did: theme 9 page tools: "Headings map" (H1-H6 badges on the page, red when a level is skipped or the heading is empty), "Loose text" (boxes around text in a plain div/span with no p, heading, li, link, button, label around it; `looseTextNodes` in `src/content/page-tools.ts`), and "Structure preview" (the page rebuilt from its HTML structure, loose text in orange, shown in a sandboxed frame: `src/content/structure-view.ts`, `src/panel/structure-preview.ts`, message `RGAA_STRUCTURE`).
   "Locate on page": when the box is missing from the page (reload, boxes removed) the panel rescans once and retries; an unreachable page now says so instead of failing silently (`focusOnPage`). The e2e harness ignores errors from sandboxed frames (the stand-in cannot run in the preview frame).
