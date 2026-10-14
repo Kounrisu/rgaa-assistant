@@ -54,7 +54,7 @@ const REVEAL_STYLE: [string, string][] = [
   ['outline', '3px dashed #d946ef'], ['background-color', 'rgba(217, 70, 239, 0.14)'], ['color', '#111'], ['z-index', 'auto'], ['display', 'block'],
 ]
 
-const CANDIDATES = 'a[href], table, [role="table"], h1, h2, h3, h4, h5, h6, [role="heading"], input:not([type=hidden]), select, textarea, button, [role="button"], nav, header, footer, main, aside, section, form, label, p, span, div, ul, li'
+const CANDIDATES = 'a[href], table, caption, [role="table"], h1, h2, h3, h4, h5, h6, [role="heading"], input:not([type=hidden]), select, textarea, button, [role="button"], nav, header, footer, main, aside, section, form, label, p, span, div, ul, li'
 
 function revealOne(el: HTMLElement): void {
   if (revealed.has(el)) return
@@ -62,7 +62,7 @@ function revealOne(el: HTMLElement): void {
   el.setAttribute(REVEAL_ATTR, '1')
   for (const [prop, value] of REVEAL_STYLE) {
     // a table, a list or an inline element keeps its own display
-    if (prop === 'display' && (['TABLE', 'UL', 'OL', 'LI', 'TR', 'TD', 'TH', 'A', 'SPAN', 'LABEL', 'INPUT', 'SELECT', 'TEXTAREA', 'BUTTON'].includes(el.tagName) || getComputedStyle(el).display !== 'block')) continue
+    if (prop === 'display' && (['TABLE', 'CAPTION', 'UL', 'OL', 'LI', 'TR', 'TD', 'TH', 'A', 'SPAN', 'LABEL', 'INPUT', 'SELECT', 'TEXTAREA', 'BUTTON'].includes(el.tagName) || getComputedStyle(el).display !== 'block')) continue
     el.style.setProperty(prop, value, 'important')
   }
 }
@@ -133,16 +133,37 @@ function badge(layer: HTMLElement, el: { getBoundingClientRect(): DOMRect }, tex
 /* Tables: caption, scope, headers                                      */
 /* ------------------------------------------------------------------ */
 
+/** Table captions this tool unhid itself (so switching it off puts only those back). */
+const unhidCaptions = new Set<HTMLElement>()
+
+function restoreCaptions(): void {
+  for (const el of unhidCaptions) {
+    const style = revealed.get(el)
+    el.removeAttribute(REVEAL_ATTR)
+    if (style === null) el.removeAttribute('style')
+    else if (style !== undefined) el.setAttribute('style', style)
+    revealed.delete(el)
+  }
+  unhidCaptions.clear()
+}
+
 function drawTables(): number {
   const layer = toolLayer('tables')
   let n = 0
+  // a caption hidden for sighted users (visually hidden text) is shown, so its place and wording can be judged
+  for (const cap of Array.from(document.querySelectorAll<HTMLElement>('caption'))) {
+    if (!mine(cap) && !cap.hasAttribute(REVEAL_ATTR) && hiddenKind(cap) === 'visually-hidden') {
+      revealOne(cap)
+      unhidCaptions.add(cap)
+    }
+  }
   for (const t of Array.from(document.querySelectorAll('table, [role="table"], [role="grid"]')).slice(0, 80)) {
     if (mine(t)) continue
     n++
     const cap = (t.querySelector('caption')?.textContent ?? t.getAttribute('aria-label') ?? '').replace(/\s+/g, ' ').trim()
     const role = (t.getAttribute('role') ?? '').toLowerCase()
     const layout = role === 'presentation' || role === 'none'
-    badge(layer, t, layout ? 'table: layout (presentation)' : cap ? `caption: “${cap}”` : 'table: NO caption / title', layout ? '#64748b' : cap ? '#0f766e' : '#b45309')
+    badge(layer, t, layout ? 'table: layout (presentation)' : cap ? `caption${t.querySelector('caption')?.hasAttribute(REVEAL_ATTR) ? ' (was hidden)' : ''}: “${cap}”` : 'table: NO caption / title', layout ? '#64748b' : cap ? '#0f766e' : '#b45309')
     for (const c of Array.from(t.querySelectorAll('th, [role="columnheader"], [role="rowheader"]')).slice(0, 400)) {
       const scope = c.getAttribute('scope')
       const id = c.getAttribute('id')
@@ -363,7 +384,10 @@ export function runTool(tool: ToolName, on: boolean, afterLayout: () => void): {
       break
     case 'tables':
       if (on) count = drawTables()
-      else dropLayer('tables')
+      else {
+        dropLayer('tables')
+        restoreCaptions()
+      }
       break
     case 'taborder':
       if (on) count = drawTabOrder()

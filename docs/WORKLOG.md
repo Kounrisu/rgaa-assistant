@@ -125,6 +125,10 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Handoff log (newest first)
 
+### 2026-10-14 — Claude Code — Table tool unhides visually hidden captions
+- Did: the Tables page tool is now "Caption and scope" (fr "Titre et scope"): a visually hidden `<caption>` is shown while the tool is on and put back when it is off (before, `caption` was not in the reveal candidates); the badge says "(was hidden)". Scope, id and `headers` badges unchanged. `src/content/page-tools.ts`, e2e test in `structure-tools.spec.ts`.
+- State: `npm run check` passes; e2e passes with parity regenerated. NOT tested: real Firefox/DevTools.
+
 ### 2026-10-14 — Claude Code — Reading view uses axe for accessible names; audited-tab banner fixed
 - Did: the reading view loads the axe engine into the tab (`RGAA_AXE_LOAD`) and takes accessible names from `axe.commons.text.accessibleText` (spec-based); the dialog says which engine gave the names, with a simplified fallback if axe cannot load.
   Fixed my earlier audited-tab banner: a DevTools page has no `chrome.tabs`, so it never updated. The background now listens to tab/window events and sends `RGAA_TAB_EVENT`; "Show the audited tab" goes through `RGAA_TAB_SHOW`.

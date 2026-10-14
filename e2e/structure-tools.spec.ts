@@ -67,3 +67,23 @@ test('reading view: tables and page transcripts mark what a screen reader cannot
   await expect(dialog.locator('li', { hasText: 'Heading level 1: Bienvenue' })).toHaveCount(1)
   await panel.locator('#reading-close').click()
 })
+
+test('table tool: a visually hidden caption is shown, and put back when the tool is off', async ({ rig }) => {
+  test.setTimeout(120_000)
+  const { panel, site } = rig
+  await panel.locator('#empty-add-btn').click()
+  await scanElements(panel)
+  await panel.locator('.themebar .themes-menu summary').click()
+  await panel.locator('.themebar .menu-actions button').first().click()
+  await site.evaluate(() => {
+    const wrap = document.createElement('div')
+    wrap.innerHTML = '<table id="t-hid"><caption id="cap-hid" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">Titre caché</caption><tr><th scope="col">A</th></tr><tr><td>1</td></tr></table>'
+    document.body.prepend(wrap)
+  })
+  await panel.locator('.theme-tab', { hasText: 'Tableaux' }).click()
+  const tool = panel.locator('#page-tools').getByRole('button', { name: 'Titre et scope' })
+  await tool.click()
+  await expect.poll(() => site.evaluate(() => Math.round(document.getElementById('cap-hid')!.getBoundingClientRect().width))).toBeGreaterThan(20)
+  await tool.click()
+  await expect.poll(() => site.evaluate(() => Math.round(document.getElementById('cap-hid')!.getBoundingClientRect().width))).toBeLessThanOrEqual(2)
+})

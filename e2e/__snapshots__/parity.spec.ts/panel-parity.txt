@@ -1,7 +1,7 @@
 00 empty                                                               154889269e 6607
 01 registered, not scanned                                             7093bbe7da 39502
-02 checks after the automatic run                                      fc62fd6eda 49935
-03 checks, one problem noted                                           a2a404d8be 50057
+02 checks after the automatic run                                      6a7ccbb635 49935
+03 checks, one problem noted                                           e7e959ea37 50057
 04 images                                                              b0446cdabe 71405
 05 images, unnamed one selected (problem banner)                       c1a22b8af6 72025
 06 images, applied from the problem banner                             0330c38ddf 70121
@@ -20,10 +20,10 @@ theme 3 Couleurs 0/3, checklist verdict clicked                        c43293024
 theme 4 Multimédia 0/13                                                393f97f410 60914
 theme 4 Multimédia 0/13, checklist verdict clicked                     0c14d3081c 60390
 theme 4 Multimédia 0/13, suggestion confirmed                          d23f6fec56 59833
-theme 5 Tableaux 2/8                                                   e030ee9359 48025
-theme 5 Tableaux 2/8, finding verdict clicked                          89031eae2d 46556
-theme 5 Tableaux 2/8, filter to review                                 f1efd54279 46302
-theme 5 Tableaux 2/8, checklist verdict clicked                        99733d7fd8 46125
+theme 5 Tableaux 2/8                                                   0de822c69a 48079
+theme 5 Tableaux 2/8, finding verdict clicked                          9dda837c45 46610
+theme 5 Tableaux 2/8, filter to review                                 fd85646a0f 46356
+theme 5 Tableaux 2/8, checklist verdict clicked                        14b699c912 46179
 theme 6 Liens 0/2                                                      b412f30763 44374
 theme 6 Liens 0/2, second finding                                      b1bc2be059 33776
 theme 6 Liens 0/2, finding verdict clicked                             75e99394fb 33649
@@ -74,7 +74,7 @@ audit overview, sheet 6                                                ac5f6c5cd
 audit overview, sheet 7                                                bdfbbfb1f0 25406
 sample                                                                 dac315aba9 10533
 audits list                                                            cb8c511b8c 4339
-checks                                                                 e108a38282 46269
-checks, English                                                        fcb0d2b909 44217
+checks                                                                 56ea4836ef 46269
+checks, English                                                        02bbbc874e 44217
 review, English                                                        62ac322bfe 58332
 theme 3, English                                                       a7f5daaf2f 43998
