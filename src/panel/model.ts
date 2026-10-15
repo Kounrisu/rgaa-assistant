@@ -31,7 +31,7 @@ export const pageLabel = (rec: PageRecord) => `P${pad(state.audit.pages.indexOf(
 export function pageInput(rec: PageRecord): PageInput {
   setActiveLevel(state.audit.meta.level)
   const reviewOfRec = (el: ImageElementInfo) => rec.reviews[(el as Item).key]
-  const computed = computeThemes(rec.items, reviewOfRec, rec.themes, rec.checklist, { findings: rec.findings, reviews: rec.findingReviews, scannedThemes: rec.scannedThemes }, state.audit.meta.level)
+  const computed = computeThemes(rec.items, reviewOfRec, rec.themes, rec.checklist, { findings: rec.findings, reviews: rec.findingReviews, scannedThemes: rec.scannedThemes, scanCoverage: rec.scanCoverage }, state.audit.meta.level)
   return {
     label: pageLabel(rec),
     results: computed.images,

@@ -1,15 +1,16 @@
-import { deleteAuditById, parseAudit, saveAudit } from './audit-store'
+import { deleteAuditById, loadAuditById, parseAudit, saveAudit } from './audit-store'
 import { AuditFormatError } from './audit-validate'
 import type { DeleteMessage, SaveMessage, SaveResponse } from './messages'
 import type { Audit } from './types'
 
 /** The raw writes the authority performs (injected in tests). */
 export interface AuditWriter {
+  read(id: string): ReturnType<typeof loadAuditById>
   save(audit: Audit): Promise<void>
   remove(id: string): Promise<void>
 }
 
-const defaultWriter: AuditWriter = { save: saveAudit, remove: deleteAuditById }
+const defaultWriter: AuditWriter = { read: loadAuditById, save: saveAudit, remove: deleteAuditById }
 
 /**
  * The one place that writes audits. Every write (audit + its line in the index) runs inside a queue, one at a time,
@@ -31,14 +32,20 @@ export function createPersistence(writer: AuditWriter = defaultWriter) {
     save(message: Pick<SaveMessage, 'audit' | 'revision'>): Promise<SaveResponse> {
       let audit: Audit
       try {
-        audit = parseAudit(message.audit)
+        audit = parseAudit(structuredClone(message.audit))
       } catch (err) {
         const detail = err instanceof AuditFormatError ? err.message : String(err)
         return Promise.resolve({ ok: false, code: 'invalid', error: detail })
       }
       return enqueue(async (): Promise<SaveResponse> => {
+        const current = await writer.read(audit.id)
+        if (current.status === 'failed') throw current.error
+        if ((current.status === 'found' ? current.audit.storageToken : undefined) !== audit.storageToken) {
+          return { ok: false, code: 'conflict', error: 'This audit was changed or deleted in another panel. Save your changes as a copy or reload the saved audit.' }
+        }
+        audit.storageToken = crypto.randomUUID()
         await writer.save(audit)
-        return { ok: true, revision: message.revision }
+        return { ok: true, revision: message.revision, storageToken: audit.storageToken }
       }).catch(failure)
     },
     remove(message: Pick<DeleteMessage, 'id'>): Promise<SaveResponse> {

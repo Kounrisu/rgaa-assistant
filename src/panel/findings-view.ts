@@ -1,3 +1,4 @@
+import { confirmAnswer, isSuggested } from '../lib/review-confirmation'
 import { reviewActions } from './review-controls'
 /**
  * The themes reviewed finding by finding (Frames, Colours, Tables, Links, Structure, Forms): list, filters, detail and criteria cards.
@@ -14,7 +15,7 @@ import { renderChecklist } from './checklist-view'
 import { tDyn } from './helpers'
 import { syncFilterBoxes, focusFinding } from './page-bridge'
 import { inActiveLevel } from '../lib/audit-levels'
-import { findingCriterionIds, findingCriteriaOf, type FindingCriterion, hintForFinding, FINDING_CRITERIA } from '../lib/findings'
+import { findingCriteriaOf, type FindingCriterion, hintForFinding } from '../lib/findings'
 import { contrastChecker } from './contrast-checker'
 import { codeBlock } from './code-view'
 import { actions } from './actions'
@@ -55,25 +56,12 @@ export function renderThemeView(): void {
   })
 }
 
-/**
- * A theme the scan found nothing in (no frame, no table, no form field…): its element criteria are not applicable, shown as such
- * (answered by the scan), so the auditor sees the blocks are done and why.
- */
-function notApplicableBlock(theme: number): HTMLElement {
-  const criteria = (FINDING_CRITERIA[theme] ?? []).filter((c) => inActiveLevel(c.id))
-  return h(
-    'ul',
-    { class: 'na-list', 'aria-label': t('Criteria not applicable: nothing found on the page') },
-    ...criteria.map((c) => h('li', { class: 'na-row' }, h('strong', {}, `RGAA ${c.id}`), ` ${t(c.question)} `, h('span', { class: 'result na' }, t('Not applicable')), ` — ${t('nothing found at the last scan')}`)),
-  )
-}
-
 /** The end of the Images page: the questions no single image answers (1.4, 1.5), like the end of every other element theme. */
 function renderImagesRest(): void {
   const rec = state.page
   if (!rec) return
   const result = pageInput(rec).themes.find((x) => x.number === 1)
-  const partial = (result?.criteria ?? []).filter((c) => c.coverage === 'partial' || (rec.checklist[c.id]?.manualTests && c.tests.some((x) => x.outcome === 'unassessed')))
+  const partial = (result?.criteria ?? []).filter((c) => (c.coverage === 'partial' && !c.manualReview) || (rec.checklist[c.id]?.manualTests && c.tests.some((x) => x.outcome === 'unassessed')))
   if (partial.length) dom.themeEl.append(partialSection(partial))
   const rest = h('div', { class: 'theme-rest' })
   renderChecklist(rest)
@@ -146,8 +134,7 @@ export function renderFindingsView(): void {
   if (!scanned) {
     dom.themeEl.append(h('p', { class: 'hint-line' }, t('Not scanned yet. Open {url} in the browser and find the elements.', { url: rec.url, label })))
   } else if (!list.length) {
-    dom.themeEl.append(notApplicableBlock(state.theme))
-    dom.themeEl.append(h('p', { class: 'hint-line' }, state.theme === 3 && passing ? t('No text with a contrast problem found: {summary}.', { summary: tDyn(passing.summary) }) : state.theme === 2 ? t('No frames found on the page at the last scan: criteria are not applicable.') : state.theme === 6 ? t('No links found on the page at the last scan: criteria are not applicable.') : state.theme === 9 ? t('No heading or landmark found on the page at the last scan.') : state.theme === 5 ? t('No table found on the page at the last scan: criteria are not applicable.') : state.theme === 11 ? t('No form field found on the page at the last scan: criteria are not applicable.') : state.theme === 7 ? t('No ARIA component found on the page at the last scan: 7.1 and 7.3 are not applicable to components. Scripts that change the page without a component (status messages, context changes) stay in the checklist below.') : t('No text colours found on the page at the last scan: criteria are not applicable.')))
+    dom.themeEl.append(h('p', { class: 'hint warn' }, t('No relevant elements detected. Confirm applicability manually in the criterion cards below.')))
   } else {
     const options: [FindingFilter, string][] =
       state.theme === 3
@@ -215,7 +202,7 @@ export function renderFindingsView(): void {
     const f = list.find((x) => x.id === state.findingSel)
     dom.themeEl.append(h('div', { class: 'finding-layout' }, h('nav', { class: 'finding-pane', 'aria-label': t('{name} findings', { name: def.name }) }, chips, ...(state.theme === 3 && passing ? [h('p', { class: 'hint-line' }, t('Not listed — {summary} pass.', { summary: tDyn(passing.summary) }))] : []), listEl2), f ? findingDetail(f) : h('p', { class: 'hint-line' }, t('Nothing in this category.'))))
   }
-  if ((themeByNumber(state.theme)?.criteria ?? []).some((c) => !findingCriterionIds(state.theme).includes(c.id) && inActiveLevel(c.id))) {
+  if ((themeByNumber(state.theme)?.criteria ?? []).some((c) => inActiveLevel(c.id))) {
     const rest = h('div', { class: 'theme-rest' })
     renderChecklist(rest)
     dom.themeEl.append(rest)
@@ -276,7 +263,7 @@ export function findingCard(f: FindingItem, review: ImageReview, c: FindingCrite
       checked: review.answers[c.id] === value,
       onclick: () => {
         review.answers[c.id] = value
-        review.auto = false
+        confirmAnswer(review, c.id)
         card.dataset.state = value
         card.querySelector('.prefill-note')?.remove()
         persist()
@@ -296,7 +283,7 @@ export function findingCard(f: FindingItem, review: ImageReview, c: FindingCrite
     h('ul', { class: 'checks' }, ...c.checks.map((x) => h('li', {}, t(x)))),
     ...(hint ? [h('p', { class: `hint ${hint.tone}` }, hint.text)] : []),
     ...apgBlocks(f, c.id),
-    ...(review.auto && review.answers[c.id] !== undefined ? [h('p', { class: 'hint info prefill-note' }, t('Pre-filled from the page. Click your answer to confirm it, or change it.'))] : []),
+    ...(isSuggested(review, c.id) ? [h('p', { class: 'hint info prefill-note' }, t('Pre-filled from the page. Click your answer to confirm it, or change it.'))] : []),
     h('fieldset', {}, h('legend', { class: 'hint-line' }, t('Verdict for criterion {id}', { id: c.id })), h('div', { class: 'verdicts' }, ...verdict('c', t('Compliant')), ...verdict('nc', t('Non-compliant')), ...verdict('na', t('Not applicable')))),
   )
   card.append(reviewActions(`finding:${f.key}:${c.id}`, () => focusFinding(f, true)))

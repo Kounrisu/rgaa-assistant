@@ -2,6 +2,42 @@
 
 Reviewed by Codex on 15 October 2026, against `236c837` on `master`.
 
+## Implementation follow-up — 15 October 2026
+
+The original observations below describe the reviewed baseline. The four P1 corrections are now implemented on
+`codex/audit-integrity-fixes`; F05–F14 remain open. See the current verification results in `WORKLOG.md`.
+
+| Finding | Implemented correction |
+| --- | --- |
+| F01 | Shared audit-level eligibility suppresses compliance rates in partial dashboards, page summaries and Excel result sheets. HTML identifies the scope and exports a diagnostic without conformity wording or a statement. A full report includes a draft only when all 106 criteria are reviewed across every page, without incomplete coverage, unconfirmed answers or evidence conflicts. |
+| F02 | Format v5 tracks pending answers by criterion. Choosing an image kind does not confirm its answers; clicking a verdict confirms that criterion only. Rescans/imported suggestions preserve existing human answers. Explicit bulk dialogs enumerate affected element/criterion identifiers; result calculations, review navigation and analysis packs use criterion confirmation. |
+| F03 | The background queue compares a persisted storage token before writing. Stale or deleted-audit writes return a conflict; Retry offers a separate copy, reload of saved work, or staying on the local work. Tokens survive background restarts. File imports deliberately rebase on the browser revision only after replacement is chosen. |
+| F04 | No detected element becomes an NA suggestion awaiting manual scope review. Known frame/shadow/truncation omissions keep per-element results incomplete. Manual criterion cards accept verdicts and notes, are included in next-review navigation and exports, preserve detected failures, and expire when the scan timestamp changes. Explicit NA answers on detected elements remain valid without a redundant decision. |
+
+Format v5 migrates versions 2–4. Old `auto: true` answers remain pending. An old `auto: false` flag cannot reveal which
+answers were implicitly confirmed by the previous defect; the migration preserves recorded decisions rather than
+inventing a history. Recheck affected historical audits where that distinction matters. Unknown closed shadow roots
+remain a documented limitation; this change does not add scanning inside frames or shadow roots.
+
+### Work still to do
+
+1. **F05 — Manual observations:** link recorded problems to the relevant internal criterion decisions and expose unresolved contradictions before final reporting.
+2. **F06 — Report evidence:** include image-specific auditor notes in HTML reports.
+3. **F07 — Page identity:** validate URL edits and separate changed-page evidence from the previous URL's audit history.
+4. **F08 — Keyboard shortcuts:** provide a way to disable or remap single-character shortcuts, or require a modifier.
+5. **F09 — Focus and form semantics:** retain focus through rerenders and give each manual-check radio group its question context.
+6. **F10 — Decision workspace:** reduce repetitive summary content while preserving the owner's visible-information, progress and display-tool requirements.
+7. **F11 — Scan lifecycle:** prevent a scan finishing after navigation from forcing the user back to Evaluation; define safe behaviour when switching pages/audits during a scan. The test helper now waits for actual scan completion, but the product lifecycle issue remains open.
+8. **F12 — Translation coverage:** translate dynamic French guidance and extend checks beyond literal translation keys.
+9. **F13 — Analysis export:** show the actual text/image payload and accurately describe the missing answers-import workflow before extending the LLM feature.
+10. **F14 — Pure export scope:** pass audit scope explicitly into criterion-selection helpers instead of relying on mutable UI state.
+
+Also validate the real extension in Firefox and DevTools, screen readers, 200%/400% zoom, forced colours, and large
+production audits. Chromium fixture tests do not establish RGAA conformity. The historical Asqatasun 322/328 score
+has not been rerun for these changes; scanner rule code and dependencies are unchanged.
+
+---
+
 RGAA Assistant has a useful technical foundation and unusually rich evidence gathering for a local browser tool. Its strongest interaction is finding an element on the inspected page, reading its evidence, and recording a criterion decision. Its largest weakness is the reliability and clarity of the transition from **what a tool detected** to **what the auditor confirmed** to **what the exported report claims**.
 
 For an inexperienced auditor, it currently needs supervision. For an experienced auditor, it can accelerate evidence collection, but reports and confirmation state need careful review. For a developer, this is a maintainable prototype with meaningful tests, but several domain invariants are implemented inconsistently across modules. Prioritize those inconsistencies before adding more automated rules or expanding AI features.

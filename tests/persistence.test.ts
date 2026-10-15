@@ -107,6 +107,31 @@ const okTransport = (calls: { id: string; revision: number; names: string[] }[] 
   }
 }
 
+describe('save conflict recovery', () => {
+  it.each(['copy', 'reload'])('keeps both panels safe when the user chooses %s', async choice => {
+    const transport = okTransport()
+    const a = harness(transport)
+    a.session.markDirty()
+    expect(await a.session.saveNow()).toBe(true)
+    const b = harness(transport, structuredClone(a.current.audit))
+    a.current.audit.name = 'Saved by A'
+    a.session.markDirty()
+    expect(await a.session.saveNow()).toBe(true)
+    b.current.audit.name = 'Unsaved by B'
+    b.session.markDirty()
+    expect(await b.session.saveNow()).toBe(false)
+    expect(b.session.saveState).toBe('error')
+    expect(b.current.audit.name).toBe('Unsaved by B')
+    b.answers.push(choice)
+    expect(await b.session.retry()).toBe(true)
+    const original = await loadAuditById(a.current.audit.id)
+    expect(original.status === 'found' && original.audit.name).toBe('Saved by A')
+    expect(b.current.audit.id === a.current.audit.id).toBe(choice === 'reload')
+    expect(b.current.audit.name).toContain(choice === 'copy' ? 'Unsaved by B' : 'Saved by A')
+    expect(b.session.hasPending()).toBe(false)
+  })
+})
+
 describe('save state machine', () => {
   beforeEach(() => vi.useFakeTimers())
   afterEach(() => vi.useRealTimers())

@@ -1,3 +1,4 @@
+import { confirmAllAnswers, isSuggested } from '../lib/review-confirmation'
 /**
  * The frame around the views: totals and their jumps, page bar, theme bar and its menu, address reminder, audit bar, empty screen.
  */
@@ -134,11 +135,11 @@ async function confirmPrefilledImages(): Promise<void> {
   if (!list.length) return
   const yes = await askConfirm(
     t('Confirm the pre-filled images?'),
-    t('You confirm the {n} answers the scan pre-filled from the markup: decorative images that are hidden from assistive technologies, images that have a text alternative (1.1 compliant) and images that nothing names (1.1 non-compliant). Look at them first with the “Pre-filled” filter. This does not judge whether a text alternative is relevant (1.3): that stays yours.', { n: list.length }),
+    t('You confirm the {n} answers the scan pre-filled from the markup: decorative images that are hidden from assistive technologies, images that have a text alternative (1.1 compliant) and images that nothing names (1.1 non-compliant). Look at them first with the “Pre-filled” filter. This does not judge whether a text alternative is relevant (1.3): that stays yours.', { n: list.length }) + '\n\n' + list.map(el => `#${el.id}: ${Object.keys(state.reviews[reviewKey(el)].answers).filter(id => isSuggested(state.reviews[reviewKey(el)], id)).join(', ')}`).join('\n'),
     t('Confirm {n}', { n: list.length }),
   )
   if (!yes) return
-  for (const el of list) state.reviews[reviewKey(el)].auto = false
+  for (const el of list) confirmAllAnswers(state.reviews[reviewKey(el)])
   persist()
   actions.renderAll()
   say(t('{n} pre-filled images confirmed.', { n: list.length }))
@@ -168,15 +169,15 @@ export function openCriterion(t: ThemeResult, criterion: CriterionResult, target
   if (target === 'unassessed') return openGridAt(criterion.id)
   actions.setView('review')
   // Partial coverage: the tests the tool does not assess, and the box to tick once you checked them by hand, are at the end of the Images page.
-  if (target === 'partial') return openPartialCard(criterion.id)
+  if (target === 'partial' && !criterion.manualReview) return openPartialCard(criterion.id)
   const card = dom.themeEl.querySelector<HTMLElement>(`[id="crit-card-${criterion.id}"]`)
   // a checklist card: the whole page's criteria of a checklist theme, and the questions no single image answers (Images 1.4, 1.5)
-  if (card && (t.number !== 1 || !IMAGE_CRITERION_IDS.includes(criterion.id))) return focusReviewTarget(card)
+  if (card && (criterion.manualReview || t.number !== 1 || !IMAGE_CRITERION_IDS.includes(criterion.id))) return focusReviewTarget(card)
 
   const matchesAnswer = (review: ImageReview | undefined) => {
     const answer = review?.answers[criterion.id]
-    if (target === 'pending' || target === 'suggested') return answer === undefined || Boolean(review?.auto)
-    if (target === 'unconfirmed') return answer === 'nc' && Boolean(review?.auto)
+    if (target === 'pending' || target === 'suggested') return answer === undefined || isSuggested(review, criterion.id)
+    if (target === 'unconfirmed') return answer === 'nc' && isSuggested(review, criterion.id)
     return answer === target
   }
   if (t.number === 1) {
@@ -230,7 +231,7 @@ export function firstThemeWith(outcome: Outcome): number | null {
     if (outcome === 'pending') {
       // a theme that was never scanned has criteria "to review" but no element to go to
       const perFinding = t.number === 1 ? IMAGE_CRITERION_IDS : findingCriterionIds(t.number)
-      const pendingCards = t.criteria.some((c) => matchesReviewOutcome(c, 'pending') && !perFinding.includes(c.id))
+      const pendingCards = t.criteria.some((c) => matchesReviewOutcome(c, 'pending') && (!perFinding.includes(c.id) || c.manualReview))
       const hasElement =
         t.number === 1 ? state.elements.some((e) => needsReview(e)) : FINDING_THEMES.has(t.number) ? rec.findings.some((f) => f.theme === t.number && findingNeedsReview(f)) : false
       if (!hasElement && !pendingCards) continue

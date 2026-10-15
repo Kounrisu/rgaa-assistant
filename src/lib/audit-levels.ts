@@ -3,6 +3,8 @@
  * total) and the complete audit (all 106). Lists: docs/audit-levels-ara.md (to be checked against the DINUM pages).
  * A partial level never gives a compliance rate or a statement: it says which level it was computed at.
  */
+export const allowsComplianceRate = (level: AuditLevel | undefined): boolean => !level || level === 'complet'
+
 export type AuditLevel = 'rapide' | 'complementaire' | 'complet'
 export const AUDIT_LEVELS: AuditLevel[] = ['complet', 'rapide', 'complementaire']
 

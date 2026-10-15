@@ -93,11 +93,17 @@ export function describeAuditError(err: unknown): string {
 export function createAuditSession(deps: SessionDeps) {
   const transport = deps.transport ?? createTransport()
   const delay = deps.delayMs ?? 400
+  const write = async (audit: Audit, revision: number): Promise<SaveResponse> => {
+    const result = await transport.save(audit, revision)
+    if (result.ok && result.storageToken) audit.storageToken = result.storageToken
+    return result
+  }
 
   let timer: ReturnType<typeof setTimeout> | undefined
   let state: SaveState = 'saved'
   let savedAt = 0
   let lastError = ''
+  let conflict = false
   /** Edit counter of the open audit; savedRevision is the last one the authority confirmed. */
   let revision = 0
   let savedRevision = 0
@@ -120,6 +126,7 @@ export function createAuditSession(deps: SessionDeps) {
     revision = 0
     savedRevision = 0
     lastError = ''
+    conflict = false
     state = 'saved'
     savedAt = deps.getAudit().updatedAt
   }
@@ -143,15 +150,18 @@ export function createAuditSession(deps: SessionDeps) {
       const snapshot = clone(deps.getAudit())
       let result: SaveResponse
       try {
-        result = await transport.save(snapshot, rev)
+        result = await write(snapshot, rev)
       } catch (err) {
         result = { ok: false, code: 'unreachable', error: message(err) }
       }
       if (!result.ok) {
-        lastError = result.error
+        conflict = result.code === 'conflict'
+        lastError = conflict ? t('This audit was changed or deleted in another panel. Save your changes as a copy or reload the saved audit.') : result.error
         setState('error')
         return false
       }
+      if (result.storageToken) deps.getAudit().storageToken = result.storageToken
+      conflict = false
       savedRevision = Math.max(savedRevision, rev)
       savedAt = Date.now()
     }
@@ -190,6 +200,7 @@ export function createAuditSession(deps: SessionDeps) {
     if (!unsaved()) return true
     for (;;) {
       if (await saveNow()) return true
+      if (conflict) return resolveConflict()
       const choice = await deps.askChoice(
         t('Your changes could not be saved'),
         t('The browser storage refused the last changes ({error}). Retry, save the audit to a file, or discard these changes.', { error: lastError || '—' }),
@@ -237,7 +248,7 @@ export function createAuditSession(deps: SessionDeps) {
   /** At start: the last audit used. A failed read is reported and nothing is created over the real audit. */
   async function loadInitial(): Promise<boolean> {
     const result = await loadActiveAudit(t('Untitled audit'), async (audit) => {
-      const response = await transport.save(audit, 0)
+      const response = await write(audit, 0)
       if (!response.ok) throw new Error(response.error)
     })
     if (result.status === 'failed') {
@@ -274,7 +285,7 @@ export function createAuditSession(deps: SessionDeps) {
     if (name === null) return false
     if (!(await settle())) return false
     const fresh = emptyAudit(name)
-    const response = await transport.save(fresh, 0)
+    const response = await write(fresh, 0)
     if (!response.ok) {
       deps.say(t('Could not create the audit: browser storage is full or unavailable.'))
       return false
@@ -300,7 +311,7 @@ export function createAuditSession(deps: SessionDeps) {
     const name = await deps.askText(t('Duplicate this audit'), t('Name of the copy'), t('{name} (copy)', { name: source.name || t('Untitled audit') }), t('Duplicate'))
     if (name === null) return
     const copy = copyOf(source, name)
-    const response = await transport.save(copy, 0)
+    const response = await write(copy, 0)
     if (!response.ok) return void deps.say(t('Could not create the audit: browser storage is full or unavailable.'))
     deps.say(t('Copy “{name}” created. It is in the list; open it when you want.', { name }))
     deps.onListChanged()
@@ -324,7 +335,7 @@ export function createAuditSession(deps: SessionDeps) {
     if (name === null) return null
     other.name = name
     other.updatedAt = Date.now()
-    const response = await transport.save(other, 0)
+    const response = await write(other, 0)
     if (!response.ok) failedWrite(response)
     deps.onListChanged()
     return name
@@ -405,7 +416,7 @@ export function createAuditSession(deps: SessionDeps) {
         await saveNow()
       }
     } else {
-      const response = await transport.save(target, 0)
+      const response = await write(target, 0)
       if (!response.ok) failedWrite(response)
     }
     deps.onState()
@@ -423,6 +434,7 @@ export function createAuditSession(deps: SessionDeps) {
       deps.say(describeAuditError(err))
       return false
     }
+    delete incoming.storageToken // A file has no authority over the browser storage revision.
     let existing: AuditSummary | undefined
     try {
       existing = (await listAudits()).find((a) => a.id === incoming.id)
@@ -431,6 +443,10 @@ export function createAuditSession(deps: SessionDeps) {
       return false
     }
     if (existing) {
+      if (!(await settle())) return false
+      const stored = await fetchAudit(incoming.id)
+      if (!stored) return false
+      incoming.storageToken = stored.storageToken
       const replace = await deps.askConfirm(
         t('This audit is already in the browser'),
         [
@@ -458,7 +474,7 @@ export function createAuditSession(deps: SessionDeps) {
       deps.say(t('Import cancelled.'))
       return false
     }
-    const response = await transport.save(incoming, 0)
+    const response = await write(incoming, 0)
     if (!response.ok) {
       deps.say(t('Could not import the audit: browser storage is full or unavailable.'))
       return false
@@ -468,10 +484,33 @@ export function createAuditSession(deps: SessionDeps) {
     return true
   }
 
+  async function resolveConflict(): Promise<boolean> {
+    const choice = await deps.askChoice(t('Save conflict'), lastError, [
+      { id: 'copy', label: t('Save my changes as a copy'), primary: true },
+      { id: 'reload', label: t('Reload saved audit') },
+      { id: 'stay', label: t('Stay on this audit') },
+    ])
+    if (choice === 'copy') {
+      const copy = copyOf(deps.getAudit(), t('{name} (copy)', { name: deps.getAudit().name }))
+      const result = await write(copy, 0)
+      if (!result.ok) { failedWrite(result); return false }
+      await switchTo(copy)
+      deps.onListChanged()
+      return true
+    }
+    if (choice === 'reload') {
+      const latest = await fetchAudit(deps.getAudit().id)
+      if (!latest) return false
+      await switchTo(latest)
+      return true
+    }
+    return false
+  }
+
   /** The Retry button of the audit bar: writes again, or tries to read the saved audit again. */
   async function retry(): Promise<boolean> {
     if (blocked) return loadInitial()
-    return saveNow()
+    return conflict ? resolveConflict() : saveNow()
   }
 
   return {

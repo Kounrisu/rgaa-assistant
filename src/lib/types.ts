@@ -47,8 +47,10 @@ export interface ImageReview {
   kind?: ImageKind
   answers: Record<string, Verdict>
   note: string
-  /** Pre-filled from the markup; cleared as soon as the user touches the answer. */
+  /** At least one stored answer is a suggestion. Legacy reviews apply this to every answer. */
   auto?: boolean
+  /** Criteria whose stored answers are still automatic suggestions. */
+  pendingAnswers?: string[]
   /** Colours checked by hand for a contrast finding (hex), overriding what the script read. */
   fg?: string
   bg?: string
@@ -88,6 +90,8 @@ export interface ChecklistAnswer {
    * fallback, the conciseness of an alternative…). It lifts the “partial coverage” of the criterion; it is never set by a tool.
    */
   manualTests?: boolean
+  /** Scan timestamp covered by the manual verdict for absent/omitted elements. */
+  coverageAt?: number
   /** What the automatic checks found for this criterion, by tool, at the last run. */
   autoResults?: Record<string, { result: 'pass' | 'fail'; rules: string[]; /** What was seen (e.g. the doctype found). */ details?: string[] }>
 }
@@ -170,7 +174,9 @@ export interface AuditMeta {
 }
 
 export interface Audit {
-  version: 4
+  version: 5
+  /** Optimistic concurrency token, assigned only by the persistence authority. */
+  storageToken?: string
   /** Stable identifier: the same audit keeps it through renames, file saves and re-imports. */
   id: string
   name: string
