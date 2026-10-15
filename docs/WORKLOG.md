@@ -4,7 +4,7 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## Current state (2026-10-15)
 
-- Branch `codex/audit-integrity-fixes`; F01–F04 implementation `71691ed`, review `53e5466`, pre-follow-up checkpoint `1c15fd1`.
+- Branch `codex/audit-integrity-fixes`; F05–F14 implementation `c59f382`, F01–F04 `71691ed`, review `53e5466`.
   Version 0.1.0; saved audit format **v6**, licence AGPL-3.0-only. Versions 2–5 migrate on load.
 - **Review F01–F04 implemented:** partial exports are scoped diagnostics without compliance rates or statements;
   complete reports require reviewed results on every page before conformity wording/a draft statement is offered.
@@ -165,7 +165,7 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
   representative large audits, or novice/expert user sessions. Asqatasun fixtures were not rerun (322/328 is historical).
 - Next: validate those real-extension workflows; model-answer import/apply remains a separate planned feature.
 - For the other agent: preserve the owner's provisional decorative-image counting and initially visible information/tools.
-  Automatic suggestions still require human verdicts. The checkpoint remains unchanged. Implementation commit: pending below.
+  Automatic suggestions still require human verdicts. The checkpoint remains unchanged. Implementation commit: `c59f382`.
 
 ### 2026-10-15 — Codex — Four priority audit-integrity corrections
 - Did: implementation commit `71691ed` on `codex/audit-integrity-fixes`. F01 gates report/rate output by scope and
