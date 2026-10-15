@@ -19,7 +19,7 @@ export function reviewOf(el: Item): ImageReview {
 export function statusOf(el: Item): Status {
   const review = state.reviews[reviewKey(el)]
   if (!review?.kind) return 'todo'
-  const applicable = criteriaFor(review.kind)
+  const applicable = criteriaFor(review.kind, state.audit.meta.level)
   const answers = applicable.map((c) => review.answers[c.id])
   if (!applicable.length) return 'todo' // none of its criteria belongs to this audit type
   if (answers.includes('nc')) return 'nc'
@@ -55,7 +55,7 @@ export function needsReview(el: Item): boolean {
   const review = state.reviews[reviewKey(el)]
   if (!review?.kind) return true
   if (review.auto) return true
-  return criteriaFor(review.kind).some((c) => review.answers[c.id] === undefined)
+  return criteriaFor(review.kind, state.audit.meta.level).some((c) => review.answers[c.id] === undefined)
 }
 
 export function matches(el: Item, f: Filter): boolean {
@@ -111,7 +111,7 @@ export function findingReview(f: FindingItem): ImageReview {
 }
 
 export function findingStatus(f: FindingItem): FStatus {
-  const answers = findingCriteriaOf(f).map((c) => state.page!.findingReviews[f.key]?.answers[c.id])
+  const answers = findingCriteriaOf(f, state.audit.meta.level).map((c) => state.page!.findingReviews[f.key]?.answers[c.id])
   if (answers.includes('nc')) return 'nc'
   if (answers.every((a) => a === undefined)) return 'todo'
   return answers.some((a) => a === undefined) ? 'progress' : 'c'
@@ -136,7 +136,7 @@ export function findingNeedsReview(f: FindingItem): boolean {
   if (f.theme === 9 && (f.type === 'heading' || f.type === 'landmark')) return false
   if (f.theme === 11 && f.type === 'field') return false
   if (f.theme === 5 && (f.type === 'table-layout' || (f.type === 'table-data' && !f.facts.Title))) return false
-  const ids = findingCriteriaOf(f).map((c) => c.id)
+  const ids = findingCriteriaOf(f, state.audit.meta.level).map((c) => c.id)
   return ids.some((c) => r?.answers[c] === undefined) || Boolean(r?.auto)
 }
 

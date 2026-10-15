@@ -120,6 +120,8 @@ export interface ImportReport {
 export interface ManualCheckAnswer {
   state: 'ok' | 'issue'
   note: string
+  /** Criterion explicitly linked by the auditor; a confirmed NC must still be recorded there. */
+  criterion?: string
 }
 
 export interface AutomaticRun {
@@ -131,6 +133,8 @@ export interface AutomaticRun {
 }
 
 export interface PageRecord {
+  /** Previous addresses explicitly corrected by the auditor, with original evidence retained. */
+  urlHistory?: { url: string; at: number }[]
   /** Latest full automatic run; absent on older audits (history is not proof of a complete run). */
   automaticRun?: AutomaticRun
   /** What the last scans did not look at (frames, shadow roots) and where they cut a list. */
@@ -174,7 +178,7 @@ export interface AuditMeta {
 }
 
 export interface Audit {
-  version: 5
+  version: 6
   /** Optimistic concurrency token, assigned only by the persistence authority. */
   storageToken?: string
   /** Stable identifier: the same audit keeps it through renames, file saves and re-imports. */

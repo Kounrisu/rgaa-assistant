@@ -2,6 +2,7 @@ import { allowsComplianceRate, LEVEL_LABEL } from './audit-levels'
 import { auditStats, isProvisional, levelStats, rateOf, type Counts, type PageInput } from './audit-sheet'
 import { getLang, t } from './i18n'
 import { MANUAL_CHECKS } from './manual-checks'
+import { unresolvedManualIssues } from './manual-evidence'
 import { dataImage, previewOf } from './url-safety'
 import { coverageLines } from './scan-coverage'
 import { CRITERION_LEVEL } from './themes'
@@ -60,6 +61,12 @@ function nonCompliances(page: PageRecord, input: PageInput): string {
           .join('')
         items.push(`<li>${thumbs}<b>${esc(test.id)}</b> — ${test.nc.map((n) => `#${n}`).join(', ')}${test.reason ? ` — ${esc(test.reason)}` : ''}</li>`)
       }
+      const imageIds = new Set(c.tests.flatMap(test => test.nc))
+      for (const id of imageIds) {
+        const image = page.items.find(item => item.id === id)
+        const note = image && page.reviews[image.key]?.note.trim()
+        if (note) items.push(`<li><b>${esc(t('Auditor note'))} · #${id} · ${esc(c.id)}</b><p class="note">${nl(note)}</p></li>`)
+      }
       const note = input.checklist[c.id]?.note?.trim()
       const flags = [
         c.unconfirmed ? t('Detected automatically, not confirmed by the auditor.') : '',
@@ -75,8 +82,9 @@ function nonCompliances(page: PageRecord, input: PageInput): string {
 }
 
 function coverageOf(page: PageRecord): string {
-  if (!page.scanCoverage) return ''
-  return `<h4>${esc(t('Scan coverage'))}</h4><ul>${coverageLines(page.scanCoverage).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`
+  const history = page.urlHistory?.length ? `<p>${esc(t('Previous addresses retained with this evidence:'))} ${page.urlHistory.map(row => esc(row.url)).join(' · ')}</p>` : ''
+  if (!page.scanCoverage) return history
+  return `${history}<h4>${esc(t('Scan coverage'))}</h4><ul>${coverageLines(page.scanCoverage).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`
 }
 
 function checksOf(page: PageRecord): string {
@@ -104,7 +112,8 @@ export function buildReportHtml(audit: Audit, inputs: PageInput[], pages: PageRe
   const rate = (n: number | null, c: Counts | boolean) => ratesAllowed ? pctP(n, c) : '—'
   const legalRate = rateOf(levels.legal)
   const statementAllowed = ratesAllowed && pages.length > 0 && stats.sampleCriteria.length === 106 && legalRate !== null &&
-    stats.perPage.every(p => !isProvisional(p.counts)) && inputs.every(p => p.themes.every(th => th.criteria.every(c => !c.conflicts?.length)))
+    stats.perPage.every(p => !isProvisional(p.counts)) && inputs.every(p => p.themes.every(th => th.criteria.every(c => !c.conflicts?.length))) &&
+    pages.every((page, i) => !unresolvedManualIssues(page.manualChecks, inputs[i].themes).length)
   const state = conformityOf(legalRate)
   const day = date.toLocaleDateString(getLang(), { day: 'numeric', month: 'long', year: 'numeric' })
   const title = `${t('Accessibility audit report')} — ${audit.name || audit.meta.site}`
@@ -120,7 +129,8 @@ export function buildReportHtml(audit: Audit, inputs: PageInput[], pages: PageRe
     .map((page, i) => `<section class="page"><h3>${esc(stats.perPage[i].label)} — ${esc(stats.perPage[i].title)}</h3><p><small>${esc(stats.perPage[i].url)}</small></p>${nonCompliances(page, inputs[i])}<h4>${esc(t('Checks'))}</h4>${checksOf(page)}${coverageOf(page)}</section>`)
     .join('')
   const failing = stats.sampleCriteria.filter((c) => c.status === 'NC')
-  const provisional = isProvisional(levels.legal) || stats.perPage.some(p => isProvisional(p.counts))
+  const unresolved = pages.flatMap((page, i) => unresolvedManualIssues(page.manualChecks, inputs[i].themes).map(check => `${stats.perPage[i].label} · ${t(check.text)} · RGAA ${check.criteria.join(', ')}`))
+  const provisional = isProvisional(levels.legal) || stats.perPage.some(p => isProvisional(p.counts)) || unresolved.length > 0
   const toConfirm = stats.sampleCriteria.filter((c) => c.suggested && c.status === 'NT').length
   const partial = stats.sampleCriteria.filter((c) => c.partial).length
 
@@ -155,6 +165,7 @@ ${statementAllowed ? `<p>${esc(t('The audited content is {state}, with a rate of
 ${provisional ? `<p class="warn"><b>${esc(t('Provisional result.'))}</b> ${esc(t('The audit is incomplete: criteria remain to be tested, some are only partly covered by the tool, or rest on automatic pre-filled answers the auditor has not confirmed. A criterion judged on only part of its tests keeps its result but is flagged. Do not publish this rate as the final conformity level.'))} ${esc(t('{toConfirm} criteria await confirmation of an automatic suggestion; {partial} have partial coverage.', { toConfirm, partial }))}</p>` : ''}
 
 <h2>2. ${esc(t('Sample of pages'))}</h2>
+${unresolved.length ? `<p class="warn">${esc(t('Resolve manual problems before final reporting. Link each problem to a criterion and record its verdict, or correct the observation after review.'))}</p><ul>${unresolved.map(text => `<li>${esc(text)}</li>`).join('')}</ul>` : ''}
 <table><thead><tr><th>#</th><th>${esc(t('Page'))}</th><th>${esc(t('Rate'))}</th><th>${esc(t('Results'))}</th></tr></thead><tbody>${sample}</tbody></table>
 
 <h2>3. ${esc(t('Results per theme'))}</h2>

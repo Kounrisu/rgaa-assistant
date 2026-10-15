@@ -15,6 +15,7 @@ import { normalizeUrl } from '../lib/audit-store'
 import { actions } from './actions'
 import { runEverything } from './auto-checks'
 import { renameAudit, saveAuditToFile, importAuditFile } from './audits-view'
+import { focusReviewTarget } from './focus-target'
 
 /** Changes the language of the whole panel, now. */
 export function applyLanguage(lang: Lang): void {
@@ -29,6 +30,11 @@ export function applyLanguage(lang: Lang): void {
 
 /** Registers every listener of the panel: its buttons, the keyboard, the page navigation, the extension messages. Called once, at start-up. */
 export function wireEvents(): void {
+  dom.currentDecisionBtn.addEventListener('click', () => {
+    setView('review')
+    const host = state.theme === 1 && state.elements.length ? dom.detailEl : dom.themeEl
+    focusReviewTarget(host.querySelector<HTMLElement>('.criterion, .kind-picker') ?? host)
+  })
   dom.openPageBtn.addEventListener('click', () => { if (state.page) goTo(state.page.url) })
   dom.reviewBtn.addEventListener('click', () => setView('review'))
   dom.evaluatePageBtn.addEventListener('click', () => {
@@ -49,6 +55,7 @@ export function wireEvents(): void {
     dom.newBanner.hidden = false
   })
   chrome.devtools.network.onNavigated.addListener((url: string) => {
+    state.navigationVersion++
     state.liveUrl = url
     // The boxes are gone with the old document: what was seen is shown as last seen until the next scan.
     state.scannedThisSession.clear()
@@ -93,16 +100,16 @@ export function wireEvents(): void {
   dom.auditBtn.addEventListener('click', () => setView('audit'))
   dom.listEl.addEventListener('keydown', listKeyDown)
   dom.nextBtn.addEventListener('click', () => { void actions.nextReview() })
-  // Keyboard: n goes to the next element to review, j / k move between images (outside text fields).
+  // Keyboard: Ctrl+Alt+n goes to the next element to review, Ctrl+Alt+j / k move between images (outside text fields).
   document.addEventListener('keydown', (event) => {
     const target = event.target as HTMLElement
-    if (document.querySelector('dialog[open]') || target.isContentEditable || event.ctrlKey || event.metaKey || event.altKey) return
-    if (state.runBusy || state.batch?.running) return
-    if (event.key === 'n' && !event.ctrlKey && !event.metaKey && !['TEXTAREA', 'INPUT', 'SELECT'].includes(target.tagName) && state.page && state.view === 'review') return void actions.nextReview()
+    if (document.querySelector('dialog[open]') || target.isContentEditable || !event.ctrlKey || !event.altKey || event.metaKey || event.shiftKey) return
+    if (state.scanBusy || state.runBusy || state.batch?.running) return
+    if (event.key === 'n' && !['TEXTAREA', 'INPUT', 'SELECT'].includes(target.tagName) && state.page && state.view === 'review') { event.preventDefault(); return void actions.nextReview() }
     if (['TEXTAREA', 'INPUT', 'SELECT'].includes(target.tagName) || state.view !== 'review' || state.theme !== 1 || !state.elements.length || state.selectedId === null) return
     const index = state.elements.findIndex((e) => e.id === state.selectedId)
     const next = event.key === 'j' ? index + 1 : event.key === 'k' ? index - 1 : -1
-    if (next >= 0 && next < state.elements.length) select(state.elements[next].id, true)
+    if (next >= 0 && next < state.elements.length) { event.preventDefault(); select(state.elements[next].id, true) }
   })
   window.addEventListener('error', (event) => say(t('Panel error: {message}', { message: event.message })))
   window.addEventListener('unhandledrejection', (event) => say(t('Panel error: {message}', { message: String(event.reason) })))

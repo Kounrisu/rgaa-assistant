@@ -868,3 +868,13 @@ body[data-view="audits"] :is(.pagebar,.page-progress,#display-tools,#nav-banner,
 #main-content:focus { outline: none; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }
 @media (forced-colors: active) { .meter, .progress .meter { border: 1px solid CanvasText; } .meter i { background: Highlight; forced-color-adjust: none; } }
+
+/* Review follow-ups: exact local export preview and labelled manual groups. */
+dialog.pack-preview { width: min(900px, 94vw); max-width: 94vw; max-height: 90vh; overflow: auto; }
+.pack-preview > label, .pack-preview fieldset label { display: block; margin: 8px 0; }
+.pack-preview select { max-width: 100%; min-height: 32px; padding: 4px 8px; }
+.pack-preview-content textarea { width: 100%; min-height: 260px; font-family: monospace; }
+.pack-preview-content img { max-width: 100%; max-height: 300px; object-fit: contain; }
+fieldset.check-row { min-width: 0; margin: 12px 0; }
+.check-row legend { padding: 0 4px; }
+.decision-name { overflow-wrap: anywhere; }

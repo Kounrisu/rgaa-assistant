@@ -215,7 +215,7 @@ export function findingDetail(f: FindingItem): HTMLElement {
   for (const [k, v] of Object.entries(f.facts)) {
     facts.append(h('dt', {}, t(k)), h('dd', { class: v === null ? 'missing' : '' }, v === null ? '—' : tDyn(v)))
   }
-  const cards = findingCriteriaOf(f).map((c) => findingCard(f, review, c))
+  const cards = findingCriteriaOf(f, state.audit.meta.level).map((c) => findingCard(f, review, c))
   if (f.theme === 3 && f.type !== 'contrast-ok') cards.unshift(contrastChecker(f, review))
   const evidence = h(
     'div',

@@ -43,7 +43,7 @@ export function shortHtml(el: Element, max = 400): string {
 
 export function boundedContext(el: Element): string {
   const parent = el.parentElement ?? el
-  const clone = cloneWithTarget(parent, el, 'script, style, noscript, svg')
+  const clone = cloneWithTarget(parent, el, `script, style, noscript, svg, [id^="${OVERLAY_ID}"]`)
   const html = clone.outerHTML
   return html.length > 2500 ? `${html.slice(0, 2500)} …` : html
 }

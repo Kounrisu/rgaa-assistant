@@ -4,15 +4,21 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## Current state (2026-10-15)
 
-- Branch `codex/audit-integrity-fixes`, implementation commit `71691ed`, based on review commit `53e5466`.
-  Version 0.1.0; saved audit format **v5**, licence AGPL-3.0-only. Versions 2–4 migrate on load.
+- Branch `codex/audit-integrity-fixes`; F01–F04 implementation `71691ed`, review `53e5466`, pre-follow-up checkpoint `1c15fd1`.
+  Version 0.1.0; saved audit format **v6**, licence AGPL-3.0-only. Versions 2–5 migrate on load.
 - **Review F01–F04 implemented:** partial exports are scoped diagnostics without compliance rates or statements;
   complete reports require reviewed results on every page before conformity wording/a draft statement is offered.
   Confirmation is tracked per criterion (classification does not confirm answers). Background saves compare persisted
   revision tokens and expose recoverable conflicts. Empty scans and known omitted content require manual scope decisions,
   expire those decisions on rescan, and retain detected failures. Explicit NA on detected elements remains valid.
-- **Remaining review work:** F05–F14 are listed in the implementation follow-up in `docs/ux-ui-code-review-2026-10-15.md`.
-  No new dependencies, network calls or scanner rules. Preserve provisional decorative-image counting and visible information.
+- **Review F05–F14 implemented and verified:** manual problems link explicitly to criterion
+  verdicts and block final reporting until resolved; HTML preserves image notes; URL edits validate and distinguish
+  address correction (recorded history) from a fresh page (old evidence retained). Ctrl+Alt replaces letter shortcuts;
+  rerenders retain control focus and manual questions have legends. Current decision jumps and named continuation
+  targets reduce navigation repetition. Scans lock identity changes, preserve view navigation and roll back interrupted
+  evidence. French guidance has catalog validation; analysis export previews exact local files with exclusions and honest
+  export-only wording; export scope is explicit. No new dependencies, network calls or scanner rules.
+  Provisional decorative-image counting and visible information/tools are preserved.
 - **Approved toolbar hierarchy implemented (`25afd1e`):** visible Audit / Page auditée / Bilan de la page / Thématiques RGAA /
   Bilan de la thématique / Outils d’affichage labels. Display and highlight controls share a non-collapsible area
   below the theme navigation and summary. One shared theme header replaces repeated headers inside each view.
@@ -46,8 +52,8 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 - **Overlay numbering follow-up (`5f1b1be`):** internal DOM IDs no longer change when audit numbers are assigned.
   A hidden image returning after relabeling cannot collide with another image’s internal ID. Owner reports numbering
   still off after the previous fix; this second defect is reproduced, but the exact real-site symptom is unconfirmed.
-- Latest `npm run check` (2026-10-15): **237 tests in 27 files**, typecheck, **788 texts / 1356 French entries / 0 missing**, build pass.
-  Full `npm run test:e2e`: **42 passed**, including four new integrity workflows, light/dark axe and the reviewed 81-screen parity baseline.
+- Latest `npm run check` (2026-10-15): **245 tests in 28 files**, typecheck, **910 texts / 1500 French entries / 0 missing**, build pass.
+  Full `npm run test:e2e`: **48 passed**, including six follow-up workflows, exact export preview, light/dark axe and the reviewed 81-screen parity baseline.
   Built content script: **0 module imports**.
   Real Firefox, actual DevTools, screen readers and browser zoom remain untested; Asqatasun fixtures were not rerun.
 - **Components review (theme 7, APG patterns)** shipped: every ARIA component (tabs, dialog, menu, disclosure / accordion,
@@ -95,16 +101,14 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## In progress (claimed)
 
-- None. F01–F04 are implemented and verified in `71691ed`; remaining review work is listed below.
+- None. F01–F14 implementation and automated verification are complete; real-extension validation remains below.
 
 ## Next (suggested order; the owner decides)
 
-The four P1 integrity corrections are implemented. Next address F05–F09: connect manual observations to decisions,
-include image notes in reports, validate page identity changes, and fix keyboard shortcut/focus semantics. Then F10–F14:
-reduce repetition while preserving visible information, guard scan lifecycle during navigation, extend dynamic translations,
-clarify the LLM payload/return workflow, and remove mutable UI scope from pure exports. The browser helper now waits for
-scan completion, but F11's product navigation race still needs correction. See the full acceptance conditions in
-`docs/ux-ui-code-review-2026-10-15.md`.
+All F01–F14 corrections are implemented and automatically verified. Next validate the real extension
+in Firefox/DevTools, with assistive technologies and representative audits. Analysis-answer import remains a separate
+planned feature; it is not promised by the export UI. See `docs/ux-ui-code-review-2026-10-15.md` for the implemented
+corrections and remaining manual validation.
 
 The corrected audit/page navigation, dashboard, explicit next-review controls and selected-page runs are implemented.
 Next verify the actual extension in Firefox/DevTools and collect feedback on a real audit, especially the top-header
@@ -139,6 +143,29 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-15 — Codex — Remaining review corrections F05–F14
+- Did: implemented after checkpoint `pre-review-followups-2026-10-15` (`1c15fd1`), following F01–F04 (`71691ed`).
+  Manual observations now link explicitly to confirmed criterion decisions and block final reporting while unresolved;
+  image notes survive HTML export; URL edits validate and preserve evidence with explicit correction history or a fresh page.
+  Keyboard shortcuts require modifiers; rerenders preserve control focus; manual groups have legends; current-decision
+  jumps and concrete next targets reduce repeated navigation. Scans preserve view changes, lock identity and discard
+  interrupted results. Dynamic guidance is translated and checked. Analysis packs preview exact files and optional
+  exclusions before local saving, with honest export-only wording. Pure export helpers receive the audit scope explicitly.
+  Format v6 migrates v2–v5 without inventing manual links or URL history. README, review and round-trip plan updated.
+- State: `npm run check` passes: 245 tests in 28 files, typecheck, 910 texts / 1500 French entries / 0 missing, build.
+  Full `npm run test:e2e` passes: 48 tests (3.3 minutes), including six new workflows, exact preview/ZIP bytes,
+  light/dark axe and the 81-screen parity baseline. Built content script has zero module imports. No new dependencies,
+  network calls or scanner rules. Visually inspected export preview and the focused decision at 320 CSS pixels.
+- Parity: reviewed intended navigation, manual-question, focus-key and continuation changes in full DOM dumps.
+  Verification exposed assistant overlays contaminating finding context; `dom-utils.ts` now strips them before
+  truncation, as image capture already did. The content fixture changes contain only 22 cleaned context HTML excerpts;
+  findings, suggestions and overlay responses are unchanged. This also removes the Structure overlay timing flake.
+- Not tested: real Firefox, actual DevTools lifecycle, screen readers, real 200%/400% zoom, forced colours,
+  representative large audits, or novice/expert user sessions. Asqatasun fixtures were not rerun (322/328 is historical).
+- Next: validate those real-extension workflows; model-answer import/apply remains a separate planned feature.
+- For the other agent: preserve the owner's provisional decorative-image counting and initially visible information/tools.
+  Automatic suggestions still require human verdicts. The checkpoint remains unchanged. Implementation commit: pending below.
 
 ### 2026-10-15 — Codex — Four priority audit-integrity corrections
 - Did: implementation commit `71691ed` on `codex/audit-integrity-fixes`. F01 gates report/rate output by scope and

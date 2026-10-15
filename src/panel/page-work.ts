@@ -26,7 +26,7 @@ export function pageWork(rec: PageRecord): HTMLElement {
   const done = all.filter((c) => !c.unconfirmed && ['c', 'nc', 'na'].includes(c.outcome)).length
   const suggestions = all.filter((c) => c.suggested || c.unconfirmed).length
   const manual = MANUAL_CHECKS.filter((c) => rec.manualChecks?.[c.id]).length
-  const pending = reviewQueue(rec).filter((x) => x.pending).length
+  const pending = reviewQueue(rec, state.audit.meta.level).filter((x) => x.pending).length
   const open = () => actions.switchTo(rec.id)
   return h('article', { class: 'card page-work', 'data-page-id': rec.id },
     h('label', {}, h('input', { type: 'checkbox', checked: state.batchSelection.has(rec.id), onchange: (e: Event) => { if ((e.target as HTMLInputElement).checked) state.batchSelection.add(rec.id); else state.batchSelection.delete(rec.id); actions.renderBatch() } }), t('Select {label} for automatic checks', { label: pageLabel(rec) })),

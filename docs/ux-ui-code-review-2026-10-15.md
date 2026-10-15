@@ -5,7 +5,7 @@ Reviewed by Codex on 15 October 2026, against `236c837` on `master`.
 ## Implementation follow-up — 15 October 2026
 
 The original observations below describe the reviewed baseline. The four P1 corrections are now implemented on
-`codex/audit-integrity-fixes`; F05–F14 remain open. See the current verification results in `WORKLOG.md`.
+`codex/audit-integrity-fixes`; F05–F14 have now been implemented after checkpoint `pre-review-followups-2026-10-15`. See the current verification results in `WORKLOG.md`.
 
 | Finding | Implemented correction |
 | --- | --- |
@@ -19,22 +19,32 @@ answers were implicitly confirmed by the previous defect; the migration preserve
 inventing a history. Recheck affected historical audits where that distinction matters. Unknown closed shadow roots
 remain a documented limitation; this change does not add scanning inside frames or shadow roots.
 
+### Follow-up corrections F05–F14
+
+| Finding | Implemented correction |
+| --- | --- |
+| F05 | Manual questions have internal review links and an explicit criterion selector. An issue remains unresolved until its linked criterion has a confirmed NC; unrelated or automatic NC answers cannot silently resolve it. Unresolved problems keep rates provisional and appear in the summary and report, blocking a draft statement. Observations never assign verdicts. |
+| F06 | HTML non-conformities include the auditor’s image note once per image/criterion, escaped with preserved line breaks, separately labelled from automatic test reasons. |
+| F07 | Both URL controls validate supported addresses and duplicates. A different page starts a fresh record while retaining the original; an explicitly confirmed address correction preserves evidence with URL history shown in the sample, report and analysis pack. |
+| F08 | N/J/K require Ctrl+Alt. Plain letters on unrelated controls have no effect. Image-list arrow navigation remains available; shortcuts are documented in sample settings. |
+| F09 | Stable controls retain focus through rerenders, including audit-type radios, theme selection and page reordering (with an enabled fallback at the list boundary). Manual questions use fieldset/legend. |
+| F10 | The top-level Current decision jump moves focus directly to the current card, including at 320px. Card continuation names its next destination; the duplicate theme-next button/count is removed. Image decisions have an accessible-name summary. Existing expanded information, counters and tools remain. |
+| F11 | Element scans have an explicit busy lifecycle. Page/audit changes, batch starts and exports are blocked during collection, while sample/summary navigation stays available. Async boundaries check target identity, URL and navigation revision; interrupted scans restore their original evidence and completion never forces Evaluation. |
+| F12 | Dynamic criterion guidance is translated. The translation checker now reads the instructional catalog and exits unsuccessfully for missing entries; a unit test verifies the runtime dictionary. Official grid text remains French. |
+| F13 | Export-only wording replaces the promised return workflow. A local dialog previews every exact text/image file, defaults pictures off and offers HTML/text/notes/URL exclusions. It states that exclusions do not guarantee anonymity. Nothing is uploaded; saved ZIP entries match the preview. |
+| F14 | Image/finding criterion helpers, review queues and Excel/analysis exports accept explicit audit scope. Library defaults are complete scope; exports no longer read the UI’s active level, and page result calculation no longer changes it. |
+
+Format v6 adds explicit manual-problem criterion links and page URL history. Versions 2–5 migrate without inventing
+links, resolutions or history. Existing v5 decisions remain intact. The checkpoint predates these additions.
+
 ### Work still to do
 
-1. **F05 — Manual observations:** link recorded problems to the relevant internal criterion decisions and expose unresolved contradictions before final reporting.
-2. **F06 — Report evidence:** include image-specific auditor notes in HTML reports.
-3. **F07 — Page identity:** validate URL edits and separate changed-page evidence from the previous URL's audit history.
-4. **F08 — Keyboard shortcuts:** provide a way to disable or remap single-character shortcuts, or require a modifier.
-5. **F09 — Focus and form semantics:** retain focus through rerenders and give each manual-check radio group its question context.
-6. **F10 — Decision workspace:** reduce repetitive summary content while preserving the owner's visible-information, progress and display-tool requirements.
-7. **F11 — Scan lifecycle:** prevent a scan finishing after navigation from forcing the user back to Evaluation; define safe behaviour when switching pages/audits during a scan. The test helper now waits for actual scan completion, but the product lifecycle issue remains open.
-8. **F12 — Translation coverage:** translate dynamic French guidance and extend checks beyond literal translation keys.
-9. **F13 — Analysis export:** show the actual text/image payload and accurately describe the missing answers-import workflow before extending the LLM feature.
-10. **F14 — Pure export scope:** pass audit scope explicitly into criterion-selection helpers instead of relying on mutable UI state.
-
-Also validate the real extension in Firefox and DevTools, screen readers, 200%/400% zoom, forced colours, and large
-production audits. Chromium fixture tests do not establish RGAA conformity. The historical Asqatasun 322/328 score
-has not been rerun for these changes; scanner rule code and dependencies are unchanged.
+The remaining review follow-up is manual validation: real Firefox/DevTools, screen readers, 200%/400% zoom, forced colours,
+representative large audits and novice/expert user sessions. Review density changes should be evaluated in those sessions;
+they preserve the owner’s visible-information requirement. Model-answer import is still a separate planned feature.
+Chromium fixture tests do not establish RGAA conformity. The historical Asqatasun 322/328 score has not been rerun;
+scanner rule code and dependencies are unchanged. Evidence capture now strips the assistant’s own overlays from
+finding context, matching image capture and eliminating timing-dependent overlay markup in Structure evidence.
 
 ---
 

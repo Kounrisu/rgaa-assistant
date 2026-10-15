@@ -8,6 +8,7 @@ import { findingCriteriaOf } from './findings'
 import type { AuditLevel } from './audit-levels'
 import { tFr } from './i18n'
 import { MANUAL_CHECKS } from './manual-checks'
+import { unresolvedManualIssues } from './manual-evidence'
 import type { AuditMeta, ChecklistAnswer, Detected, FindingItem, ImageElementInfo, ImageReview, ManualCheckAnswer } from './types'
 
 /** Status of one TEST (theme 1 detail). Criteria use `statusOf`, which also looks at coverage. */
@@ -55,7 +56,7 @@ export const thumbKey = (pageIndex: number, imageId: number) => pageIndex * 1000
  * waiting for the auditor to confirm a tool suggestion, `unconfirmed` = counted C/NC/NA that still rest on a pre-filled
  * verdict nobody confirmed.
  */
-export interface Counts { C: number; NC: number; NA: number; NT: number; partial: number; suggested: number; unconfirmed: number }
+export interface Counts { C: number; NC: number; NA: number; NT: number; partial: number; suggested: number; unconfirmed: number; manualIssues?: number }
 export const rateOf = (c: Counts): number | null => (c.C + c.NC ? Math.round((c.C / (c.C + c.NC)) * 100) : null)
 const emptyCounts = (): Counts => ({ C: 0, NC: 0, NA: 0, NT: 0, partial: 0, suggested: 0, unconfirmed: 0 })
 
@@ -64,7 +65,7 @@ const emptyCounts = (): Counts => ({ C: 0, NC: 0, NA: 0, NT: 0, partial: 0, sugg
  * only partly covered by this tool, or a counted verdict is still an unconfirmed pre-fill. Only a rate with NT = 0,
  * no partial coverage and nothing unconfirmed is final for its scope.
  */
-export const isProvisional = (c: Counts): boolean => c.NT > 0 || c.unconfirmed > 0 || c.partial > 0
+export const isProvisional = (c: Counts): boolean => c.NT > 0 || c.unconfirmed > 0 || c.partial > 0 || Boolean(c.manualIssues)
 export const PROVISIONAL_FR = 'provisoire'
 export const PROVISIONAL_NOTE_FR =
   'Taux provisoire : des critères restent à tester, ne sont couverts que partiellement par RGAA Assistant (leur résultat ne porte que sur les tests que l’outil sait évaluer), ou reposent sur un pré-remplissage automatique non confirmé. Seule une relecture complète par l’auditeur donne un taux définitif.'
@@ -75,6 +76,8 @@ const flat = (p: PageInput) => p.themes.flatMap((theme) => theme.criteria.map((c
 
 export function countsOf(p: PageInput): Counts {
   const n = emptyCounts()
+  const manualIssues = unresolvedManualIssues(p.manualChecks, p.themes).length
+  if (manualIssues) n.manualIssues = manualIssues
   for (const { c } of flat(p)) {
     const st = statusOf(c)
     n[st]++
@@ -135,6 +138,8 @@ export function auditStats(pages: PageInput[]): AuditStats {
     if (c.unconfirmed && c.status !== 'NT') counts.unconfirmed++
   }
   for (const c of sampleCriteria) tally(sampleCounts, c)
+  const manualIssues = perPage.reduce((n, p) => n + (p.counts.manualIssues ?? 0), 0)
+  if (manualIssues) sampleCounts.manualIssues = manualIssues
   const perTheme = (pages[0]?.themes ?? []).map((theme) => {
     const counts = emptyCounts()
     for (const c of sampleCriteria.filter((x) => x.theme === theme.number)) tally(counts, c)
@@ -185,7 +190,8 @@ export function levelStats(stats: AuditStats): LevelStats {
     if (c.unconfirmed && c.status !== 'NT') counts.unconfirmed++
   }
   const legal = emptyCounts()
-  for (const k of Object.keys(legal) as (keyof Counts)[]) legal[k] = perLevel.A[k] + perLevel.AA[k]
+  if (stats.sampleCounts.manualIssues) legal.manualIssues = stats.sampleCounts.manualIssues
+  for (const k of Object.keys(emptyCounts()) as (keyof Counts)[]) legal[k] = (perLevel.A[k] ?? 0) + (perLevel.AA[k] ?? 0)
   const pages = stats.perPage.map((p) => ({ label: p.label, title: p.title, counts: p.counts, rate: rateExact(p.counts) }))
   const rated = pages.filter((p): p is typeof p & { rate: number } => p.rate !== null)
   const average = rated.length ? rated.reduce((a, p) => a + p.rate, 0) / rated.length : null
@@ -523,7 +529,7 @@ export function manualSheet(pages: PageInput[]): Sheet {
         { v: page.label, s: 'crit' },
         { v: tFr(c.group), s: 'wrap' },
         { v: tFr(c.text), s: 'wrap' },
-        c.criteria.join(', '),
+        a?.criterion ? `${c.criteria.join(', ')} → ${a.criterion}` : c.criteria.join(', '),
         a ? (a.state === 'ok' ? { v: 'OK', s: 'C' as const } : { v: 'Problème', s: 'NC' as const }) : { v: 'À faire', s: 'default' as const },
         { v: a?.note ?? '', s: 'wrap' },
       ])
@@ -532,13 +538,13 @@ export function manualSheet(pages: PageInput[]): Sheet {
   return { name: 'Contrôles manuels', widths: [7, 18, 70, 18, 11, 50], rows, freezeRow: 3 }
 }
 
-export function findingsSheet(pages: PageInput[]): Sheet {
+export function findingsSheet(pages: PageInput[], level?: AuditLevel): Sheet {
   const rows: CellInput[][] = [
     title('Détail des éléments – cadres, couleurs, liens et structure'),
     [],
     head(['Page', 'Thème', 'N°', 'Aperçu', 'Type', 'Constat', 'Détails', 'Critère', 'Statut', 'Remarque']),
   ]
-  const criteriaOf = (f: FindingItem) => findingCriteriaOf(f).map((c) => c.id)
+  const criteriaOf = (f: FindingItem) => findingCriteriaOf(f, level).map((c) => c.id)
   pages.forEach((page, pageIndex) => {
     for (const f of page.findings) {
       const review = page.findingReviews[f.key]
@@ -564,7 +570,7 @@ export function findingsSheet(pages: PageInput[]): Sheet {
 }
 
 /** The sheets of one page: what the "Page results" view shows. */
-export const pageSheets = (page: PageInput, level?: AuditLevel): Sheet[] => [gridSheet(page), summarySheet([page], level), testsSheet([page]), imagesSheet([page]), ...(page.findings.length ? [findingsSheet([page])] : []), ...(page.manualChecks && Object.keys(page.manualChecks).length ? [manualSheet([page])] : [])]
+export const pageSheets = (page: PageInput, level?: AuditLevel): Sheet[] => [gridSheet(page), summarySheet([page], level), testsSheet([page]), imagesSheet([page]), ...(page.findings.length ? [findingsSheet([page], level)] : []), ...(page.manualChecks && Object.keys(page.manualChecks).length ? [manualSheet([page])] : [])]
 
 /** The sheets of the whole audit: what the "Audit" view shows and the .xlsx contains. */
 export const auditSheets = (pages: PageInput[], meta: AuditMeta): Sheet[] => [
@@ -575,7 +581,7 @@ export const auditSheets = (pages: PageInput[], meta: AuditMeta): Sheet[] => [
   ...pages.map(gridSheet),
   testsSheet(pages),
   imagesSheet(pages),
-  ...(pages.some((p) => p.findings.length) ? [findingsSheet(pages)] : []),
+  ...(pages.some((p) => p.findings.length) ? [findingsSheet(pages, meta.level)] : []),
   ...(pages.some((p) => p.manualChecks && Object.keys(p.manualChecks).length) ? [manualSheet(pages)] : []),
 ]
 

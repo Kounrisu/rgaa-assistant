@@ -1,5 +1,5 @@
 import { t } from './i18n'
-import { inActiveLevel } from './audit-levels'
+import { inLevel, type AuditLevel } from './audit-levels'
 import type { FindingItem, Verdict } from './types'
 import type { Hint } from './rgaa'
 
@@ -158,7 +158,7 @@ export const FINDING_CRITERIA: Record<number, FindingCriterion[]> = {
 }
 
 /** The criteria a given finding is answered for. */
-export const findingCriteriaOf = (f: { theme: number; type: string }): FindingCriterion[] => (FINDING_CRITERIA[f.theme] ?? []).filter((c) => (!c.types || c.types.includes(f.type)) && inActiveLevel(c.id))
+export const findingCriteriaOf = (f: { theme: number; type: string }, level?: AuditLevel): FindingCriterion[] => (FINDING_CRITERIA[f.theme] ?? []).filter((c) => (!c.types || c.types.includes(f.type)) && inLevel(level, c.id))
 
 /** Criteria of a finding-based theme that are answered per finding. */
 export const findingCriterionIds = (theme: number): string[] => (FINDING_CRITERIA[theme] ?? []).map((c) => c.id)

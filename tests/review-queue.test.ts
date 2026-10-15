@@ -38,7 +38,7 @@ describe('automatic run migration', () => {
     page.checklist['8.1'] = { verdict: 'nc', note: 'Human evidence' }
     const legacy = { ...audit, version: 3 }
     const migrated = parseAudit(legacy)
-    expect(migrated.version).toBe(5)
+    expect(migrated.version).toBe(6)
     expect(migrated.pages[0].automaticRun).toBeUndefined()
     expect(migrated.pages[0].checklist['8.1']).toEqual(page.checklist['8.1'])
   })

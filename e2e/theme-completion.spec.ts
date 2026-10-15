@@ -29,7 +29,7 @@ test('what is left in a theme, partial coverage you can resolve, a theme with no
 
   // Images: the questions no image answers (1.4, 1.5) are open criteria with a button that goes to them
   const todo = panel.locator('#theme-todo')
-  await expect(todo).toContainText('Reste à faire dans cette thématique')
+  await expect(todo).toContainText('Évaluer par critère')
   await expect(todo.locator('.todo-chip[data-crit="1.4"]')).toBeVisible()
   await todo.locator('.todo-chip[data-crit="1.4"]').click()
   await expect(panel.locator('input[name="chk-1.4"]').first()).toBeFocused()

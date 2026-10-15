@@ -104,7 +104,7 @@ test('every screen of the panel matches the reviewed baseline', async ({ rig }) 
   await panel.locator('#filters .chip').nth(1).click()
   await shot('10 images, filter to review')
   await panel.locator('#filters .chip').nth(0).click()
-  await panel.keyboard.press('j')
+  await panel.keyboard.press('Control+Alt+j')
   await shot('11 images, next with the keyboard')
 
   // every theme tab
