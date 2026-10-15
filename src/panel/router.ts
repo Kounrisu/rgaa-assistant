@@ -9,7 +9,7 @@ import { renderResults } from './results-view'
 import { renderAudit } from './audit-overview'
 import { renderSample } from './sample-view'
 import { loadPage, persist, pageLabel, normalizeTheme } from './model'
-import { dom, say } from './dom'
+import { dom, say, captureFocus } from './dom'
 import { normalizeUrl, emptyAudit } from '../lib/audit-store'
 import { t } from '../lib/i18n'
 import { goTo, clearBoxes, applyBoxes } from './page-bridge'
@@ -24,6 +24,7 @@ import { renderChecks } from './checks-view'
 import { setPageToolsTheme } from './page-tools-ui'
 
 export function renderAll(): void {
+  const restoreFocus = captureFocus()
   setActiveLevel(state.audit.meta.level)
   normalizeTheme() // a render never changes the state itself
   renderPageBar()
@@ -36,10 +37,12 @@ export function renderAll(): void {
   if (state.view === 'page') renderResults()
   if (state.view === 'audit') renderAudit()
   if (state.view === 'sample') renderSample()
+  restoreFocus()
 }
 
 /** Selects a page of the sample; with `navigate`, the browser tab goes to its URL too. */
 export function switchTo(id: string, navigate = false): void {
+  if (state.scanBusy) return void say(t('Wait for the scan to finish before changing pages or audits.'))
   const rec = state.audit.pages.find((p) => p.id === id)
   if (!rec) return
   if (rec !== state.page) loadPage(rec)
@@ -176,6 +179,13 @@ export function setView(next: View): void {
   if (next === 'audits') void renderAuditsView()
   if (next === 'checks') renderChecks()
   for (const el of [dom.auditBar, dom.pageBar, dom.auditNavigation, dom.pageNavigation, dom.appEl, dom.themeEl, dom.checksEl, dom.pageProgressEl, dom.themebarEl, dom.themeHeadEl, dom.displayToolsEl]) el.inert = state.runBusy || Boolean(state.batch?.running)
+  if (state.scanBusy) {
+    // View navigation stays available; page/audit identity and answers stay locked until the scan settles.
+    for (const el of [dom.appEl, dom.themeEl, dom.checksEl, dom.themebarEl, dom.themeHeadEl, dom.displayToolsEl]) el.inert = true
+  }
+  for (const el of [dom.pageSelect, dom.scanBtn, dom.autoBtn, dom.openPageBtn, dom.auditsBtn, dom.openFileBtn, dom.saveFileBtn, dom.auditNameBtn, dom.rescanBtn]) {
+    if (state.scanBusy) el.setAttribute('disabled', '')
+  }
   renderBatch()
   renderAuditBar()
 }

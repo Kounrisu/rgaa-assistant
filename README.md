@@ -43,7 +43,7 @@ spacing, language changes. The tools shown follow the theme you are in.
 
 **Audits**: several named audits, saved in the browser (`chrome.storage.local`) as you work, and as a
 `.rgaa.json` file you can reopen later. The file contains everything, including a gzipped copy of the HTML of the
-captured pages: treat it as an internal working document. Format v5 reads and migrates v2–v4. Existing v4 suggestions
+captured pages: treat it as an internal working document. Format v6 reads and migrates v2–v5. Existing v4 suggestions
 remain suggestions; earlier implicit confirmations cannot be reconstructed from the old element-wide flag.
 Concurrent edits of one audit are rejected as a save conflict. Use Retry to save your local work as a separate copy,
 reload the saved audit, or stay on the current audit. A stale panel cannot silently restore a deleted audit.
@@ -53,10 +53,23 @@ printable **HTML report** (summary, rates per theme and page, non-conformities w
 accessibility statement when eligible). Quick and complementary audits export scoped diagnostic counts with no
 compliance rate or statement. Incomplete complete audits retain provisional rates, without conformity wording or a
 draft statement; those require all 106 criteria to be reviewed across every page with no unresolved coverage,
-confirmation or evidence conflict. Print it to PDF from the browser. **Export for analysis (LLM)** (Summary and exports) writes a
+confirmation, evidence conflict or unresolved manual problem. Print it to PDF from the browser. **Export for analysis (LLM)** (Summary and exports) writes a
 `.zip` pack for a language model: the code and the picture of every element, what the tools found, what you answered, a README
 of instructions and an empty `answers-template.jsonl` to complete (plan: `docs/PLAN-llm-roundtrip.md`; importing the answers
-back is not built yet). Nothing is sent anywhere; you give the file to your assistant yourself.
+back is not built yet). Before saving, inspect the exact local text/image files and choose whether to exclude HTML, text, notes, URLs or pictures. These exclusions do not guarantee anonymity. Nothing is sent anywhere; you give the file to your assistant yourself.
+
+Manual problems are supporting observations: link each to its criterion and record a confirmed non-compliant
+verdict there, or correct the observation after review. The summary lists unresolved problems before final reporting.
+HTML reports retain image-specific human notes alongside the automatic evidence.
+
+Changing a page URL requires choosing between correcting the same page (previous addresses remain recorded with
+its evidence) and creating a fresh page (the original and its evidence remain in the sample). Both URL entry controls
+reject invalid or duplicate addresses. Element scans lock page/audit changes and exports until completion, preserve
+navigation to the sample or summary, and discard interrupted results if the inspected tab navigates.
+
+Use **Current decision** to jump directly to the decision with keyboard focus. Card continuation buttons name the
+next target. Shortcuts require **Ctrl+Alt+N** (next decision) or **Ctrl+Alt+J/K** (next/previous image); image-list arrow
+keys remain available. Unmodified letters no longer navigate the panel.
 
 ## Use
 

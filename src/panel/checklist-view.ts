@@ -103,7 +103,7 @@ export function renderChecklist(host: HTMLElement = dom.themeEl): void {
         h('a', { class: 'crit-link', href: `https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/#${c.id}`, target: '_blank', rel: 'noreferrer' }, t('Official tests ↗'), newTabNote()),
       ),
       h('p', { class: 'question' }, c.title.replace(/`/g, '')),
-      h('p', { class: 'hint info' }, c.note),
+      h('p', { class: 'hint info' }, t(c.note)),
       ...(manual ? [h('p', { class: 'hint warn' }, t('Manual scope check: no relevant element was detected, or the scan skipped content. Inspect the whole page, including frames, shadow content and truncated results. Record your decision for this missing coverage; detected failures remain recorded. A new scan requires a new decision.'))] : []),
       ...autoHints(answer),
       ...(!answer.verdict && answer.suggested

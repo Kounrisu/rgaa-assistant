@@ -2,8 +2,8 @@ import { computeThemes } from './results'
 import { isSuggested } from './review-confirmation'
 /**
  * An “audit pack”: the audit as files a person or a language model can read — the code and the picture of every element, what the
- * tools found, what the auditor answered, and an empty answers file to complete. Pure: no network, no DOM. The model's answers come back
- * through `audit-answers.ts` and are only ever suggestions. Plan: docs/PLAN-llm-roundtrip.md.
+ * tools found, what the auditor answered, and an empty answers file to complete. Pure: no network, no DOM. The model's answers
+ * are currently reviewed manually: answers import is not implemented. Plan: docs/PLAN-llm-roundtrip.md.
  */
 import { strToU8, zipSync } from 'fflate'
 import type { Audit, AuditItem, FindingItem, PageRecord } from './types'
@@ -17,6 +17,8 @@ export const PACK_SCHEMA = 1
 export const PROMPT_VERSION = '1'
 
 export interface PackOptions {
+  /** Explicit field exclusions, applied before any file is written. They do not guarantee anonymity. */
+  exclude?: ('html' | 'text' | 'notes' | 'urls')[]
   /** Put the picture of each element in the pack (they can show personal data). */
   pictures: boolean
   /** Only the elements and criteria that still need an answer. */
@@ -61,7 +63,22 @@ export function buildPack(audit: Audit, opts: PackOptions): Pack {
   const id = `${audit.id.slice(0, 8)}-${date}`
   const level = audit.meta.level
   const files: Record<string, Uint8Array> = {}
-  const put = (path: string, content: string | Uint8Array) => { files[path] = typeof content === 'string' ? strToU8(content) : content }
+  const excluded = new Set(opts.exclude ?? [])
+  const redact = (key: string, value: unknown): unknown => {
+    if (excluded.has('html') && ['html', 'context_html'].includes(key)) return null
+    if (excluded.has('urls') && ['url', 'src', 'link_href', 'url_history'].includes(key)) return null
+    if (excluded.has('notes') && ['note', 'notes'].includes(key)) return null
+    if (excluded.has('text') && ['site', 'title', 'alt', 'aria_label', 'labelled_by_text', 'svg_title', 'accessible_name', 'nearby_text', 'link_text', 'figcaption', 'label', 'facts', 'tool_results'].includes(key)) return null
+    if (excluded.has('text') && key === 'summary' && typeof value === 'string') return null
+    return value
+  }
+  const put = (path: string, content: string | Uint8Array) => {
+    if (typeof content === 'string' && path !== 'criteria.json') {
+      if (path.endsWith('.json')) content = JSON.stringify(JSON.parse(content), redact, 2)
+      if (path.endsWith('.jsonl')) content = content.trim() ? content.trim().split('\n').map(line => JSON.stringify(JSON.parse(line), redact)).join('\n') + '\n' : ''
+    }
+    files[path] = typeof content === 'string' ? strToU8(content) : content
+  }
   const summary: PackSummary = { pages: audit.pages.length, elements: 0, openAnswers: 0, pictures: 0, bytes: 0 }
   const template: unknown[] = []
   const slot = (page: string, scope: 'element' | 'page', criterion: string, element?: string) => {
@@ -85,7 +102,7 @@ export function buildPack(audit: Audit, opts: PackOptions): Pack {
     for (const el of rec.items as AuditItem[]) {
       const review = rec.reviews[el.key]
       const kind = review?.kind ?? suggestedKind(el) ?? undefined
-      const open = criteriaFor(kind).filter((c) => inLevel(level, c.id) && (review?.answers[c.id] === undefined || isSuggested(review, c.id)))
+      const open = criteriaFor(kind, level).filter((c) => inLevel(level, c.id) && (review?.answers[c.id] === undefined || isSuggested(review, c.id)))
       if (opts.openOnly && !open.length) continue
       const key = `img-${el.id}`
       elements.push({
@@ -107,7 +124,7 @@ export function buildPack(audit: Audit, opts: PackOptions): Pack {
 
     for (const f of rec.findings as FindingItem[]) {
       const review = rec.findingReviews[f.key]
-      const open = findingCriteriaOf(f).filter((c) => inLevel(level, c.id) && (review?.answers[c.id] === undefined || isSuggested(review, c.id)))
+      const open = findingCriteriaOf(f, level).filter((c) => inLevel(level, c.id) && (review?.answers[c.id] === undefined || isSuggested(review, c.id)))
       if (opts.openOnly && !open.length) continue
       if (f.type === 'contrast-ok') continue
       const key = `fnd-${f.theme}-${f.id}`
@@ -133,13 +150,13 @@ export function buildPack(audit: Audit, opts: PackOptions): Pack {
     })
     for (const row of checklist) if (!row.auditor) slot(page, 'page', row.criterion)
 
-    put(`pages/${page}/page.json`, JSON.stringify({ page, url: rec.url, title: rec.title, themes: rec.themes, scan_coverage: rec.scanCoverage ?? null, checklist }, null, 2))
+    put(`pages/${page}/page.json`, JSON.stringify({ page, url: rec.url, url_history: rec.urlHistory ?? [], title: rec.title, themes: rec.themes, scan_coverage: rec.scanCoverage ?? null, manual_checks: rec.manualChecks ?? {}, checklist }, null, 2))
     put(`pages/${page}/elements.jsonl`, jsonl(elements))
   })
 
   put('criteria.json', JSON.stringify(THEMES.map((t) => ({ theme: t.number, name: t.name, criteria: t.criteria.filter((c) => inLevel(level, c.id)).map((c) => ({ id: c.id, title: c.title.replace(/`/g, ''), tests: c.tests.map((x) => ({ id: x.id, text: x.text.replace(/`/g, '') })) })) })).filter((t) => t.criteria.length), null, 2))
   put('answers-template.jsonl', jsonl(template))
-  put('README.md', readme(id, audit))
+  put('README.md', readme(id))
   put('manifest.json', JSON.stringify({ pack: id, schema: PACK_SCHEMA, prompt_version: PROMPT_VERSION, audit: audit.id, site: audit.meta.site, rgaa: '4.1', level: level ?? 'complet', criteria_in_scope: LEVEL_COUNT[level ?? 'complet'], created: new Date(now).toISOString(), pages: audit.pages.map((p) => ({ page: pageLabelOf(audit, p), url: p.url })), summary, files: Object.keys(files).sort() }, null, 2))
 
   const zipped = zipSync(files)
@@ -147,10 +164,12 @@ export function buildPack(audit: Audit, opts: PackOptions): Pack {
   return { id, files, zip: zipped, summary }
 }
 
-function readme(id: string, audit: Audit): string {
+function readme(id: string): string {
   return `# RGAA audit pack ${id}
 
-Audit of **${audit.meta.site || audit.name}** against RGAA 4.1, prepared by RGAA Assistant. You are asked to help a human auditor.
+Audit against RGAA 4.1, prepared by RGAA Assistant. You are asked to help a human auditor.
+Export only: importing model answers into RGAA Assistant is not implemented. The auditor must review suggestions and enter decisions manually.
+Text, HTML, URLs, notes and pictures may contain personal or confidential information. Field exclusions do not guarantee anonymity.
 
 ## What is in this pack
 - \`criteria.json\` — the RGAA criteria in scope, with the official tests.

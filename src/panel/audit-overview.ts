@@ -12,6 +12,7 @@ import { pageLabel, allPageInputs } from './model'
 import { exportWorkbook, openReport, exportAuditPack } from './exports'
 import { slugOf } from './helpers'
 import { actions } from './actions'
+import { unresolvedManualIssues } from '../lib/manual-evidence'
 
 export function donut(label: string, cPct: number | null, caption: string): HTMLElement {
   const c = cPct ?? 0
@@ -178,6 +179,15 @@ export function renderAudit(): void {
   if (!inputs.length) return void dom.auditEl.append(h('p', { class: 'hint-line' }, t('Scan a page to start the audit.')))
   const sheets = auditSheets(inputs, state.audit.meta)
   const named = (name: string) => sheets.find((s) => s.name === name)!
+  const issues = state.audit.pages.flatMap((page, i) => unresolvedManualIssues(page.manualChecks, inputs[i].themes).map(check => ({ page, check })))
+  if (issues.length) dom.auditEl.append(h('section', { class: 'card manual-final-review' },
+    h('h2', {}, t('Manual problems to resolve ({n})', { n: issues.length })),
+    h('p', {}, t('Resolve manual problems before final reporting. Link each problem to a criterion and record its verdict, or correct the observation after review.')),
+    h('ul', {}, ...issues.map(({ page, check }) => h('li', {}, h('button', { type: 'button', onclick: () => {
+      actions.switchTo(page.id); actions.setView('checks')
+      document.getElementById(`mc-${check.id}-issue`)?.focus()
+    } }, `${pageLabel(page)} · ${t(check.text)}`)))),
+  ))
   dom.auditEl.append(
     h(
       'div',

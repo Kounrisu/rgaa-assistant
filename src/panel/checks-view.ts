@@ -15,7 +15,8 @@ import { captureAndCheckHtml, validateSnapshot } from './auto-checks'
 import { dateTimeOf, slugOf, kb } from './helpers'
 import { unpackSnapshot } from '../lib/snapshot'
 import { actions } from './actions'
-import { goToFirst } from './chrome'
+import { goToFirst, openCriterion } from './chrome'
+import { unresolvedManualIssues } from '../lib/manual-evidence'
 import { VERDICT_WORD } from './checklist-view'
 import { evidenceConflicts } from '../lib/evidence'
 
@@ -62,6 +63,8 @@ export function renderChecks(): void {
   const rec = state.page
   rec.manualChecks ??= {}
   const progress = manualProgress(rec)
+  const themes = pageInput(rec).themes
+  const unresolved = new Set(unresolvedManualIssues(rec.manualChecks, themes).map(c => c.id))
   const body = h('div', { class: 'checks-body' })
 
   for (const group of MANUAL_GROUPS) {
@@ -80,12 +83,25 @@ export function renderChecks(): void {
       ]
       card.append(
         h(
-          'div',
+          'fieldset',
           { class: 'check-row', 'data-state': answer?.state ?? '' },
-          h('p', { class: 'question' }, t(c.text)),
+          h('legend', { class: 'question' }, t(c.text)),
           h('p', { class: 'hint-line how' }, h('strong', {}, `${t('How to check:')} `), t(c.how)),
           h('p', { class: 'hint-line' }, t('Feeds RGAA'), ' ', ...c.criteria.flatMap((id, i) => [i ? ', ' : '', h('a', { href: criterionUrl(id), target: '_blank', rel: 'noreferrer' }, id, newTabNote())])),
           h('div', { class: 'verdicts' }, ...radio('todo', t('To do')), ...radio('ok', t('Checked, OK')), ...radio('issue', t('Problem found'))),
+          ...(answer?.state === 'issue' ? [
+            h('p', { class: unresolved.has(c.id) ? 'hint warn' : 'hint info' }, unresolved.has(c.id) ? t('Unresolved manual problem: link a criterion and record a confirmed non-compliant verdict there.') : t('This observation is linked to a confirmed non-compliant criterion.')),
+            h('label', {}, t('Criterion for this problem'), h('select', { id: `mc-link-${c.id}`, onchange: (event: Event) => {
+              answer.criterion = (event.target as HTMLSelectElement).value || undefined
+              persist(); keepScroll(dom.checksEl, renderChecks)
+            } }, h('option', { value: '' }, t('Choose a criterion')), ...c.criteria.map(id => h('option', { value: id, selected: answer.criterion === id }, `RGAA ${id}`)))),
+            h('div', { class: 'nav' }, ...c.criteria.map(id => h('button', { type: 'button', onclick: () => {
+              const theme = themes.find(th => th.criteria.some(cr => cr.id === id))
+              const criterion = theme?.criteria.find(cr => cr.id === id)
+              if (theme && criterion) openCriterion(theme, criterion, criterion.outcome)
+              else say(t('This criterion is outside the selected audit scope.'))
+            } }, t('Review RGAA {id}', { id })))),
+          ] : []),
           answer?.state === 'issue'
             ? h('textarea', {
                 'aria-label': t('What is wrong, and where'),
@@ -114,6 +130,7 @@ export function renderChecks(): void {
       h('div', { class: 'nav' }, h('button', { type: 'button', onclick: () => actions.setView('review') }, t('← Back to review'))),
     ),
     h('p', { class: 'hint-line' }, runLabel(rec)),
+    h('p', { class: 'hint-line' }, t('Manual checks are supporting observations. Only the criterion decisions determine the results.')),
     ...(reports.length ? [reviewQueue(rec)] : []),
     body,
     disclosure('run-history', { class: 'card run-history', id: 'run-history' },

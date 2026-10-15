@@ -206,6 +206,7 @@ export function renderDetailNow(): void {
     codeBlock(t('Context (parent markup)'), el.contextHtml, t('Yellow line = the image. Orange attributes are the ones assistive technologies read.')),
   )
 
+  decision.append(h('p', { class: 'decision-name hint-line' }, t('Accessible name: {name}', { name: el.accessibleName || t('None') })))
   const banner = problemBanner(el, review)
   if (banner) decision.append(banner)
   decision.append(renderKindPicker(el, review))
@@ -320,7 +321,7 @@ export function renderKindPicker(el: Item, review: ImageReview): HTMLElement {
 
 export function renderCriteria(el: Item, review: ImageReview, host: HTMLElement): void {
   host.replaceChildren()
-  const applicable = criteriaFor(review.kind)
+  const applicable = criteriaFor(review.kind, state.audit.meta.level)
   if (!applicable.length) {
     host.append(h('p', { class: 'hint-line' }, review.kind ? t('None of the criteria of this kind of image belongs to the chosen audit type.') : t('Choose informative or decorative to see the RGAA criteria that apply.')))
     return
@@ -380,7 +381,7 @@ export function criterionCard(el: Item, review: ImageReview, criterion: Criterio
 export function criteriaProgressText(el: Item): string {
   const review = state.reviews[reviewKey(el)]
   if (!review?.kind) return ''
-  const list = criteriaFor(review.kind)
+  const list = criteriaFor(review.kind, state.audit.meta.level)
   const open = list.find((c) => review.answers[c.id] === undefined)
   const done = list.length - list.filter((c) => review.answers[c.id] === undefined).length
   const text = open ? t('{done}/{total} criteria of this image answered · next: {id}', { done, total: list.length, id: open.id }) : t('{done}/{total} criteria of this image answered', { done, total: list.length })

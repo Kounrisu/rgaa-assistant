@@ -15,6 +15,7 @@ export interface PanelState {
   page: PageRecord | null
   /** The address the browser tab is on now. */
   liveUrl: string
+  navigationVersion: number
   /** Pages scanned since the panel opened or since the tab last navigated (their boxes are on the page). */
   scannedThisSession: Set<string>
   /** Shortcuts into `page`, set by loadPage: its images, their reviews, its scan count. */
@@ -47,6 +48,7 @@ export interface PanelState {
   disclosures: Map<string, boolean>
   batchSelection: Set<string>
   batch?: { auditId: string; ids: string[]; index: number; paused: boolean; running: boolean }
+  scanBusy: boolean
   runBusy: boolean
   axeRunning: boolean
   /** The last scan() went through (runEverything goes on to the checks only then). */
@@ -59,6 +61,7 @@ export const state: PanelState = {
   audit: emptyAudit(),
   page: null,
   liveUrl: '',
+  navigationVersion: 0,
   scannedThisSession: new Set<string>(),
   elements: [],
   scanCount: 0,
@@ -79,6 +82,7 @@ export const state: PanelState = {
   overviewSheet: 0,
   disclosures: new Map(),
   batchSelection: new Set(),
+  scanBusy: false,
   runBusy: false,
   axeRunning: false,
   lastScanOk: false,

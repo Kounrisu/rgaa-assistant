@@ -26,7 +26,7 @@ async function waitForPage(url: string): Promise<void> {
 }
 
 export async function runSelected(resume = false): Promise<void> {
-  if (state.runBusy || state.batch?.running) return
+  if (state.scanBusy || state.runBusy || state.batch?.running) return
   if (!resume) {
     const ids = state.audit.pages.filter((p) => state.batchSelection.has(p.id)).map((p) => p.id)
     if (!ids.length) return

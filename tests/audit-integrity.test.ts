@@ -53,7 +53,7 @@ describe('criterion-specific confirmation', () => {
     const p = (raw.pages as PageRecord[])[0]
     p.reviews['img-1'].auto = true
     const a = parseAudit(raw)
-    expect(a.version).toBe(5)
+    expect(a.version).toBe(6)
     expect(a.storageToken).toBe(`legacy:${a.id}`)
     expect(a.pages[0].reviews['img-1'].pendingAnswers).toEqual(['1.1', '1.2'])
     expect(parseAudit(JSON.parse(JSON.stringify(a)))).toEqual(a)

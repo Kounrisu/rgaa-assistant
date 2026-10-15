@@ -41,7 +41,6 @@ export interface TodoDeps {
   open: (theme: ThemeResult, criterion: CriterionResult, target: TodoTarget) => void
 }
 
-let lastOpened = ''
 
 /** The criteria of this theme no single element answers (what a “nothing here” button can record). */
 function pageLevelIds(theme: number): string[] {
@@ -211,17 +210,13 @@ export function renderThemeTodo(host: HTMLElement, deps: TodoDeps): void {
   const open = (item: TodoItem) => {
     const criterion = theme.criteria.find((c) => c.id === item.id)
     if (!criterion) return
-    lastOpened = item.id
     deps.open(theme, criterion, TARGET[item.reason])
   }
-  const after = todo.findIndex((x) => x.id === lastOpened)
-  const next = todo[(after + 1) % todo.length]
   host.append(
     h(
       'div',
       { class: 'todo-line' },
-      h('strong', {}, t('Left to do in this theme: {n} criteria', { n: todo.length })),
-      h('button', { type: 'button', class: 'primary todo-next', onclick: () => open(next) }, after < 0 ? t('Go to the first') : t('Go to the next one')),
+      h('strong', {}, t('Review by criterion')),
     ),
     h(
       'div',

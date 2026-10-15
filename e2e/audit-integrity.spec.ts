@@ -31,6 +31,7 @@ test('partial audit dashboard, page results and report contain no compliance rat
     await panel.locator('#sample-btn').click()
     await panel.locator(`label[for="audit-level-${level}"]`).click()
     await panel.locator('#evaluate-page-btn').click()
+    await expect(panel.locator('#page-select')).not.toContainText('%')
     await panel.locator('#results-btn').click()
     await expect(panel.locator('#results .results-summary .rate')).toHaveCount(0)
     await panel.locator('#audit-btn').click()

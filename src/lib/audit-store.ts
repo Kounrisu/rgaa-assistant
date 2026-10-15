@@ -140,6 +140,12 @@ const MIGRATIONS: Record<number, (a: Rec) => void> = { 2: v2ToV3, 3: (a) => {
       }
     }
   }
+}, 5: (a) => {
+  // Existing observations have no explicit criterion link. Never infer a resolution from an unrelated NC.
+  for (const p of (a.pages as unknown[]).filter(isRecord)) {
+    if (isRecord(p.manualChecks)) for (const check of Object.values(p.manualChecks).filter(isRecord)) delete check.criterion
+    delete p.urlHistory
+  }
 } }
 
 /**

@@ -1,3 +1,5 @@
+import { FR_FOLLOWUPS } from './i18n-fr-followups'
+import { FR_GUIDANCE } from './i18n-fr-guidance'
 import { FR_INTEGRITY } from './i18n-fr-integrity'
 import { FR_WORKFLOW } from './i18n-fr-workflow'
 import { FR_PANEL } from './i18n-fr-panel'
@@ -15,6 +17,8 @@ import { FR_A11Y } from './i18n-fr-a11y'
 
 /** French texts, keyed by the English text used in the code. */
 export const FR: Record<string, string> = {
+  ...FR_FOLLOWUPS,
+  ...FR_GUIDANCE,
   ...FR_INTEGRITY,
   ...FR_WORKFLOW,
   ...FR_LIB,

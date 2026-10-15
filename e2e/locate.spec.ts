@@ -35,9 +35,9 @@ test('locate on page from the criterion cards gives the same focus as a click on
   // the image card: “Repérer sur la page” comes right before “Suivant à évaluer”, in the card and in the header
   await items.nth(0).click()
   await panel.locator('label[for="kind-1-informative"]').click()
-  const card = panel.locator('.criterion', { hasText: 'RGAA 1.1' })
+  const card = panel.locator('.criterion', { has: panel.locator('input[name="crit-1-1.1"]') })
   const buttons = card.locator('.review-actions button')
-  await expect(buttons).toHaveText(['Repérer sur la page', 'Suivant à évaluer'])
+  await expect(buttons).toHaveText(['Repérer sur la page', /Suivant : .*RGAA [0-9]+\.[0-9]+/])
 
   // away from the element, then locate from the card
   await site.evaluate(() => scrollTo(0, 0))
@@ -55,7 +55,7 @@ test('locate on page from the criterion cards gives the same focus as a click on
   await panel.locator('.theme-tab', { hasText: 'Liens' }).click()
   await expect(panel.locator('.finding-pane .item.finding').first()).toBeVisible({ timeout: 20_000 })
   const linkCard = panel.locator('.finding-detail .criterion').first()
-  await expect(linkCard.locator('.review-actions button')).toHaveText(['Repérer sur la page', 'Suivant à évaluer'])
+  await expect(linkCard.locator('.review-actions button')).toHaveText(['Repérer sur la page', /Suivant : .*RGAA [0-9]+\.[0-9]+/])
   await site.evaluate(() => scrollTo(0, 0))
   await linkCard.getByRole('button', { name: 'Repérer sur la page' }).click()
   await expect.poll(async () => (await focusOnSite()).border).toContain('4px solid')
