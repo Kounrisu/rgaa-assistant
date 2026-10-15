@@ -2,10 +2,14 @@
 
 Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
-## Current state (2026-10-11)
+## Current state (2026-10-15)
 
-- Branch `codex/toolbar-clarity`, based on `master` at `86767a5` (Claude's latest application work: `f7d2c5a`).
+- Branch `master`, reviewed at `236c837` (latest application change `7e75cd9`, accessibility self-audit fixes).
   Version 0.1.0; saved audit format **v4**, licence AGPL-3.0-only. No saved-data changes in the toolbar work.
+- **Comprehensive UX/UI and code review (2026-10-15):** `docs/ux-ui-code-review-2026-10-15.md`, with saved browser/domain evidence.
+  Developer, novice and experienced auditor perspectives; 14 prioritized findings. Highest priorities: partial-audit exports still
+  generate conformity claims/statements, per-element confirmation flags confirm unrelated answers, same-audit concurrent writes lose
+  updates, and absent scanner findings become fully covered NA without accounting for scan limitations. No product fixes in this review.
 - **Approved toolbar hierarchy implemented (`25afd1e`):** visible Audit / Page auditée / Bilan de la page / Thématiques RGAA /
   Bilan de la thématique / Outils d’affichage labels. Display and highlight controls share a non-collapsible area
   below the theme navigation and summary. One shared theme header replaces repeated headers inside each view.
@@ -39,10 +43,11 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 - **Overlay numbering follow-up (`5f1b1be`):** internal DOM IDs no longer change when audit numbers are assigned.
   A hidden image returning after relabeling cannot collide with another image’s internal ID. Owner reports numbering
   still off after the previous fix; this second defect is reproduced, but the exact real-site symptom is unconfirmed.
-- Latest `npm run check`: **192 tests**, typecheck, **710 texts / 1245 French entries / 0 missing**, build pass.
-  Latest full `npm run test:e2e`: **23 passed**, including the reviewed **80-screen** parity baseline, 480/768/1280 layouts,
-  sequential runs/pause/resume, engine failure/retry, source-URL isolation and keyboard continuation. Built content script:
-  **0 module imports**. Real Firefox/DevTools still untested.
+- Latest `npm run check` (2026-10-15): **221 tests**, typecheck, **790 texts / 1343 French entries / 0 missing**, build pass.
+  Latest full `npm run test:e2e`: **36 passed, 2 failed** (audit-pack workflow intermittently returns to review; parity differs in
+  Structure checklist and audit overview sheet 2). Isolated audit-pack rerun passed. Existing panel axe test passed, light/dark.
+  Built content script: **0 module imports**. Additional Chromium walkthrough covered 320/480/768/1280 widths and confirmed focus loss,
+  global character shortcuts, invalid saved URL and classification implicitly confirming a criterion. Real Firefox/DevTools still untested.
 - **Components review (theme 7, APG patterns)** shipped: every ARIA component (tabs, dialog, menu, disclosure / accordion,
   details, combobox, listbox, slider, spinbutton, switch, checkbox, radio group, tree, tooltip, custom button, toolbar) is a
   finding with the structural checks of its WAI-ARIA Authoring Practices pattern run by the script (7.1, pre-filled NC when
@@ -88,9 +93,13 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## In progress (claimed)
 
-- None. Second numbering defect fixed in `5f1b1be`; owner’s exact visible symptom still needs confirmation.
+- None. Comprehensive review finished; findings are documented, not fixed.
 
 ## Next (suggested order; the owner decides)
+
+The 2026-10-15 review recommends addressing result/export integrity and concurrent-write safety before extending automation.
+See the prioritized findings and acceptance conditions in `docs/ux-ui-code-review-2026-10-15.md`. Stabilize the browser test failures;
+do not update parity just to make it pass. Preserve the owner's visible-information and decorative-image counting decisions.
 
 The corrected audit/page navigation, dashboard, explicit next-review controls and selected-page runs are implemented.
 Next verify the actual extension in Firefox/DevTools and collect feedback on a real audit, especially the top-header
@@ -124,6 +133,20 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-15 — Codex — Comprehensive UX UI and code review
+- Did: reviewed `236c837` from developer, inexperienced auditor and experienced auditor perspectives. Added
+  `docs/ux-ui-code-review-2026-10-15.md` and `docs/review-evidence-2026-10-15/` (two screenshots and browser/domain observations).
+  Updated the stale top-level branch/check summary. Documentation only; product code and parity baseline unchanged.
+- State: `npm run check` passed (221 tests, 0 missing translations, typecheck/build); full e2e 36 passed / 2 failed (audit-pack and parity).
+  Audit-pack passed in an isolated rerun. Existing light/dark axe test passed. Content bundle has no module imports.
+  Browser observations use the existing Chromium fixture harness; pure probes reproduce export and same-audit persistence defects.
+- Not tested: real Firefox/DevTools, screen reader, real zoom/text spacing/forced-colours interaction, production-scale audits,
+  external vulnerability audit, Asqatasun fixture suite. The earlier 322/328 remains historical.
+- Next: prioritize F01–F04 (report eligibility, individual confirmation, concurrent saves, scan coverage/applicability), then the
+  manual workflow, export-note preservation, accessibility and density findings. Fix scan lifecycle/test waiting before relying on parity.
+- For the other agent: preserve visible information/display tools and the owner's decorative-image counting decision. The 21st
+  missing-alt warning was a source-comment false positive. Do not describe this review or axe pass as full RGAA certification.
 
 ### 2026-10-13 — Claude Code — RGAA self-audit, skip link and new-tab notices
 - Did: self-audit in `docs/RGAA-SELF-AUDIT-2026-10-13.md`. Fixed: skip link to the main content on the panel and the coverage page (12.7);

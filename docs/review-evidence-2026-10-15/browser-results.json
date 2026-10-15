@@ -1,0 +1,128 @@
+{
+  "beforeKind": "1/6 critères de cette image renseignés · prochain : 1.3 · pré-rempli, à confirmer",
+  "afterKind": "1/6 critères de cette image renseignés · prochain : 1.3",
+  "prefillNotesAfterKind": 0,
+  "shortcutBefore": "1",
+  "shortcutFocus": {
+    "tag": "BUTTON",
+    "id": "audit-name-btn",
+    "text": "127.0.0.1"
+  },
+  "shortcutAfter": "2",
+  "layout768": {
+    "width": 768,
+    "scroll": 768,
+    "detail": {
+      "x": 0,
+      "y": 1150.75,
+      "width": 768,
+      "height": 3241,
+      "top": 1150.75,
+      "right": 768,
+      "bottom": 4391.75,
+      "left": 0
+    },
+    "main": {
+      "x": 0,
+      "y": 80.5,
+      "width": 768,
+      "height": 6139.953125,
+      "top": 80.5,
+      "right": 768,
+      "bottom": 6220.453125,
+      "left": 0
+    },
+    "body": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 6220.453125,
+      "top": 0,
+      "right": 768,
+      "bottom": 6220.453125,
+      "left": 0
+    },
+    "visibleControls": 71
+  },
+  "layout480": {
+    "width": 480,
+    "scroll": 480,
+    "detail": {
+      "x": 0,
+      "y": 1474.75,
+      "width": 480,
+      "height": 3721,
+      "top": 1474.75,
+      "right": 480,
+      "bottom": 5195.75,
+      "left": 0
+    },
+    "main": {
+      "x": 0,
+      "y": 150,
+      "width": 480,
+      "height": 7129.453125,
+      "top": 150,
+      "right": 480,
+      "bottom": 7279.453125,
+      "left": 0
+    },
+    "body": {
+      "x": 0,
+      "y": 0,
+      "width": 480,
+      "height": 7279.453125,
+      "top": 0,
+      "right": 480,
+      "bottom": 7279.453125,
+      "left": 0
+    },
+    "visibleControls": 53
+  },
+  "layout320": {
+    "width": 320,
+    "scroll": 320,
+    "detail": {
+      "x": 0,
+      "y": 2053.25,
+      "width": 320,
+      "height": 4547.5,
+      "top": 2053.25,
+      "right": 320,
+      "bottom": 6600.75,
+      "left": 0
+    },
+    "main": {
+      "x": 0,
+      "y": 247.5,
+      "width": 320,
+      "height": 9194.453125,
+      "top": 247.5,
+      "right": 320,
+      "bottom": 9441.953125,
+      "left": 0
+    },
+    "body": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 9441.953125,
+      "top": 0,
+      "right": 320,
+      "bottom": 9441.953125,
+      "left": 0
+    },
+    "visibleControls": 22
+  },
+  "manualGroup": {
+    "html": "<div class=\"check-row\" data-state=\"\"><p class=\"question\">Avec la seule touche Tab, chaque lien, bouton et champ peut être atteint et utilisé.</p><p class=\"hint-line how\"><strong>Comment faire : </strong>Cliquez sur la page, puis appuyez sur Tab encore et encore (Maj+Tab revient en arrière). Entrée ou Espace active un lien ou un bouton ; les flèches fonctionnent dans les menus, les onglets et les listes.</p><p class=\"hint-line\">Alimente les critères RGAA <a href=\"https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/#12.8\" target=\"_blank\" rel=\"noreferrer\">12.8<span class=\"sr-only\"> (s’ouvre dans un nouvel onglet)</span></a>, <a href=\"https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/#7.1\" target=\"_blank\" rel=\"noreferrer\">7.1<span class=\"sr-only\"> (s’ouvre dans un nouvel onglet)</span></a></p><div class=\"verdicts\"><input type=\"radio\" name=\"mc-kb-reach\" id=\"mc-kb-reach-todo\" style=\"\"><label for=\"mc-kb-reach-todo\">À faire</label><input type=\"radio\" name=\"mc-kb-reach\" id=\"mc-kb-reach-ok\" style=\"\"><label for=\"mc-kb-reach-ok\">Vérifié, OK</label><input type=\"radio\" name=\"mc-kb-reach\" id=\"mc-kb-reach-issue\" style=\"\"><label for=\"mc-kb-reach-issue\">Problème constaté</label></div></div>"
+  },
+  "focusAfterLevel": {
+    "tag": "BODY",
+    "id": ""
+  },
+  "quickSummary": "Synthèse de l’audit — 1 page(s)\n\nRGAA 4.1 · toutes les thématiques auditées · une feuille par page, comme la grille Excel officielle.\n\n← Retour à la relecture\nExporter en Excel (toutes les pages)\nOuvrir le rapport\nTélécharger le rapport (HTML)\nExporter pour analyse (LLM)\nTableau de bord\nSynthèse\nÉchantillon\nCritères\nP01\nDétail par test (Images)\nDétail par image\nCadres et couleurs\n\nAudit rapide (25 critères) : ces chiffres ne portent que sur ces critères. Ce n’est pas un taux de conformité RGAA et il ne permet pas de déclaration d’accessibilité.\n\nConformité RGAA 4\nNiveau\n\tC\tNC\nA\t20,00 %\t80,00 %\nAA (légal)\t20,00 %\t80,00 %\nAAA\t—\t—\n\nprovisoire — Taux provisoire : des critères restent à tester, ne sont couverts que partiellement par cet outil, ou reposent sur une réponse automatique non confirmée. Un critère jugé sur une partie seulement de ses tests garde son résultat mais le taux reste provisoire ; une conformité suggérée compte comme à relire tant que vous ne l’avez pas confirmée ; un échec est toujours conservé.\n\nCes chiffres sont le niveau de conformité global à reporter dans la déclaration d’accessibilité. La référence est le niveau légal AA (A + AA) : un site est déclaré conforme à 100 %. Les autres chiffres sont indicatifs.\n\nConformité pour chaque niveau\nNiveau\n\tC\tNC\nA\t20,00 %\t80,00 %\nAA\t—\t—\nAAA\t—\t—\nRésultats par niveau\nNiveau\n\tC\tNC\nA\t1\t4\nAA\t\t\nAAA\t\t\nTotal\t1\t4\nConformité par niveau\n0%\n25%\n50%\n75%\n100%\nNiveau A\nNiveau AA\nNiveau AAA\nC\nNC\nConformité RGAA 4 (niveau légal AA)\n20,00 %\nC\nNC\n\nC ÷ (C + NC) sur l’échantillon, niveaux A et AA (provisoire)\n\nMoyenne par page\n20,00 %\nC\nNC\n\nMoyenne des taux des pages\n\nRésultats par page\nPage\tTitre\tC\tNC\tNA\t% C\nP01\tSite de test RGAA\t1\t4\t1\t20,00 %*\nRésultats : moyennes\nNiveau\n\t\nNiveau\n\nMoyenne\t20,00 %\nMeilleure page (P01)\t20,00 %\nPire page (P01)\t20,00 %\nPar thématique (niveau échantillon)\nThématique\tAuditée\tC\tNC\tNA\tNT\tCritères respectés\n1. Images\toui\t0\t1\t0\t0\t\n0%*\n2. Cadres\toui\t0\t0\t0\t0\t\n—\n3. Couleurs\toui\t0\t0\t0\t1\t\n—\n4. Multimédia\toui\t0\t0\t0\t2\t\n—\n5. Tableaux\toui\t0\t0\t1\t1\t\n—\n6. Liens\toui\t0\t1\t0\t1\t\n0%*\n7. Scripts\toui\t0\t1\t0\t1\t\n0%*\n8. Éléments obligatoires\toui\t0\t0\t0\t3\t\n—\n9. Structuration de l’information\toui\t1\t0\t0\t0\t\n100%*\n10. Présentation de l’information\toui\t0\t0\t0\t3\t\n—\n11. Formulaires\toui\t0\t1\t0\t5\t\n0%*\n12. Navigation\toui\t0\t0\t0\t2\t\n—\n13. Consultation\toui\t0\t0\t0\t0\t\n—\nComment la conformité est calculée\n\nLa conformité globale est C ÷ (C + NC), où C est le nombre de critères conformes et NC le nombre de critères non conformes. Les critères non applicables (NA) ou non testés (NT) sont écartés. C’est la référence légale : c’est le taux de conformité de l’échantillon.\n\nLes taux marqués provisoires (ou d’un astérisque) viennent d’un audit incomplet. Un critère jugé sur une partie seulement de ses tests garde son résultat mais signale le taux, une suggestion d’un outil compte comme à relire tant que vous ne l’avez pas confirmée, et un échec connu est toujours conservé.\n\nLes niveaux A / AA / AAA sont déduits des critères de succès WCAG auxquels renvoie chaque critère RGAA. Le taux d’accessibilité utilisé ailleurs dans ce panneau est la moyenne des taux des pages.",
+  "invalidUrl": "not-a-url",
+  "invalidUrlSave": "Enregistré 16:01",
+  "problems": []
+}
