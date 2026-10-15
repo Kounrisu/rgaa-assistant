@@ -83,10 +83,10 @@ describe('audit file validation', () => {
 
   it('rejects future and unknown versions instead of relabelling them as v3', () => {
     const future = raw(sampleAudit())
-    future.version = 5
+    future.version = 6
     expect(codeOf(() => auditFromFile(fileOf(future)))).toBe('unsupported-version')
     expect(codeOf(() => parseAudit(future))).toBe('unsupported-version')
-    expect(future.version).toBe(5) // not touched
+    expect(future.version).toBe(6) // not touched
     const old = raw(sampleAudit())
     old.version = 1
     expect(codeOf(() => parseAudit(old))).toBe('unsupported-version')
@@ -152,7 +152,7 @@ describe('migrations of older files', () => {
       ],
     }
     const audit = parseAudit(v2)
-    expect(audit.version).toBe(4)
+    expect(audit.version).toBe(5)
     expect(audit.id).toBeTruthy()
     expect(audit.name).toBe('')
     expect(audit.createdAt).toBe(1000)
@@ -166,7 +166,7 @@ describe('migrations of older files', () => {
 
   it('a version-less audit is read as v2', () => {
     const audit = parseAudit({ pages: [], meta: { site: '', auditor: '', context: '' } })
-    expect(audit.version).toBe(4)
+    expect(audit.version).toBe(5)
     expect(audit.pages).toEqual([])
   })
 

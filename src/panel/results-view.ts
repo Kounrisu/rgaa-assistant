@@ -4,7 +4,7 @@
 import { h, dom } from './dom'
 import { t } from '../lib/i18n'
 import { state } from './state'
-import { LEVEL_COUNT, LEVEL_LABEL } from '../lib/audit-levels'
+import { allowsComplianceRate, LEVEL_COUNT, LEVEL_LABEL } from '../lib/audit-levels'
 import type { Sheet } from '../lib/xlsx'
 import { select } from './images-view'
 import { pageInput, pageLabel } from './model'
@@ -110,7 +110,9 @@ export function renderResults(): void {
     h(
       'div',
       { class: 'results-summary' },
-      h('div', { class: `rate${stat.rate !== null && isProvisional(stat.counts) ? ' provisional' : '' }` }, ...(stat.rate !== null && isProvisional(stat.counts) ? [h('span', { class: 'pill warn-pill', title: provisionalHelp() }, t('provisional'))] : []), h('strong', {}, stat.rate === null ? '—' : `${stat.rate}%`), h('span', {}, t('accessibility rate of {label} (C ÷ (C + NC), themes {themes})', { label: pageLabel(state.page), themes: stat.themes.join(', ') }))),
+      ...(allowsComplianceRate(state.audit.meta.level) ? [
+      h('div', { class: `rate${stat.rate !== null && isProvisional(stat.counts) ? ' provisional' : '' }` }, ...(stat.rate !== null && isProvisional(stat.counts) ? [h('span', { class: 'pill warn-pill', title: provisionalHelp() }, t('provisional'))] : []), h('strong', {}, stat.rate === null ? '—' : `${stat.rate}%`), h('span', {}, t('accessibility rate of {label} (C ÷ (C + NC), themes {themes})', { label: pageLabel(state.page), themes: stat.themes.join(', ') })))
+      ] : []),
       pill('c', t('{n} compliant', { n: stat.counts.C })),
       pill('nc', t('{n} non-compliant', { n: stat.counts.NC })),
       pill('na', t('{n} not applicable', { n: stat.counts.NA })),
@@ -120,6 +122,6 @@ export function renderResults(): void {
     ),
     ...(isProvisional(stat.counts) ? [h('p', { class: 'hint warn' }, provisionalHelp())] : []),
   )
-  const sheets = pageSheets(input)
+  const sheets = pageSheets(input, state.audit.meta.level)
   tabsFor(dom.resultsEl, sheets.map((sheet) => ({ name: sheet.name === pageLabel(state.page!) ? t('Grid ({label})', { label: pageLabel(state.page!) }) : sheet.name, render: () => sheetTable(sheet) })), 'resultsSheet')
 }

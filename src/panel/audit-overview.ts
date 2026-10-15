@@ -1,3 +1,5 @@
+import { allowsComplianceRate } from '../lib/audit-levels'
+import { diagnosticSheet } from '../lib/audit-sheet'
 /**
  * The audit overview: dashboard (level tables, charts, results per page) and the sheets of all pages.
  */
@@ -79,8 +81,10 @@ export function miniTable(caption: string, headers: string[], rows: (string | nu
 
 /** The "Tableau de bord audit RGAA 4": level tables, charts, results per page and averages. */
 export function dashboard(inputs: PageInput[]): HTMLElement {
+  if (!allowsComplianceRate(state.audit.meta.level)) return h('div', {}, levelNote()!, sheetTable(diagnosticSheet(inputs, state.audit.meta.level)))
   const stats = auditStats(inputs)
   const lv = levelStats(stats)
+  const incomplete = stats.perPage.some(p => isProvisional(p.counts))
   const cOf = (c: Counts) => pct2(rateExact(c))
   const nOf = (c: Counts) => (c.C + c.NC ? pct2((c.NC / (c.C + c.NC)) * 100) : '—')
   const tone = (rate: number | null) => (rate === null ? 'none' : rate >= 100 ? 'full' : rate >= 75 ? 'good' : rate >= 50 ? 'mid' : 'low')
@@ -93,8 +97,8 @@ export function dashboard(inputs: PageInput[]): HTMLElement {
       'section',
       { class: 'dash-col' },
       miniTable(t('RGAA 4 compliance'), ['', 'C', 'NC'], [['A', cOf(lv.perLevel.A), nOf(lv.perLevel.A)], [t('AA (legal)'), cOf(lv.legal), nOf(lv.legal)], ['AAA', cOf(lv.perLevel.AAA), nOf(lv.perLevel.AAA)]], 'level-table'),
-      ...(isProvisional(lv.legal) ? [h('p', { class: 'hint warn' }, `${t('provisional')} — ${provisionalHelp()}`)] : []),
-      h('p', { class: 'dash-note' }, t('These figures are the overall compliance level to report in the conformity statement. The reference is the legal level AA (A + AA): a site is declared compliant at 100 %. Other figures are indicative.')),
+      ...((incomplete || isProvisional(lv.legal)) ? [h('p', { class: 'hint warn' }, `${t('provisional')} — ${provisionalHelp()}`)] : []),
+      h('p', { class: 'dash-note' }, t('Only a complete audit with every result reviewed can support an accessibility statement. Provisional results must not be published as a final conformity level.')),
       miniTable(t('Compliance for each level'), ['', 'C', 'NC'], [['A', cOf(lv.perLevel.A), nOf(lv.perLevel.A)], ['AA', cOf(lv.perLevel.AA), nOf(lv.perLevel.AA)], ['AAA', cOf(lv.perLevel.AAA), nOf(lv.perLevel.AAA)]], 'level-table'),
       miniTable(t('Results by level'), ['', 'C', 'NC'], [['A', lv.perLevel.A.C, lv.perLevel.A.NC], ['AA', lv.perLevel.AA.C, lv.perLevel.AA.NC], ['AAA', lv.perLevel.AAA.C, lv.perLevel.AAA.NC], [t('Total'), lv.perLevel.A.C + lv.perLevel.AA.C + lv.perLevel.AAA.C, lv.perLevel.A.NC + lv.perLevel.AA.NC + lv.perLevel.AAA.NC]]),
     ),
@@ -102,7 +106,7 @@ export function dashboard(inputs: PageInput[]): HTMLElement {
       'section',
       { class: 'dash-col charts' },
       levelBars(lv.perLevel),
-      donut(t('Compliance RGAA 4 (legal level AA)'), rateExact(lv.legal), t('C ÷ (C + NC) over the sample, levels A and AA') + (isProvisional(lv.legal) ? ` (${t('provisional')})` : '')),
+      donut(t('Compliance RGAA 4 (legal level AA)'), rateExact(lv.legal), t('C ÷ (C + NC) over the sample, levels A and AA') + ((incomplete || isProvisional(lv.legal)) ? ` (${t('provisional')})` : '')),
       donut(t('Average per page'), lv.average, t('Average of the page rates')),
     ),
     h(
@@ -184,7 +188,7 @@ export function renderAudit(): void {
         { class: 'nav' },
         h('button', { type: 'button', onclick: () => actions.setView('review') }, t('← Back to review')),
         h('button', { type: 'button', class: 'primary', onclick: () => void exportWorkbook(inputs, auditSheets(inputs, state.audit.meta), `grille-rgaa-${slugOf(state.audit.meta.site || state.audit.name)}.xlsx`) }, t('Export Excel (all pages)')),
-        h('button', { type: 'button', class: 'primary', title: t('One printable page with the summary, the non-conformities and a draft accessibility statement'), onclick: () => openReport(false) }, t('Open the report')),
+        h('button', { type: 'button', class: 'primary', title: t('Printable recorded results; a draft statement is included only for a complete, fully reviewed audit.'), onclick: () => openReport(false) }, t('Open the report')),
         h('button', { type: 'button', onclick: () => openReport(true) }, t('Download the report (HTML)')),
         h('button', { type: 'button', title: t('A zip with the code, pictures and evidence of every element and an answers file to complete, to give to a language model'), onclick: () => void exportAuditPack() }, t('Export for analysis (LLM)')),
       ),

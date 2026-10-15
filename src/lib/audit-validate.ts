@@ -6,9 +6,9 @@
 import type { Audit } from './types'
 import { MAX_SNAPSHOT_BASE64, MAX_SNAPSHOT_BYTES } from './snapshot'
 
-export const CURRENT_VERSION = 4
+export const CURRENT_VERSION = 5
 /** Versions this code knows how to migrate (explicitly, see migrate() in audit-store.ts). */
-export const SUPPORTED_VERSIONS: readonly number[] = [2, 3, 4]
+export const SUPPORTED_VERSIONS: readonly number[] = [2, 3, 4, 5]
 
 /** Largest audit file accepted (bytes of the text). Checked on file.size before reading, then on the text. */
 export const MAX_IMPORT_BYTES = 100 * 1024 * 1024
@@ -89,6 +89,7 @@ function review(v: unknown, path: string): void {
   str(v.note, `${path}.note`)
   optional(v.kind, oneOf(['informative', 'decorative']), `${path}.kind`)
   optional(v.auto, bool, `${path}.auto`)
+  optional(v.pendingAnswers, (a, p) => array(a, p, str), `${path}.pendingAnswers`)
   for (const k of ['fg', 'bg', 'autoNote']) optional(v[k], str, `${path}.${k}`)
 }
 
@@ -98,6 +99,7 @@ function checklistAnswer(v: unknown, path: string): void {
   str(v.note, `${path}.note`)
   optional(v.source, str, `${path}.source`)
   optional(v.manualTests, bool, `${path}.manualTests`)
+  optional(v.coverageAt, num, `${path}.coverageAt`)
   optional(
     v.autoResults,
     (r, p) =>
@@ -226,12 +228,13 @@ function page(v: unknown, path: string): void {
   optional(v.htmlCheck, htmlCheck, `${path}.htmlCheck`)
 }
 
-/** Throws unless `v` is a complete, current (v4) audit. */
+/** Throws unless `v` is a complete, current (v5) audit. */
 export function validateAudit(v: unknown): asserts v is Audit {
   if (!isRecord(v)) return bad('audit', 'an object is expected')
   if (v.version !== CURRENT_VERSION) bad('version', `version ${CURRENT_VERSION} is expected after migration`)
   if (typeof v.id !== 'string' || !v.id || v.id.length > MAX_ID_LENGTH) bad('id', 'a non-empty identifier is expected')
   str(v.name, 'name')
+  optional(v.storageToken, str, 'storageToken')
   num(v.createdAt, 'createdAt')
   num(v.updatedAt, 'updatedAt')
   optional(v.exportedAt, num, 'exportedAt')

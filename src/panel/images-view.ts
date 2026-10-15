@@ -1,3 +1,4 @@
+import { confirmAnswer, isSuggested } from '../lib/review-confirmation'
 import { reviewActions } from './review-controls'
 import { previewBackgroundControl } from './preview-bg'
 import { previewOf } from '../lib/url-safety'
@@ -241,7 +242,7 @@ export function problemBanner(el: Item, review: ImageReview): HTMLElement | null
   const t12 = testIdFor('1.2', el)
   const apply = (kind: ImageKind, criterion: string, note: string) => () => {
     review.kind = kind
-    review.auto = false
+    confirmAnswer(review, criterion)
     review.answers[criterion] = 'nc'
     if (!review.note.trim()) review.note = note
     saveReviews()
@@ -287,7 +288,7 @@ export function renderKindPicker(el: Item, review: ImageReview): HTMLElement {
       checked: review.kind === value,
       onclick: () => {
         review.kind = value
-        review.auto = false
+        // Classifying the image does not confirm any criterion.
         saveReviews()
         const host = $('criteria')
         renderCriteria(el, review, host)
@@ -341,7 +342,7 @@ export function criterionCard(el: Item, review: ImageReview, criterion: Criterio
       checked: review.answers[criterion.id] === value,
       onclick: () => {
         review.answers[criterion.id] = value
-        review.auto = false
+        confirmAnswer(review, criterion.id)
         card.dataset.state = value
         card.querySelector('.prefill-note')?.remove()
         saveReviews()
@@ -363,7 +364,7 @@ export function criterionCard(el: Item, review: ImageReview, criterion: Criterio
     h('p', { class: 'official' }, criterion.title),
     h('ul', { class: 'checks' }, ...criterion.checks.map((c) => h('li', {}, t(c)))),
     ...(hint ? [h('p', { class: `hint ${hint.tone}` }, hint.text)] : []),
-    ...(review.auto ? [h('p', { class: 'hint info prefill-note' }, t('Pre-filled from the markup (alt="", aria-hidden or role="presentation"). Click Compliant to confirm the image really is decorative, or change the answer if the developer made a mistake.'))] : []),
+    ...(isSuggested(review, criterion.id) ? [h('p', { class: 'hint info prefill-note' }, t('Pre-filled from the page. Click your answer to confirm it, or change it.'))] : []),
     h(
       'fieldset',
       {},

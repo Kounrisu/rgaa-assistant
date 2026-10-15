@@ -1,3 +1,5 @@
+import { computeThemes } from './results'
+import { isSuggested } from './review-confirmation'
 /**
  * An “audit pack”: the audit as files a person or a language model can read — the code and the picture of every element, what the
  * tools found, what the auditor answered, and an empty answers file to complete. Pure: no network, no DOM. The model's answers come back
@@ -83,7 +85,7 @@ export function buildPack(audit: Audit, opts: PackOptions): Pack {
     for (const el of rec.items as AuditItem[]) {
       const review = rec.reviews[el.key]
       const kind = review?.kind ?? suggestedKind(el) ?? undefined
-      const open = criteriaFor(kind).filter((c) => inLevel(level, c.id) && (review?.answers[c.id] === undefined || review.auto))
+      const open = criteriaFor(kind).filter((c) => inLevel(level, c.id) && (review?.answers[c.id] === undefined || isSuggested(review, c.id)))
       if (opts.openOnly && !open.length) continue
       const key = `img-${el.id}`
       elements.push({
@@ -96,7 +98,7 @@ export function buildPack(audit: Audit, opts: PackOptions): Pack {
         html: cleanHtml(el.html), context_html: cleanHtml(el.contextHtml, 3000),
         picture: picture(page, key, el.shot, el.thumb),
         tool: { detected: detectedOf(el), suggested_kind: suggestedKind(el) },
-        auditor: review ? { kind: review.kind ?? null, answers: review.answers, note: review.note, confirmed: !review.auto } : null,
+        auditor: review ? { kind: review.kind ?? null, answers: review.answers, note: review.note, confirmed: !review.auto, confirmed_criteria: Object.keys(review.answers).filter(id => !isSuggested(review, id)) } : null,
         open_criteria: open.map((c) => c.id),
       })
       summary.elements++
@@ -105,7 +107,7 @@ export function buildPack(audit: Audit, opts: PackOptions): Pack {
 
     for (const f of rec.findings as FindingItem[]) {
       const review = rec.findingReviews[f.key]
-      const open = findingCriteriaOf(f).filter((c) => inLevel(level, c.id) && (review?.answers[c.id] === undefined || review.auto))
+      const open = findingCriteriaOf(f).filter((c) => inLevel(level, c.id) && (review?.answers[c.id] === undefined || isSuggested(review, c.id)))
       if (opts.openOnly && !open.length) continue
       if (f.type === 'contrast-ok') continue
       const key = `fnd-${f.theme}-${f.id}`
@@ -113,23 +115,25 @@ export function buildPack(audit: Audit, opts: PackOptions): Pack {
         id: key, theme: f.theme, kind: f.type, present: f.present, label: f.label, summary: f.summary, facts: f.facts, count: f.count,
         html: cleanHtml(f.html), context_html: cleanHtml(f.contextHtml, 3000),
         picture: picture(page, key, f.shot, null),
-        auditor: review ? { answers: review.answers, note: review.note, confirmed: !review.auto } : null,
+        auditor: review ? { answers: review.answers, note: review.note, confirmed: !review.auto, confirmed_criteria: Object.keys(review.answers).filter(id => !isSuggested(review, id)) } : null,
         open_criteria: open.map((c) => c.id),
       })
       summary.elements++
       for (const c of open) slot(page, 'element', c.id, key)
     }
 
+    const results = computeThemes(rec.items, el => rec.reviews[(el as AuditItem).key], rec.themes, rec.checklist, { findings: rec.findings, reviews: rec.findingReviews, scannedThemes: rec.scannedThemes, scanCoverage: rec.scanCoverage }, level)
+    const manual = new Set(results.themes.flatMap(t => t.criteria.filter(c => c.manualReview).map(c => c.id)))
     const pageCriteria = THEMES.filter((t) => rec.themes.includes(t.number)).flatMap((t) =>
-      t.criteria.filter((c) => inLevel(level, c.id) && !PER_ELEMENT.has(c.id)).map((c) => ({ theme: t.number, c })),
+      t.criteria.filter((c) => inLevel(level, c.id) && (!PER_ELEMENT.has(c.id) || manual.has(c.id))).map((c) => ({ theme: t.number, c })),
     )
     const checklist = pageCriteria.map(({ theme, c }) => {
       const a = rec.checklist[c.id]
-      return { criterion: c.id, theme, title: c.title.replace(/`/g, ''), auditor: a?.verdict ?? null, note: a?.note ?? '', tool_suggestion: a?.suggested ?? null, tool: a?.source ?? null, tool_results: a?.autoResults ?? null }
+      return { criterion: c.id, theme, title: c.title.replace(/`/g, ''), auditor: manual.has(c.id) && a?.coverageAt !== (rec.scanCoverage?.at ?? 0) ? null : a?.verdict ?? null, manual_coverage: manual.has(c.id), note: a?.note ?? '', tool_suggestion: a?.suggested ?? null, tool: a?.source ?? null, tool_results: a?.autoResults ?? null }
     })
     for (const row of checklist) if (!row.auditor) slot(page, 'page', row.criterion)
 
-    put(`pages/${page}/page.json`, JSON.stringify({ page, url: rec.url, title: rec.title, themes: rec.themes, checklist }, null, 2))
+    put(`pages/${page}/page.json`, JSON.stringify({ page, url: rec.url, title: rec.title, themes: rec.themes, scan_coverage: rec.scanCoverage ?? null, checklist }, null, 2))
     put(`pages/${page}/elements.jsonl`, jsonl(elements))
   })
 

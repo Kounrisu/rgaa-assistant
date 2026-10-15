@@ -1,3 +1,4 @@
+import { confirmAllAnswers, isSuggested } from '../lib/review-confirmation'
 /**
  * “What is left in this theme”: the open criteria as buttons that go straight to them, a clear “theme finished” when nothing is left,
  * and, when there is nothing to check on the page (no multimedia, no form…), one button that records the open criteria as not applicable.
@@ -69,7 +70,11 @@ async function markNotApplicable(ids: string[]): Promise<void> {
     t('Mark {n} not applicable', { n: ids.length }),
   )
   if (!yes) return
-  for (const id of ids) confirmVerdict((rec.checklist[id] ??= { note: '' }), 'na')
+  for (const id of ids) {
+    const answer = (rec.checklist[id] ??= { note: '' })
+    confirmVerdict(answer, 'na')
+    answer.coverageAt = rec.scanCoverage?.at ?? 0
+  }
   persist()
   actions.renderAll()
   say(t('{n} criteria recorded as not applicable.', { n: ids.length }))
@@ -85,11 +90,15 @@ async function confirmNaSuggestions(ids: string[]): Promise<void> {
   if (!rec || !ids.length) return
   const yes = await askConfirm(
     t('Confirm the “not applicable” suggestions?'),
-    t('The checks found nothing to verify for {n} criteria of this theme ({ids}) and suggest Not applicable. You confirm that this is right: look at the page if you are not sure.', { n: ids.length, ids: ids.join(', ') }),
+    t('The checks found nothing to verify for {n} criteria ({ids}). Inspect the whole page, including frames, shadow content and truncated results, before confirming Not applicable.', { n: ids.length, ids: ids.join(', ') }),
     t('Confirm {n}', { n: ids.length }),
   )
   if (!yes) return
-  for (const id of ids) confirmVerdict((rec.checklist[id] ??= { note: '' }), 'na')
+  for (const id of ids) {
+    const answer = (rec.checklist[id] ??= { note: '' })
+    confirmVerdict(answer, 'na')
+    answer.coverageAt = rec.scanCoverage?.at ?? 0
+  }
   persist()
   actions.renderAll()
   say(t('{n} criteria confirmed as not applicable.', { n: ids.length }))
@@ -105,16 +114,18 @@ function prefilledFindingKeys(theme: number): string[] {
 async function confirmPrefilledFindings(keys: string[]): Promise<void> {
   const rec = state.page
   if (!rec || !keys.length) return
+  const scope = keys.map(key => ({ finding: rec.findings.find(f => f.key === key)!, ids: Object.keys(rec.findingReviews[key].answers).filter(id => isSuggested(rec.findingReviews[key], id)) }))
+  const count = scope.reduce((n, item) => n + item.ids.length, 0)
   const yes = await askConfirm(
     t('Confirm the pre-filled answers?'),
-    t('You confirm the {n} answers the scan pre-filled from the markup in this theme. Look at the ones that matter first (a link name can be present and still meaningless). Answers you change yourself are not affected.', { n: keys.length }),
-    t('Confirm {n}', { n: keys.length }),
+    t('You confirm the {n} answers the scan pre-filled from the markup in this theme. Look at the ones that matter first (a link name can be present and still meaningless). Answers you change yourself are not affected.', { n: count }) + '\n\n' + scope.map(item => `#${item.finding.id}: ${item.ids.join(', ')}`).join('\n'),
+    t('Confirm {n}', { n: count }),
   )
   if (!yes) return
-  for (const k of keys) rec.findingReviews[k].auto = false
+  for (const k of keys) confirmAllAnswers(rec.findingReviews[k])
   persist()
   actions.renderAll()
-  say(t('{n} pre-filled answers confirmed.', { n: keys.length }))
+  say(t('{n} pre-filled answers confirmed.', { n: count }))
 }
 
 type PrefilledGroup = 'ignored' | 'named' | 'nameless'
@@ -148,9 +159,9 @@ const GROUP_TEXT: Record<PrefilledGroup, { label: string; ask: string }> = {
 
 async function confirmPrefilledImageGroup(group: PrefilledGroup, keys: string[]): Promise<void> {
   if (!keys.length) return
-  const yes = await askConfirm(t('Confirm these pre-filled images?'), `${t(GROUP_TEXT[group].ask)}\n\n${t('{n} images. Look at them first with the “Pre-filled” filter.', { n: keys.length })}`, t('Confirm {n}', { n: keys.length }))
+  const yes = await askConfirm(t('Confirm these pre-filled images?'), `${t(GROUP_TEXT[group].ask)}\n\n${t('{n} images. Look at them first with the “Pre-filled” filter.', { n: keys.length })}\n\n${keys.map(key => `#${state.elements.find(el => reviewKey(el) === key)?.id}: ${Object.keys(state.reviews[key].answers).filter(id => isSuggested(state.reviews[key], id)).join(', ')}`).join('\n')}`, t('Confirm {n}', { n: keys.length }))
   if (!yes) return
-  for (const k of keys) state.reviews[k].auto = false
+  for (const k of keys) confirmAllAnswers(state.reviews[k])
   persist()
   actions.renderAll()
   say(t('{n} pre-filled images confirmed.', { n: keys.length }))

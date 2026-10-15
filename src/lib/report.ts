@@ -1,3 +1,4 @@
+import { allowsComplianceRate, LEVEL_LABEL } from './audit-levels'
 import { auditStats, isProvisional, levelStats, rateOf, type Counts, type PageInput } from './audit-sheet'
 import { getLang, t } from './i18n'
 import { MANUAL_CHECKS } from './manual-checks'
@@ -99,23 +100,27 @@ function checksOf(page: PageRecord): string {
 export function buildReportHtml(audit: Audit, inputs: PageInput[], pages: PageRecord[], date = new Date()): string {
   const stats = auditStats(inputs)
   const levels = levelStats(stats)
+  const ratesAllowed = allowsComplianceRate(audit.meta.level)
+  const rate = (n: number | null, c: Counts | boolean) => ratesAllowed ? pctP(n, c) : '—'
   const legalRate = rateOf(levels.legal)
+  const statementAllowed = ratesAllowed && pages.length > 0 && stats.sampleCriteria.length === 106 && legalRate !== null &&
+    stats.perPage.every(p => !isProvisional(p.counts)) && inputs.every(p => p.themes.every(th => th.criteria.every(c => !c.conflicts?.length)))
   const state = conformityOf(legalRate)
   const day = date.toLocaleDateString(getLang(), { day: 'numeric', month: 'long', year: 'numeric' })
   const title = `${t('Accessibility audit report')} — ${audit.name || audit.meta.site}`
 
   const sample = stats.perPage
-    .map((p) => `<tr><td>${esc(p.label)}</td><td>${esc(p.title)}<br><small>${esc(p.url)}</small></td><td>${pctP(p.rate, p.counts)}</td><td>${bar(p.counts)}<br><small>${counts(p.counts)}</small></td></tr>`)
+    .map((p) => `<tr><td>${esc(p.label)}</td><td>${esc(p.title)}<br><small>${esc(p.url)}</small></td><td>${rate(p.rate, p.counts)}</td><td>${bar(p.counts)}<br><small>${counts(p.counts)}</small></td></tr>`)
     .join('')
   const themes = stats.perTheme
     .filter((x) => x.audited)
-    .map((x) => `<tr><td>${x.number}. ${esc(x.name)}</td><td>${pctP(x.rate, x.counts)}</td><td>${bar(x.counts)}<br><small>${counts(x.counts)}</small></td></tr>`)
+    .map((x) => `<tr><td>${x.number}. ${esc(x.name)}</td><td>${rate(x.rate, x.counts)}</td><td>${bar(x.counts)}<br><small>${counts(x.counts)}</small></td></tr>`)
     .join('')
   const perPage = pages
     .map((page, i) => `<section class="page"><h3>${esc(stats.perPage[i].label)} — ${esc(stats.perPage[i].title)}</h3><p><small>${esc(stats.perPage[i].url)}</small></p>${nonCompliances(page, inputs[i])}<h4>${esc(t('Checks'))}</h4>${checksOf(page)}${coverageOf(page)}</section>`)
     .join('')
   const failing = stats.sampleCriteria.filter((c) => c.status === 'NC')
-  const provisional = isProvisional(levels.legal)
+  const provisional = isProvisional(levels.legal) || stats.perPage.some(p => isProvisional(p.counts))
   const toConfirm = stats.sampleCriteria.filter((c) => c.suggested && c.status === 'NT').length
   const partial = stats.sampleCriteria.filter((c) => c.partial).length
 
@@ -136,16 +141,17 @@ export function buildReportHtml(audit: Audit, inputs: PageInput[], pages: PageRe
   section.page { break-inside: avoid-page; } @media print { body { padding: 0; } h2 { break-after: avoid; } tr { break-inside: avoid; } }
 </style></head><body>
 <h1>${esc(title)}</h1>
-<p>${esc(t('RGAA 4.1 audit'))} · ${esc(audit.meta.site)} · ${esc(day)}${audit.meta.auditor ? ` · ${esc(audit.meta.auditor)}` : ''}${audit.meta.context ? ` · ${esc(audit.meta.context)}` : ''}</p>
+<p>${esc(t(LEVEL_LABEL[audit.meta.level ?? 'complet']))} · ${esc(t('RGAA 4.1 audit'))} · ${esc(audit.meta.site)} · ${esc(day)}${audit.meta.auditor ? ` · ${esc(audit.meta.auditor)}` : ''}${audit.meta.context ? ` · ${esc(audit.meta.context)}` : ''}</p>
 
 <h2>1. ${esc(t('Summary'))}</h2>
 <div class="kpis">
-  <div class="kpi"><b>${pctP(legalRate, provisional)}</b>${esc(t('Criteria met (levels A and AA, whole sample)'))}</div>
-  <div class="kpi"><b>${pctP(stats.averageRate, stats.perPage.some((p) => isProvisional(p.counts)))}</b>${esc(t('Average rate of the pages'))}</div>
+  ${ratesAllowed ? `  <div class="kpi"><b>${rate(legalRate, provisional)}</b>${esc(t('Criteria met (levels A and AA, whole sample)'))}</div>
+  <div class="kpi"><b>${rate(stats.averageRate, stats.perPage.some((p) => isProvisional(p.counts)))}</b>${esc(t('Average rate of the pages'))}</div>
+` : ''}
   <div class="kpi"><b>${pages.length}</b>${esc(t('Pages in the sample'))}</div>
   <div class="kpi"><b>${failing.length}</b>${esc(t('Non-compliant criteria'))}</div>
 </div>
-<p>${esc(t('The audited content is {state}, with a rate of {rate} of the applicable criteria met (C / (C + NC), levels A and AA).', { state: t(CONFORMITY_TEXT[state]), rate: pct(legalRate) }))}</p>
+${statementAllowed ? `<p>${esc(t('The audited content is {state}, with a rate of {rate} of the applicable criteria met (C / (C + NC), levels A and AA).', { state: t(CONFORMITY_TEXT[state]), rate: pct(legalRate) }))}</p>` : `<p class="warn">${esc(t('Diagnostic results only. This audit does not yet support a conformity claim or an accessibility statement.'))}</p>`}
 ${provisional ? `<p class="warn"><b>${esc(t('Provisional result.'))}</b> ${esc(t('The audit is incomplete: criteria remain to be tested, some are only partly covered by the tool, or rest on automatic pre-filled answers the auditor has not confirmed. A criterion judged on only part of its tests keeps its result but is flagged. Do not publish this rate as the final conformity level.'))} ${esc(t('{toConfirm} criteria await confirmation of an automatic suggestion; {partial} have partial coverage.', { toConfirm, partial }))}</p>` : ''}
 
 <h2>2. ${esc(t('Sample of pages'))}</h2>
@@ -158,7 +164,7 @@ ${provisional ? `<p class="warn"><b>${esc(t('Provisional result.'))}</b> ${esc(t
 <h2>4. ${esc(t('Non-conformities and checks per page'))}</h2>
 ${perPage}
 
-<h2>5. ${esc(t('Draft accessibility statement'))}</h2>
+${statementAllowed ? `<h2>5. ${esc(t('Draft accessibility statement'))}</h2>
 <div class="statement">
   <p><b>${esc(t('State of conformity'))}</b> — ${esc(audit.meta.site)} ${esc(t('is'))} <b>${esc(t(CONFORMITY_TEXT[state]))}</b> ${esc(t('with the RGAA 4.1.'))} ${esc(t('The audit shows {rate} of the criteria met.', { rate: pct(legalRate) }))}${provisional ? ` <b>${esc(t('Provisional: the audit is incomplete.'))}</b>` : ''}</p>
   <p><b>${esc(t('Content that is not accessible'))}</b></p>
@@ -169,9 +175,9 @@ ${perPage}
   <p><b>${esc(t('Pages checked'))}</b></p>
   <ul>${stats.perPage.map((p) => `<li>${esc(p.title)} — ${esc(p.url)}</li>`).join('')}</ul>
   <p><b>${esc(t('Feedback and contact'))}</b> — <span class="todo">${esc(t('to fill in'))}</span></p>
-</div>
+</div>` : ''}
 
 <h2>6. ${esc(t('Method and tools'))}</h2>
-<p>${esc(t('The audit follows the RGAA 4.1 on a sample of pages. Pages were checked in a browser with RGAA Assistant: element-by-element review (images, frames, colours, links, structure, tables, forms), automatic checks (axe-core, RGAA checks, rules derived from Asqatasun, HTML validation) and manual checks (keyboard, zoom, screen reader). Automatic results are evidence and suggestions: they only count once the auditor has confirmed them, and they cover only part of the RGAA.'))}</p>
+<p>${esc(t('This report contains the recorded decisions, automatic suggestions and manual checks for the selected audit scope. Automatic checks cover only part of RGAA. Unconfirmed answers and incomplete coverage keep the results provisional.'))}</p>
 </body></html>`
 }

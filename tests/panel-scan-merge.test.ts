@@ -110,9 +110,9 @@ describe('mergeScan: a scan joins the images already known', () => {
       info(3, { accessibleName: null, alt: null, ignoredBy: null }),
     ])
     const [a, b, c] = state.elements
-    expect(state.reviews[a.key]).toEqual({ kind: 'decorative', answers: { '1.2': 'c' }, note: '', auto: true })
-    expect(state.reviews[b.key]).toEqual({ kind: 'informative', answers: { '1.1': 'c' }, note: '', auto: true })
-    expect(state.reviews[c.key]).toEqual({ kind: 'informative', answers: { '1.1': 'nc' }, note: '', auto: true })
+    expect(state.reviews[a.key]).toEqual({ kind: 'decorative', answers: { '1.2': 'c' }, note: '', auto: true, pendingAnswers: ['1.2'] })
+    expect(state.reviews[b.key]).toEqual({ kind: 'informative', answers: { '1.1': 'c' }, note: '', auto: true, pendingAnswers: ['1.1'] })
+    expect(state.reviews[c.key]).toEqual({ kind: 'informative', answers: { '1.1': 'nc' }, note: '', auto: true, pendingAnswers: ['1.1'] })
   })
 
   it('pre-filling never touches an image the auditor already worked on', () => {
