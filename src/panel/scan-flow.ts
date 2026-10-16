@@ -21,6 +21,7 @@ export async function scan(): Promise<void> {
   if (!state.page) return void say(t('Add a page to the audit pages sample first (button “Audit pages sample”).'))
   const scannable = state.page.themes.filter((n) => SCANNED_THEMES.has(n))
   if (!scannable.length) return void say(t('None of the selected themes can be scanned: they are checklists. Select Images, Frames or Colours to scan.'))
+  const viewAtStart = state.view
   say(t('Scanning…'))
   // an audit style changes how the page looks (revealed hidden content, forced layout): the scan must see the page as it is
   const stylesOff = await switchAuditStylesOff()
@@ -84,7 +85,8 @@ export async function scan(): Promise<void> {
     state.scannedThisSession.add(rec.id)
     dom.newBanner.hidden = true
     dom.navBanner.hidden = true
-    setView('review')
+    // the scan takes a while: if you went to another view meanwhile (audit overview, sample), stay there
+    if (state.view === viewAtStart) setView('review')
     renderAll()
     persist()
     state.lastScanOk = true
