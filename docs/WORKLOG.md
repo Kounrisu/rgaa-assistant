@@ -8,7 +8,10 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
   Version 0.1.0; saved audit format **v6**, licence AGPL-3.0-only. Versions 2–5 migrate on load.
 - **Integrated remote master through `97f0f88`:** retains structure tools, page/table reading tabs, hidden-caption reveal,
   absent-image removal, audited-tab indicator and locate recovery alongside the audit-integrity fixes. Both existing
-  commit-labelled test ZIPs are retained as historical builds; neither represents the combined source.
+  older commit-labelled test ZIPs are retained as historical builds. The combined build is available below.
+- **Test build published:** [v0.1.0-22d0e15](https://github.com/Kounrisu/rgaa-assistant/releases/tag/v0.1.0-22d0e15),
+  compiled from merged source `22d0e15`. Installable ZIP and SHA-256 checksum in `releases/` and GitHub assets;
+  unsigned prerelease for user testing. Extension version remains 0.1.0.
 - **Review F01–F04 implemented:** partial exports are scoped diagnostics without compliance rates or statements;
   complete reports require reviewed results on every page before conformity wording/a draft statement is offered.
   Confirmation is tracked per criterion (classification does not confirm answers). Background saves compare persisted
@@ -106,7 +109,7 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## In progress (claimed)
 
-- None. Integration into `master` is complete; real-extension validation remains below.
+- None. Merged test build is published; real-extension validation remains below.
 
 ## Next (suggested order; the owner decides)
 
@@ -148,6 +151,19 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-16 — Codex — Publish the merged test build
+- Did: rebuilt source `22d0e15`, tagged it `v0.1.0-22d0e15`, and published a GitHub prerelease with
+  `rgaa-assistant-0.1.0-22d0e15.zip` (594,208 bytes) plus its SHA-256 checksum. Added both files to `releases/`
+  and linked the current build/install instructions in `releases/README.md`. Existing tags/archives are preserved.
+- State: fresh `npm run check` passes (245 tests in 28 files, typecheck, 936 texts / 1535 French entries / 0 missing,
+  build). Verified ZIP CRCs and all 27 file bytes against `dist/`, root manifest, required entry points and zero
+  content-script module imports. SHA-256: `cd8ea83644bff7d26484e40e1a26f3f165a3f4aabca4a7432bf205069566be53`.
+  Browser verification is the preceding merge's 51 cases; not rerun because application source is unchanged.
+- Next: owner loads the ZIP in Firefox or its extracted folder in Chrome/Edge, reloads the page, and tests the
+  actual DevTools panel. Real Firefox/DevTools and assistive technologies were not tested here.
+- For the other agent: the tag points to the source commit; the later packaging commit only adds release files/docs.
+  Unsigned test prerelease, manifest version 0.1.0, saved format v6. Download the ZIP asset, not GitHub's source archive.
 
 ### 2026-10-16 — Codex — Merge audit fixes with current master
 - Did: combined fix-branch tip `7d76297` (implementations `71691ed`, `c59f382`) with remote-master tip `97f0f88`.
