@@ -29,7 +29,7 @@ or `src/background.ts`; WORKLOG updated; changes committed with a message that s
   evidence (`src/lib/evidence.ts`), counted as “to review” until confirmed. Rates are labelled *provisional* while the
   audit is incomplete. Never claim full RGAA coverage from automated checks.
 - **The content script is one self-contained classic script.** Modules in `src/content/**` may import each other and
-  `import type` from `src/lib`, nothing shared with the panel. After a build: `grep -c "^import \|[^a-zA-Z]import(" dist/assets/inject.ts-*.js` prints `0`.
+  `import type` from `src/lib`, nothing shared with the panel. After a build: `grep -c "^import \|[^a-zA-Z]import(" dist/assets/src-content-inject.ts-*.js` prints `0`.
 - **Panel layout**: shared state in `src/panel/state.ts`, DOM lookups in `dom.ts`, upward calls through `actions.ts`;
   no import cycles and `panel.ts` stays a thin bootstrap (a test checks it). See the README “Code layout”.
 - **French/English**: the English text is the key. Add French in a file `src/lib/i18n-fr-<topic>.ts` (wired in

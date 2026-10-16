@@ -149,6 +149,6 @@ export async function openRig(context: BrowserContext): Promise<Rig> {
 export async function scanElements(panel: Page): Promise<void> {
   await panel.locator('#scan-btn').click()
   // a page has every theme by default: the scan (elements, then the previews) takes a moment; wait until it is over
-  await expect(panel.locator('#status')).toContainText('analysée', { timeout: 60_000 })
+  await expect(panel.locator('#status')).toContainText(/analysée|Réanalyse/, { timeout: 60_000 })
   await expect(panel.locator('#status')).not.toContainText('Analyse en cours')
 }

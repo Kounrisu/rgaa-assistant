@@ -90,7 +90,7 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## In progress (claimed)
 
-- None. The requested rollback is complete; the selected release's browser-test failures are recorded above.
+- None. Rollback kept by the owner; its e2e failures are fixed (see the 2026-10-16 handoff, top of the log).
 
 ## Next (suggested order; the owner decides)
 
@@ -129,6 +129,12 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-16 — Claude Code — Green e2e on the restored release; dev toolchain upgraded (0 npm audit findings)
+- Did: owner kept the rollback. (1) `src/panel/scan-flow.ts`: a finishing scan no longer forces the review view if the auditor moved to another view meanwhile (this was the flaky audit-pack / audit-level e2e, also seen in CI). (2) e2e: scan helper waits for the "analysée"/"Réanalyse" message; parity serializer masks the `DD/MM/YYYY` date of the Excel sheet (baseline changed daily) and the page-snapshot size (followed the bundle/bundler); baseline regenerated after reading the diff (Links first screen = existing visibility rows/chip, sample sheet = date). (3) `npm audit`: vite 5→8.3, vitest 3→5.0, @crxjs/vite-plugin 2→3: 0 vulnerabilities. The built content script file is now `assets/src-content-inject.ts-*.js` (AGENTS.md grep updated).
+- State: `npm run check` passes (221 tests, 814 texts / 0 missing, build); content script 0 module imports; `npm run test:e2e` 41 passed; `check:asqatasun` 322/328. CI: the last master run (restore commit) failed on audit-level + parity, the same flakiness; not pushed yet, so the new run is not seen. NOT tested: real Firefox/DevTools, and the upgraded build loaded as a real extension (crxjs 3 changed the generated manifest/service-worker loader: `service-worker-loader.js`).
+- Next: owner loads `dist/` in Firefox and Chrome to confirm the crxjs 3 build; push and read the CI run; then the accessibility pass (reduced motion, forced colours, 24px targets).
+- For the other agent: html-validate warns about an optional vitest peer (`^3 || ^4`): harmless. Do not reintroduce a date or a size in the parity serializer output.
 
 ### 2026-10-16 — Codex — Restore the previous release at the owner's request
 - Did: owner explicitly selected `v0.1.0-964e63a` (`97f0f88`) after reporting the merged test build did not work.
