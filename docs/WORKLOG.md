@@ -4,27 +4,9 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## Current state (2026-10-16)
 
-- Branch `master`; F05–F14 implementation `c59f382`, F01–F04 `71691ed`, review `53e5466`.
-  Version 0.1.0; saved audit format **v6**, licence AGPL-3.0-only. Versions 2–5 migrate on load.
-- **Integrated remote master through `97f0f88`:** retains structure tools, page/table reading tabs, hidden-caption reveal,
-  absent-image removal, audited-tab indicator and locate recovery alongside the audit-integrity fixes. Both existing
-  older commit-labelled test ZIPs are retained as historical builds. The combined build is available below.
-- **Test build published:** [v0.1.0-22d0e15](https://github.com/Kounrisu/rgaa-assistant/releases/tag/v0.1.0-22d0e15),
-  compiled from merged source `22d0e15`. Installable ZIP and SHA-256 checksum in `releases/` and GitHub assets;
-  unsigned prerelease for user testing. Extension version remains 0.1.0.
-- **Review F01–F04 implemented:** partial exports are scoped diagnostics without compliance rates or statements;
-  complete reports require reviewed results on every page before conformity wording/a draft statement is offered.
-  Confirmation is tracked per criterion (classification does not confirm answers). Background saves compare persisted
-  revision tokens and expose recoverable conflicts. Empty scans and known omitted content require manual scope decisions,
-  expire those decisions on rescan, and retain detected failures. Explicit NA on detected elements remains valid.
-- **Review F05–F14 implemented and verified:** manual problems link explicitly to criterion
-  verdicts and block final reporting until resolved; HTML preserves image notes; URL edits validate and distinguish
-  address correction (recorded history) from a fresh page (old evidence retained). Ctrl+Alt replaces letter shortcuts;
-  rerenders retain control focus and manual questions have legends. Current decision jumps and named continuation
-  targets reduce navigation repetition. Scans lock identity changes, preserve view navigation and roll back interrupted
-  evidence. French guidance has catalog validation; analysis export previews exact local files with exclusions and honest
-  export-only wording; export scope is explicit. No new dependencies, network calls or scanner rules.
-  Provisional decorative-image counting and visible information/tools are preserved.
+- Branch `master`: restored to the owner-selected previous release `v0.1.0-964e63a` (`97f0f88`).
+  Version 0.1.0; saved audit format **v4**, licence AGPL-3.0-only. This version cannot read v5/v6 audits.
+  Newer work remains recoverable from Git history and the existing branches/tags; browser data is not modified.
 - **Approved toolbar hierarchy implemented (`25afd1e`):** visible Audit / Page auditée / Bilan de la page / Thématiques RGAA /
   Bilan de la thématique / Outils d’affichage labels. Display and highlight controls share a non-collapsible area
   below the theme navigation and summary. One shared theme header replaces repeated headers inside each view.
@@ -58,12 +40,11 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 - **Overlay numbering follow-up (`5f1b1be`):** internal DOM IDs no longer change when audit numbers are assigned.
   A hidden image returning after relabeling cannot collide with another image’s internal ID. Owner reports numbering
   still off after the previous fix; this second defect is reproduced, but the exact real-site symptom is unconfirmed.
-- Latest `npm run check` (2026-10-16): **245 tests in 28 files**, typecheck, **936 texts / 1535 French entries / 0 missing**, build pass.
-  Combined browser suite: **51 tests validated**. Final full run: 50 passed and one Chromium fixture-load error
-  (`ERR_NO_BUFFER_SPACE`, before application code); that export test passed on targeted rerun. Includes upstream
-  reading/structure workflows, six follow-up workflows, light/dark axe and the reviewed 81-screen parity baseline.
-  Built content script: **0 module imports**.
-  Real Firefox, actual DevTools, screen readers and browser zoom remain untested; Asqatasun fixtures were not rerun.
+- Rollback verification (2026-10-16): `npm run check` passes: **221 tests in 26 files**, typecheck,
+  **814 texts / 1375 French entries / 0 missing**, build. Browser suite: **38 passed, 3 failed** on the exact selected tag:
+  audit-level selection timeout, analysis-export navigation timeout, and panel parity mismatch. No application or test
+  changes were added to conceal those failures; source/tests match the requested release. Built content script has
+  **0 module imports**. Real Firefox/DevTools still untested.
 - **Components review (theme 7, APG patterns)** shipped: every ARIA component (tabs, dialog, menu, disclosure / accordion,
   details, combobox, listbox, slider, spinbutton, switch, checkbox, radio group, tree, tooltip, custom button, toolbar) is a
   finding with the structural checks of its WAI-ARIA Authoring Practices pattern run by the script (7.1, pre-filled NC when
@@ -109,14 +90,12 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## In progress (claimed)
 
-- None. Merged test build is published; real-extension validation remains below.
+- None. The requested rollback is complete; the selected release's browser-test failures are recorded above.
 
 ## Next (suggested order; the owner decides)
 
-All F01–F14 corrections are implemented and automatically verified. Next validate the real extension
-in Firefox/DevTools, with assistive technologies and representative audits. Analysis-answer import remains a separate
-planned feature; it is not promised by the export UI. See `docs/ux-ui-code-review-2026-10-15.md` for the implemented
-corrections and remaining manual validation.
+First confirm the restored release works in the owner's browser. Use v4-compatible saved audits or a fresh browser
+profile: the restored version cannot load v5/v6 audits. Preserve newer audit files and decide further fixes separately.
 
 The corrected audit/page navigation, dashboard, explicit next-review controls and selected-page runs are implemented.
 Next verify the actual extension in Firefox/DevTools and collect feedback on a real audit, especially the top-header
@@ -142,8 +121,7 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Known limits and small issues
 
-- Scans read the main document; frames/open shadow roots/truncations require manual scope decisions. No new subtree scanner was added. Closed shadow roots remain undetectable.
-- Old v4 `auto: false` decisions cannot reveal prior implicit confirmations. Existing decisions are preserved; recheck historical audits where that distinction matters.
+- Scans read the main document; content in iframes / shadow roots can be missed (reported, not scanned). Closed shadow roots and cross-origin frames cannot be read.
 - `RGAA_AXE_RUN` without a `rules` list would run every axe rule (the panel always sends the list).
 - Theme 3 draws a box for every contrast finding (at most 200 are listed, so bounded).
 - `areas` of an image map share the box of their `<img>`.
@@ -152,93 +130,22 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 
 ## Handoff log (newest first)
 
-### 2026-10-16 — Codex — Publish the merged test build
-- Did: rebuilt source `22d0e15`, tagged it `v0.1.0-22d0e15`, and published a GitHub prerelease with
-  `rgaa-assistant-0.1.0-22d0e15.zip` (594,208 bytes) plus its SHA-256 checksum. Added both files to `releases/`
-  and linked the current build/install instructions in `releases/README.md`. Existing tags/archives are preserved.
-- State: fresh `npm run check` passes (245 tests in 28 files, typecheck, 936 texts / 1535 French entries / 0 missing,
-  build). Verified ZIP CRCs and all 27 file bytes against `dist/`, root manifest, required entry points and zero
-  content-script module imports. SHA-256: `cd8ea83644bff7d26484e40e1a26f3f165a3f4aabca4a7432bf205069566be53`.
-  Browser verification is the preceding merge's 51 cases; not rerun because application source is unchanged.
-- Next: owner loads the ZIP in Firefox or its extracted folder in Chrome/Edge, reloads the page, and tests the
-  actual DevTools panel. Real Firefox/DevTools and assistive technologies were not tested here.
-- For the other agent: the tag points to the source commit; the later packaging commit only adds release files/docs.
-  Unsigned test prerelease, manifest version 0.1.0, saved format v6. Download the ZIP asset, not GitHub's source archive.
-
-### 2026-10-16 — Codex — Merge audit fixes with current master
-- Did: combined fix-branch tip `7d76297` (implementations `71691ed`, `c59f382`) with remote-master tip `97f0f88`.
-  Preserved structure tools, reading tabs, hidden-caption reveal, absent-image removal and audited-tab improvements.
-  Resolved additive CSS and handoff conflicts by keeping both contributions. Kept both commit-labelled test ZIPs;
-  they remain historical builds, not packages of this merged source. The checkpoint tag is unchanged.
-- State: `npm run check` passes: 245 tests in 28 files, typecheck, 936 texts / 1535 French entries / 0 missing, build.
-  Content script has zero module imports. All 51 browser cases validated: final full run passed 50, with one
-  `ERR_NO_BUFFER_SPACE` on the local fixture's initial navigation before app code; the export case then passed alone.
-  The previous full run passed all 50 functional tests and failed only the expected pre-integration screen baseline.
-  Reviewed every distinct full-DOM difference before updating it: audited-tab chip, structure/reading controls,
-  renamed caption tool and capture sizes. Final parity passes with no normalizer or assertion relaxed.
-- Next: real Firefox/DevTools, screen readers, zoom/forced colours, representative audits and novice/expert sessions.
-  These were not tested here; Asqatasun fixtures were not rerun (322/328 is historical).
-- For the other agent: use master for this combined state. Automatic suggestions still require human confirmation;
-  preserve the owner's provisional decorative-image counting and visible information/tools. Both histories are retained.
-
-### 2026-10-15 — Codex — Remaining review corrections F05–F14
-- Did: implemented after checkpoint `pre-review-followups-2026-10-15` (`1c15fd1`), following F01–F04 (`71691ed`).
-  Manual observations now link explicitly to confirmed criterion decisions and block final reporting while unresolved;
-  image notes survive HTML export; URL edits validate and preserve evidence with explicit correction history or a fresh page.
-  Keyboard shortcuts require modifiers; rerenders preserve control focus; manual groups have legends; current-decision
-  jumps and concrete next targets reduce repeated navigation. Scans preserve view changes, lock identity and discard
-  interrupted results. Dynamic guidance is translated and checked. Analysis packs preview exact files and optional
-  exclusions before local saving, with honest export-only wording. Pure export helpers receive the audit scope explicitly.
-  Format v6 migrates v2–v5 without inventing manual links or URL history. README, review and round-trip plan updated.
-- State: `npm run check` passes: 245 tests in 28 files, typecheck, 910 texts / 1500 French entries / 0 missing, build.
-  Full `npm run test:e2e` passes: 48 tests (3.3 minutes), including six new workflows, exact preview/ZIP bytes,
-  light/dark axe and the 81-screen parity baseline. Built content script has zero module imports. No new dependencies,
-  network calls or scanner rules. Visually inspected export preview and the focused decision at 320 CSS pixels.
-- Parity: reviewed intended navigation, manual-question, focus-key and continuation changes in full DOM dumps.
-  Verification exposed assistant overlays contaminating finding context; `dom-utils.ts` now strips them before
-  truncation, as image capture already did. The content fixture changes contain only 22 cleaned context HTML excerpts;
-  findings, suggestions and overlay responses are unchanged. This also removes the Structure overlay timing flake.
-- Not tested: real Firefox, actual DevTools lifecycle, screen readers, real 200%/400% zoom, forced colours,
-  representative large audits, or novice/expert user sessions. Asqatasun fixtures were not rerun (322/328 is historical).
-- Next: validate those real-extension workflows; model-answer import/apply remains a separate planned feature.
-- For the other agent: preserve the owner's provisional decorative-image counting and initially visible information/tools.
-  Automatic suggestions still require human verdicts. The checkpoint remains unchanged. Implementation commit: `c59f382`.
-
-### 2026-10-15 — Codex — Four priority audit-integrity corrections
-- Did: implementation commit `71691ed` on `codex/audit-integrity-fixes`. F01 gates report/rate output by scope and
-  completion; F02 tracks individual pending answers; F03 checks persisted revision tokens and offers conflict recovery;
-  F04 requires manual scope decisions for missing/omitted elements. Added v5 migration/validation, French strings,
-  domain/session/browser regressions, README instructions, and the F05–F14 remaining-work list in the review.
-- State: `npm run check` passes: 237 unit tests, typecheck, 788 texts / 1356 French entries / 0 missing, production build.
-  Full `npm run test:e2e` passes: 42 tests, including the four new workflows and light/dark axe. Built content script:
-  zero module imports. No new dependencies, network calls or scanner-rule changes. Local commits only; not pushed.
-- Parity: inspected the full DOM dump and updated the intended changes in confirmation notices/counts, missing-element
-  scope cards, result tables and report messaging. The baseline now covers 81 screens. Normalized the workbook's
-  calendar date so it does not change the hash each day. The scan helper now waits for the completion message;
-  the previous negative check could return during preview capture and made the audit-pack test race.
-- Not tested: real Firefox, actual DevTools/lifecycle, screen readers, real 200%/400% zoom, forced colours, production-scale
-  audits, external vulnerability auditing, or the downloaded Asqatasun fixtures (322/328 remains historical).
-- Next: F05–F09 first (manual-observation decisions, report image notes, URL/evidence identity, shortcuts, focus/groups),
-  then F10–F14 (density within owner constraints, scan/navigation lifecycle, dynamic translations, LLM payload/workflow,
-  pure export scope). Validate the actual extension before claiming production audit readiness.
-- For the other agent: preserve the owner's provisional decorative-image counting and visible-information decisions.
-  Old `auto: true` answers remain pending after migration. Old implicit confirmations cannot be reconstructed from an
-  `auto: false` flag; recheck affected historical audits. No subtree scanning was added. Manual scope decisions are tied
-  to the last scan timestamp and must be renewed after rescanning. Do not present the Chromium/axe pass as RGAA certification.
-
-### 2026-10-15 — Codex — Comprehensive UX UI and code review
-- Did: reviewed `236c837` from developer, inexperienced auditor and experienced auditor perspectives. Added
-  `docs/ux-ui-code-review-2026-10-15.md` and `docs/review-evidence-2026-10-15/` (two screenshots and browser/domain observations).
-  Updated the stale top-level branch/check summary. Documentation only; product code and parity baseline unchanged.
-- State: `npm run check` passed (221 tests, 0 missing translations, typecheck/build); full e2e 36 passed / 2 failed (audit-pack and parity).
-  Audit-pack passed in an isolated rerun. Existing light/dark axe test passed. Content bundle has no module imports.
-  Browser observations use the existing Chromium fixture harness; pure probes reproduce export and same-audit persistence defects.
-- Not tested: real Firefox/DevTools, screen reader, real zoom/text spacing/forced-colours interaction, production-scale audits,
-  external vulnerability audit, Asqatasun fixture suite. The earlier 322/328 remains historical.
-- Next: prioritize F01–F04 (report eligibility, individual confirmation, concurrent saves, scan coverage/applicability), then the
-  manual workflow, export-note preservation, accessibility and density findings. Fix scan lifecycle/test waiting before relying on parity.
-- For the other agent: preserve visible information/display tools and the owner's decorative-image counting decision. The 21st
-  missing-alt warning was a source-comment false positive. Do not describe this review or axe pass as full RGAA certification.
+### 2026-10-16 — Codex — Restore the previous release at the owner's request
+- Did: owner explicitly selected `v0.1.0-964e63a` (`97f0f88`) after reporting the merged test build did not work.
+  Reverted packaging `91b5500`, then integration `22d0e15` relative to its second parent (`97f0f88`), without
+  rewriting history. Every tracked file matches the selected tag except this worklog. Source, tests, baseline and
+  the original test ZIP are restored unchanged. Newer fixes remain in history, `codex/audit-integrity-fixes`,
+  and the existing tags. No browser storage or saved audit file was modified.
+- State: `npm run check` passes: 221 tests in 26 files, typecheck, 814 texts / 1375 French entries / 0 missing, build.
+  Full browser suite: 38 passed, 3 failed. Audit-level selection times out after its target becomes unstable;
+  analysis export times out after its button becomes hidden; parity differs from the historical hashes.
+  These failures were observed with exact tag code/tests. No assertion or baseline was relaxed to report success.
+  Content script has zero module imports. Real Firefox/DevTools, assistive technologies and Asqatasun fixtures not tested.
+- Next: owner tests the restored release. Original built download:
+  https://github.com/Kounrisu/rgaa-assistant/releases/download/v0.1.0-964e63a/rgaa-assistant-0.1.0-964e63a.zip
+- For the other agent: saved format is v4 again; v5/v6 audits cannot be opened here. Preserve newer files rather than
+  editing their version numbers or clearing storage. The owner was told to use an older backup or fresh profile.
+  Reintroducing fixes is separate work; do not silently reapply them while testing this rollback.
 
 ### 2026-10-14 — Claude Code — Page reading, table reading and structure preview open in a browser tab
 - Did: the three views no longer use small popins: the panel stores the result (`chrome.storage.local`, key `rgaa-view-data`) and opens `src/reading/reading.html` in a tab (like the RGAA coverage page): full-width transcript with a "show only the lines marked ⚠" filter, or a full-height sandboxed frame for the structure preview. New: `src/reading/*`, `src/panel/open-view.ts`; removed: `reading-view.ts` and the two dialogs; new rollup entry `reading` in `vite.config.ts`. The e2e harness gives the reading page a storage stand-in.
@@ -271,16 +178,6 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
   NOT tested: real Firefox/DevTools (tab events, banner, focusing the window); the stand-in has no tab events, so the banner is untested.
 - Next: test the banner in real Chrome and Firefox with DevTools undocked; an e2e test for the remove popin.
 - For the other agent: the shell default is Node 10; use Node 22 (`~/.nvm/versions/node/v22.16.0/bin`).
-
-### 2026-10-13 — Claude Code — RGAA self-audit, skip link and new-tab notices
-- Did: self-audit in `docs/RGAA-SELF-AUDIT-2026-10-13.md`. Fixed: skip link to the main content on the panel and the coverage page (12.7);
-  hidden "(opens in a new tab)" text on every `target="_blank"` link (13.2, helper `newTabNote()` in `dom.ts`); `prefers-reduced-motion` and
-  `forced-colors` rules; coverage page `lang="fr"` by default. French in `i18n-fr-a11y.ts`. Parity baseline updated (every screen gains the skip link).
-- State: `npm run check` passes (221 unit tests, 0 missing translations); `panel-a11y` axe e2e passes. Full e2e: all pass except two tests that were already
-  flaky before this change (`audit-level` "asks exactly its criteria" failed 3 of 5 runs on the untouched code too; parity screen
-  "theme 9 Structure 0/4, checklist verdict clicked" gives a different hash on each run, 2 screens already differed from the baseline before this change).
-- Not tested: keyboard walk-through, 400 % zoom and text spacing (items 3, 5, 8 of the audit), screen reader, real Firefox/DevTools.
-- Next: those untested items; make the two flaky tests deterministic.
 
 ### 2026-10-13 — Claude Code — the panel passes axe (light and dark), first accessibility pass (UX plan WP8, started)
 - Did: ran axe (WCAG 2.x A/AA + best practice) on every main view: 4 failing rules at first (colour contrast near misses 4.2-4.35:1 on pills/outcomes, theme tabs white on amber/lime/cyan, no `<main>`

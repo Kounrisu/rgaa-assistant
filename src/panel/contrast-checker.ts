@@ -1,4 +1,3 @@
-import { confirmAnswer } from '../lib/review-confirmation'
 /**
  * The colours of a contrast finding: the ratio and the verdict it implies, and the checker card with its colour picker.
  */
@@ -49,7 +48,7 @@ export function applyContrastVerdict(f: FindingItem, review: ImageReview, setVer
   if (!out) return
   if (setVerdict) {
     review.answers['3.2'] = out.ok ? 'c' : 'nc'
-    confirmAnswer(review, '3.2')
+    review.auto = false
   }
   const mine = !review.note.trim() || review.note === review.autoNote
   if (!mine) return

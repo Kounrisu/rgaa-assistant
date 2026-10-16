@@ -47,10 +47,8 @@ export interface ImageReview {
   kind?: ImageKind
   answers: Record<string, Verdict>
   note: string
-  /** At least one stored answer is a suggestion. Legacy reviews apply this to every answer. */
+  /** Pre-filled from the markup; cleared as soon as the user touches the answer. */
   auto?: boolean
-  /** Criteria whose stored answers are still automatic suggestions. */
-  pendingAnswers?: string[]
   /** Colours checked by hand for a contrast finding (hex), overriding what the script read. */
   fg?: string
   bg?: string
@@ -90,8 +88,6 @@ export interface ChecklistAnswer {
    * fallback, the conciseness of an alternative…). It lifts the “partial coverage” of the criterion; it is never set by a tool.
    */
   manualTests?: boolean
-  /** Scan timestamp covered by the manual verdict for absent/omitted elements. */
-  coverageAt?: number
   /** What the automatic checks found for this criterion, by tool, at the last run. */
   autoResults?: Record<string, { result: 'pass' | 'fail'; rules: string[]; /** What was seen (e.g. the doctype found). */ details?: string[] }>
 }
@@ -120,8 +116,6 @@ export interface ImportReport {
 export interface ManualCheckAnswer {
   state: 'ok' | 'issue'
   note: string
-  /** Criterion explicitly linked by the auditor; a confirmed NC must still be recorded there. */
-  criterion?: string
 }
 
 export interface AutomaticRun {
@@ -133,8 +127,6 @@ export interface AutomaticRun {
 }
 
 export interface PageRecord {
-  /** Previous addresses explicitly corrected by the auditor, with original evidence retained. */
-  urlHistory?: { url: string; at: number }[]
   /** Latest full automatic run; absent on older audits (history is not proof of a complete run). */
   automaticRun?: AutomaticRun
   /** What the last scans did not look at (frames, shadow roots) and where they cut a list. */
@@ -178,9 +170,7 @@ export interface AuditMeta {
 }
 
 export interface Audit {
-  version: 6
-  /** Optimistic concurrency token, assigned only by the persistence authority. */
-  storageToken?: string
+  version: 4
   /** Stable identifier: the same audit keeps it through renames, file saves and re-imports. */
   id: string
   name: string

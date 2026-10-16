@@ -1,4 +1,3 @@
-import { confirmAnswer, isSuggested } from '../lib/review-confirmation'
 import { reviewActions } from './review-controls'
 import { previewBackgroundControl } from './preview-bg'
 import { previewOf } from '../lib/url-safety'
@@ -239,7 +238,6 @@ export function renderDetailNow(): void {
     codeBlock(t('Context (parent markup)'), el.contextHtml, t('Yellow line = the image. Orange attributes are the ones assistive technologies read.')),
   )
 
-  decision.append(h('p', { class: 'decision-name hint-line' }, t('Accessible name: {name}', { name: el.accessibleName || t('None') })))
   const banner = problemBanner(el, review)
   if (banner) decision.append(banner)
   decision.append(renderKindPicker(el, review))
@@ -276,7 +274,7 @@ export function problemBanner(el: Item, review: ImageReview): HTMLElement | null
   const t12 = testIdFor('1.2', el)
   const apply = (kind: ImageKind, criterion: string, note: string) => () => {
     review.kind = kind
-    confirmAnswer(review, criterion)
+    review.auto = false
     review.answers[criterion] = 'nc'
     if (!review.note.trim()) review.note = note
     saveReviews()
@@ -322,7 +320,7 @@ export function renderKindPicker(el: Item, review: ImageReview): HTMLElement {
       checked: review.kind === value,
       onclick: () => {
         review.kind = value
-        // Classifying the image does not confirm any criterion.
+        review.auto = false
         saveReviews()
         const host = $('criteria')
         renderCriteria(el, review, host)
@@ -354,7 +352,7 @@ export function renderKindPicker(el: Item, review: ImageReview): HTMLElement {
 
 export function renderCriteria(el: Item, review: ImageReview, host: HTMLElement): void {
   host.replaceChildren()
-  const applicable = criteriaFor(review.kind, state.audit.meta.level)
+  const applicable = criteriaFor(review.kind)
   if (!applicable.length) {
     host.append(h('p', { class: 'hint-line' }, review.kind ? t('None of the criteria of this kind of image belongs to the chosen audit type.') : t('Choose informative or decorative to see the RGAA criteria that apply.')))
     return
@@ -376,7 +374,7 @@ export function criterionCard(el: Item, review: ImageReview, criterion: Criterio
       checked: review.answers[criterion.id] === value,
       onclick: () => {
         review.answers[criterion.id] = value
-        confirmAnswer(review, criterion.id)
+        review.auto = false
         card.dataset.state = value
         card.querySelector('.prefill-note')?.remove()
         saveReviews()
@@ -398,7 +396,7 @@ export function criterionCard(el: Item, review: ImageReview, criterion: Criterio
     h('p', { class: 'official' }, criterion.title),
     h('ul', { class: 'checks' }, ...criterion.checks.map((c) => h('li', {}, t(c)))),
     ...(hint ? [h('p', { class: `hint ${hint.tone}` }, hint.text)] : []),
-    ...(isSuggested(review, criterion.id) ? [h('p', { class: 'hint info prefill-note' }, t('Pre-filled from the page. Click your answer to confirm it, or change it.'))] : []),
+    ...(review.auto ? [h('p', { class: 'hint info prefill-note' }, t('Pre-filled from the markup (alt="", aria-hidden or role="presentation"). Click Compliant to confirm the image really is decorative, or change the answer if the developer made a mistake.'))] : []),
     h(
       'fieldset',
       {},
@@ -414,7 +412,7 @@ export function criterionCard(el: Item, review: ImageReview, criterion: Criterio
 export function criteriaProgressText(el: Item): string {
   const review = state.reviews[reviewKey(el)]
   if (!review?.kind) return ''
-  const list = criteriaFor(review.kind, state.audit.meta.level)
+  const list = criteriaFor(review.kind)
   const open = list.find((c) => review.answers[c.id] === undefined)
   const done = list.length - list.filter((c) => review.answers[c.id] === undefined).length
   const text = open ? t('{done}/{total} criteria of this image answered · next: {id}', { done, total: list.length, id: open.id }) : t('{done}/{total} criteria of this image answered', { done, total: list.length })

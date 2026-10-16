@@ -1,6 +1,3 @@
-import { FR_FOLLOWUPS } from './i18n-fr-followups'
-import { FR_GUIDANCE } from './i18n-fr-guidance'
-import { FR_INTEGRITY } from './i18n-fr-integrity'
 import { FR_WORKFLOW } from './i18n-fr-workflow'
 import { FR_PANEL } from './i18n-fr-panel'
 import { FR_LIB } from './i18n-fr-lib'
@@ -13,13 +10,9 @@ import { FR_MANUAL } from './i18n-fr-manual'
 import { FR_STYLES } from './i18n-fr-styles'
 import { FR_TODO } from './i18n-fr-todo'
 import { FR_PACK } from './i18n-fr-pack'
-import { FR_A11Y } from './i18n-fr-a11y'
 
 /** French texts, keyed by the English text used in the code. */
 export const FR: Record<string, string> = {
-  ...FR_FOLLOWUPS,
-  ...FR_GUIDANCE,
-  ...FR_INTEGRITY,
   ...FR_WORKFLOW,
   ...FR_LIB,
   ...FR_PANEL,
@@ -32,6 +25,5 @@ export const FR: Record<string, string> = {
   ...FR_STYLES,
   ...FR_TODO,
   ...FR_PACK,
-  ...FR_A11Y,
   // audit bar and audits screen are in i18n-fr-panel.ts
 }

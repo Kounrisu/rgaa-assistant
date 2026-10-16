@@ -1,7 +1,7 @@
 # Plan: an "audit pack" for an LLM, and a way to bring its answers back
 
 Written 2026-10-13 by Claude Code, from the owner's request: *export all the data available (code, photos of the elements) so that an LLM
-can check everything, then complete the saved file and import it back into the app.* The original proposal follows. Current implementation status (15 October 2026): ZIP export and the answers parser exist; the panel now previews the exact local files, offers field exclusions and defaults pictures off. Importing/applying model answers in the panel remains unimplemented. Read `AGENTS.md` first.
+can check everything, then complete the saved file and import it back into the app.* Plan only, nothing built. Read `AGENTS.md` first.
 
 ## 0. What already exists (checked on a real saved audit, `banque-france-fr_banque-de-france_2026-10-13.rgaa.json`, 4.7 MB)
 

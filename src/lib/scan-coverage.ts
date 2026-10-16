@@ -51,7 +51,3 @@ export function coverageLines(c: ScanCoverage): string[] {
   }
   return out
 }
-
-/** Unknown closed roots are a standing limitation; known omitted content requires manual review. */
-export const hasScanGaps = (scan: ScanCoverage | undefined): boolean => Boolean(scan &&
-  (scan.frames.total || scan.openShadowRoots || scan.truncated.some(x => x.total === null || x.total > x.shown)))

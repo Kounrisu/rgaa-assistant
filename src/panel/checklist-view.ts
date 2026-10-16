@@ -7,7 +7,7 @@ import { IMAGE_CRITERION_IDS } from '../lib/rgaa'
 import { inActiveLevel } from '../lib/audit-levels'
 import { state } from './state'
 import type { ChecklistAnswer, ChecklistVerdict } from '../lib/types'
-import { h, dom, newTabNote } from './dom'
+import { h, dom } from './dom'
 import { t } from '../lib/i18n'
 import { themeByNumber, FINDING_THEMES } from '../lib/themes'
 import { pageInput, persist } from './model'
@@ -46,7 +46,6 @@ export function renderChecklist(host: HTMLElement = dom.themeEl): void {
   if (!state.page || !def) return
   const rec = state.page
   const result = pageInput(rec).themes.find((t) => t.number === state.theme)!
-  const hasManualScope = result.criteria.some(c => c.manualReview)
   const autoLabel = { auto: t('Automatic'), semi: t('Semi-automatic'), manual: t('Manual') } as const
 
   host.append(
@@ -56,25 +55,21 @@ export function renderChecklist(host: HTMLElement = dom.themeEl): void {
       h(
         'div',
         {},
-        ...(perElementTheme() ? [h('h3', {}, hasManualScope ? t('Manual scope checks and other criteria') : t('Other criteria of this theme'))] : []),
-        h('p', { class: 'hint-line' }, hasManualScope ? t('Review these criteria across the whole page, including content outside the scan.') : perElementTheme() ? t('Criteria {ids} are not detectable by a script: check them on {url}.', { ids: def.criteria.filter((x) => !perFindingIds().includes(x.id) && inActiveLevel(x.id)).map((x) => x.id).join(', '), url: rec.url }) : t('{n} criteria. Check them on {url} and answer each one. Nothing to scan for this theme.', { n: def.criteria.filter((x) => inActiveLevel(x.id)).length, url: rec.url })),
+        ...(perElementTheme() ? [h('h3', {}, t('Other criteria of this theme'))] : []),
+        h('p', { class: 'hint-line' }, perElementTheme() ? t('Criteria {ids} are not detectable by a script: check them on {url}.', { ids: def.criteria.filter((x) => !perFindingIds().includes(x.id) && inActiveLevel(x.id)).map((x) => x.id).join(', '), url: rec.url }) : t('{n} criteria. Check them on {url} and answer each one. Nothing to scan for this theme.', { n: def.criteria.filter((x) => inActiveLevel(x.id)).length, url: rec.url })),
       ),
     ),
   )
   const list = h('div', { class: 'checklist' })
   const perFinding = perFindingIds()
-  for (const c of def.criteria.filter((x) => (!perFinding.includes(x.id) || result.criteria.find(c => c.id === x.id)?.manualReview) && inActiveLevel(x.id))) {
+  for (const c of def.criteria.filter((x) => !perFinding.includes(x.id) && inActiveLevel(x.id))) {
     const answer = (rec.checklist[c.id] ??= { note: '' })
-    const computed = result.criteria.find((x) => x.id === c.id)
-    const outcome = computed?.outcome
-    const manual = Boolean(computed?.manualReview)
-    const currentVerdict = !manual || answer.coverageAt === (rec.scanCoverage?.at ?? 0) ? answer.verdict : undefined
-    const card = h('div', { class: 'card criterion', 'data-state': currentVerdict ?? '', id: `crit-card-${c.id}` })
+    const outcome = result.criteria.find((x) => x.id === c.id)?.outcome
+    const card = h('div', { class: 'card criterion', 'data-state': answer.verdict ?? '', id: `crit-card-${c.id}` })
     const conflicts = h('div', { class: 'evidence-conflicts', 'aria-live': 'polite' })
     const refreshConflicts = () => conflicts.replaceChildren(...evidenceConflictsOf(answer).map((x) => h('p', { class: 'hint warn' }, t('Conflicting evidence: {x}.', { x }))))
     const setVerdict = (value: ChecklistVerdict) => {
       confirmVerdict(answer, value)
-      if (manual) answer.coverageAt = rec.scanCoverage?.at ?? 0
       card.querySelector('.source-note')?.remove()
       card.dataset.state = value
       card.classList.remove('todo')
@@ -89,7 +84,7 @@ export function renderChecklist(host: HTMLElement = dom.themeEl): void {
     const verdict = (value: ChecklistVerdict, label: string) => [
       h('input', {
         type: 'radio', name: `chk-${c.id}`, id: `chk-${c.id}-${value}`, value,
-        checked: currentVerdict === value,
+        checked: answer.verdict === value,
         onchange: () => setVerdict(value),
       }),
       h('label', { for: `chk-${c.id}-${value}` }, label),
@@ -100,11 +95,10 @@ export function renderChecklist(host: HTMLElement = dom.themeEl): void {
         { class: 'criterion-head' },
         h('span', { class: 'crit-id' }, `RGAA ${c.id}`),
         h('span', { class: `badge ${c.automation}` }, autoLabel[c.automation]),
-        h('a', { class: 'crit-link', href: `https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/#${c.id}`, target: '_blank', rel: 'noreferrer' }, t('Official tests ↗'), newTabNote()),
+        h('a', { class: 'crit-link', href: `https://accessibilite.numerique.gouv.fr/methode/criteres-et-tests/#${c.id}`, target: '_blank', rel: 'noreferrer' }, t('Official tests ↗')),
       ),
       h('p', { class: 'question' }, c.title.replace(/`/g, '')),
-      h('p', { class: 'hint info' }, t(c.note)),
-      ...(manual ? [h('p', { class: 'hint warn' }, t('Manual scope check: no relevant element was detected, or the scan skipped content. Inspect the whole page, including frames, shadow content and truncated results. Record your decision for this missing coverage; detected failures remain recorded. A new scan requires a new decision.'))] : []),
+      h('p', { class: 'hint info' }, c.note),
       ...autoHints(answer),
       ...(!answer.verdict && answer.suggested
         ? [

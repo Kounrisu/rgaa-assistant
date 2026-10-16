@@ -1,6 +1,3 @@
-import type { ScanCoverage } from './scan-coverage'
-import { hasScanGaps } from './scan-coverage'
-import { isSuggested } from './review-confirmation'
 import { levelCriteria, type AuditLevel } from './audit-levels'
 import { t as tr } from './i18n'
 import theme1 from './rgaa-theme1.json'
@@ -101,8 +98,6 @@ export interface CriterionResult {
   /** Evidence that disagrees (tools against each other, a tool failure against a human "compliant"). */
   conflicts?: string[]
   /** Non-compliant findings with their notes (frames, colours). */
-  /** Needs a manual judgement for absent elements or content outside the scan. */
-  manualReview?: boolean
   ncRefs?: { id: number; label: string; note: string }[]
 }
 export interface Theme1Results {
@@ -159,10 +154,10 @@ function testOutcome(
     if (!verdict) pending++
     else {
       answered.push(el.id)
-      if (isSuggested(review, criterion)) unconfirmed = true
+      if (review.auto) unconfirmed = true
       if (verdict === 'nc') {
         nc.push(el.id)
-        if (!isSuggested(review, criterion)) humanNc = true
+        if (!review.auto) humanNc = true
       }
       if (verdict === 'c') compliant++
     }
@@ -234,7 +229,6 @@ export interface FindingInputs {
   findings: FindingItem[]
   reviews: Record<string, ImageReview>
   scannedThemes: number[]
-  scanCoverage?: ScanCoverage
 }
 
 /** Outcome of one criterion over the findings of a theme. Never scanned means undecided. */
@@ -250,11 +244,11 @@ function findingOutcome(theme: number, criterion: string, input: FindingInputs):
   const ncRefs: { id: number; label: string; note: string }[] = []
   for (const f of list) {
     const verdict = input.reviews[f.key]?.answers[criterion]
-    if (verdict && isSuggested(input.reviews[f.key], criterion)) unconfirmed = true
+    if (verdict && input.reviews[f.key]?.auto) unconfirmed = true
     if (!verdict) pending++
     else if (verdict === 'nc') {
       ncRefs.push({ id: f.id, label: f.label, note: input.reviews[f.key]?.note?.trim() ?? '' })
-      if (!isSuggested(input.reviews[f.key], criterion)) humanNc = true
+      if (!input.reviews[f.key]?.auto) humanNc = true
     } else if (verdict === 'c') compliant++
   }
   const flag = unconfirmed ? { unconfirmed } : {}
@@ -300,15 +294,18 @@ export function computeThemes(
         name: theme.name,
         selected: isSelected,
         // never scanned: nothing can be called "not applicable" yet
-        criteria: imageResults.criteria.map((c): CriterionResult => {
-          if (!isSelected) return { id: c.id, title: c.title, outcome: 'unassessed', tests: [], coverage: 'none' }
-          if (c.tests.length && c.tests.every(x => x.outcome === 'unassessed')) return { ...c, ...checklistOutcome(checklist[c.id]), coverage: 'full' }
-          if (!fi.scannedThemes.includes(1)) return { ...c, outcome: 'pending' }
-          const hasRelevantImage = images.some(el => (!reviewOf(el)?.kind || reviewOf(el)?.kind === CRITERION_KIND[c.id]) && c.tests.some(test => test.imageIds.includes(el.id)))
-          const needsManual = !hasRelevantImage || hasScanGaps(fi.scanCoverage)
-          const covered = c.coverage === 'partial' && checklist[c.id]?.manualTests ? { ...c, coverage: 'full' as Coverage } : c
-          return needsManual ? withManualCoverage(covered, checklist[c.id], fi.scanCoverage) : covered
-        }),
+        criteria: imageResults.criteria.map((c) =>
+          !isSelected
+            ? { id: c.id, title: c.title, outcome: 'unassessed' as Outcome, tests: [], coverage: 'none' as Coverage }
+            : // no per-image question exists for it (1.4, 1.5): the auditor answers it for the page, like a checklist criterion
+              c.tests.length && c.tests.every((x) => x.outcome === 'unassessed')
+              ? { ...c, ...checklistOutcome(checklist[c.id]), coverage: 'full' as Coverage }
+              : !fi.scannedThemes.includes(1) && c.outcome === 'na'
+                ? { ...c, outcome: 'pending' as Outcome }
+                : c.coverage === 'partial' && (checklist[c.id]?.manualTests || images.length === 0)
+                  ? { ...c, coverage: 'full' as Coverage } // checked by hand by the auditor, or nothing on the page for those tests to apply to
+                  : c,
+        ),
       }
     }
     const perFinding = (FINDING_CRITERIA[theme.number] ?? []).map((c) => c.id)
@@ -318,13 +315,7 @@ export function computeThemes(
       selected: isSelected,
       criteria: theme.criteria.map((c) => {
         if (!isSelected) return { id: c.id, title: c.title, outcome: 'unassessed' as Outcome, tests: [], coverage: 'none' as Coverage }
-        if (perFinding.includes(c.id)) {
-          const result: CriterionResult = { id: c.id, title: c.title, tests: [], coverage: 'full', ...findingOutcome(theme.number, c.id, fi) }
-          const definition = FINDING_CRITERIA[theme.number].find(x => x.id === c.id)!
-          const hasElements = fi.findings.some(f => f.theme === theme.number && (!definition.types || definition.types.includes(f.type)))
-          return fi.scannedThemes.includes(theme.number) && (!hasElements || hasScanGaps(fi.scanCoverage))
-            ? withManualCoverage(result, checklist[c.id], fi.scanCoverage) : result
-        }
+        if (perFinding.includes(c.id)) return { id: c.id, title: c.title, tests: [], coverage: 'full' as Coverage, ...findingOutcome(theme.number, c.id, fi) }
         return { id: c.id, title: c.title, tests: [], coverage: 'full' as Coverage, ...checklistOutcome(checklist[c.id]) }
       }),
     }
@@ -332,18 +323,4 @@ export function computeThemes(
   // a partial audit level counts only its own criteria (the other ones stay answerable but are outside its progress and rate)
   const scope = levelCriteria(level)
   return { themes: scope ? themes.map((t) => ({ ...t, criteria: t.criteria.filter((c) => scope.has(c.id)) })) : themes, images: imageResults }
-}
-
-/** A scan cannot decide that an absent element, or content it skipped, is not applicable. */
-function withManualCoverage(result: CriterionResult, answer: ChecklistAnswer | undefined, scan: ScanCoverage | undefined): CriterionResult {
-  const verdict = answer?.coverageAt === (scan?.at ?? 0) ? answer.verdict : undefined
-  if (!verdict) return {
-    ...result, manualReview: true, coverage: 'partial',
-    outcome: result.outcome === 'nc' ? 'nc' : 'pending',
-    ...(result.outcome === 'na' ? { suggested: 'na' as const } : {}),
-  }
-  const outcome = result.outcome === 'nc' || verdict === 'nc' ? 'nc' : result.outcome === 'pending' ? 'pending' : result.outcome === 'c' || verdict === 'c' ? 'c' : 'na'
-  return { ...result, outcome, manualReview: true, coverage: 'full',
-    ...(verdict === 'nc' ? { unconfirmed: false } : {}),
-  }
 }

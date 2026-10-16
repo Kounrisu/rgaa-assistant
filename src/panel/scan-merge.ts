@@ -1,4 +1,3 @@
-import { suggestAnswer, isSuggested } from '../lib/review-confirmation'
 /**
  * How a scan joins what the page already holds: images (mergeScan) and findings (mergeFindings).
  * Ids, answers and the verdicts pre-filled from the markup are kept or set here.
@@ -48,7 +47,7 @@ export function mergeFindings(themeNo: number, raw: RawFinding[]): { map: { from
   // or an answer they gave (an answer pre-filled by the scan does not count).
   const worked = (f: FindingItem) => {
     const r = rec.findingReviews[f.key]
-    return Boolean(r && ((r.note.trim() && r.note !== r.autoNote) || Object.keys(r.answers).some(id => !isSuggested(r, id))))
+    return Boolean(r && ((r.note.trim() && r.note !== r.autoNote) || (!r.auto && Object.keys(r.answers).length)))
   }
   for (const f of rec.findings.filter((x) => x.theme === themeNo && !seen.has(x.key) && !worked(x))) delete rec.findingReviews[f.key]
   rec.findings = rec.findings.filter((x) => x.theme !== themeNo || seen.has(x.key) || worked(x))
@@ -75,12 +74,15 @@ export function mergeFindings(themeNo: number, raw: RawFinding[]): { map: { from
   for (const f of rec.findings) {
     if (f.theme !== themeNo || !f.present) continue
     const review = (rec.findingReviews[f.key] ??= { answers: {}, note: '' })
+    let filled = false
     for (const [c, v] of Object.entries(suggestFinding(f))) {
       if (review.answers[c] === undefined) {
-        suggestAnswer(review, c, v)
+        review.answers[c] = v
+        filled = true
       }
     }
     if (f.type === 'contrast-fail' && !review.note.trim()) applyContrastVerdict(f, review, false)
+    if (filled) review.auto = true
   }
   // Numbers follow the page (reading order of the latest scan), like the images; answers follow the element through its key.
   // The unnumbered “text that passes” line of Colours keeps 0.
@@ -115,12 +117,14 @@ export function prefill(el: Item): void {
     const decorativeWithoutVerdict = review.kind === 'decorative' && review.answers['1.2'] === undefined
     if (!untouched && !decorativeWithoutVerdict) return
     review.kind = 'decorative'
-    suggestAnswer(review, '1.2', 'c')
+    review.answers['1.2'] = 'c'
+    review.auto = true
     return
   }
   if (!untouched) return
   review.kind = 'informative'
-  suggestAnswer(review, '1.1', el.accessibleName ? 'c' : 'nc')
+  review.answers['1.1'] = el.accessibleName ? 'c' : 'nc'
+  review.auto = true
 }
 
 /** Merges a scan into the current page. Returns the new count and the renumbering for the page's boxes. */

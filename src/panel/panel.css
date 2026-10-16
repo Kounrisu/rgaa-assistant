@@ -863,22 +863,6 @@ body[data-view="audits"] :is(.pagebar,.page-progress,#display-tools,#nav-banner,
 .item .num { color: color-mix(in srgb, var(--tc) 65%, black); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .item .num { color: color-mix(in srgb, var(--tc) 50%, white); } }
 
-.skip-link { position: absolute; left: 8px; top: -100px; z-index: 100; padding: 8px 14px; border-radius: 8px; background: var(--surface); color: var(--text); border: 2px solid var(--accent); font-weight: 600; text-decoration: none; }
-.skip-link:focus { top: 8px; }
-#main-content:focus { outline: none; }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }
-@media (forced-colors: active) { .meter, .progress .meter { border: 1px solid CanvasText; } .meter i { background: Highlight; forced-color-adjust: none; } }
-
-/* Review follow-ups: exact local export preview and labelled manual groups. */
-dialog.pack-preview { width: min(900px, 94vw); max-width: 94vw; max-height: 90vh; overflow: auto; }
-.pack-preview > label, .pack-preview fieldset label { display: block; margin: 8px 0; }
-.pack-preview select { max-width: 100%; min-height: 32px; padding: 4px 8px; }
-.pack-preview-content textarea { width: 100%; min-height: 260px; font-family: monospace; }
-.pack-preview-content img { max-width: 100%; max-height: 300px; object-fit: contain; }
-fieldset.check-row { min-width: 0; margin: 12px 0; }
-.check-row legend { padding: 0 4px; }
-.decision-name { overflow-wrap: anywhere; }
-
 .pick-list { list-style: none; margin: 0 0 14px; padding: 0; max-height: 50vh; overflow: auto; border: 1px solid var(--border); border-radius: 8px; }
 .pick-list li + li { border-top: 1px solid var(--border); }
 .pick-list label { display: flex; gap: 8px; align-items: baseline; padding: 6px 10px; cursor: pointer; }
@@ -889,3 +873,5 @@ fieldset.check-row { min-width: 0; margin: 12px 0; }
 
 .inspected-tab { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 1px 8px; border: 1px solid var(--border); border-radius: 999px; font-size: 12px; background: var(--surface-2); color: var(--text); }
 .inspected-tab.behind { border-color: var(--warn); color: var(--warn); font-weight: 600; }
+
+

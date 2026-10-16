@@ -27,7 +27,7 @@ test('the panel and the coverage page pass axe in every main view, light and dar
     await panel.emulateMedia({ colorScheme: scheme })
     const found: string[] = []
     const check = async (name: string) => found.push(...(await violations(panel)).map((v) => `[${scheme}] ${name}: ${v}`))
-    await panel.locator('#evaluate-page-btn').click()
+    await panel.locator('#review-btn').click()
     await panel.locator('.theme-tab', { hasText: 'Images' }).click()
     await check('Images')
     for (const [button, name] of [['#sample-btn', 'Sample'], ['#audit-btn', 'Audit overview'], ['#results-btn', 'Page results'], ['#checks-btn', 'Manual checks']] as const) {
@@ -35,15 +35,11 @@ test('the panel and the coverage page pass axe in every main view, light and dar
       await panel.locator(button).click()
       await check(name)
     }
-    await panel.locator('#evaluate-page-btn').click()
+    await panel.locator('#review-btn').click()
     for (const theme of ['Liens', 'Formulaires', 'Éléments obligatoires']) {
       await panel.locator('.theme-tab', { hasText: theme }).click()
       await check(theme)
     }
-    await panel.locator('#audit-btn').click()
-    await panel.getByRole('button', { name: 'Exporter pour analyse (LLM)' }).click()
-    await check('Analysis export preview')
-    await panel.locator('.pack-preview').getByRole('button', { name: 'Annuler' }).click()
     expect(found).toEqual([])
   }
 

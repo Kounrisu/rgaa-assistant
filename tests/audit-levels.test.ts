@@ -34,12 +34,12 @@ describe('review screens follow the audit type', () => {
     const { findingCriteriaOf } = await import('../src/lib/findings')
     try {
       setActiveLevel('rapide')
-      expect(criteriaFor('informative', 'rapide').map((c) => c.id)).toEqual(['1.1'])
-      expect(criteriaFor('decorative', 'rapide')).toEqual([])
-      expect(findingCriteriaOf({ theme: 6, type: 'link' }, 'rapide').map((c) => c.id)).toEqual(['6.1', '6.2'])
-      expect(findingCriteriaOf({ theme: 2, type: 'iframe' }, 'rapide')).toEqual([])
+      expect(criteriaFor('informative').map((c) => c.id)).toEqual(['1.1'])
+      expect(criteriaFor('decorative')).toEqual([])
+      expect(findingCriteriaOf({ theme: 6, type: 'link' }).map((c) => c.id)).toEqual(['6.1', '6.2'])
+      expect(findingCriteriaOf({ theme: 2, type: 'iframe' })).toEqual([])
       setActiveLevel('complementaire')
-      expect(criteriaFor('informative', 'complementaire').map((c) => c.id)).toEqual(['1.1', '1.3', '1.6', '1.7'])
+      expect(criteriaFor('informative').map((c) => c.id)).toEqual(['1.1', '1.3', '1.6', '1.7'])
       setActiveLevel('complet')
       expect(criteriaFor('informative').length).toBeGreaterThan(4)
     } finally {

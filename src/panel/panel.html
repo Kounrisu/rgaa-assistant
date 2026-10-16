@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="panel.css" />
   </head>
   <body>
-    <a class="skip-link" href="#main-content" data-i18n>Skip to main content</a>
     <div class="auditbar" role="region" aria-label="Current audit" data-i18n-attrs="aria-label">
       <h1 class="brand-inline">RGAA Assistant</h1>
       <span class="auditbar-sep" aria-hidden="true">›</span>
@@ -16,11 +15,10 @@
       <span id="audit-level" class="pill level-pill" role="status"></span>
       <nav class="audit-navigation" aria-label="Audit workflow" data-i18n-attrs="aria-label">
         <button id="evaluate-page-btn" type="button" disabled aria-pressed="false" data-i18n>Evaluate the page</button>
-        <button id="current-decision-btn" type="button" data-i18n>Current decision</button>
         <button id="sample-btn" type="button" aria-pressed="false" data-i18n>Sample and progress</button>
         <button id="audit-btn" type="button" disabled aria-pressed="false" data-i18n>Summary and exports</button>
       </nav>
-      <a id="coverage-link" class="link-btn coverage-reference" href="../rgaa/rgaa.html" target="_blank" rel="noreferrer"><span data-i18n>RGAA coverage ↗</span><span class="sr-only" data-i18n> (opens in a new tab)</span></a>
+      <a id="coverage-link" class="link-btn coverage-reference" href="../rgaa/rgaa.html" target="_blank" rel="noreferrer" data-i18n>RGAA coverage ↗</a>
       <span class="spacer"></span>
       <span id="save-state" class="pill" role="status" aria-live="polite"></span>
       <button id="save-retry-btn" type="button" class="pill error-retry" hidden></button>
@@ -34,7 +32,7 @@
       </div>
     </div>
 
-    <main id="main-content" tabindex="-1">
+    <main id="main-content">
     <p id="status" role="status" class="status top-status"></p>
 
     <div class="pagebar">
@@ -62,7 +60,7 @@
       <div class="summary-heading">
         <h2 id="page-summary-title" class="scope-label"></h2>
         <span id="progress" class="progress" role="status" aria-live="polite"></span>
-        <button id="next-btn" type="button" title="Go to the next element or criterion that still needs your answer, in any theme (shortcut: Ctrl+Alt+N)" data-i18n data-i18n-attrs="title" disabled>Next to evaluate</button>
+        <button id="next-btn" type="button" title="Go to the next element or criterion that still needs your answer, in any theme (shortcut: n)" data-i18n data-i18n-attrs="title" disabled>Next to evaluate</button>
       </div>
       <div id="page-summary" class="theme-summary page-totals" data-scope="page" aria-label="Criteria of the whole page" data-i18n-attrs="aria-label"></div>
     </section>

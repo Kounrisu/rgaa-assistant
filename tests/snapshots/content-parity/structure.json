@@ -161,7 +161,7 @@
             "Element": "<header>"
           },
           "html": "<header>Titre</header>",
-          "contextHtml": "<body>\n<header data-rgaa-target=\"\"><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n</body>",
+          "contextHtml": "<body>\n<header data-rgaa-target=\"\"><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div></body>",
           "count": 1,
           "data": {
             "humanNeeded": false,
@@ -204,7 +204,7 @@
             "Element": "<nav>"
           },
           "html": "<nav aria-label=\"Menu\">Menu</nav>",
-          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\" data-rgaa-target=\"\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n</body>",
+          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\" data-rgaa-target=\"\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div></body>",
           "count": 1,
           "data": {
             "humanNeeded": false,
@@ -249,7 +249,7 @@
             "Element": "<h4>"
           },
           "html": "<h4>Saut de niveau</h4>",
-          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4 data-rgaa-target=\"\">Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n</body>",
+          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4 data-rgaa-target=\"\">Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div></body>",
           "count": 1,
           "data": {
             "humanNeeded": true,
@@ -272,7 +272,7 @@
             "Element": "<h2>"
           },
           "html": "<h2></h2>",
-          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2 data-rgaa-target=\"\"></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n</body>",
+          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2 data-rgaa-target=\"\"></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div></body>",
           "count": 1,
           "data": {
             "humanNeeded": true,
@@ -295,7 +295,7 @@
             "Element": "<div>"
           },
           "html": "<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>",
-          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\" data-rgaa-target=\"\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n</body>",
+          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\" data-rgaa-target=\"\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div></body>",
           "count": 1,
           "data": {
             "humanNeeded": false,
@@ -318,7 +318,7 @@
             "Element": "<h1>"
           },
           "html": "<h1>Deuxième h1</h1>",
-          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1 data-rgaa-target=\"\">Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n</body>",
+          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1 data-rgaa-target=\"\">Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div></body>",
           "count": 1,
           "data": {
             "humanNeeded": false,
@@ -339,7 +339,7 @@
             "Element": "<main>"
           },
           "html": "<main>Section sans nom Section nommée Masqué</main>",
-          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main data-rgaa-target=\"\">\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n</body>",
+          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main data-rgaa-target=\"\">\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer>Pied</footer>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div></body>",
           "count": 1,
           "data": {
             "humanNeeded": false,
@@ -465,7 +465,7 @@
             "Element": "<footer>"
           },
           "html": "<footer>Pied</footer>",
-          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer data-rgaa-target=\"\">Pied</footer>\n\n\n</body>",
+          "contextHtml": "<body>\n<header><h1>Titre</h1></header>\n<nav aria-label=\"Menu\"><h2>Menu</h2></nav>\n<h4>Saut de niveau</h4>\n<h2></h2>\n<div role=\"heading\" aria-level=\"3\">Titre ARIA</div>\n<h1>Deuxième h1</h1>\n<main>\n  <section><h3>Section sans nom</h3></section>\n  <section aria-label=\"Avec nom\"><h3>Section nommée</h3></section>\n  <aside><h3 style=\"display:none\">Masqué</h3></aside>\n  <form><input type=\"text\" aria-label=\"Q\"></form>\n  <div role=\"search\"></div>\n</main>\n<footer data-rgaa-target=\"\">Pied</footer>\n\n\n<div id=\"rgaa-assistant-overlay\" style=\"position: absolute; top: 0px; left: 0px; z-index: 2147483647; pointer-events: none;\"></div></body>",
           "count": 1,
           "data": {
             "humanNeeded": false,
