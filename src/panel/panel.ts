@@ -30,6 +30,7 @@ import { runSelected } from './batch-runner'
 import { renderBatch } from './batch-view'
 import { nextReview } from './review-navigation'
 import { wireEvents } from './events'
+import { watchInspectedTab } from './inspected-tab'
 
 /**
  * The functions the other modules call "upwards" (see actions.ts): a module that is below them cannot import them
@@ -88,7 +89,12 @@ state.session = createAuditSession({
 async function init(): Promise<void> {
   setLang(getLang())
   translateStatic()
-  initPageTools(dom.pageToolsEl, { send: (payload) => sendToPage(inspectedTabId(), payload as Extract<ContentMessage, { type: 'RGAA_TOOL' }>), say })
+  initPageTools(dom.pageToolsEl, { send: (payload) => sendToPage(inspectedTabId(), payload as Extract<ContentMessage, { type: 'RGAA_TOOL' }>), structure: () => sendToPage(inspectedTabId(), { type: 'RGAA_STRUCTURE' }),
+    transcript: async (scope) => {
+      // the axe engine gives the accessible names (by the spec); if it cannot be loaded the page answers with its simplified computation
+      await chrome.runtime.sendMessage({ type: 'RGAA_AXE_LOAD', tabId: inspectedTabId() }).catch(() => undefined)
+      return sendToPage(inspectedTabId(), { type: 'RGAA_TRANSCRIPT', scope })
+    }, say })
   initAuditStyles({ apply: (m) => chrome.runtime.sendMessage({ type: 'RGAA_STYLE', tabId: inspectedTabId(), ...m }), say, refresh: refreshPageTools })
   const loaded = await state.session.loadInitial()
   const firstUrl = state.audit.pages.find((p) => p.url)?.url
@@ -101,6 +107,7 @@ async function init(): Promise<void> {
   renderAll()
   renderAuditBar()
   if (state.liveUrl) showNavBanner(state.liveUrl)
+  watchInspectedTab()
   if (loaded) say(t('Audit “{name}” opened: {n} page(s).', { name: auditTitle(state.audit), n: state.audit.pages.length }))
 }
 

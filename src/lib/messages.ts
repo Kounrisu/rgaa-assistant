@@ -45,6 +45,8 @@ export interface TabInfoMessage {
 export interface TabInfoResponse {
   url: string
   title: string
+  /** Is this the tab in front in its window? Absent when unknown. */
+  active?: boolean
 }
 
 export interface AxeMessage {
@@ -71,7 +73,25 @@ export interface StyleMessage {
 }
 export type StyleResponse = { ok: true } | { ok?: false; error: string }
 
-export type BackgroundMessage = SaveMessage | DeleteMessage | CaptureMessage | TabInfoMessage | AxeMessage | RelayMessage | StyleMessage
+/** Loads the axe engine into the tab (for its accessible-name computation) without running it. */
+export interface AxeLoadMessage {
+  type: 'RGAA_AXE_LOAD'
+  tabId: number
+}
+
+/** Brings the inspected tab (and its window) to the front. */
+export interface TabShowMessage {
+  type: 'RGAA_TAB_SHOW'
+  tabId: number
+}
+
+/** Sent by the background to the panels when a tab or window focus change may have changed which tab is in front. */
+export interface TabEventMessage {
+  type: 'RGAA_TAB_EVENT'
+  tabId?: number
+}
+
+export type BackgroundMessage = SaveMessage | DeleteMessage | CaptureMessage | TabInfoMessage | AxeMessage | AxeLoadMessage | TabShowMessage | RelayMessage | StyleMessage
 
 /* Content script: what the panel (through the background relay) asks the page, and what the page answers.
  * Only types are exported from here (erased at build time): the content script must stay one self-contained script,
@@ -129,6 +149,8 @@ export type ContentMessage =
   | { type: 'RGAA_SNAPSHOT' }
   | { type: 'RGAA_TOOL'; tool: ToolName; on: boolean }
   | { type: 'RGAA_TOOLS_RESET' }
+  | { type: 'RGAA_STRUCTURE' }
+  | { type: 'RGAA_TRANSCRIPT'; scope: 'page' | 'tables' }
 
 export type ContentMessageType = ContentMessage['type']
 
@@ -181,6 +203,8 @@ export interface ContentResponses {
   RGAA_SNAPSHOT: { url: string; title: string; html: string; coverage: ScanCoverage }
   RGAA_TOOL: { ok: boolean; count?: number }
   RGAA_TOOLS_RESET: OkResponse
+  RGAA_TRANSCRIPT: import('../content/transcript').TranscriptResult
+  RGAA_STRUCTURE: { title: string; lang: string; html: string; headings: number; loose: number; truncated: boolean }
 }
 
 /** The answer to a given message. */

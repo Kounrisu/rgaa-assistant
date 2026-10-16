@@ -2,10 +2,13 @@
 
 Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
-## Current state (2026-10-15)
+## Current state (2026-10-16)
 
-- Branch `codex/audit-integrity-fixes`; F05–F14 implementation `c59f382`, F01–F04 `71691ed`, review `53e5466`.
+- Branch `master`; F05–F14 implementation `c59f382`, F01–F04 `71691ed`, review `53e5466`.
   Version 0.1.0; saved audit format **v6**, licence AGPL-3.0-only. Versions 2–5 migrate on load.
+- **Integrated remote master through `97f0f88`:** retains structure tools, page/table reading tabs, hidden-caption reveal,
+  absent-image removal, audited-tab indicator and locate recovery alongside the audit-integrity fixes. Both existing
+  commit-labelled test ZIPs are retained as historical builds; neither represents the combined source.
 - **Review F01–F04 implemented:** partial exports are scoped diagnostics without compliance rates or statements;
   complete reports require reviewed results on every page before conformity wording/a draft statement is offered.
   Confirmation is tracked per criterion (classification does not confirm answers). Background saves compare persisted
@@ -52,8 +55,10 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 - **Overlay numbering follow-up (`5f1b1be`):** internal DOM IDs no longer change when audit numbers are assigned.
   A hidden image returning after relabeling cannot collide with another image’s internal ID. Owner reports numbering
   still off after the previous fix; this second defect is reproduced, but the exact real-site symptom is unconfirmed.
-- Latest `npm run check` (2026-10-15): **245 tests in 28 files**, typecheck, **910 texts / 1500 French entries / 0 missing**, build pass.
-  Full `npm run test:e2e`: **48 passed**, including six follow-up workflows, exact export preview, light/dark axe and the reviewed 81-screen parity baseline.
+- Latest `npm run check` (2026-10-16): **245 tests in 28 files**, typecheck, **936 texts / 1535 French entries / 0 missing**, build pass.
+  Combined browser suite: **51 tests validated**. Final full run: 50 passed and one Chromium fixture-load error
+  (`ERR_NO_BUFFER_SPACE`, before application code); that export test passed on targeted rerun. Includes upstream
+  reading/structure workflows, six follow-up workflows, light/dark axe and the reviewed 81-screen parity baseline.
   Built content script: **0 module imports**.
   Real Firefox, actual DevTools, screen readers and browser zoom remain untested; Asqatasun fixtures were not rerun.
 - **Components review (theme 7, APG patterns)** shipped: every ARIA component (tabs, dialog, menu, disclosure / accordion,
@@ -101,7 +106,7 @@ Read this first, update it last. Rules for agents are in `../AGENTS.md`.
 
 ## In progress (claimed)
 
-- None. F01–F14 implementation and automated verification are complete; real-extension validation remains below.
+- None. Integration into `master` is complete; real-extension validation remains below.
 
 ## Next (suggested order; the owner decides)
 
@@ -143,6 +148,22 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
 - Real-Firefox behaviour is only known from the owner's tests so far (Firefox applies the page CSP to content scripts: axe is shipped patched, see `scripts/patch-axe.mjs`).
 
 ## Handoff log (newest first)
+
+### 2026-10-16 — Codex — Merge audit fixes with current master
+- Did: combined fix-branch tip `7d76297` (implementations `71691ed`, `c59f382`) with remote-master tip `97f0f88`.
+  Preserved structure tools, reading tabs, hidden-caption reveal, absent-image removal and audited-tab improvements.
+  Resolved additive CSS and handoff conflicts by keeping both contributions. Kept both commit-labelled test ZIPs;
+  they remain historical builds, not packages of this merged source. The checkpoint tag is unchanged.
+- State: `npm run check` passes: 245 tests in 28 files, typecheck, 936 texts / 1535 French entries / 0 missing, build.
+  Content script has zero module imports. All 51 browser cases validated: final full run passed 50, with one
+  `ERR_NO_BUFFER_SPACE` on the local fixture's initial navigation before app code; the export case then passed alone.
+  The previous full run passed all 50 functional tests and failed only the expected pre-integration screen baseline.
+  Reviewed every distinct full-DOM difference before updating it: audited-tab chip, structure/reading controls,
+  renamed caption tool and capture sizes. Final parity passes with no normalizer or assertion relaxed.
+- Next: real Firefox/DevTools, screen readers, zoom/forced colours, representative audits and novice/expert sessions.
+  These were not tested here; Asqatasun fixtures were not rerun (322/328 is historical).
+- For the other agent: use master for this combined state. Automatic suggestions still require human confirmation;
+  preserve the owner's provisional decorative-image counting and visible information/tools. Both histories are retained.
 
 ### 2026-10-15 — Codex — Remaining review corrections F05–F14
 - Did: implemented after checkpoint `pre-review-followups-2026-10-15` (`1c15fd1`), following F01–F04 (`71691ed`).
@@ -202,6 +223,38 @@ preserve Claude’s scan, preview and manual-help changes. Also confirm image nu
   manual workflow, export-note preservation, accessibility and density findings. Fix scan lifecycle/test waiting before relying on parity.
 - For the other agent: preserve visible information/display tools and the owner's decorative-image counting decision. The 21st
   missing-alt warning was a source-comment false positive. Do not describe this review or axe pass as full RGAA certification.
+
+### 2026-10-14 — Claude Code — Page reading, table reading and structure preview open in a browser tab
+- Did: the three views no longer use small popins: the panel stores the result (`chrome.storage.local`, key `rgaa-view-data`) and opens `src/reading/reading.html` in a tab (like the RGAA coverage page): full-width transcript with a "show only the lines marked ⚠" filter, or a full-height sandboxed frame for the structure preview. New: `src/reading/*`, `src/panel/open-view.ts`; removed: `reading-view.ts` and the two dialogs; new rollup entry `reading` in `vite.config.ts`. The e2e harness gives the reading page a storage stand-in.
+- State: `npm run check` passes; e2e passes with parity regenerated. NOT tested: real Firefox/Chrome (opening the tab from DevTools, storage hand-over).
+
+### 2026-10-14 — Claude Code — Table tool unhides visually hidden captions
+- Did: the Tables page tool is now "Caption and scope" (fr "Titre et scope"): a visually hidden `<caption>` is shown while the tool is on and put back when it is off (before, `caption` was not in the reveal candidates); the badge says "(was hidden)". Scope, id and `headers` badges unchanged. `src/content/page-tools.ts`, e2e test in `structure-tools.spec.ts`.
+- State: `npm run check` passes; e2e passes with parity regenerated. NOT tested: real Firefox/DevTools.
+
+### 2026-10-14 — Claude Code — Reading view uses axe for accessible names; audited-tab banner fixed
+- Did: the reading view loads the axe engine into the tab (`RGAA_AXE_LOAD`) and takes accessible names from `axe.commons.text.accessibleText` (spec-based); the dialog says which engine gave the names, with a simplified fallback if axe cannot load.
+  Fixed my earlier audited-tab banner: a DevTools page has no `chrome.tabs`, so it never updated. The background now listens to tab/window events and sends `RGAA_TAB_EVENT`; "Show the audited tab" goes through `RGAA_TAB_SHOW`.
+- State: `npm run check` passes; `npm run test:e2e` 39 passed, parity regenerated (the "checks" screens show the page snapshot size, which follows the content script bundle size: a known coupling). NOT tested: real Firefox/Chrome DevTools (tab events, banner, axe names on real pages).
+
+### 2026-10-14 — Claude Code — Reading view (screen-reader style transcript of tables and of the page)
+- Did: "Table reading" (theme 5) and "Page reading" (theme 9) open a dialog with what a screen reader would say: each table cell with the header cells that name it (scope, headers attribute, th position, rowspan/colspan), the page in reading order (landmarks, headings, lists, links, buttons, fields, images). Problems are marked on their line (no header, headers pointing to a missing id, no table title, empty heading or skipped level, nameless link/button/field, image with no alt). `src/content/transcript.ts`, `src/panel/reading-view.ts`, message `RGAA_TRANSCRIPT`. A simplified accessible-name computation, not the browser's full algorithm. It helps spot bad coding; it gives no verdict.
+- State: `npm run check` passes; `npm run test:e2e` 39 passed with the parity baseline regenerated. NOT tested: real Firefox/DevTools.
+- Next: recording of HTML/CSS/JS around an action (explicitly postponed by the owner); a reading view per selected element.
+
+### 2026-10-14 — Claude Code — Structure tools (headings map, loose text, structure preview); Locate on page made robust
+- Did: theme 9 page tools: "Headings map" (H1-H6 badges on the page, red when a level is skipped or the heading is empty), "Loose text" (boxes around text in a plain div/span with no p, heading, li, link, button, label around it; `looseTextNodes` in `src/content/page-tools.ts`), and "Structure preview" (the page rebuilt from its HTML structure, loose text in orange, shown in a sandboxed frame: `src/content/structure-view.ts`, `src/panel/structure-preview.ts`, message `RGAA_STRUCTURE`).
+  "Locate on page": when the box is missing from the page (reload, boxes removed) the panel rescans once and retries; an unreachable page now says so instead of failing silently (`focusOnPage`). The e2e harness ignores errors from sandboxed frames (the stand-in cannot run in the preview frame).
+- State: `npm run check` passes; `npm run test:e2e` 38 passed with the parity baseline regenerated for the new buttons. NOT tested: real Firefox/DevTools; the exact real-site cause of "Locate on page" / navigation between images not working was not reproduced (the existing test passes), only the likely cases are handled.
+- Next: reproduce the navigation failure on the user's real page (ask for the URL / console errors); the questions on recording (HTML/CSS/JS snapshots around an action, focus trail, for an LLM) and on a screen-reader style transcript of tables/elements are answered in chat as proposals, not built.
+
+### 2026-10-14 — Claude Code — remove absent images; audited-tab indicator
+- Did: Images theme: "Remove absent images…" (end of the filter chips, current page only) opens a popin with one ticked checkbox per image no longer on the page; the ticked ones and their answers/notes are deleted (`src/panel/images-view.ts`, `askPick` in `dialogs.ts`).
+  Audited tab: DevTools belong to one tab, nothing said so. New `src/panel/inspected-tab.ts`: a chip "Audited tab: title" beside the address, and a warning banner with "Show the audited tab" when another tab is in front (undocked DevTools / second window). `RGAA_TAB_INFO` now also returns `active`. No new permission.
+- State: `npm run check` passes (221 tests, 0 missing translations); `npm run test:e2e` 38 passed. The parity baseline was regenerated: the chip is on every screen, and it also absorbs a drift that already existed on `master` (themes 6 and 9, audit overview sheet 2, sample), cause not investigated.
+  NOT tested: real Firefox/DevTools (tab events, banner, focusing the window); the stand-in has no tab events, so the banner is untested.
+- Next: test the banner in real Chrome and Firefox with DevTools undocked; an e2e test for the remove popin.
+- For the other agent: the shell default is Node 10; use Node 22 (`~/.nvm/versions/node/v22.16.0/bin`).
 
 ### 2026-10-13 — Claude Code — RGAA self-audit, skip link and new-tab notices
 - Did: self-audit in `docs/RGAA-SELF-AUDIT-2026-10-13.md`. Fixed: skip link to the main content on the panel and the coverage page (12.7);
