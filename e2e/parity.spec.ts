@@ -51,6 +51,8 @@ async function serialize(panel: Page): Promise<string> {
     .replace(/\d{1,2}:\d{2}(?:\s?[AP]M)?/g, 'HH:MM')
     .replace(/\d{4}-\d{2}-\d{2}/g, 'YYYY-MM-DD')
     .replace(/\d{2}\/\d{2}\/\d{4}/g, 'DD/MM/YYYY')
+    // the page snapshot's size follows the content-script bundle size (and the bundler): not part of the reviewed UI
+    .replace(/\d+ KB \(stocké en \d+ KB\)|\d+ KB \(stored as \d+ KB\)/g, 'N KB (stored as N KB)')
     .replace(/></g, '>\n<')
 }
 
