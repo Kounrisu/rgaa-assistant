@@ -1,4 +1,3 @@
-import { suggestAnswer } from './review-confirmation'
 import { suggest } from './evidence'
 import type { ChecklistVerdict, ImportReport, PageRecord } from './types'
 
@@ -185,15 +184,18 @@ export function applyToolResults(rec: PageRecord, res: ToolResults, opts: { addT
         review.note = addLine(review.note, `${mark} ${v.rule}${ratio}: ${v.help}`)
         // the script could not judge this text: the tool did, so its answer is offered as the pre-fill
         if (theme === 11 && criterion === '11.1' && review.answers['11.1'] === undefined) {
-          suggestAnswer(review, '11.1', 'nc')
+          review.answers['11.1'] = 'nc'
+          review.auto = true
           report.set++
         }
         if (f.type === 'link-empty' && review.answers['6.2'] === undefined) {
-          suggestAnswer(review, '6.2', 'nc')
+          review.answers['6.2'] = 'nc'
+          review.auto = true
           report.set++
         }
         if (f.type === 'contrast-unknown' && review.answers['3.2'] === undefined) {
-          suggestAnswer(review, '3.2', 'nc')
+          review.answers['3.2'] = 'nc'
+          review.auto = true
           report.set++
         }
         report.noted++

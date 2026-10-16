@@ -19,9 +19,7 @@ for (const f of files) {
   }
 }
 
-// Dynamic instructional catalog: official titles/tests deliberately stay in French.
-const catalog = JSON.parse(readFileSync('src/rgaa/rgaa-tests.json', 'utf8'))
-for (const topic of catalog.topics) for (const criterion of topic.criteria) used.set(criterion.note, 'src/rgaa/rgaa-tests.json: ' + criterion.id)
+const src = files.length ? '' : ''
 const dict = new Set()
 for (const f of readdirSync('src/lib').filter((n) => /^i18n-fr-.+\.ts$/.test(n)).map((n) => join('src/lib', n))) {
   const text = readFileSync(f, 'utf8')
@@ -31,5 +29,3 @@ const missing = [...used.keys()].filter((k) => !dict.has(k))
 console.log(`${used.size} texts used, ${dict.size} French entries, ${missing.length} missing`)
 for (const k of missing) console.log(`MISSING  ${used.get(k)}: ${k}`)
 if (process.argv.includes('--unused')) for (const k of dict) if (!used.has(k)) console.log(`UNUSED   ${k}`)
-
-if (missing.length) process.exitCode = 1

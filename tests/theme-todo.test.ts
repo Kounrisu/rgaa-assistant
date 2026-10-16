@@ -51,7 +51,7 @@ describe('themeTodo: what is left, and why', () => {
     expect(todo.find((x) => x.id === '1.4')?.reason).toBe('todo')
     expect(todo.map((x) => x.id)).toEqual([...todo.map((x) => x.id)].sort((a, b) => Number(a.split('.')[1]) - Number(b.split('.')[1])))
     // nothing left once everything is confirmed and covered
-    const done = run([], {}, Object.fromEntries(Array.from({ length: 9 }, (_, i) => [`1.${i + 1}`, { verdict: 'na' as const, note: 'Whole page checked', coverageAt: 0 }])))
+    const done = run([], {}, { '1.4': { verdict: 'na', note: '' }, '1.5': { verdict: 'na', note: '' } })
     expect(themeTodo(done.themes.find((t) => t.number === 1))).toEqual([])
   })
 

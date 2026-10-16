@@ -136,7 +136,7 @@ export async function runAutoChecks(): Promise<'complete' | 'partial' | 'failed'
 
 /** Everything at once: scan every theme that can be scanned, then axe, our RGAA checks, the Asqatasun-derived rules and the HTML check. */
 export async function runEverything(): Promise<void> {
-  if (!state.page || state.runBusy || state.scanBusy) return
+  if (!state.page || state.runBusy) return
   const rec = state.page
   state.runBusy = true
   rec.automaticRun = { status: 'running', startedAt: Date.now(), url: rec.url }

@@ -130,22 +130,6 @@ function v2ToV3(a: Rec): void {
 const MIGRATIONS: Record<number, (a: Rec) => void> = { 2: v2ToV3, 3: (a) => {
   // v3 had tool reports but no reliable full-run status. Leave it unknown.
   for (const p of (a.pages as unknown[]).filter(isRecord)) delete p.automaticRun
-}, 4: (a) => {
-  a.storageToken = `legacy:${String(a.id)}`
-  for (const p of (a.pages as unknown[]).filter(isRecord)) {
-    for (const reviews of [p.reviews, p.findingReviews]) {
-      if (!isRecord(reviews)) continue
-      for (const r of Object.values(reviews).filter(isRecord)) {
-        if (isRecord(r.answers)) r.pendingAnswers = r.auto ? Object.keys(r.answers) : []
-      }
-    }
-  }
-}, 5: (a) => {
-  // Existing observations have no explicit criterion link. Never infer a resolution from an unrelated NC.
-  for (const p of (a.pages as unknown[]).filter(isRecord)) {
-    if (isRecord(p.manualChecks)) for (const check of Object.values(p.manualChecks).filter(isRecord)) delete check.criterion
-    delete p.urlHistory
-  }
 } }
 
 /**
@@ -298,7 +282,6 @@ export async function loadActiveAudit(defaultName: string, persist: (audit: Audi
       } catch (error) {
         return { status: 'failed', error: asCorrupt(error, LEGACY_KEY) }
       }
-      delete migrated.storageToken // Moving the legacy singleton to a new indexed storage key.
       migrated.name ||= defaultName
       await persist(migrated)
       await setActiveId(migrated.id)
@@ -334,7 +317,6 @@ export function copyOf(audit: Audit, name: string): Audit {
   copy.name = name
   copy.createdAt = now
   copy.updatedAt = now
-  delete copy.storageToken
   delete copy.exportedAt
   return copy
 }

@@ -19,8 +19,8 @@ export interface DeleteMessage {
   type: 'RGAA_DELETE'
   id: string
 }
-export type SaveErrorCode = 'invalid' | 'storage' | 'unreachable' | 'conflict'
-export type SaveResponse = { ok: true; revision: number; storageToken?: string } | { ok: false; code: SaveErrorCode; error: string }
+export type SaveErrorCode = 'invalid' | 'storage' | 'unreachable'
+export type SaveResponse = { ok: true; revision: number } | { ok: false; code: SaveErrorCode; error: string }
 
 /* Screenshots */
 

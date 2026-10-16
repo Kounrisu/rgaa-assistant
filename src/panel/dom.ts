@@ -23,24 +23,6 @@ export function h<K extends keyof HTMLElementTagNameMap>(
   return node
 }
 
-/** Hidden text that tells assistive technology a link opens a new tab (RGAA 13.2). Append it inside the link. */
-export const newTabNote = (): HTMLElement => h('span', { class: 'sr-only' }, ' ', t('(opens in a new tab)'))
-
-/** Restore only an equivalent control, never steal focus from a deliberate navigation. */
-export function captureFocus(): () => void {
-  const old = document.activeElement as HTMLElement | null
-  const key = old?.getAttribute('data-focus-key')
-  const selector = old?.id ? `#${CSS.escape(old.id)}` : key ? `[data-focus-key="${CSS.escape(key)}"]` : null
-  const selection = old instanceof HTMLInputElement || old instanceof HTMLTextAreaElement ? [old.selectionStart, old.selectionEnd] : null
-  return () => {
-    if (!old || old.isConnected || !selector || (document.activeElement !== document.body && document.activeElement !== null)) return
-    const next = document.querySelector<HTMLElement>(selector)
-    if (!next || next.closest('[hidden], [inert]') || next.matches(':disabled')) return
-    next.focus({ preventScroll: true })
-    if (selection?.[0] != null && selection[1] != null && (next instanceof HTMLInputElement || next instanceof HTMLTextAreaElement)) next.setSelectionRange(selection[0], selection[1])
-  }
-}
-
 /** Like t(), but each `{name}` is replaced by a node (a <strong>, a link…) instead of text. */
 export function tNodes(en: string, nodes: Record<string, Child>): Child[] {
   return t(en)
@@ -57,14 +39,12 @@ export function tNodes(en: string, nodes: Record<string, Child>): Child[] {
  * of the columns are put back, and the part keeps its height while previews load (a shorter page would scroll up).
  */
 export function keepScroll(host: HTMLElement, rebuild: () => void): void {
-  const restoreFocus = captureFocus()
   const root = (document.scrollingElement ?? document.documentElement) as HTMLElement
   const sel = '.col'
   const y = root.scrollTop
   const inner = [...host.querySelectorAll<HTMLElement>(sel)].map((e) => e.scrollTop)
   host.style.minHeight = `${host.offsetHeight}px`
   rebuild()
-  restoreFocus()
   host.querySelectorAll<HTMLElement>(sel).forEach((e, i) => (e.scrollTop = inner[i] ?? 0))
   root.scrollTop = y
   window.setTimeout(() => (host.style.minHeight = ''), 700)
@@ -114,7 +94,6 @@ export const dom = {
   progressEl: $('progress'),
   pageProgressEl: $('page-progress'),
   nextBtn: $<HTMLButtonElement>('next-btn'),
-  currentDecisionBtn: $<HTMLButtonElement>('current-decision-btn'),
   liveUrlEl: $('live-url'),
   resetThemeBtn: $<HTMLButtonElement>('reset-theme-btn'),
   pageSummaryTitle: $('page-summary-title'),

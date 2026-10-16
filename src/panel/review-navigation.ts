@@ -10,7 +10,7 @@ import { focusFinding } from './page-bridge'
 export async function nextReview(after?: string): Promise<void> {
   const page = state.page
   if (!page || !(await state.session.saveNow()) || state.page !== page) return
-  const queue = reviewQueue(page, state.audit.meta.level)
+  const queue = reviewQueue(page)
   const focused = document.activeElement instanceof HTMLInputElement ? document.activeElement.name : ''
   const current = queue.filter((x) => x.theme === state.theme && (x.kind === 'image' ? x.itemId === state.selectedId : x.kind === 'finding' ? x.itemId === state.findingSel : false))
   const remembered = state.reviewCursor?.page === page.id ? queue.find((x) => x.key === state.reviewCursor?.key) : undefined

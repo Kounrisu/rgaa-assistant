@@ -1,4 +1,3 @@
-import { allowsComplianceRate } from './audit-levels'
 import { OUTCOME_LABEL, statusOf, type CriterionResult, type Outcome, type Status, type Theme1Results, type ThemeResult } from './results'
 import { CRITERION_LEVEL, THEME_LABEL, type Level } from './themes'
 import type { Thumb } from './thumbs'
@@ -8,7 +7,6 @@ import { findingCriteriaOf } from './findings'
 import type { AuditLevel } from './audit-levels'
 import { tFr } from './i18n'
 import { MANUAL_CHECKS } from './manual-checks'
-import { unresolvedManualIssues } from './manual-evidence'
 import type { AuditMeta, ChecklistAnswer, Detected, FindingItem, ImageElementInfo, ImageReview, ManualCheckAnswer } from './types'
 
 /** Status of one TEST (theme 1 detail). Criteria use `statusOf`, which also looks at coverage. */
@@ -56,7 +54,7 @@ export const thumbKey = (pageIndex: number, imageId: number) => pageIndex * 1000
  * waiting for the auditor to confirm a tool suggestion, `unconfirmed` = counted C/NC/NA that still rest on a pre-filled
  * verdict nobody confirmed.
  */
-export interface Counts { C: number; NC: number; NA: number; NT: number; partial: number; suggested: number; unconfirmed: number; manualIssues?: number }
+export interface Counts { C: number; NC: number; NA: number; NT: number; partial: number; suggested: number; unconfirmed: number }
 export const rateOf = (c: Counts): number | null => (c.C + c.NC ? Math.round((c.C / (c.C + c.NC)) * 100) : null)
 const emptyCounts = (): Counts => ({ C: 0, NC: 0, NA: 0, NT: 0, partial: 0, suggested: 0, unconfirmed: 0 })
 
@@ -65,19 +63,17 @@ const emptyCounts = (): Counts => ({ C: 0, NC: 0, NA: 0, NT: 0, partial: 0, sugg
  * only partly covered by this tool, or a counted verdict is still an unconfirmed pre-fill. Only a rate with NT = 0,
  * no partial coverage and nothing unconfirmed is final for its scope.
  */
-export const isProvisional = (c: Counts): boolean => c.NT > 0 || c.unconfirmed > 0 || c.partial > 0 || Boolean(c.manualIssues)
+export const isProvisional = (c: Counts): boolean => c.NT > 0 || c.unconfirmed > 0 || c.partial > 0
 export const PROVISIONAL_FR = 'provisoire'
 export const PROVISIONAL_NOTE_FR =
   'Taux provisoire : des critères restent à tester, ne sont couverts que partiellement par RGAA Assistant (leur résultat ne porte que sur les tests que l’outil sait évaluer), ou reposent sur un pré-remplissage automatique non confirmé. Seule une relecture complète par l’auditeur donne un taux définitif.'
-export const withProvisional = (text: string, c: Counts, incomplete = false): string => (text !== '—' && text !== 'indisponible' && (incomplete || isProvisional(c)) ? `${text} (${PROVISIONAL_FR})` : text)
+export const withProvisional = (text: string, c: Counts): string => (text !== '—' && text !== 'indisponible' && isProvisional(c) ? `${text} (${PROVISIONAL_FR})` : text)
 
 /** Every criterion of the referential, in official order, with its theme. */
 const flat = (p: PageInput) => p.themes.flatMap((theme) => theme.criteria.map((c) => ({ theme, c })))
 
 export function countsOf(p: PageInput): Counts {
   const n = emptyCounts()
-  const manualIssues = unresolvedManualIssues(p.manualChecks, p.themes).length
-  if (manualIssues) n.manualIssues = manualIssues
   for (const { c } of flat(p)) {
     const st = statusOf(c)
     n[st]++
@@ -138,8 +134,6 @@ export function auditStats(pages: PageInput[]): AuditStats {
     if (c.unconfirmed && c.status !== 'NT') counts.unconfirmed++
   }
   for (const c of sampleCriteria) tally(sampleCounts, c)
-  const manualIssues = perPage.reduce((n, p) => n + (p.counts.manualIssues ?? 0), 0)
-  if (manualIssues) sampleCounts.manualIssues = manualIssues
   const perTheme = (pages[0]?.themes ?? []).map((theme) => {
     const counts = emptyCounts()
     for (const c of sampleCriteria.filter((x) => x.theme === theme.number)) tally(counts, c)
@@ -190,8 +184,7 @@ export function levelStats(stats: AuditStats): LevelStats {
     if (c.unconfirmed && c.status !== 'NT') counts.unconfirmed++
   }
   const legal = emptyCounts()
-  if (stats.sampleCounts.manualIssues) legal.manualIssues = stats.sampleCounts.manualIssues
-  for (const k of Object.keys(emptyCounts()) as (keyof Counts)[]) legal[k] = (perLevel.A[k] ?? 0) + (perLevel.AA[k] ?? 0)
+  for (const k of Object.keys(legal) as (keyof Counts)[]) legal[k] = perLevel.A[k] + perLevel.AA[k]
   const pages = stats.perPage.map((p) => ({ label: p.label, title: p.title, counts: p.counts, rate: rateExact(p.counts) }))
   const rated = pages.filter((p): p is typeof p & { rate: number } => p.rate !== null)
   const average = rated.length ? rated.reduce((a, p) => a + p.rate, 0) / rated.length : null
@@ -238,21 +231,7 @@ export function sampleSheet(pages: PageInput[], meta: AuditMeta): Sheet {
   }
 }
 
-/** Partial audits export scoped counts only, never a compliance percentage or declaration advice. */
-export function diagnosticSheet(pages: PageInput[], level: AuditLevel | undefined, name = 'Synthèse'): Sheet {
-  const stats = auditStats(pages)
-  return { name, widths: [30, 48, 12, 12, 12, 12, 18, 18], rows: [
-    title('Diagnostic partiel'), [levelFr(level)],
-    ['Ces résultats ne permettent pas de produire une déclaration d’accessibilité.'],
-    head(['Page', 'Titre', 'C', 'NC', 'NA', 'NT', 'À confirmer', 'Couverture partielle']),
-    ...stats.perPage.map(p => [p.label, p.title, p.counts.C, p.counts.NC, p.counts.NA, p.counts.NT, p.counts.unconfirmed + p.counts.suggested, p.counts.partial]),
-    [], head(['Thématique', '', 'C', 'NC', 'NA', 'NT', 'À confirmer', 'Couverture partielle']),
-    ...stats.perTheme.filter(p => p.audited).map(p => [p.name, '', p.counts.C, p.counts.NC, p.counts.NA, p.counts.NT, p.counts.unconfirmed + p.counts.suggested, p.counts.partial]),
-  ] }
-}
-
-export function summarySheet(pages: PageInput[], level?: AuditLevel): Sheet {
-  if (!allowsComplianceRate(level)) return diagnosticSheet(pages, level)
+export function summarySheet(pages: PageInput[]): Sheet {
   const stats = auditStats(pages)
   const pct = (r: number | null) => (r === null ? 'indisponible' : `${r} %`)
   const themeHead = stats.perTheme.map((t) => `${t.number}. ${t.name}`)
@@ -265,7 +244,7 @@ export function summarySheet(pages: PageInput[], level?: AuditLevel): Sheet {
       title('Synthèse de l’audit RGAA 4.1.2'),
       [],
       [{ v: 'Taux d’accessibilité (moyenne des pages)', s: 'head' }, { v: stats.perPage.some((p) => isProvisional(p.counts)) ? `${pct(stats.averageRate)} (${PROVISIONAL_FR})` : pct(stats.averageRate), s: 'crit' }],
-      [{ v: 'Critères respectés sur l’ensemble de l’échantillon', s: 'head' }, { v: withProvisional(pct(stats.sampleRate), stats.sampleCounts, stats.perPage.some(p => isProvisional(p.counts))), s: 'crit' }],
+      [{ v: 'Critères respectés sur l’ensemble de l’échantillon', s: 'head' }, { v: withProvisional(pct(stats.sampleRate), stats.sampleCounts), s: 'crit' }],
       [{ v: 'Pages auditées', s: 'head' }, pages.length],
       [],
       title('Synthèse par page'),
@@ -302,13 +281,12 @@ export function summarySheet(pages: PageInput[], level?: AuditLevel): Sheet {
 }
 
 /** The "Résultats" dashboard of the official audit workbook, as tables. */
-export function resultsSheet(pages: PageInput[], level?: AuditLevel): Sheet {
-  if (!allowsComplianceRate(level)) return diagnosticSheet(pages, level, 'Résultats')
+export function resultsSheet(pages: PageInput[]): Sheet {
   const stats = auditStats(pages)
   const lv = levelStats(stats)
   const row = (label: string, c: Counts): CellInput[] => [
     { v: label, s: 'crit' },
-    { v: withProvisional(pct2(rateExact(c)), c, stats.perPage.some(p => isProvisional(p.counts))), s: 'C' },
+    { v: withProvisional(pct2(rateExact(c)), c), s: 'C' },
     { v: c.C + c.NC ? pct2((c.NC / (c.C + c.NC)) * 100) : '—', s: 'NC' },
   ]
   const counts = (label: string, c: Counts): CellInput[] => [{ v: label, s: 'crit' }, c.C, c.NC]
@@ -322,7 +300,7 @@ export function resultsSheet(pages: PageInput[], level?: AuditLevel): Sheet {
       row('A', lv.perLevel.A),
       row('AA (Légal)', lv.legal),
       row('AAA', lv.perLevel.AAA),
-      ['Seul un audit complet, entièrement vérifié par l’auditeur, peut étayer une déclaration d’accessibilité. Les résultats provisoires ne doivent pas être publiés comme niveau de conformité définitif.'],
+      ['Les résultats ci-dessus représentent le niveau de conformité global tel qu’il doit être reporté dans la déclaration de conformité. Le niveau de référence est le niveau légal AA. Pour qu’un site soit déclaré conforme au RGAA, ce niveau doit être de 100 %.'],
       [],
       head(['Conformité pour chaque niveau', 'C', 'NC']),
       row('A', lv.perLevel.A),
@@ -465,20 +443,17 @@ export function testsSheet(pages: PageInput[]): Sheet {
   for (const page of pages) {
     if (!page.themes[0]?.selected) continue
     for (const c of page.results.criteria) {
-      const criterion = page.themes.flatMap(theme => theme.criteria).find(x => x.id === c.id)
-      const scopePending = criterion?.manualReview && criterion.coverage === 'partial'
       for (const t of c.tests) {
-        const outcome = scopePending && t.outcome !== 'nc' ? 'pending' : t.outcome
-        const status = STATUS[outcome]
+        const status = STATUS[t.outcome]
         rows.push([
           { v: page.label, s: 'crit' },
           { v: c.id, s: 'crit' },
           { v: t.id, s: 'crit' },
           { v: t.text.replace(/`/g, ''), s: 'wrap' },
           { v: t.scope ? t.scope.map((x) => `<${x}>`).join(' ') : '—', s: 'wrap' },
-          { v: `${status} – ${tFr(OUTCOME_LABEL[outcome])}`, s: status },
+          { v: `${status} – ${tFr(OUTCOME_LABEL[t.outcome])}`, s: status },
           { v: t.imageIds.map((i) => `#${i}`).join(' '), s: 'wrap' },
-          { v: t.nc.length ? `Non conforme : ${t.nc.map((i) => `#${i}`).join(' ')}. ${t.reason}` : scopePending ? `Périmètre à vérifier manuellement. ${t.reason}` : t.reason, s: 'wrap' },
+          { v: t.nc.length ? `Non conforme : ${t.nc.map((i) => `#${i}`).join(' ')}. ${t.reason}` : t.reason, s: 'wrap' },
         ])
       }
     }
@@ -529,7 +504,7 @@ export function manualSheet(pages: PageInput[]): Sheet {
         { v: page.label, s: 'crit' },
         { v: tFr(c.group), s: 'wrap' },
         { v: tFr(c.text), s: 'wrap' },
-        a?.criterion ? `${c.criteria.join(', ')} → ${a.criterion}` : c.criteria.join(', '),
+        c.criteria.join(', '),
         a ? (a.state === 'ok' ? { v: 'OK', s: 'C' as const } : { v: 'Problème', s: 'NC' as const }) : { v: 'À faire', s: 'default' as const },
         { v: a?.note ?? '', s: 'wrap' },
       ])
@@ -538,13 +513,13 @@ export function manualSheet(pages: PageInput[]): Sheet {
   return { name: 'Contrôles manuels', widths: [7, 18, 70, 18, 11, 50], rows, freezeRow: 3 }
 }
 
-export function findingsSheet(pages: PageInput[], level?: AuditLevel): Sheet {
+export function findingsSheet(pages: PageInput[]): Sheet {
   const rows: CellInput[][] = [
     title('Détail des éléments – cadres, couleurs, liens et structure'),
     [],
     head(['Page', 'Thème', 'N°', 'Aperçu', 'Type', 'Constat', 'Détails', 'Critère', 'Statut', 'Remarque']),
   ]
-  const criteriaOf = (f: FindingItem) => findingCriteriaOf(f, level).map((c) => c.id)
+  const criteriaOf = (f: FindingItem) => findingCriteriaOf(f).map((c) => c.id)
   pages.forEach((page, pageIndex) => {
     for (const f of page.findings) {
       const review = page.findingReviews[f.key]
@@ -570,18 +545,18 @@ export function findingsSheet(pages: PageInput[], level?: AuditLevel): Sheet {
 }
 
 /** The sheets of one page: what the "Page results" view shows. */
-export const pageSheets = (page: PageInput, level?: AuditLevel): Sheet[] => [gridSheet(page), summarySheet([page], level), testsSheet([page]), imagesSheet([page]), ...(page.findings.length ? [findingsSheet([page], level)] : []), ...(page.manualChecks && Object.keys(page.manualChecks).length ? [manualSheet([page])] : [])]
+export const pageSheets = (page: PageInput): Sheet[] => [gridSheet(page), summarySheet([page]), testsSheet([page]), imagesSheet([page]), ...(page.findings.length ? [findingsSheet([page])] : []), ...(page.manualChecks && Object.keys(page.manualChecks).length ? [manualSheet([page])] : [])]
 
 /** The sheets of the whole audit: what the "Audit" view shows and the .xlsx contains. */
 export const auditSheets = (pages: PageInput[], meta: AuditMeta): Sheet[] => [
   sampleSheet(pages, meta),
   criteriaSheet(pages),
-  resultsSheet(pages, meta.level),
-  summarySheet(pages, meta.level),
+  resultsSheet(pages),
+  summarySheet(pages),
   ...pages.map(gridSheet),
   testsSheet(pages),
   imagesSheet(pages),
-  ...(pages.some((p) => p.findings.length) ? [findingsSheet(pages, meta.level)] : []),
+  ...(pages.some((p) => p.findings.length) ? [findingsSheet(pages)] : []),
   ...(pages.some((p) => p.manualChecks && Object.keys(p.manualChecks).length) ? [manualSheet(pages)] : []),
 ]
 

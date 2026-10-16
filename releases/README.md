@@ -3,12 +3,6 @@
 `rgaa-assistant-<version>-<commit>.zip` is the built extension (the contents of `dist/`, `manifest.json` at the root) made from that commit.
 It is **not signed**: it is for testing, not for distribution. Source and build: see the main `README.md` (`npm install`, `npm run build`).
 
-## Current test build — 16 October 2026
-
-[Download the built extension (v0.1.0-22d0e15)](https://github.com/Kounrisu/rgaa-assistant/releases/download/v0.1.0-22d0e15/rgaa-assistant-0.1.0-22d0e15.zip).
-[Release notes](https://github.com/Kounrisu/rgaa-assistant/releases/tag/v0.1.0-22d0e15).
-This build includes the merged audit fixes and reading/structure tools. The ZIP and its SHA-256 checksum are also in this folder.
-
 ## Firefox (the browser the project targets, 121 or later)
 
 **Quick test (lasts until Firefox is closed)**

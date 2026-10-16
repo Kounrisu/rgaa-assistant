@@ -77,9 +77,3 @@ ul.tests { list-style: none; margin: 0; padding: 0 12px 12px; }
 
 .scope { margin: 12px 0 4px; }
 .scope-help { margin: 4px 0 8px; max-width: 70ch; }
-
-.skip-link { position: absolute; left: 8px; top: -100px; z-index: 100; padding: 8px 14px; border-radius: 8px; background: var(--surface); color: var(--text); border: 2px solid var(--accent); font-weight: 600; text-decoration: none; }
-.skip-link:focus { top: 8px; }
-#main-content:focus { outline: none; }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }
-@media (forced-colors: active) { .meter, .progress .meter { border: 1px solid CanvasText; } .meter i { background: Highlight; forced-color-adjust: none; } }

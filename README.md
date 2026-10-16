@@ -7,10 +7,7 @@ and produces an Excel grid and a printable report.
 
 **It is an aid, not an automatic certification.** Automatic checks cover only part of the RGAA. What they find is
 shown as pre-filled answers to confirm; a check that finds nothing never proves that a criterion is met. The auditor
-confirms or changes every verdict. Confirmation is stored per criterion: classifying an image or answering one
-question does not confirm its other suggestions. Empty scans suggest NA; absent elements and known gaps (frames,
-open shadow roots, truncated lists) have manual scope cards. Record a verdict and notes after inspecting that content;
-a new scan invalidates the scope decision. A confirmed failure remains a failure even when coverage is incomplete.
+confirms or changes every verdict.
 
 ## What it does
 
@@ -43,33 +40,14 @@ spacing, language changes. The tools shown follow the theme you are in.
 
 **Audits**: several named audits, saved in the browser (`chrome.storage.local`) as you work, and as a
 `.rgaa.json` file you can reopen later. The file contains everything, including a gzipped copy of the HTML of the
-captured pages: treat it as an internal working document. Format v6 reads and migrates v2–v5. Existing v4 suggestions
-remain suggestions; earlier implicit confirmations cannot be reconstructed from the old element-wide flag.
-Concurrent edits of one audit are rejected as a save conflict. Use Retry to save your local work as a separate copy,
-reload the saved audit, or stay on the current audit. A stale panel cannot silently restore a deleted audit.
+captured pages: treat it as an internal working document.
 
 **Exports**: an **.xlsx** grid laid out like the official RGAA audit grid (sheet texts are in French), and a
 printable **HTML report** (summary, rates per theme and page, non-conformities with screenshots and notes, draft
-accessibility statement when eligible). Quick and complementary audits export scoped diagnostic counts with no
-compliance rate or statement. Incomplete complete audits retain provisional rates, without conformity wording or a
-draft statement; those require all 106 criteria to be reviewed across every page with no unresolved coverage,
-confirmation, evidence conflict or unresolved manual problem. Print it to PDF from the browser. **Export for analysis (LLM)** (Summary and exports) writes a
+accessibility statement). Print it to PDF from the browser. **Export for analysis (LLM)** (Summary and exports) writes a
 `.zip` pack for a language model: the code and the picture of every element, what the tools found, what you answered, a README
 of instructions and an empty `answers-template.jsonl` to complete (plan: `docs/PLAN-llm-roundtrip.md`; importing the answers
-back is not built yet). Before saving, inspect the exact local text/image files and choose whether to exclude HTML, text, notes, URLs or pictures. These exclusions do not guarantee anonymity. Nothing is sent anywhere; you give the file to your assistant yourself.
-
-Manual problems are supporting observations: link each to its criterion and record a confirmed non-compliant
-verdict there, or correct the observation after review. The summary lists unresolved problems before final reporting.
-HTML reports retain image-specific human notes alongside the automatic evidence.
-
-Changing a page URL requires choosing between correcting the same page (previous addresses remain recorded with
-its evidence) and creating a fresh page (the original and its evidence remain in the sample). Both URL entry controls
-reject invalid or duplicate addresses. Element scans lock page/audit changes and exports until completion, preserve
-navigation to the sample or summary, and discard interrupted results if the inspected tab navigates.
-
-Use **Current decision** to jump directly to the decision with keyboard focus. Card continuation buttons name the
-next target. Shortcuts require **Ctrl+Alt+N** (next decision) or **Ctrl+Alt+J/K** (next/previous image); image-list arrow
-keys remain available. Unmodified letters no longer navigate the panel.
+back is not built yet). Nothing is sent anywhere; you give the file to your assistant yourself.
 
 ## Use
 

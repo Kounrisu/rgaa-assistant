@@ -50,7 +50,6 @@ async function serialize(panel: Page): Promise<string> {
     .replace(/(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{1,2},? \d{1,2}:\d{2}(?:\s?[AP]M)?/g, 'DATE HH:MM')
     .replace(/\d{1,2}:\d{2}(?:\s?[AP]M)?/g, 'HH:MM')
     .replace(/\d{4}-\d{2}-\d{2}/g, 'YYYY-MM-DD')
-    .replace(/\b\d{1,2}\/\d{1,2}\/\d{4}\b/g, 'DD/MM/YYYY')
     .replace(/></g, '>\n<')
 }
 
@@ -104,7 +103,7 @@ test('every screen of the panel matches the reviewed baseline', async ({ rig }) 
   await panel.locator('#filters .chip').nth(1).click()
   await shot('10 images, filter to review')
   await panel.locator('#filters .chip').nth(0).click()
-  await panel.keyboard.press('Control+Alt+j')
+  await panel.keyboard.press('j')
   await shot('11 images, next with the keyboard')
 
   // every theme tab

@@ -29,7 +29,7 @@ test('what is left in a theme, partial coverage you can resolve, a theme with no
 
   // Images: the questions no image answers (1.4, 1.5) are open criteria with a button that goes to them
   const todo = panel.locator('#theme-todo')
-  await expect(todo).toContainText('Évaluer par critère')
+  await expect(todo).toContainText('Reste à faire dans cette thématique')
   await expect(todo.locator('.todo-chip[data-crit="1.4"]')).toBeVisible()
   await todo.locator('.todo-chip[data-crit="1.4"]').click()
   await expect(panel.locator('input[name="chk-1.4"]').first()).toBeFocused()
@@ -71,7 +71,7 @@ test('what is left in a theme, partial coverage you can resolve, a theme with no
   await expect.poll(() => count('#theme-summary button:has-text("échec(s) à confirmer")')).toBeLessThan(failBefore)
 })
 
-test('a theme with nothing detected requires explicit confirmation of applicability, and the "not applicable" suggestions of the checks confirm together', async ({ rig }) => {
+test('a theme with nothing on the page shows its criteria as not applicable, and the "not applicable" suggestions of the checks confirm together', async ({ rig }) => {
   test.setTimeout(180_000)
   const { panel } = rig
   await panel.locator('#empty-add-btn').click()
@@ -79,14 +79,12 @@ test('a theme with nothing detected requires explicit confirmation of applicabil
   await expect(panel.locator('#status')).toContainText('Contrôles automatiques de P01', { timeout: 90_000 })
   await panel.locator('#review-btn').click()
 
-  // No frames detected is a suggestion, with a manual card and a deliberate confirmation.
+  // Frames: the fixture has no iframe, the scan found nothing: 2.1 and 2.2 are shown answered "not applicable"
   await panel.locator('.theme-tab', { hasText: 'Cadres' }).click()
-  const card = panel.locator('[id="crit-card-2.1"]')
-  await expect(card).toContainText('Vérification manuelle du périmètre')
-  await expect(panel.locator('#theme-todo .todo-chip[data-crit="2.1"]')).toBeVisible()
-  await panel.locator('label[for="chk-2.1-na"]').click()
-  await expect(panel.locator('#theme-todo .todo-chip[data-crit="2.1"]')).toHaveCount(0)
-  await expect(panel.locator('#theme-todo .todo-chip[data-crit="2.2"]')).toBeVisible()
+  const rows = panel.locator('.na-list .na-row')
+  await expect(rows).toHaveCount(2)
+  await expect(rows.first()).toContainText('RGAA 2.1')
+  await expect(rows.first()).toContainText('Non applicable')
 
   // Multimedia: no media on the page, the checks suggest "not applicable" criterion by criterion: one button confirms them
   await panel.locator('.theme-tab', { hasText: 'Multimédia' }).click()
@@ -118,7 +116,7 @@ test('links: pre-filled answers keep the theme at 0 until you confirm them, and 
   expect(rig.problems).toEqual([])
 })
 
-test('image classification does not confirm a prefilled criterion; its answer does', async ({ rig }) => {
+test('clicking the answer an image was pre-filled with confirms it (the radio is already checked)', async ({ rig }) => {
   test.setTimeout(120_000)
   const { panel } = rig
   await panel.locator('#empty-add-btn').click()
@@ -130,10 +128,7 @@ test('image classification does not confirm a prefilled criterion; its answer do
   const checked = panel.locator('input[id^="kind-"]:checked').first()
   await panel.locator(`label[for="${await checked.getAttribute('id')}"]`).click()
   const after = (await all.count()) ? Number(/\d+/.exec((await all.textContent()) ?? '')?.[0]) : 0
-  expect(after).toBe(before)
-  await panel.locator('label[for="crit-1-1.1-c"]').click()
-  const confirmed = Number(/\d+/.exec((await all.textContent()) ?? '')?.[0])
-  expect(confirmed).toBe(before - 1)
+  expect(after).toBe(before - 1)
   expect(rig.problems).toEqual([])
 })
 
