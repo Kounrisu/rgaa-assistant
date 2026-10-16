@@ -33,11 +33,28 @@ export interface Rig {
  */
 export async function openRig(context: BrowserContext): Promise<Rig> {
   const problems: string[] = []
+  // The reading page is opened by the panel in a tab of its own: give it the storage stand-in (the same localStorage keys as the panel's).
+  await context.addInitScript(() => {
+    if (!location.pathname.includes('/reading/')) return
+    const PREFIX = 'e2e-chrome-storage:'
+    ;(window as unknown as { chrome: unknown }).chrome = {
+      storage: {
+        local: {
+          get: async (key: string) => {
+            const raw = localStorage.getItem(PREFIX + key)
+            return raw === null ? {} : { [key]: JSON.parse(raw) }
+          },
+        },
+      },
+    }
+  })
   const site = await context.newPage()
   const panel = await context.newPage()
   for (const [name, page] of [['site', site], ['panel', panel]] as const) {
-    page.on('console', (m) => m.type() === 'error' && problems.push(`[${name}] console.error: ${m.text()}`))
-    page.on('pageerror', (e) => problems.push(`[${name}] uncaught: ${e.message}`))
+    // The structure preview is a sandboxed frame (no script, no storage): the test stand-in injected into every frame cannot run there, which is expected.
+    const inSandbox = (text: string) => /sandboxed/.test(text)
+    page.on('console', (m) => m.type() === 'error' && !inSandbox(m.text()) && problems.push(`[${name}] console.error: ${m.text()}`))
+    page.on('pageerror', (e) => !inSandbox(e.message) && problems.push(`[${name}] uncaught: ${e.message}`))
     // nothing may leave the loopback: an external request is a bug of the test or of the app
     page.on('request', (r) => {
       if (!/^(http:\/\/127\.0\.0\.1|data:|blob:|about:)/.test(r.url())) problems.push(`[${name}] external request: ${r.url()}`)
@@ -90,6 +107,12 @@ export async function openRig(context: BrowserContext): Promise<Rig> {
           axeInjected = true
         }
         return dispatch({ type: 'RGAA_AXE_RUN', locale: message.locale ?? null, rules: message.rules ?? null })
+      case 'RGAA_AXE_LOAD':
+        if (!axeInjected) {
+          await site.addScriptTag({ path: join(root, 'dist', 'axe.min.js') })
+          axeInjected = true
+        }
+        return { ok: true }
       case 'RGAA_NEW_IMAGES':
         return undefined
       default:
